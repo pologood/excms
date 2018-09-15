@@ -1,0 +1,427 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+  <div region="center" style="border:none; overflow: auto;">
+    <div class="portlet light">
+      <div class="portlet-body form">
+        <form role="form" ms-controller="formId" id="formId" name="formId">
+          <div class="form-body">
+            <div class="form-group hide">
+              <label>模型ID</label>
+              <input type="text" class="form-control" name="id" placeholder="" ms-duplex="id"
+                     readonly>
+            </div>
+            <div class="form-group hide">
+              <label>站点ID</label>
+              <input type="text" class="form-control" name="siteId" placeholder="" ms-duplex="siteId"
+                     readonly>
+            </div>
+            <div class="form-group hide">
+              <label>type</label>
+              <input type="text" class="form-control" name="type" placeholder="" ms-duplex="type"
+                     readonly>
+            </div>
+            <div class="form-group">
+              <label>模型名称</label>
+              <input type="text" class="form-control" name="name" id="name" placeholder=""
+                     ms-duplex="name">
+            </div>
+            <div class="form-group hide">
+              <label>模型标识</label>
+              <input type="text" class="form-control" name="code" id="code" placeholder=""
+                     ms-duplex="code">
+            </div>
+            <div class="form-group">
+              <label>栏目类型</label>
+              <select id="modelTypeCode" class="form-control" name="modelTypeCode" placeholder="请选择栏目类型"
+                      ms-duplex="modelTypeCode" ms-change="columnTypeChange">
+              </select>
+            </div>
+
+            <!--    论坛配置开始   -->
+            <div class="form-group bbs dn">
+              <label>发帖限制</label>
+              <div class="radio-group">
+                <label class="radio-inline"><input type="radio" name="isIssue" value="1" ms-duplex-string="isIssue">允许发布主题 </label>
+                <label class="radio-inline"><input type="radio" name="isIssue" value="0" ms-duplex-string="isIssue">禁止发布主题</label>
+                <label class="radio-inline"><input type="radio" name="isReply" value="1" ms-duplex-string="isReply">允许回复帖子</label>
+                <label class="radio-inline"><input type="radio" name="isReply" value="0" ms-duplex-string="isReply">禁止回复帖子</label>
+              </div>
+            </div>
+            <div class="form-group bbs dn">
+              <label>限制回帖年份</label>
+              <input type="text" name="year" ms-duplex="year" class="form-control" placeholder="如果设定，在设定年以前的帖子将禁止回复">
+            </div>
+            <div class="form-group bbs dn">
+              <label>禁止发帖IP</label>
+              <textarea name="ips" class="form-control" rows="1" placeholder="格式为 (IP地址),多个，请用'#'分隔符分隔" ms-duplex="ips"></textarea>
+            </div>
+            <div class="form-group bbs dn">
+              <label>注册会员积分</label>
+              <input type="text" name="registerNum" ms-duplex="registerNum" class="form-control" placeholder="注册会员积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>会员登录积分</label>
+              <input type="text" name="loginNum" ms-duplex="loginNum" class="form-control" placeholder="会员登录积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>发帖积分</label>
+              <input type="text" name="postedNum" ms-duplex="postedNum" class="form-control" placeholder="用户发帖时积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>回复积分</label>
+              <input type="text" name="replyNum" ms-duplex="replyNum" class="form-control" placeholder="用户回帖时积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>审核通过积分</label>
+              <input type="text" name="checkNum" ms-duplex="checkNum" class="form-control" placeholder="用户发帖被审核通过时积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>删贴积分</label>
+              <input type="text" name="delNum" ms-duplex="delNum" class="form-control" placeholder="用户帖子别删除时积分减少">
+            </div>
+            <div class="form-group bbs dn">
+              <label>固顶积分</label>
+              <input type="text" name="topNum" ms-duplex="topNum" class="form-control" placeholder="用户帖子被固顶时积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>推荐积分</label>
+              <input type="text" name="essenceNum" ms-duplex="essenceNum" class="form-control" placeholder="用户帖子被推荐时积分增加">
+            </div>
+            <div class="form-group bbs dn">
+              <label>按时回复时间 (超时状态天数)</label>
+              <input type="text" name="replyDay" ms-duplex="replyDay" class="form-control" placeholder="设置成超时状态天数">
+            </div>
+            <div class="form-group bbs dn">
+              <label>红牌期限 (红牌状态天数)</label>
+              <input type="text" name="redDay" ms-duplex="redDay" class="form-control" placeholder="设置成红牌状态天数">
+            </div>
+            <div class="form-group bbs dn">
+              <label>黄牌期限 (黄牌状态天数)</label>
+              <input type="text" name="yellowDay" ms-duplex="yellowDay" class="form-control" placeholder="设置成黄牌状态天数">
+            </div>
+            <div class="form-group bbs dn">
+              <label>日期池 (节假日 [2015-03-13 ，日期间用'#'号分隔])</label>
+              <textarea name="times" class="form-control" rows="1" placeholder="节假日 [2015-03-13 ，日期间用'#'号分隔]" ms-duplex="times"></textarea>
+            </div>
+            <!--    论坛配置结束   -->
+
+            <div class="form-group dn guestBook">
+              <label>留言类型</label>
+              <div class="input-group">
+                <div id="menuContent"
+                     style="display:none;position: absolute; top: 34px;height:300px; left: 0px;z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: auto;background-color: InactiveBorder">
+                  <ul id="treeDemo" class="ztree" style="margin-top:0; width:160px;"></ul>
+                </div>
+                <input type="text" name="classCodes" class="form-control hide" ms-duplex="classCodes">
+                <input type="text" id="classNames" name="classNames" placeholder="留言类型" ms-duplex="classNames"
+                       class="form-control readonly" onclick="showTypeTree()">
+                        <span class="input-group-btn">
+                  <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                          onclick="showTypeTree()">
+                    <i class="fa fa-caret-down"></i>
+                  </button>
+                          </span>
+              </div>
+            </div>
+
+            <div class="form-group dn guestBook">
+              <label>开启登录后留言</label>
+              <div class="radio-group">
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isLoginGuest" value="1"> 是 </label>
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isLoginGuest" value="0"> 否 </label>
+              </div>
+            </div>
+            <div class="form-group dn articleNews picNews videoNews">
+              <label>缩略图宽度</label>
+              <input type="text" name="picWidth" ms-duplex="picWidth" placeholder="为0不限制缩略图宽度"
+                     class="form-control" placeholder="">
+            </div>
+            <div class="form-group dn articleNews picNews videoNews">
+              <label>缩略图高度</label>
+              <input type="text" name="picHeight" ms-duplex="picHeight"
+                     class="form-control" placeholder="为0或为空不限制缩略图高度">
+            </div>
+            <div class="form-group dn articleNews picNews videoNews">
+              <label>正文图片宽度</label>
+              <input type="text" name="contentWidth" ms-duplex="contentWidth"
+                     class="form-control" placeholder="为0或为空不限制正文图片宽度">
+            </div>
+            <div class="form-group dn articleNews pictureNews ">
+              <label>是否启用评论</label>
+
+              <div class="radio-group">
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isComment" value="1"> 是 </label>
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isComment" value="0"> 否 </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>启用美图</label>
+
+              <div class="radio-group">
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isEnableBeauty" value="1"> 是 </label>
+                <label class="radio-inline">
+                  <input type="radio" ms-duplex-number="isEnableBeauty" value="0"> 否 </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>内容过滤</label>
+
+              <div class="radio-group">
+                <label class="checkbox-inline">
+                  <input type="checkbox" id="isSensitiveWord" name="isSensitiveWord" value=""> 启用检查敏感词
+                </label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" id="isEasyWord" name="isEasyWord" value=""> 启用检查易错词
+                </label>
+                <label class="checkbox-inline">
+                  <input type="checkbox" id="isHotWord" name="isHotWord" value=""> 启用检查热词
+                </label>
+              </div>
+            </div>
+            <div class="form-group hide">
+              <label>tplId</label>
+              <input type="text" class="form-control" name="tplId" id="tplId" placeholder=""
+                     ms-duplex="tplId">
+            </div>
+
+            <div class="form-group" id="abcd">
+              <label>描述</label>
+              <textarea class="form-control" name="description" id="description" rows="3"
+                        ms-duplex="description"></textarea>
+            </div>
+          </div>
+          <div class="form-actions noborder hide">
+            <button type="submit" class="btn btn-default btn-save">保 存</button>
+            <button type="button" class="btn btn-default btn-cancle" onclick="doCancle()">取 消</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/model_guest_type.js"></script>
+<script>
+  var id = "${id}";
+  var isFlag = "${isFlag}";
+  var parent = Ls.getWin.win;
+  var siteId = parent.GLOBAL_SITEID;
+  var isPublic="${isPublic}";
+  var validateCode = "";
+
+  var curr = {
+    vm: {},
+  }
+
+  getModelType();
+
+  $(document).ready(function () {
+    var dialog = art.dialog,
+      api = art.dialog.open.api;
+    if (!api) return;
+    // 操作对话框
+    api.button(
+      {
+        name: '保存',
+        id: 'saveBtn',
+        focus: true,
+        callback: function () {
+          $("form").submit();
+          return false;
+        }
+      }
+    );
+    doSubmit();
+  });
+  function getModelVO() {
+    Ls.ajaxGet({
+      url: "/contentModel/getVO",
+      data: {id: id,isPublic:isPublic}
+    }).done(function (text) {
+      data = text.data;
+      data.modelTypeCode = Ls.isEmpty(data.modelTypeCode) ? "" : data.modelTypeCode;
+      validateCode = data.modelTypeCode;
+      curr.\$id = "formId";
+      //初始化表单字段
+      curr.init = Ls.initFORM(curr.\$id, data);
+      //如果模型已经绑定，不再绑定
+      curr.vm = avalon.vmodels[curr.\$id];
+      curr.vm = avalon.define(curr.init);
+      //avalon.scan(document.body, curr.vm);
+      avalon.scan($("#formId").get(0), curr.vm);
+      modelTypeChange(curr.vm.modelTypeCode);
+
+      if (text.data.isSensitiveWord == 1) {
+        $("#isSensitiveWord").prop("checked", true);
+      }
+      if (text.data.isEasyWord == 1) {
+        $("#isEasyWord").prop("checked", true);
+      }
+      if (text.data.isHotWord == 1) {
+        $("#isHotWord").prop("checked", true);
+      }
+      /*if(curr.vm.modelTypeCode!=null||curr.vm.modelTypeCode!=''){
+        $("#modelTypeCode").attr("disabled","disabled");
+      }*/
+    });
+    type_select_tree_ser.init();
+  }
+
+  function getModelType() {
+    Ls.ajaxGet({
+      url: "/contentModel/getModelType",
+      data: {}
+    }).done(function (text) {
+      var str = '<option value=""> 请选择栏目类型 </option> ';
+      if (text != null) {
+        var data = text;
+        var length = data.length;
+        if (length > 0) {
+          for (i = 0; i < length; i++) {
+            if(data[i].code!='bbs'&&data[i].code!='virtualBBS'){
+              str += ' <option value=' + data[i].code + '>' + data[i].key + '</option> ';
+            }
+          }
+        }
+      }
+      $("#modelTypeCode").append(str);
+      getModelVO();
+    });
+  }
+
+  function doSubmit() {
+    $('#formId').validator({
+      rules: {
+        bbsRule: function (el, param, field) {
+          var isTrue = (validateCode == "bbs" ? true : false);
+          return isTrue;
+        }
+      },
+      fields: {
+        'name': '名称:required;',
+        'modelTypeCode': '模型类别:required;',
+        'year': '限制回帖年份:integer;range[1999~9999]',
+        'registerNum': '注册新会员积分:integer;range[0~99999]',
+        'loginNum': '会员每次登录积分:integer;range[0~99999]',
+        'postedNum': '发帖积分:integer;range[0~99999]',
+        'replyNum': '回复积分:integer;range[0~99999]',
+        'checkNum': '审核积分:integer;range[0~99999]',
+        'delNum': '删贴积分:integer;range[0~99999]',
+        'topNum': '固顶积分:integer;range[0~99999]',
+        'essenceNum': '推荐积分:integer;range[0~99999]',
+        'replyDay': '按时回复时间:integer;range[0~99999]',
+        'yellowDay': '黄牌期限:integer;range[0~99999]',
+        'redDay': '红牌期限:integer;range[0~99999]'
+
+        //'optionsRadios': '单选框:checked;'
+      },
+      valid: function () {
+
+        checkEO();
+      }
+    });
+  }
+  function checkEO() {
+    var name = curr.vm.name;
+    var id = curr.vm.id;
+    Ls.ajaxGet({
+      url: "/contentModel/checkNameExisted",
+      data: {name: name, modelId: id, siteId: siteId},
+    }).done(function (data) {
+      if (data.data) {
+        checkModelType();
+      } else {
+        Ls.tipsInfo("模型名称已存在");
+        return;
+      }
+    });
+  }
+  function checkModelType() {
+    Ls.ajaxGet({
+      url: "/contentModel/checkModelType",
+      data: {modelTypeCode: curr.vm.modelTypeCode, siteId: siteId, modelId: curr.vm.id,isPublic:isPublic}
+    }).done(function (data) {
+      if (data.data) {
+        saveEO();
+      } else {
+        Ls.tipsInfo("该类型的内容模型已存在，不能重复添加");
+        return;
+      }
+    });
+  }
+
+  function saveEO() {
+    if ($("#isSensitiveWord").is(':checked')) {
+      curr.vm.isSensitiveWord = 1;
+    } else {
+      curr.vm.isSensitiveWord = 0;
+    }
+    if ($("#isEasyWord").is(':checked')) {
+      curr.vm.isEasyWord = 1;
+    } else {
+      curr.vm.isEasyWord = 0;
+    }
+    if ($("#isHotWord").is(':checked')) {
+      curr.vm.isHotWord = 1;
+    } else {
+      curr.vm.isHotWord = 0;
+    }
+    curr.vm.isPublic=isPublic;
+    curr.vm.siteId=null;
+    //curr.vm.vo=Ls.toJSON(curr.vm.vo);
+    var value = curr.vm.$model;
+    value = Ls.toJSON(value);
+    Ls.ajaxGet({
+      url: "/contentModel/saveEO",
+      data: value
+    }).done(function (text) {
+      if (!text.status) {
+        Ls.tipsErr(text.desc);
+        return;
+      } else {
+        Ls.tipsOk("保存成功");
+        if (isFlag == '1') {
+          parent.addContentModel(text.data.code, text.data.name);
+        } else {
+          parent.grid.reload();
+        }
+        art.dialog.close();
+        return;
+      }
+    });
+  }
+  function doCancle() {
+    art.dialog.close();
+  }
+  function columnTypeChange() {
+    var code = curr.vm.modelTypeCode;
+    modelTypeChange(code);
+    validateCode = code;
+    $("." + code + "N").show();
+
+  }
+
+  function modelTypeChange(code) {
+    $(".dn").hide();
+    code && $("." + code).show();
+  }
+  function typeChange(type) {
+    var code = curr.vm.modelTypeCode;
+    if (type == 1) {
+      $("." + code + "N").hide();
+      $("." + code + "Y").show();
+    } else {
+      $("." + code + "Y").hide();
+      $("." + code + "N").show();
+    }
+  }
+
+</script>

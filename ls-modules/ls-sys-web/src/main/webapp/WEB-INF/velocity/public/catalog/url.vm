@@ -1,0 +1,101 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12" style="width: 5%">
+                    <div class="btn-group">
+                        <button type="button" id="adduser_btn" class="btn btn-default bt" onclick="exportList()"> 导 出
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-12" style="width: 35%">
+                    <div class="btn-group">
+                        <button type="button" id="adduser_btn" class="btn btn-default bt" onclick="exportAllList()"> 导出全部
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-12" style="width: 60%">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <select id="public_organId_select" class="form-control">
+                                #foreach($organ in $organList)
+                                    <option value="$!{organ.organId}">$!{organ.name}</option>
+                                #end
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="searchPublicUrl()">查 询</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="public_url_datagrid" class="mini-datagrid" style="width:100%;" showPager="false" url="/public/catalog/getUrlPage?flag=1">
+            <div property="columns">
+                <div type="indexcolumn" headerAlign="center" width="80">序号</div>
+                <div field="name" width="300" headerAlign="center" allowSort="flase" align="left">标题</div>
+                <div field="url" width="100%" headerAlign="center" allowSort="flase" align="left">URL</div>
+                <div width="90" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        public_url_grid: null,
+        client: null
+    }
+
+    function searchPublicUrl() {
+        var organId = $("#public_organId_select").val();
+        cur.public_url_grid.load({organId: organId});
+    }
+
+    function copyUrl(url) {
+        try {
+            if (window.clipboardData) {
+                window.clipboardData.setData("Text", url);
+                Ls.tipsOk("复制成功！")
+            } else {
+                var input = document.createElement("input");
+                input.value = url;
+                document.body.appendChild(input);
+                input.select(); // 选择对象
+                document.execCommand("copy"); // 执行浏览器复制命令
+                Ls.tipsOk("复制成功！", function () {
+                    document.body.removeChild(input);
+                });
+            }
+        } catch (e) {
+            Ls.tipsErr("浏览器版本不支持！");
+        }
+    }
+
+    function renderOp(e) {
+        var rec = e.record, i = e.rowIndex;
+        return '<button class="btn btn-default btn-sm btn-edit" onclick="copyUrl(\'' + rec.url + '\')">复制链接</button> ';
+    }
+
+    function exportAllList() {
+        debugger
+        var select = $("#public_organId_select");
+
+        $("#public_organId_select option").each(function(i){
+            $('#download_frame').attr("src", "/public/catalog/exportUrl?organId=" + this.value+"&organName="+this.innerHTML);
+            setTimeout(alert("下载 "+this.innerHTML.trim()+".csv 成功，请点击确定下载下一个！"),20000);
+        });
+    }
+
+    function exportList() {
+        var organId = $("#public_organId_select").val();
+        var organName = $("#public_organId_select").find("option:selected").text();
+        $('#download_frame').attr("src", "/public/catalog/exportUrl?organId=" + organId+"&organName="+organName);
+    }
+
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.public_url_grid = mini.get("public_url_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.public_url_grid);
+    });
+</script>

@@ -1,0 +1,159 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div title="center" region="center" style="border:none; overflow: auto;">
+            <form id="sources_form" role="form" ms-controller="sources_form">
+                <div class="form-body" style="margin-right: 20px">
+                    <table class="table table-bordered article-table" style="margin-top:18px;margin-bottom: 0px;">
+                        <tr>
+                            <th>排序号:</th>
+                            <td>
+                                <input type="text" id="sortNum" name="sortNum" class="form-control" data-rule="排序号:required;"  placeholder="" ms-duplex="sortNum">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>引导标识:</th>
+                            <td>
+                                <input type="text" id="seqNum" name="seqNum" class="form-control" data-rule="引导标识:required;"  placeholder="" ms-duplex="seqNum">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>标题:</th>
+                            <td>
+                                <input type="text" id="title" name="title" class="form-control" data-rule="标题:required;" placeholder="" ms-duplex="title">
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered article-table" >
+                        <tr>
+                            <td style="width: 100px" align="right">内容:</td>
+                            <td>
+                                <textarea id="content" name="content" ms-duplex="content" style="width: 100%;height: 240px;"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "sources_form",
+        form: $('#sources_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type")
+    };
+    var eweb;
+
+    $(document).ready(function () {
+        //初始化文本编辑器
+        initKindEditor();
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:false,name:'保存',callback:function(){eweb.update();cur.vm.ifActive = 0;cur.vm.ifShow = 0;saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+            });
+            setData(cur.model);
+            getSortNum();
+        } else {
+            cur.model = cur.dialog.data("record");
+            setData(cur.model);
+            /*cur.content.html(cur.model.content);*/
+            eweb.setHtml(cur.model.content);
+        }
+    })
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function saveData() {
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/lsrobot/saveRobotSources"
+        } else {
+            url = "/lsrobot/updateRobotSources"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                sortNum:cur.vm.sortNum,
+                seqNum:cur.vm.seqNum,
+                title: cur.vm.title,
+                /*content:cur.content.html(),*/
+                content: eweb.getHtml(),
+                ifActive:cur.vm.ifActive,
+                ifShow:cur.vm.ifShow
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(resp);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icon:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getSortNum() {
+        Ls.ajaxGet({
+            url: "/lsrobot/getMaxSortNum",
+            data: {},
+            success: function (resp) {
+                if (resp.status == 1) {
+                    cur.vm.sortNum = resp.data + 4;
+                    avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+                } else {
+                    Ls.tips("获取排序号失败，请手工输入!", {icon:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + 0});
+        #*
+        var setting = {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '$!{rc.contextPath}/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+        };
+        cur.content = KindEditor.create('textarea[name="content"]', setting);
+        * *#
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+</script>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
+  <xsl:template match="/">
+    <html>
+      <head>
+        <title>RSS-
+          <xsl:value-of select="rss/channel/title" />
+        </title>
+      </head>
+      <body>
+        <center>
+          <xsl:apply-templates select="rss/channel" />
+        </center>
+      </body>
+    </html>
+  </xsl:template>
+  <xsl:template match="channel">
+    <table width="750" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding-right:15px;" valign="bottom">
+          <xsl:element name="A">
+            <xsl:attribute name="href">
+              <xsl:value-of select="image/link"/>
+            </xsl:attribute>
+            <xsl:attribute name="target">_blank</xsl:attribute>
+            <xsl:element name="IMG">
+              <xsl:attribute name="src">
+                <xsl:value-of select="image/url" />
+              </xsl:attribute>
+              <xsl:attribute name="border">0</xsl:attribute>
+            </xsl:element>
+          </xsl:element>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" align="center"><B>
+          <xsl:element name="A">
+            <xsl:attribute name="href">
+              <xsl:value-of select="link"/>
+            </xsl:attribute>
+            <xsl:attribute name="target">_blank</xsl:attribute>
+            <xsl:value-of select="title"/>
+          </xsl:element>
+          </B></td>
+      </tr>
+      <tr style="font-size:12px;" bgcolor="#eeeeff">
+        <td colspan="2" style="font-size:14px;padding-top:5px;padding-bottom:5px;">
+          <b>
+            <xsl:text></xsl:text>
+            <xsl:text></xsl:text>
+            <xsl:text></xsl:text>
+            <xsl:text></xsl:text>
+          </b>
+        </td>
+      </tr>
+    </table>
+    <table width="750" cellpadding="0" cellspacing="0">
+      <xsl:for-each select="item">
+        <tr bgcolor="#eeeeee">
+          <td style="padding-top:5px;padding-left:5px;" height="30" width="750" cellpadding="0" cellspacing="0"><B>
+            <xsl:value-of select="title" />
+            </B></td>
+        </tr>
+        <tr bgcolor="#eeeeee">
+          <td style="padding-left:5px;word-wrap:break-word ;" width="750" cellpadding="0" cellspacing="0">
+            <xsl:value-of select="description" />
+          </td>
+        </tr>
+        <tr bgcolor="#eeeeee">
+          <td style="padding-top:5px;padding-left:5px;" width="750" cellpadding="0" cellspacing="0">
+            <xsl:element name="A">
+              <xsl:attribute name="href">
+                <xsl:value-of select="link" />
+              </xsl:attribute>
+              <xsl:attribute name="target">_blank</xsl:attribute>
+              <xsl:value-of select="link" />
+            </xsl:element>
+          </td>
+        </tr>
+        <tr bgcolor="#eeeeee">
+          <td style="padding-top:5px;padding-left:5px;padding-bottom:5px;" width="750" cellpadding="0" cellspacing="0">
+            <span>
+              <xsl:value-of select="pubDate" />
+            </span>
+          </td>
+        </tr>
+        <tr height="10">
+          <td></td>
+        </tr>
+      </xsl:for-each>
+      <tr>
+        <td height="20"></td>
+      </tr>
+    </table>
+  </xsl:template>
+</xsl:stylesheet>

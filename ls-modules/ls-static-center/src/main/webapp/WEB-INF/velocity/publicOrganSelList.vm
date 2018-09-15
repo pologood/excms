@@ -1,0 +1,6 @@
+<select name="organId" id="organId" onchange="reloadDatas()">
+    <option value="" selected>&nbsp;--政府部门选择--</option>
+	#foreach($organ in $resultObj)
+        <option value="$!{organ.organId}">[$!{organ.name}]</option>
+	#end
+</select>

@@ -1,0 +1,329 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white" ms-controller="sensitive_form">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="toolbar" class="table-toolbar" style="margin-bottom: 10px">
+                    <div class="row">
+                        <div class="col-md-7">
+                        </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <select id="type" class="form-control" name="type">
+                                        <option value="">选择检测类型</option>
+                                        <option value="title">标题</option>
+                                        <option value="subTitle">副标题</option>
+                                        <option value="remarks">摘要</option>
+                                        <option value="content">内容</option>
+                                        <option value="guest">留言</option>
+                                        <option value="repGuest">回复留言</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="ser_easyerr" name="searchKey" class="form-control"
+                                           placeholder="关键词">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search"
+                                        onclick="search()">搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all"
+                                        onclick="showAll()">显示全部
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="content-detail" style="width: 100%;height: 100%;display: none">
+                    <textarea name="content" style="width: 100%;height: 400px;" ms-duplex="content"></textarea>
+                    <br>
+                    <button type="button" class="btn btn-default btn-close" onclick="back()">返回</button>
+                </div>
+                <div id="datagrid" class="mini-datagrid" style="height:430px;"
+                     allowResize="true" allowCellEdit="true" allowCellSelect="true"
+                     url="/content/check/getPageEO"  idField="id" multiSelect="true"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="" width="50%" headerAlign="center" renderer="titleDiy">标题</div>
+                        <div field="" width="80" headerAlign="center" align="center" renderer="type">位置</div>
+                        <div field="" width="25%" align="center" headerAlign="center" renderer="wordsDiy">易错词</div>
+                        <div field="replaceWords" width="25%" align="center" headerAlign="center">
+                            建议替换词(<font style="color: red">可编辑</font>)
+                            <input property="editor" class="mini-textbox" style="width:100%;" />
+                        </div>
+                        <div field="" width="60" align="center" headerAlign="center" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button id="check-btn" class="btn btn-default btn-add" onclick="check()">重新检测</button>
+            <button id="on-check-btn" class="btn btn-default btn-add" disabled style="display: none;">检测中</button>
+            <button class="btn btn-default btn-replace" onclick="replace()">替换选中</button>
+            <button type="button" class="btn btn-default btn-close" onclick="closeWin()">关 闭</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    setCookie('words_check_easyerr_flag',false);
+    var eweb;
+    var cur = {
+        win: Ls.getWin.win,
+        datagrid:mini.get("datagrid"),
+        toolbar:$("#toolbar"),
+        checkBtn:$("#check-btn"),
+        onCheckBtn:$("#on-check-btn"),
+        params: {
+            pageIndex: 0,
+            pageSize: 10,
+            checkType:'EASYERR',
+            checkId:''
+        }
+    }
+
+    $(document).ready(function () {
+        cur.datagrid.load(cur.params);
+        initKindEditor();
+
+        var flag = getCookie("words_check_easyerr_flag");
+        if(flag == 'true') {
+            cur.checkBtn.hide();
+            cur.onCheckBtn.show();
+        } else {
+            cur.checkBtn.show();
+            cur.onCheckBtn.hide();
+        }
+    })
+
+    function msg_words() {
+        setCookie('words_check_easyerr_flag',false);
+        cur.checkBtn.show();
+        cur.onCheckBtn.hide();
+        search();
+    }
+
+    function titleDiy(obj) {
+        var record = obj.record;
+        var title = "";
+        if(record.type == 'title') {
+            words = record.words;
+            var replace = '<font style="color: red"><strong>' + words + '</strong></font>';
+            record.title= record.title.replace(new RegExp(words,"gm"),replace);
+        }
+        var diyDom = '<a href="#" onclick="showContent('+record.id+',\''+record.words+'\')"><u>' + record.title + '</u></a>';
+        return diyDom;
+    }
+
+    function type(obj) {
+        var record = obj.record;
+        if(record.type == 'title') {
+            return "标题";
+        } else if(record.type == 'subTitle') {
+            return "副标题";
+        } else if(record.type == 'content') {
+            return "内容";
+        } else if(record.type == 'remarks') {
+            return "摘要";
+        } else if(record.type == 'guest') {
+            return "留言";
+        } else if(record.type == 'repGuest') {
+            return "回复留言";
+        }
+        return "";
+    }
+
+    function showContent(id,words) {
+        var record = getSelectedNode(id);
+        var replace = '<font style="color: red"><strong>'+words+'</strong></font>';
+        var content = "";
+        if(record.type == 'title') {
+            content = record.title.replace(new RegExp(words,"gm"),replace);
+        } else if(record.type == 'subTitle') {
+            content = record.subTitle.replace(new RegExp(words,"gm"),replace);
+        } else if(record.type == 'content') {
+            content = record.content.replace(new RegExp(words,"gm"),replace);
+        } else if(record.type == 'remarks') {
+            content = record.remarks.replace(new RegExp(words,"gm"),replace);
+        } else if(record.type == 'guest') {
+            content = record.guest.replace(new RegExp(words,"gm"),replace);
+        } else if(record.type == 'repGuest') {
+            content = record.repGuest.replace(new RegExp(words,"gm"),replace);
+        }
+        /*cur.editor_content.html(content);*/
+        eweb.setHtml(content);
+        $('#content-detail').show();
+        cur.datagrid.hide();
+        cur.toolbar.hide();
+    }
+
+    function back() {
+        /*cur.editor_content.html('');*/
+        eweb.setHtml('');
+        cur.toolbar.show();
+        cur.datagrid.show();
+        $('#content-detail').hide();
+    }
+
+    function check() {
+        var tips = Ls.tips("检测中",{icons:'loading',autoClose:false});
+        Ls.ajaxGet({
+            url: "/content/check/checkContent",
+            data: {
+                checkType: "EASYERR"
+            },
+            success: function (resp) {
+                tips.hide();
+                if(resp.status == 1) {
+                    Ls.tips(resp.desc);
+                    cur.datagrid.load(cur.params);
+                    cur.checkBtn.hide();
+                    cur.onCheckBtn.show();
+                    setCookie('words_check_easyerr_flag',true);
+                } else {
+                    Ls.tips(resp.desc,{icons:"error"});
+                }
+            },
+            error: function(e) {
+                tips.hide();
+                Ls.tips("系统错误!",{icons:"error"});
+            }
+        });
+    }
+
+    function wordsDiy(obj) {
+        var words = obj.record.words;
+        var diyDom = '<font style="color: red">' + words + '</font>';
+        return diyDom;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" checkId='+record.id+' contentId='+record.contentId+' class="btn btn-default btn-sm btn-edit" onclick="replace('+record.id+',\''+record.words+'\',\''+record.replaceWords+'\',\''+record.type+'\')">替 换</button>';
+        return diyDom;
+    }
+
+    function replace(id,words,replaceWords,type) {
+        var eos = [];
+        if(id == null) {
+            var checkIds = cur.datagrid.getSelecteds();
+            if(checkIds.length <= 0) {
+                Ls.tips("至少选择一项!");
+                return;
+            }
+
+            for(var i=0;i<checkIds.length;i++) {
+                var eo = {id:checkIds[i].id,words:checkIds[i].words,replaceWords:checkIds[i].replaceWords,type:checkIds[i].type};
+                eos.push(eo);
+            }
+        } else {
+            var eo = {id:id,words:words,replaceWords:replaceWords,type:type};
+            eos.push(eo);
+        }
+
+        Ls.ajaxGet({
+            url: "/content/check/replace",
+            data: {
+                eos:JSON.stringify(eos)
+            },
+            success: function (resp) {
+                if(resp.status == 1) {
+                    Ls.tips(resp.desc);
+                    searchCurIndex();
+                } else {
+                    Ls.tips(resp.desc,{icons:'error'});
+                }
+            },
+            error: function(e) {
+                Ls.tips("系统错误!",{icons:"error"});
+            }
+        });
+    }
+
+    function searchCurIndex() {
+        var keyValue = $("#ser_sensitive").val();
+        var type = $("#type").val();
+        cur.params.keys = "content,title,subTitle,guest,repGuest";
+        cur.params.keyValue = keyValue;
+        cur.params.type = type;
+        cur.datagrid.load(cur.params);
+    }
+
+    function search() {
+        var keyValue = $("#ser_easyerr").val();
+        var type = $("#type").val();
+        cur.params.keys = "content,title,subTitle";
+        cur.params.keyValue = keyValue;
+        cur.params.type = type;
+        cur.params.pageIndex = 0;
+        cur.datagrid.load(cur.params);
+    }
+
+    function showAll(type) {
+        $("#ser_easyerr").val('');
+        $("#type").val('');
+        search();
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {style: "Lmini",height: "500"});
+        #*
+        var setting = {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '$!{rc.contextPath}/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            readonlyMode:true,
+            items:['source']
+        };
+        cur.editor_content = KindEditor.create('textarea[name="content"]', setting);
+        * *#
+
+    }
+
+    function getSelectedNode(id) {
+        return cur.datagrid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+    }
+
+    function closeWin() {
+        Ls.winClose();
+    }
+
+    function setCookie(name,value) {
+        var Days = 30;
+        var exp = new Date();
+        exp.setTime(exp.getTime() + Days*24*60*60*1000);
+        document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+    }
+
+    function getCookie(name) {
+        var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+        if(arr=document.cookie.match(reg))
+            return unescape(arr[2]);
+        else
+            return null;
+    }
+
+    function delCookie(name) {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval=getCookie(name);
+        if(cval!=null)
+            document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+    }
+</script>
+</body>
+</html>

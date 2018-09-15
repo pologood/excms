@@ -1,0 +1,120 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="formDict" ms-controller="formDict">
+            <div class="form-body">
+                <div class="form-group">
+                    <label>字典名称</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="" ms-duplex="name">
+                </div>
+
+                <div class="form-group">
+                    <label>字典编码</label>
+                    <input type="text" class="form-control" id="code" name="code" placeholder="" ms-duplex="code">
+                </div>
+
+                <div class="form-group">
+                    <label>是否对外开放 （超管及站点管理员可编辑字典项）</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline"><input type="radio" name="isOpen" value="1" checked ms-duplex-number="isOpen">
+                            是 </label>
+                        <label class="radio-inline"><input type="radio" name="isOpen" value="0" checked ms-duplex-number="isOpen">
+                            否 </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>是否应用</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline"><input type="radio" name="isUsed" value="1" checked ms-duplex-number="isUsed">
+                            是 </label>
+                        <label class="radio-inline"><input type="radio" name="isUsed" value="0" ms-duplex-number="isUsed">
+                            否 </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="" ms-duplex="description"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        vm: {}
+    };
+    var dialog = Ls.getWin.art, W = Ls.getWin.win, api = Ls.getWin.api;
+
+    jQuery(document).ready(function () {
+
+        api.button(
+            {
+                id: "save_btn",
+                name: "保 存",
+                callback: function () {
+                    $("#formDict").submit();
+                    return false;
+                }
+            }
+        )
+
+        //验证
+        $('#formDict').validator({
+            fields: {
+                'name': '字典名称:required',
+                'code': '字典编码:required'
+            },
+            valid: function () {
+                saveDict();
+            }
+        });
+
+        var data = {
+            name: "",
+            code: "",
+            isUsed: 0,
+            isOpen: 0,
+            description: ""
+        };
+
+        data.$id = "formDict";
+
+        //绑定模型
+        cur.vm = avalon.define(data);
+
+        //扫描模型
+        avalon.scan($("#formDict").get(0), cur.vm);
+
+    })
+
+    var saveDict = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        Ls.ajax({
+            url: "/dataDict/saveDict",
+            data: data
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                Ls.getWin.win.grid.reload();
+                Ls.winClose();
+            }
+        })
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+
+</script>
+</html>

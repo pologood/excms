@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>数据转换</title>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+<body>
+<form id="formDB" action="/site/convert/updateMongoFileName" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新mongoDB fileName</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateMongoContentFileName" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新mongoDB 内容中的路径</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateImageLink" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新新闻 IMAGE_LINK 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updatePIC" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新图片新闻 PATH 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateVideoNewsPath" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新视频新闻 VIDEO_PATH 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateWateMarkPath" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新水印图片 PIC_PATH 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateWeiboPIC" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新微博图片 PIC_URL 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateTableUpload" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新网上办事表格资源库 PIC_URL 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form id="formDB" action="/site/convert/updateRelatedRuleUpload" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新网上办事法规资源库 PIC_URL 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form id="formDB" action="/site/convert/updateWorkGuide" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新网上办事 CONTENT,SET_ACCORD,APPLY_CONDITION,HANDLE_DATA,HANDLE_PROCESS 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form id="formDB" action="/site/convert/updateMsgSubmit" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新信息报送 IMAGE_LINK 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form id="formDB" action="/site/convert/updateMessageReply" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新留言回复附件 ATTACH_ID 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateWeXinPIC" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新微信素材缩略图 THUMB_IMG 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form id="formDB" action="/site/convert/updateZMHD" method="post">
+    <table>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; ">更新在线访谈（desc）、民意征集(content)、网上调查(content) 字段</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

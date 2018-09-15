@@ -1,0 +1,106 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="tabbable-line" style="margin:12px 20px 15px;">
+    <div >
+        <ul class="ztree" id="site_tree">
+            <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150"
+                                                                               width="80">...</marquee></span>
+        </ul>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/content/copyReferNews.js"></script>
+<script>
+    var initZtree = {};
+    var cur = {
+        W: Ls.getWin.win,
+        site_tree: null,
+        public_tree: null,
+        msg_tree: null,
+        contentModeCode: null,//当前内容模型
+        columnId: null,//当前栏目id
+        type: null,//当前信息公开类型
+        id: null,//当前信息公开目录id
+        siteIds: "$!{siteIds}"
+    };
+
+    var ztree_settings = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        check: {
+            enable: true
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                var tree = $.fn.zTree.getZTreeObj(treeId);
+                if (node.nocheck) {
+                    tree.expandNode(node, !node.open, false, true, true);
+                    tree.cancelSelectedNode(node);
+                } else {
+                    tree.checkNode(node, !node.checked);
+                }
+            }
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: "indicatorId",
+                pIdKey: "parentId"
+            }
+        }
+    };
+
+    $(document).ready(function () {
+        var tree = null;
+        var json = Ls.ajax({
+            async: false,// 同步
+            url: Ls.getWin.win.GLOBAL_CONTEXTPATH + "/siteMain/getSiteTree"
+        }).responseJSON;
+        // 构造树
+        if (json.status == 1) {// 成功
+            if (json.data != null && json.data.length > 0) {
+                var data = Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+                for (var i = 0; i < data.length; i++) {
+                    var node = data[i];
+                    node.nocheck = false;
+                    if (node.isParent) {// 父节点
+                        node.nocheck = true;
+                        node.open = true;
+                    }
+                    //新增文章页同步信息回显
+                    if (cur.siteIds.indexOf(node.indicatorId) >= 0) {
+                        node.checked = true;
+                    }
+                }
+            }
+        }
+
+        cur.site_tree = $.fn.zTree.init($("#site_tree"), ztree_settings, data);
+
+        $(".ztree").height("315").css("overflow", "auto");
+    });
+
+    // 获取数据，内容管理选中、信息公开选中、信息报送选中
+    function ok() {
+        var data = {};
+        if (cur.site_tree) {
+            var checks = cur.site_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建内容管理选中节点
+                var ids = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    ids.push(checks[i].indicatorId);
+                    names.push(checks[i].name);
+                }
+                data.siteIds = ids.join(",");
+                data.siteNames = names.join(",");
+            }
+        }
+        return data;
+    }
+</script>

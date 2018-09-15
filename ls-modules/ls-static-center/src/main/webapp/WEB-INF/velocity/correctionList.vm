@@ -1,0 +1,16 @@
+#foreach($eo in $resultObj.data)
+<ul class="correction-list">
+    <li>
+        $!{eo.createName}
+    </li>
+</ul>
+#end
+<div id="page_$!{siteId}" class="pagination"></div>
+<script>
+    Ls.pagination("#page_$!{siteId}", function (pageIndex) {
+        location.href = "$!{linkPrefix}?pageIndex=" + pageIndex;
+    }, {
+        pageCount:$!{resultObj.pageCount},
+        currPage:$!{resultObj.pageIndex}
+    })
+</script>

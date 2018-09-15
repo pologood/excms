@@ -1,0 +1,97 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="240" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <button id="addButton_btn" class="btn btn-default btn-add" onclick="add()">新 增</button>
+                            <button id="deleteButton_btn" class="btn btn-default btn-delete" onclick="deleteData()">删 除</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="menu_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                     sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/system/menu/getButton">
+                    <div property="columns">
+                        <div type="checkcolumn" width="60"></div>
+                        <div field="name" width="180" headerAlign="center" allowSort="flase" align="center">权限名称</div>
+                        <div field="code" width="160" headerAlign="center" allowSort="flase" align="center">权限编码</div>
+                        <div field="uri" width="240" headerAlign="center" allowSort="flase" align="center">链接地址</div>
+                        <div field="description" width="100%" headerAlign="center" allowSort="flase">描述</div>
+                        <div width="115" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/menu_manage.js"></script>
+<script>
+    var cur = {
+        id: null,//操作id，菜单或者id
+        menu_url: "/system/menu/getMenu?all=1",//菜单查询url
+        tree_id: "ui_tree",//树id
+        grid_id: "menu_datagrid",//列表id
+        root_id: "root_id",//根id，自定义
+        tree: null,//树对象
+        grid: null,//列表对象
+        node: null,//选中节点
+        update_type: null, //类型1.添加2.修改
+        entity_type: null//类型1.菜单2.按钮
+    };
+
+    $(document).ready(function () {
+        menuManage.menu();
+    });
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        str += '<button class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.indicatorId + ')">修 改</button> '
+        str += '<button class="btn btn-default btn-sm btn-delete" onclick="deleteData(' + rec.indicatorId + ')">删 除</button>'
+        return str;
+    }
+
+    function add() {
+        menuManage.saveOrUpdate(null, 2);
+    }
+
+    function edit(indicatorId) {
+        menuManage.saveOrUpdate(indicatorId, 2);
+    }
+    function deleteData(id) {
+        var ids = [];
+        if (id) {
+            ids.push(id);
+        } else {
+            var rows = cur.grid.getSelecteds();
+            if (rows.length == 0) {
+                Ls.tipsInfo("至少选择一项");
+                return;
+            }
+            for (var i = 0, l = rows.length; i < l; i++) {
+                ids[i] = rows[i].indicatorId;
+            }
+        }
+        if (confirm('真的要删除吗？')) {
+            Ls.ajaxGet({
+                url: "/system/indicator/delete",
+                data: {
+                    ids: ids
+                }
+            }).done(function (d) {
+                Ls.tips('删除成功!', {
+                    icons: "success"
+                });
+                cur.grid.reload();
+            });
+        }
+    }
+</script>

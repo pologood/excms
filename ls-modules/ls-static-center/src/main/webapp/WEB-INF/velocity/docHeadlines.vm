@@ -1,0 +1,41 @@
+#set($Integer=0)
+#set($length=$Integer.parseInt("$!{paramObj.length}"))
+#set($noteLength=$Integer.parseInt("$!{paramObj.noteLength}"))
+#set($isDetailed="$!{paramObj.isDetailed}")
+#set($showType="$!{paramObj.showType}")
+#foreach($eo in $resultObj)
+    #if("$!{eo.isBold}" == "1")
+        #set($style="font-weight:bold;")
+    #end
+    #if("$!{eo.isTilt}" == "1")
+        #set($style=$style+"font-style:italic;")
+    #end
+    #if("$!{eo.underline}" == "1")
+        #set($style=$style+"text-decoration:underline;")
+    #end
+    #if("$!{eo.titleColor}" != "#000000")
+        #set($style=$style+"color:$!{resultObj.titleColor};")
+    #end
+
+<ul class="list1">
+    <h2 class="title">
+        <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" title="${eo.title}" target="$!{paramObj.target}"
+           style="${style}">#cutstr($eo.title,$length)
+        </a>
+    </h2>
+    #if("${isDetailed}"=="true" || "${isDetailed}"=="1")
+        <p class="remarks">
+            #if("$!{showType}"=="1")
+                #cutstr("#filterHtml($!{eo.article})",$noteLength)
+            #else
+                #cutstr($!{eo.remarks},$!{noteLength})
+            #end
+
+            #if("$paramObj.detailed"!="")
+                <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" target="$!{paramObj.target}"
+                   class="detailed">$!{paramObj.detailed}</a>
+            #end
+        </p>
+    #end
+</ul>
+#end

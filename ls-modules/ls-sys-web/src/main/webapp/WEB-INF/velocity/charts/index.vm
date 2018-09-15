@@ -1,0 +1,9 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="font-size: 18px; color: #999999; margin: 10px 20px;">
+            即将上线，敬请期待！
+        </div>
+
+    </div>
+</div>

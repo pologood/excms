@@ -1,0 +1,171 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body>
+<div class="mini-toolbar" style="text-align:center;line-height:30px;"
+     borderStyle="border-left:0;border-top:0;border-right:0;">
+    <label>名称：</label>
+    <input id="name" class="mini-textbox" style="width:150px;" onenter="onKeyEnter"/>
+    <a class="mini-button" style="width:60px;" onclick="search()">查询</a>
+    <input id="siteId" class="mini-textbox" style="display:none"/>
+</div>
+<div class="mini-fit">
+    <div class="mini-fit">
+        <ul class="ztree" id="treeview2"></ul>
+    </div>
+</div>
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+    <a class="mini-button" style="width:60px;" onclick="onOk()">确定</a>
+    <span style="display:inline-block;width:25px;"></span>
+    <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+
+    function nodeClick(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        }
+    }
+
+    var idNew = "";
+    var setting = {
+        async: {
+            enable: false,
+            /*url:"$!{rc.contextPath}/siteMain/getColumnTreeBySite",
+            autoParam:["id", "name=n", "level=lv"],
+            otherParam:{siteId:idNew},*/
+            //dataFilter: dataFilter
+        },
+        isEdit: true,
+        view: {},
+        check: {
+            enable: true,
+            autoCheckTrigger: false,
+            chkboxType: {"Y": "", "N": ""}
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'indicatorId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            /*  onCheck: onCheck,
+              onAsyncSuccess: onAsyncSuccess*/
+        }
+    };
+
+
+    $(document).ready(function () {
+
+    });
+    function CloseWindow(action) {
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();
+    }
+    var data1;
+    function SetData(data) {
+        data1 = data;
+        if (data.action == "edit") {
+            if (data.flag == 0) {//同步到栏目
+                jQuery.ajax({
+                    url: "$!{rc.contextPath}/siteMain/getColumnTreeBySite",
+                    type: 'post',
+                    data: {siteId: data.siteId},
+                    cache: false,
+                    success: function (json) {
+                        idNew = data.siteId;
+                        jQuery.fn.zTree.init($("#treeview2"), setting, json);
+                        var columnIds = data.synColumnIds;
+                        var columnId = columnIds.split(",");
+                        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+                        for (var i = 0; i < columnId.length - 1; i++) {
+                            var node = zTree.getNodeByParam("indicatorId", columnId[i], null);
+                            zTree.checkNode(node, true, true);
+                        }
+                    }
+                });
+            }
+            if (data.type == 1) {
+                jQuery.ajax({
+                    url: "$!{rc.contextPath}/siteMain/searchColumnUnderSite",
+                    type: 'post',
+                    data: {siteId: data.siteId},
+                    success: function (json) {
+                        idNew = data.siteId;
+                        jQuery.fn.zTree.init($("#treeview2"), setting, json);
+                        var genePageIds = data.genePageIds;
+                        var genePageId = genePageIds.split(",");
+                        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+                        for (var i = 0; i < genePageId.length - 1; i++) {
+                            var node = zTree.getNodeByParam("indicatorId", genePageId[i], null);
+                            zTree.checkNode(node, true, true);
+                        }
+                    }
+                });
+            }
+        }
+        ;
+    }
+
+    function GetData() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        // var  nodes = zTree.getSelectedNodes();
+        var nodes = zTree.getCheckedNodes(true);
+        var newNodes = [];
+        if (nodes != null && nodes != "") {
+            for (i = 0; i < nodes.length; i++) {
+                newNodes.add(nodes[i]);
+            }
+        }
+        return newNodes;
+    }
+
+    function onOk() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        var nodes = zTree.getSelectedNodes();
+        CloseWindow("ok");
+    }
+
+    function onCancel() {
+        CloseWindow("cancel");
+    }
+
+    function search() {
+        var name = mini.get("name").getValue();
+        if (data1.type == 0) {
+            jQuery.ajax({
+                url: "$!{rc.contextPath}/siteMain/searchColumnTreeByName",
+                type: 'post',
+                data: {name: name, siteId: data1.siteId},
+                cache: false,
+                success: function (json) {
+                    jQuery.fn.zTree.init($("#treeview2"), setting, json);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    mini.alert("error");
+                }
+            });
+        }
+        if (data1.type == 1) {
+            jQuery.ajax({
+                url: "$!{rc.contextPath}/siteMain/searchColumnUnderSiteByName",
+                type: 'post',
+                data: {name: name, siteId: data1.siteId},
+                cache: false,
+                success: function (json) {
+                    jQuery.fn.zTree.init($("#treeview2"), setting, json);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    mini.alert("error");
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

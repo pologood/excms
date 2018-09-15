@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+
+	<display-name>ls-static-center</display-name>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>cn.lonsun.staticcenter.core.CenterContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 设置servlet编码开始 -->
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- 设置servlet编码结束 -->
+
+	<filter>
+		<filter-name>SpringOpenSessionInViewFilter</filter-name>
+		<filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>SpringOpenSessionInViewFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>cn.lonsun.shiro.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>filterXss</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<servlet>
+		<servlet-name>springServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath*:/conf/**/applicationContext-mvc.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>springServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>DruidStatView</servlet-name>
+		<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DruidStatView</servlet-name>
+		<url-pattern>/druid/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>exceptionServlet</servlet-name>
+		<servlet-class>cn.lonsun.core.exception.servlet.ExceptionServlet</servlet-class>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+	
+	<!--<servlet>
+		<servlet-name>WebServiceServlet</servlet-name>
+		<servlet-class>cn.lonsun.webservice.core.WebServiceServlet</servlet-class>
+		<load-on-startup>4</load-on-startup>
+	</servlet>-->
+
+
+	<error-page>
+		<error-code>401</error-code>
+		<location>/error/401</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/error/403</location>
+	</error-page>
+	<error-page>
+	   <error-code>500</error-code>
+	    <location>/error/500</location>
+	</error-page>
+
+</web-app>

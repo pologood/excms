@@ -1,0 +1,303 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>信息公开导入</title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+<body>
+<table>
+    <tbody>
+
+    <tr>
+        <td valign="top" colspan="6">
+            <button type="button" style="height: 40px; margin:5px;" onclick="importPublicGuide();">导入公开指南</button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importPublicAnnualReport();">导入公开年报</button>
+##            <button type="button" style="height: 40px; margin:5px;" onclick="importPublicInstitution();">导入公开制度</button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublic();">导入依申请公开</button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublicCatalog();">导入依申请公开目录</button>
+            <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+            <span id="clear_msg" style="color: red;display: none">数据正在清空,请耐心等待(请勿关闭浏览器)。</span>
+        </td>
+    </tr>
+    <tr style="margin-top:20px">
+        <td valign="top" style="width:400px;" colspan="2">原信息公开目录：
+            <div style="border: 1px solid black;height:400px;overflow:auto;">
+                <ul id="ahqi_public_tree" class="ztree"></ul>
+            </div>
+        </td>
+        <td valign="top" style="padding-left:30px;width:400px;" colspan="2">-> 现信息公开目录：
+            <div style="border: 1px solid black;height:400px;overflow:auto;">
+                <ul id="ex8_public_tree" class="ztree" style="width:300px;"></ul>
+            </div>
+        </td>
+        <td valign="top" style="width:400px" colspan="2">--> 操作：
+            <button type="button" style="height:40px; " onclick="importDrivingPublic();">导入</button>
+            <button type="button" style="height:40px; " onclick="clearPublicInfo();" >清空</button><br />
+            <span style="margin-left:30px;">可选择对应单位或者目录进行数据相关操作。</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script type="text/javascript">
+    var cur = {
+        ahqi_tree : null,
+        ex8_tree : null,
+        ahqi_selectNode : null,
+        ex8_selectNode : null
+    }
+
+    var ztree_settings_ahqi = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            autoParam : [ "organId=id", "id=mongoId" ],
+            url: "/ahqi/xxgk/getAhqiPublicTree"
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                if(node.isParent){
+                    var tree = jQuery.fn.zTree.getZTreeObj(treeId);
+                    tree.expandNode(node);
+                    tree.cancelSelectedNode(node);
+                    return false;
+                }else{
+                    cur.ahqi_selectNode = node;
+                }
+
+            }
+        }
+    };
+
+    var ztree_settings_ex8 = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/ahqi/xxgk/getEx8PublicTree",
+            autoParam: ["organId=id"]
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                if(node.isParent){
+                    var tree = jQuery.fn.zTree.getZTreeObj(treeId);
+                    tree.expandNode(node);
+                    tree.cancelSelectedNode(node);
+                    return false;
+                }else{
+                    cur.ex8_selectNode = node;
+                }
+
+
+            }
+        }
+    };
+
+    jQuery(document).ready(function () {
+        cur.ahqi_tree = jQuery.fn.zTree.init(jQuery("#ahqi_public_tree"), ztree_settings_ahqi);
+        cur.ex8_tree = jQuery.fn.zTree.init(jQuery("#ex8_public_tree"), ztree_settings_ex8);
+
+    });
+
+    function importPublicInfo(url){
+        jQuery("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: url,
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    alert("导入成功");
+                    jQuery("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+
+    function importPublicGuide(){
+        if(confirm("确认导入？")){
+            jQuery("#doSub_msg").show();
+            Ls.ajaxGet({
+                url: "/ahqi/xxgk/importPublicGuide?random="+Math.random(),
+                success: function (text) {
+                    if (text.status == 0) {
+                        alert("系统异常，请联系管理员");
+                        jQuery("#doSub_msg").hide();
+                    } else {
+                        alert("导入成功");
+                        jQuery("#doSub_msg").hide();
+                    }
+                }
+            });
+        }
+    }
+
+    function importPublicAnnualReport(){
+        if(confirm("确认导入？")){
+            jQuery("#doSub_msg").show();
+            Ls.ajaxGet({
+                url: "/ahqi/xxgk/importPublicAnnualReport?random="+Math.random(),
+                success: function (text) {
+                    if (text.status == 0) {
+                        alert("系统异常，请联系管理员");
+                        jQuery("#doSub_msg").hide();
+                    } else {
+                        alert("导入成功");
+                        jQuery("#doSub_msg").hide();
+                    }
+                }
+            });
+        }
+    }
+
+
+    function importPublicInstitution(){
+        if(confirm("确认导入？")){
+            jQuery("#doSub_msg").show();
+            Ls.ajaxGet({
+                url: "/ahqi/xxgk/importPublicInstitution?random="+Math.random(),
+                success: function (text) {
+                    if (text.status == 0) {
+                        alert("系统异常，请联系管理员");
+                        jQuery("#doSub_msg").hide();
+                    } else {
+                        alert("导入成功");
+                        jQuery("#doSub_msg").hide();
+                    }
+                }
+            });
+        }
+    }
+
+    function importApplyPublic(){
+        if(confirm("确认导入？")){
+            jQuery("#doSub_msg").show();
+            Ls.ajaxGet({
+                url: "/ahqi/xxgk/importApplyPublic?random="+Math.random(),
+                success: function (text) {
+                    if (text.status == 0) {
+                        alert("系统异常，请联系管理员");
+                        jQuery("#doSub_msg").hide();
+                    } else {
+                        alert("导入成功");
+                        jQuery("#doSub_msg").hide();
+                    }
+                }
+            });
+        }
+    }
+
+    function importApplyPublicCatalog(){
+        if(confirm("确认导入？")){
+            jQuery("#doSub_msg").show();
+            Ls.ajaxGet({
+                url: "/ahqi/xxgk/importApplyPublicCatalog?random="+Math.random(),
+                success: function (text) {
+                    if (text.status == 0) {
+                        alert("系统异常，请联系管理员");
+                        jQuery("#doSub_msg").hide();
+                    } else {
+                        alert("导入成功");
+                        jQuery("#doSub_msg").hide();
+                    }
+                }
+            });
+        }
+    }
+
+    function importDrivingPublic(){
+        if(cur.ahqi_selectNode==null || cur.ex8_selectNode == null){
+            alert("请选择对应单位或目录");
+            return false;
+        }
+
+        var data = {};
+//        var data = {isOrgan : cur.ahqi_selectNode.isOrgan};
+//        if(data.isOrgan){
+//            data.ahqiOrganId = cur.ahqi_selectNode.id;
+//            data.ex8OrganId = cur.ex8_selectNode.id;
+//        }else{
+//            data.ahqiOrganId = cur.ahqi_selectNode.organId;
+            data.ahqiCatId = cur.ahqi_selectNode.id;
+//            data.ex8OrganId = cur.ex8_selectNode.organId;
+            data.ex8CatId = cur.ex8_selectNode.id;
+//        }
+        jQuery("#doSub_msg").show();
+        Ls.ajaxGet({
+            data: data,
+            url: "/ahqi/xxgk/importDrivingPublic?random="+Math.random(),
+            success: function (text) {
+                if (text.status == 0) {
+                    alert("系统异常，请联系管理员");
+                    jQuery("#doSub_msg").hide();
+                } else {
+                    alert("导入成功");
+                    jQuery("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+
+    function clearPublicInfo(){
+        if(cur.ex8_selectNode == null){
+            alert("请选择EX8信息公开单位或目录");
+            return false;
+        }
+        var data = {};
+
+        data.catId = cur.ex8_selectNode.id;
+
+        jQuery("#clear_msg").show();
+        Ls.ajaxGet({
+            url: "/ahqi/xxgk/clear?random="+Math.random(),
+            data : data,
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    alert("清空成功");
+                    jQuery("#clear_msg").hide();
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

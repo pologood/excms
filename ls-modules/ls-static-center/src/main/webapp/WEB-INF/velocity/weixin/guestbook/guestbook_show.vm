@@ -1,0 +1,80 @@
+<div class="guestbook-show">
+  <div class="guestbook-title title1">来信信息</div>
+  <div class="guestbook-table table1">
+    <table class="tb1">
+      <tbody>
+      <tr>
+        <th>信件编号：</th>
+        <td>$!{eo.docNum}</td>
+      </tr>
+      <tr>
+        <th>信件类型：</th>
+        <td>$!{eo.className}</td>
+      </tr>
+      <tr>
+        <th>来信标题：</th>
+        <td>$!{eo.title}</td>
+      </tr>
+      <tr>
+        <th>来信时间：</th>
+        <td>#date_format("$!{eo.addDate}","yyyy-MM-dd HH:mm:ss")</td>
+      </tr>
+      <tr>
+        <th>来信内容：</th>
+        <td>
+          <div class="content">
+              $!{eo.guestBookContent}
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="guestbook-title title2">来信人详细信息</div>
+  <div class="guestbook-table table2">
+    <table class="tb2">
+      <tbody>
+      <tr>
+        <th>姓 名：</th>
+        <td>$!{eo.personName}</td>
+      </tr>
+
+      #*<tr>
+        <th>联系电话：</th>
+        <td>$!{eo.personPhone}</td>
+      </tr>*#
+
+      </tbody>
+    </table>
+  </div>
+      <div class="guestbook-title title3">回复内容</div>
+      <div class="guestbook-table table3">
+        <table class="tb3">
+          <tbody>
+              #if("!${eo.recType}"=="0")
+              <tr>
+                <th> 收信单位：</th>
+                <td>$!{eo.receiveName}</td>
+              </tr>
+              #end
+              #if("!${eo.recType}"=="1")
+              <tr>
+                <th> 收信单位：</th>
+                <td>$!{eo.receiveUserName}</td>
+              </tr>
+              #end
+          <tr>
+            <th>办理时间：</th>
+            <td>#date_format("$!{eo.replyDate}","yyyy-MM-dd HH:mm:ss")</td>
+          </tr>
+          <tr>
+            <th>回复内容：</th>
+            <td>
+              <div class="content">
+                  $!{eo.responseContent}
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>

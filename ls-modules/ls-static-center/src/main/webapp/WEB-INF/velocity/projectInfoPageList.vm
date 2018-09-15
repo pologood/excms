@@ -1,0 +1,36 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="bsdttablelist">
+    <tr>
+        <th class="h1">单位名称</th>
+        <th class="h2">项目名称</th>
+        <th class="h3">项目地址</th>
+        <th class="h4">发证文号</th>
+        <th class="h5">发证日期</th>
+    </tr>
+    #foreach($eo in $resultObj.data)
+
+    <tr>
+        <td class="t1"><a href="/content/article/$!{eo.contentId}?projectInfoId=$!{eo.id}" target="$!{paramObj.target}">#cutstr($!{eo.buildUnitName},$length)</a></td>
+        <td class="t2">#cutstr($!{eo.projectName},$length)</td>
+        <td class="t3">$!{eo.projectAddress}</td>
+        <td class="t4">$!{eo.certificationNum}</td>
+        <td class="t5">#date_format("$!{eo.certificationDate}","$!{paramObj.dateFormat}")</td>
+    </tr>
+    #end
+</table>
+
+
+#if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+<div id="page_1" class="pagination"></div>
+<script>
+    Ls.pagination("#page_1", function (pageIndex) {
+        location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex ;
+    }, {
+        pageCount:$!{resultObj.pageCount},
+        currPage:$!{resultObj.pageIndex} +1
+    })
+</script>
+#end

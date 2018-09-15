@@ -1,0 +1,351 @@
+<script id="person_script" type="text/html">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tbody>
+        <tr>
+            <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+            <td class="bor1" height="30" width="100"><span>*</span>姓&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+            <td class="bor2" width="253" align="left">
+                <input name="name" data-rule="required;length(~30);"
+                       data-msg-required="姓名不能为空" data-msg-length="姓名最多填写30个字符"/>
+            </td>
+            <td class="bor1" width="100"><span>*</span>工作单位</td>
+            <td class="bor2" width="318" align="left">
+                <input name="organName" data-rule="required;length(~30);"
+                       data-msg-required="工作单位不能为空" data-msg-length="工作单位最多填写30个字符"/>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>证件名称</td>
+            <td width="253" class="bor2" align="left">
+                <select id="cardTypeSelect" name="cardType">
+                    {ls:card}
+                    #foreach($card in $resultObj)
+                        <option value="$!{card.value}">$!{card.key}</option>
+                    #end
+                    {/ls:card}
+                </select>
+            </td>
+            <td width="100" class="bor1"><span>*</span>证件号码</td>
+            <td width="318" class="bor2" align="left">
+                <input name="cardNum" data-rule="required;cardNum;" data-msg-required="证件号码不能为空"/>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1">电子邮箱</td>
+            <td width="253" class="bor2" align="left"><input name="mail" data-rule="email" ></td>
+            <td width="100" class="bor1">邮政编码</td>
+            <td width="318" class="bor2" align="left"><input name="postalNum"></td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>联系电话</td>
+            <td width="253" class="bor2" class="bor2" align="left">
+                <input name="phone" data-rule="required;mobile|tel|shortTel" data-msg-required="联系电话不能为空" />
+            </td>
+            <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+            <td width="318" class="bor2" align="left"><input name="fax"></td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>联系地址</td>
+            <td colspan="3" class="bor2" align="left">
+                <input name="address" class="dizhi" data-rule="required;length(~50);"
+                       data-msg-required="联系地址不能为空" data-msg-length="联系地址最多填写50个字符"/>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+<script id="organ_script" type="text/html">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+        <tbody>
+        <tr>
+            <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+            <td class="bor1" height="30" width="100"><span>*</span>组织机构名称</td>
+            <td class="bor2" width="253" align="left">
+                <input name="organName" data-rule="required;length(~80);"
+                       data-msg-required="组织机构名称不能为空" data-msg-length="组织机构名称最多填写80个字符"/>
+            </td>
+            <td class="bor1" width="100">组织机构代码</td>
+            <td width="318" class="bor2" align="left"><input name="organCode"/></td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>法人代表</td>
+            <td class="bor2" align="left">
+                <input name="legalName" data-rule="required;length(~8);"
+                       data-msg-required="法人代表不能为空" data-msg-length="法人代表最多填写8个字符"/>
+            </td>
+            <td width="100" class="bor1"><span>*</span>联系人姓名</td>
+            <td width="318" class="bor2" align="left">
+                <input name="contactName" data-rule="required;length(~8);"
+                       data-msg-required="联系人姓名不能为空" data-msg-length="联系人姓名最多填写8个字符"/>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>联系电话</td>
+            <td class="bor2" align="left">
+                <input name="contactPhone" data-rule="required;mobile|tel|shortTel" data-msg-required="联系电话不能为空"/>
+            </td>
+            <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+            <td width="318" class="bor2" align="left"><input name="fax"/></td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1"><span>*</span>联系地址</td>
+            <td colspan="3" class="bor2" align="left">
+                <input name="address" data-rule="required;length(~50);"
+                       data-msg-required="联系地址不能为空" data-msg-length="联系地址最多填写50个字符"/>
+            </td>
+        </tr>
+        <tr>
+            <td width="100" height="30" class="bor1">&nbsp;</td>
+            <td colspan="3" class="bor2">&nbsp;</td>
+        </tr>
+        </tbody>
+    </table>
+</script>
+<!-- 正文开始-->
+<div class="xxgk_sq_ysq_top1">
+    <p>依申请公开</p>
+</div>
+<div class="xxgk_sq_ysq_top2">依申请公开指南</div>
+<div class="xxgk_sq_ysq_znnr">&nbsp;&nbsp;&nbsp;&nbsp;对于公开权利人的申请，能够当场答复或者提供政府信息的，当场予以答复或者提供政府信息；不能当场答复或者提供政府信息的，自收到申请之日起15个工作日内根据下列不同情况进行处理：
+    <p>（一）属于依申请公开范围的，应当制作公开决定书，向公开权利人提供其所需要的政府信息；</p>
+    <p>（二）属于不予公开范围的，应当制作政府信息不予公开决定书，告知公开权利人；</p>
+    <p>（三）属于已主动公开的，应当告知公开权利人获取该政府信息的方式和途径；</p>
+    <p>（四）属于主动公开范围但尚未主动公开的，应当及时向公开权利人提供其所需要政府信息；</p>
+    <p>（五）申请公开的政府信息不存在的，应当书面告知公开权利人；</p>
+    <p>（六）申请公开的内容不明确的，应当告知公开权利人更改完善、补充申请。</p>
+    <p>（七）公开义务人应当建立政府信息公开审核制度，在向公开权利人提供政府信息前，应当依照《中华人民共和国保守国家秘密法》以及其他法律、法规和国家有关规定对拟公开的政府信息进行保密审查。对依申请公开的政府信息不能确定是否可以公开时，应当依照法律、法规和国家有关规定及时报有关主管部门或者保密工作部门确定。</p>
+    <p>（八）因正当理由不能在规定的期限内作出答复或者提供政府信息的，经单位负责人同意，可以将答复或者提供政府信息的期限适当延长并书面告知申请人，延长期限不得超过15个工作日。公开义务人征求第三方意见所需时间不计算在本条第一款规定的期限内。</p>
+</div>
+<div class="xxgk_sq_sqbtop">
+    <ul class="tit">依申请公开申请表</ul>
+    <ul class="bz">注：<span>*</span> 为必填项</ul>
+    <div class="clear"></div>
+</div>
+
+<form method="post" id="publicApplyForm" name="form2" onsubmit="return false;">
+    <div class="xxgk_sqnrbox">
+        <div class="xxgk_sqr">申请人信息</div>
+        <div class="xxgk_sqrxx">
+            <table style="border:#dddddd 1px solid;border-bottom:0px; border-right:0px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td style="border-bottom:#dddddd 1px solid;border-right:#dddddd 1px solid;" height="46">
+                        <table style="margin-left:15px;" align="left" border="0" cellpadding="0" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td>请选择：</td>
+                                <td width="18"><input onClick="selectTable(1)" value="person" checked="checked" name="type" class="radio" type="radio"></td>
+                                <td width="34">公民</td>
+                                <td width="18"><input onClick="selectTable(2)" value="organ" name="type" class="radio" type="radio"></td>
+                                <td width="94">法人/其它组织</td>
+                                <td>是否公开信息：</td>
+                                <td width="18"><input name="isPublic" value="true" checked="checked" class="radio" type="radio"></td>
+                                <td width="24">是</td>
+                                <td width="18"><input name="isPublic" value="false" class="radio" type="radio"></td>
+                                <td width="27">否</td>
+                                <td>单位：</td>
+                                <td width="228">
+                                    <select name="organId">
+                                        {ls:publicOrganList}
+                                        #foreach($organ in $resultObj)
+                                            <option value="$!{organ.organId}" #if("$!{organ.organId}" == "$!{context.columnId}")selected #end>$!{organ.name}</option>
+                                        #end
+                                        {/ls:publicOrganList}
+                                    </select>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" id="publicApply_table"></td>
+                </tr>
+                <script>
+                    function selectTable(type) {
+                        if (type == 1) {
+                            $("#publicApply_table").html($("#person_script").html());
+                        } else if (type == 2) {
+                            $("#publicApply_table").html($("#organ_script").html());
+                        }
+                    }
+                    selectTable(1);
+                </script>
+                </tbody>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="xxgk_sqnrbox">
+        <div class="xxgk_sqr1">所需信息情况</div>
+        <div class="xxgk_sqrxx">
+            <table style="border-left:#dddddd 1px solid;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td class="bor" align="center" height="104" width="169" style="*width:170px;"><span>*</span>所需信息的内容<br/>描述</td>
+                    <td colspan="3" class="bor3" width="708">
+						<textarea rows="9" cols="98" name="content"
+                                  data-rule="required;length(~500);" data-msg-required="所需信息的内容描述不能为空" data-msg-length="所需信息的内容描述最多填写500个字符"></textarea>
+                        <div id="description_message"></div>
+                        <ui:v pass="√" tips="" warn="<img src='/images/jsico.png'/>" empty="<img src='/images/jsico.png'/>" rule="require" for="nrms"></ui:v>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="169" height="104" align="center" class="bor" style="*width:170px;">所需信息的用途</td>
+                    <td colspan="3" class="bor3" width="708">
+                        <textarea rows="9" cols="98" name="use"></textarea>
+                        <div id="infoUse_message"></div>
+                        <ui:v pass="√" tips="" warn="<img src='/images/jsico.png'/>" empty="<img src='/images/jsico.png'/>" rule="require" for="xxyt"></ui:v>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" height="121">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td colspan="2" class="bor4" height="23" width="359">所需信息的指定提供方式（可选）</td>
+                                <td colspan="2" class="bor4" width="360">获取信息的方式（可选）</td>
+                            </tr>
+                            <tr>
+                                <td class="bor5" height="28" width="36"><input value="纸面" size="30" name="provideType" class="radio" type="checkbox"></td>
+                                <td class="bor6" width="326">纸面</td>
+                                <td class="bor5"><input value="邮寄" size="30" name="receiveType" class="radio" type="checkbox"></td>
+                                <td class="bor6" width="327">邮寄（快递）</td>
+                            </tr>
+                            <tr>
+                                <td class="bor5" height="28"><input value="电子邮件" size="30" name="provideType" class="radio" type="checkbox"></td>
+                                <td class="bor6">电子邮件</td>
+                                <td class="bor5"><input value="电子邮件" size="30" name="receiveType" class="radio" type="checkbox"></td>
+                                <td class="bor6">电子邮件</td>
+                            </tr>
+                            <tr>
+                                <td class="bor5" height="28"><input value="光盘" size="30" name="provideType" class="radio" type="checkbox"></td>
+                                <td class="bor6">光盘</td>
+                                <td class="bor5"><input value="传真" size="30" name="receiveType" class="radio" type="checkbox"></td>
+                                <td class="bor6">传真</td>
+                            </tr>
+                            <tr>
+                                <td class="bor5" height="28"><input value="磁盘" size="30" name="provideType" class="radio" type="checkbox"></td>
+                                <td class="bor6">磁盘</td>
+                                <td class="bor5"><input value="自行领取" size="30" name="receiveType" class="radio" type="checkbox"></td>
+                                <td class="bor6">自行领取</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td width="169" height="104" align="center" class="bor" style="*width:170px;">备注</td>
+                    <td colspan="3" class="bor3" width="708"><textarea rows="9" cols="98" name="remarks"></textarea></td>
+                </tr>
+                <tr>
+                    <td class="bor" align="center" height="30"><span>*</span>验证码</td>
+                    <td colspan="3" class="bor3">
+                        <table border="0" cellpadding="0" cellspacing="0" width="300">
+                            <tbody>
+                            <tr>
+                                <td width="80">
+                                    <input name="webCode" class="yzm" type="text"
+                                           data-rule="required;length(~4);" data-msg-required="验证码不能为空" data-msg-length="验证码最多填写4个字符"/>
+                                </td>
+                                <td align="left" valign="middle" class="yzm">
+                                    <img src="/public/getCode" onClick="this.src='/public/getCode?'+new Date().getTime()" title="看不清楚，换个图片">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bor" align="center" height="30"><span>*</span>查询密码</td>
+                    <td class="bor3">
+                        <input maxlength="8" size="30" id="queryPassword" name="queryPassword" type="password"
+                               data-rule="required;length(~30);" data-msg-required="查询密码不能为空" data-msg-length="查询密码最多填写30个字符"/>
+                    </td>
+                    <td class="bor" align="center" height="30" width="120"><span>*</span>确认密码</td>
+                    <td class="bor3">
+                        <input maxlength="8" size="30" name="confirmPassword" type="password"
+                               data-rule="equal;" data-msg-equal="确认密码必须和查询密码一致"/>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="xxgk_sq_btn">
+        <input name="button" class="tj" value="" type="submit"/>
+        <input name="reset" class="cz" value="" type="reset" id="public_apply_reset"/>
+    </div>
+</form>
+<script id="public_apply_submit_tips_tpl" type="text/html">
+    <div class="public-apply-submit-tips">
+        <ul class="public-apply-submit-text">
+            <h2 class="font_01">您的依申请公开提交成功！</h2>
+            <div class="tishi_con">我们会及时审核并回复。<br/>
+                请记录您的查询编号和密码，以便于查询您的本次依申请公开。
+            </div>
+        </ul>
+        <ul class="public-apply-submit-text">
+            <li>查询编号：<span><?=queryCode?></span></li>
+            <li>查询密码：<span><?=queryPassword?></span></li>
+        </ul>
+    </div>
+</script>
+<script>
+$(document).ready(function () {
+    // 验证
+    using("validator", function () {
+        $('#publicApplyForm').validator({
+            rules: {
+                equal: function (element) {
+                    return $("#queryPassword").val() == element.value;
+                },
+				cardNum : function(element) {
+					return this.test(element, "IDcard") === true
+                   		|| /南字第(\d{8})号|北字第(\d{8})号|沈字第(\d{8})号|兰字第(\d{8})号|成字第(\d{8})号|济字第(\d{8})号|广字第(\d{8})号|海字第(\d{8})号|空字第(\d{8})号|参字第(\d{8})号|政字第(\d{8})号|后字第(\d{8})号|装字第(\d{8})号/.test(element.value)
+						|| '请填写正确的证件号码';
+				}
+            },
+            valid: function (form) {
+                var me = this;
+                // 提交表单之前，hold住表单
+                me.holdSubmit();
+                var data = $(form).serializeObject();
+				// 处理多选值的情况
+				var provideType = data.provideType;
+				if (provideType && typeof(provideType) == "object") {
+				   data.provideType = provideType.join(" ");
+				}
+				var receiveType = data.receiveType;
+				if (receiveType && typeof(receiveType) == "object") {
+				   data.receiveType = receiveType.join(" ");
+				}
+                data.siteId = "$!{context.siteId}";
+                data.cardTypeName = $("#cardTypeSelect option:selected").text();
+                // 提交
+                Ls.ajax({
+                    url: "/public/applySubmit",
+                    data: data
+                }).done(function (d) {
+                    me.holdSubmit(false);
+                    if (d.status == 1) {
+                        // 返回查询编号
+                        using("dialog", function () {
+                            Ls.openWin({
+                                title: '温馨提示',
+								height:190,
+                                content: Ls.template("public_apply_submit_tips_tpl", d.data)
+                            }).show();
+                        });
+                        $("#public_apply_reset").click();
+                    } else {
+                        // 返回错误信息
+                        Ls.tipsErr(d.desc);
+                    }
+                });
+            }
+        });
+    });
+});
+</script>

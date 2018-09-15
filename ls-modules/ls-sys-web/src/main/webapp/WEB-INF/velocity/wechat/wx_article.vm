@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>$!{_title}</title>
+    <link href="$!{sysStaticPath}/assets/js/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/pages/css/weui.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <style>
+        body {
+            background-color: #fbf9fe
+        }
+
+        .page.cell .page_title {
+            color: #225fba;
+            text-align: center;
+        }
+
+        section {
+            padding: 10px;
+        }
+
+        section h2 {
+            font-weight: 700 !important;
+        }
+
+        .reply {
+            background-color: #ffffff;
+        }
+
+        .spacing {
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page slideIn cell">
+    <div class="hd">
+        <h1 class="page_title">我要咨询</h1>
+    </div>
+    <div class="bd">
+
+        <article class="weui_article">
+            <section>
+                <section>
+                    <h2 class="title">我的留言标题</h2>
+                    <p>哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合</p>
+                    <div>
+                        留言日期：2016-04-06 10:00:00
+                    </div>
+                </section>
+                <section class="reply">
+                    哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合哈俣合
+                    <div>
+                        <p>回复单位：单位单位单位</p>
+                        <p>回复日期：2016-04-06 10:00:00</p>
+                    </div>
+                </section>
+            </section>
+        </article>
+
+    </div>
+    <div class="bd spacing">
+        <a href="javascript:;" class="weui_btn weui_btn_default">返回</a>
+    </div>
+</div>
+
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/avalon.mobile-min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/wx_mgr.js"></script>
+<script>
+    $(document).ready(function () {
+        wx_mgr.article();
+    });
+</script>
+</html>

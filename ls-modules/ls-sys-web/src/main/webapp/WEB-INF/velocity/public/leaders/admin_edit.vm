@@ -1,0 +1,319 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light" style="padding-left: 0">
+            <div class="portlet-body form">
+                <form role="form" id="leaders_form" ms-controller="leaders_form">
+                    <table class="table table-bordered article-table">
+                        <tbody>
+                        <tr>
+                            <th>选择单位:</th>
+                            <td colspan="2">
+                                <input id="organId" type="text" class="form-control" readonly placeholder="" data-rule="required;" onclick="selectOrgan()">
+                            </td>
+                            <td class="w300" rowspan="6">
+
+                                <div class="thumb_layout">
+                                    <div class="thumb1">
+                                        <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                                    </div>
+                                    #if(${uploadBar} == 'hide')
+                                    #else
+                                        <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                        <div class="thum-upload" id="uploadImg"><i class="fa fa-upload"></i></div>
+                                    #end
+                                </div>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>姓名：</th>
+                            <td colspan="2">
+                                <table class="w100p">
+                                    <tbody>
+                                    <tr>
+                                        <td><input type="text" name="leadersName" id="leadersName" data-rule="required;" ms-duplex="leadersName" class="form-control" maxlength="50"></td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>编码：</th>
+                            <td style="width: 120px;" >
+                                <input type="text" id="leadersNum"  name="leadersNum" ms-duplex="leadersNum" data-rule="required;digits;"  class="form-control" placeholder="" maxlength="6">
+                            </td>
+                            <td align="left">
+                                请根据领导顺序编写6位编码
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>职务：</th>
+                            <td colspan="2">
+                                <input type="text" id="post" name="post" ms-duplex="post" class="form-control" placeholder="" maxlength="300">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>分工：</th>
+                            <td colspan="2">
+                                <textarea class="form-control" id="work" name="work" ms-duplex="work" rows="3" placeholder=""></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>排序值：</th>
+                            <td style="width: 80px;">
+                                <input type="text" id="sortNum"  name="sortNum" ms-duplex="sortNum" data-rule="digits;" class="form-control" placeholder="" maxlength="19">
+                            </td>
+                            <td align="left" colspan="2">
+                                (倒序排列，例如10,8,5,3。县处级排序>50, 科级干部排序值<50)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>状态：</th>
+                            <td colspan="3">
+                                <select id="status" name="status" ms-duplex="status">
+                                    <option value="Normal">启用</option>
+                                    <option value="Removed">禁用</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr id="edit_content">
+                            <th style="vertical-align: top;">工作简历/工作流程：</th>
+
+                            <td colspan="3">
+                                <textarea id="article_content" name="content" style="width: 100%; visibility: visible;"></textarea>
+                            </td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var eweb;
+    var cur = {
+        vm:{},
+        id:Ls.getWin.dialog.data("leadersId"),
+//        siteId:Ls.getWin.win.GLOBAL_SITEID,
+        vm_id: "leaders_form",
+        form: $('#leaders_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type"),
+        imageLink:"",
+        selectOrgan: [],
+        organId:''
+    };
+    $(document).ready(function () {
+        cur.api.button(
+                {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){eweb.update();saveData();return false;}},
+                {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+
+        /*editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + cur.siteId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: cur.siteId,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+        eweb = Ls.editor("article_content", {cusdir: "/" + cur.siteId + "/" + 0});
+        initData();
+        getOrgans();
+
+        //上传缩略图
+        $("#uploadImg").click(function () {
+            normalUpload();
+        });
+
+        //移除缩略图
+        $("#delImg").click(function () {
+            $("#imageLink").attr("src", GLOBAL_CONTEXTPATH + '/assets/global/img/no.photo.jpg');
+            cur.imageLink = '';
+        });
+    })
+
+
+    function getOrgans() {
+        Ls.ajaxGet({
+            url: "/public/leaders/getOrgans",
+        }).done(function (response) {
+            var str = '<option value=""> 选择单位 </option> ';
+            if (response != null) {
+                var data = response.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        if(data[i].organId==cur.vm.organId){
+                            str += ' <option selected="selected" value="' + data[i].organId + '">' + data[i].name + '</option> '
+                        }else{
+                            str += ' <option value="' + data[i].organId + '">' + data[i].name + '</option> '
+                        }
+                    }
+                }
+            }
+            cur.organId.append(str);
+        });
+    }
+
+    //普通上传缩略图
+    function normalUpload() {
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].fileName);
+            return true;
+        }, {
+            upload_url: '/public/leaders/normalUploadThumb',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "columnId": 0,
+                "contentId": cur.id,
+                "imgPath": cur.imageLink==null?"":cur.imageLink,
+                "desc": "上传缩略图"
+            }
+        });
+    }
+
+    //缩略图路径
+    function changeImg(path) {
+        if(path.indexOf(".") != -1){
+            $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + path);
+        }else{
+            $("#imageLink").attr("src", GLOBAL_FILESERVERPATH + path);
+        }
+        cur.imageLink = path;
+    }
+
+
+    function initData() {
+        if (cur.id!=null&&cur.id!="") {
+            Ls.ajaxGet({
+                data: {
+                    id: cur.id
+                },
+                url: "/public/leaders/getLeadersVO",
+                success: function (text) {
+                    var leaders = text.data.leaders;
+                    cur.id = leaders.leadersId;
+                    leaders.$id = cur.vm_id;
+                    if (leaders.imageLink != null) {
+                        if(leaders.imageLink.indexOf(".") != -1){
+                            $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + leaders.imageLink);
+                        }else{
+                            $("#imageLink").attr("src", GLOBAL_FILESERVERPATH + leaders.imageLink);
+                        }
+                    }
+                    /*editor.html(leaders.experience);*/
+                    eweb.setHtml(leaders.experience);
+                    if (leaders.imageLink != null) {
+                        if(leaders.imageLink.indexOf(".") != -1){
+                            $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + leaders.imageLink);
+                        }else{
+                            $("#imageLink").attr("src", GLOBAL_FILESERVERPATH + leaders.imageLink);
+                        }
+                        cur.imageLink = leaders.imageLink;
+                    }
+                    //初始化表单字段
+                    cur.init = Ls.initFORM(cur.vm_id, leaders);
+                    //如果模型已经绑定，不再绑定
+                    cur.vm = avalon.vmodels[cur.vm_id];
+                    cur.vm = avalon.define(cur.init);
+                    avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+                }
+            })
+        }else{
+            //初始化表单字段
+            cur.init = Ls.initFORM(cur.vm_id, {});
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[cur.vm_id];
+            cur.vm = avalon.define(cur.init);
+            avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+        }
+    }
+
+
+    function saveData() {
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+
+        url = "/public/leaders/admin_saveLeaders"
+
+        var data = Ls.toJSON(cur.vm.$model);
+        data.organId = $("#organId option:selected").val();
+        data.organName = $("#organId option:selected").text();
+        data.imageLink = cur.imageLink;
+        //data.experience = editor.html();
+        //data.experienceText = editor.text();
+	data.experience = eweb.getHtml();
+        data.experienceText = eweb.getText();
+//        data.imageLink =
+
+        Ls.ajax({
+            url: url,
+            data: data,
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+    //选择单位
+    function selectOrgan(){
+        Ls.selectUnitUser(function(arg){
+            if(arg && arg.list.length>0){
+                cur.selectOrgan = arg.list;
+                if(arg && arg.ids && arg.names){
+                    console.info(arg.ids);
+                    console.info(arg.names);
+                    $("#organId").val(arg.names);
+                    cur.organId = arg.ids;
+                }
+            }
+        },{
+            scope:3,
+            scopeType:'single',
+            organIds:'',
+            data:{
+                list: cur.selectOrgan
+            }
+        });
+    }
+
+
+</script>

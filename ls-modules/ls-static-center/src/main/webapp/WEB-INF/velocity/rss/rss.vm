@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="/assets/css/rss_style.css"?>
+<rss version="2.0">
+    <channel>
+        <title>$!{siteEO.name}</title>
+        <link>$!{siteEO.uri}/index.html</link>
+        <copyright><![CDATA[ Copyright $!{siteEO.uri} Rights Reserved ]]></copyright>
+        #foreach($eo in $pagination.data)
+            <item>
+                <title>
+                    <![CDATA[ $!{eo.title} ]]>
+                </title>
+                <link>$!{siteEO.uri}/$!{eo.columnId}/$!{eo.id}.html</link>
+                <author>$!{eo.author}</author>
+                <pubDate>$!{eo.publishDate}</pubDate>
+                <description>
+                <![CDATA[ #cutstr("#filterHtml($!{eo.article})",150) ]]>
+                </description>
+            </item>
+        #end
+    </channel>
+</rss>

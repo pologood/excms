@@ -1,0 +1,171 @@
+#parse("_page_layout/_header.vm")
+<style>
+    @media (max-width: 1366px) {
+        .page-content-white {
+            overflow-y: auto!important;
+        }
+    }
+</style>
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="reply_form" ms-controller="reply_form">
+            <table class="table table-bordered public-info-table">
+                <tbody>
+                <tr>
+                    <th>内容描述：</th>
+                    <td id="title1"></td>
+                </tr>
+                <tr>
+                    <th>回复状态：</th>
+                    <td>
+                        #foreach($s in $statusList)
+                            <label class="radio-inline">
+                                <input type="radio" name="replyStatus" ms-duplex-string="replyStatus"
+                                       value="$!{s.code}"/> $!{s.key}
+                            </label>
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <th>回复日期：</th>
+                    <td>
+                        <input type="datetime" name="replyDate" ms-duplex="replyDate" class="form-control"
+                               onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">回复内容：</th>
+                    <td colspan="2">
+            <textarea id="replyContent" name="replyContent" ms-duplex="replyContent" class="form-control"
+                      style="width: 100%; visibility: visible;"></textarea>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var curr = {
+        vm: ""
+    }
+    var eweb;
+    var id = '${id}';
+    var api = Ls.getWin.api;
+    if ('$!{toolbar}' != 'hide') {
+        api.button({
+            id: 'abcd',
+            focus: true,
+            name: '保 存',
+            callback: function () {
+                eweb.update();
+                $("#reply_form").submit();
+                return false;
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        eweb = Ls.editor("replyContent", {style: "Lmini",height: "200"});
+        /*editor = KindEditor.create('textarea[name="replyContent"]', {
+            resizeType: 1,
+            allowPreviewEmoticons: false,
+            allowImageUpload: false,
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID,// 上传文件
+            fileManagerJson: '/fileCenter/getPage',// 文件空间
+            allowFileManager: false,
+            fileServerPath: GLOBAL_FILESERVERPATH,
+            items: [
+                'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'insertfile'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            filterMode: true
+        });*/
+        getVO();
+    });
+
+    function getVO() {
+        Ls.ajaxGet({
+            url: "/public/apply/getPublicApply",
+            data: {id: id}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tips(text.desc, {icons: "info"});
+                return;
+            }
+            data = text.data;
+            curr.\$id = "reply_form";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.\$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.\$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            // avalon.scan(document.body, curr.vm);
+            avalon.scan($("#reply_form").get(0), curr.vm);
+            if (data.replyContent != null) {
+                //editor.html(data.replyContent);
+                eweb.setHtml(data.replyContent);
+            }
+            $("#title1").html(data.content);
+        });
+    }
+
+    $('#reply_form').validator({
+        rules: {
+            replyContent: function() {
+                var len = $("#replyContent").val().replace(/<[^>]+>/g,"").length;
+                if (len<1 || len>500) {
+                    return '请填写1到500个字符'
+                }
+            }
+        },
+        fields: {
+            'replyDate': '回复日期:required;',
+            'replyContent': "required; replyContent"
+        },
+        valid: function () {
+            save();
+        }
+    })
+
+
+    function save() {
+
+        var content = $("#replyContent").val();
+        /*curr.vm.replyContent = editor.html();*/
+        curr.vm.replyContent = eweb.getHtml();
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            type: "POST",
+            url: "/public/apply/saveReply",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                parent.resetContent();
+                Ls.tipsOk("回复成功", function () {
+                    Ls.winClose();
+                });
+                // window.parent.guestbook_manage.getData(pageIndex, columnId, key, condition, status);
+
+            }
+        })
+
+    }
+</script>

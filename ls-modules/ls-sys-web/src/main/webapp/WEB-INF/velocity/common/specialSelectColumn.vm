@@ -1,0 +1,107 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="tabbable-line" style="margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li>
+            <a href="#tab_1_1" data-toggle="tab">当前专题栏目</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">站点栏目</a>
+        </li>
+    </ul>
+
+    <div class="tab-content pt10">
+        <div class="tab-pane" id="tab_1_1">
+            <ul class="ztree" id="catalog_tree" style="height: 314px;">
+                <span style="margin:auto" class="bold font-red-mint">正在加载中...</span>
+            </ul>
+        </div>
+        <div class="tab-pane" id="tab_1_2">
+            <ul class="ztree" id="catalog_site_tree" style="height: 314px;">
+                <span style="margin:auto" class="bold font-red-mint">正在加载中...</span>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/common/specialSelectColumn.js"></script>
+<script>
+
+    var initZtree = {};
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        tips: "",
+        tabId: '#tab_1_1',
+        columnTree: {},
+        configType: Ls.url.get("configType"),
+        chkStyle: Ls.url.get("chkStyle"),
+        columnId: Ls.url.get("columnId"),
+        curTabId: Ls.url.get("tabId"),
+        targetId: Ls.url.get("targetId")
+    };
+
+    // 获取数据，内容管理选中、信息公开选中、信息报送选中
+    function getColumnIds() {
+        var data = "";
+        if (cur.tabId == '#tab_1_1') {
+            data = cur.columnTree["catalog_tree"].getCheckedNodes(true);
+        } else {
+            data = cur.columnTree["catalog_site_tree"].getCheckedNodes(true);
+        }
+        return data;
+    }
+
+    $(document).ready(function () {
+
+        //配置类型
+        $("#configName").text(Ls.url.get("configName"));
+
+        var isSubmit = false;
+        try {
+            api.button({
+                name: "确定",
+                callback: function () {
+                    // 提交
+                    api.close(getColumnIds());
+                    return false;
+                }
+            });
+        } catch (e) {
+
+        }
+
+        var vmData = W.$.Site.vm.$data;
+        var label = cur.targetId ? vmData.conf[cur.targetId].label : vmData.label;
+        if(label) {
+            var siteId = !Ls.isEmpty(cur.curTabId) ? label[cur.curTabId].siteId : label.siteId;
+        }
+
+
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            cur.tabId = e.currentTarget.hash;
+            if (cur.tabId == '#tab_1_1') {
+                !cur.columnTree["catalog_tree"] && special_mgr.columnInit("catalog_tree", cur.configType, W.GLOBAL_SITEID, cur.columnId);
+            } else if (cur.tabId == '#tab_1_2') {
+                !cur.columnTree["catalog_site_tree"] && special_mgr.columnInit("catalog_site_tree", cur.configType, null, null);
+            }
+        });
+
+        if(siteId&&siteId!=W.GLOBAL_SITEID) { //站点栏目
+            $(".nav-tabs li").eq(1).addClass("active");
+            $("#tab_1_2").addClass("active");
+            special_mgr.columnInit("catalog_site_tree", cur.configType, null, null);
+
+        }else {
+            $(".nav-tabs li").eq(0).addClass("active");
+            $("#tab_1_1").addClass("active");
+            special_mgr.columnInit("catalog_tree", cur.configType, W.GLOBAL_SITEID, cur.columnId);
+
+        }
+
+    });
+
+</script>

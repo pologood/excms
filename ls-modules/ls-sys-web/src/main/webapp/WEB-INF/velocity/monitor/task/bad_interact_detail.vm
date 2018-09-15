@@ -1,0 +1,96 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <p><strong>考察点：</strong>互动回应类栏目长期未回应的情况。</p>
+                    <p><strong>普查扣分细则：</strong>监测时间点前1年内，要求对公众信件、留言及时答复处理的政务咨询类栏目（在线访谈、调查征集、举报投诉类栏目除外）中存在超过三个月未回应的现象，即单项否决。</p>
+                    <p><strong>本站监测扣分细则：</strong>监测时间点前【<span id="monitoredNum">$!{monitoredNum}</span>】【<span id="monitoredTimeType">$!{monitoredTimeType}</span>】内，存在超过【<span id="num">$!{num}</span>】个月未回应的现象，即单项否决。</p>
+                </div>
+                <div>小计：监测点前1年内，超过3个月未回应的留言数<span class="red">$!{unreplayCounts}</span>个</div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getBadInteractPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="columnType" width="200" align="center" headerAlign="center" renderer="columnType" >栏目类型</div>
+                        <div field="columnName" width="240" align="left" headerAlign="center"  renderer="columnName">栏目名称</div>
+                        <div field="updateCount" width="70" align="center" headerAlign="center" >更新数量</div>
+                        <div field="unreplyCount" width="80" align="center" headerAlign="center" renderer="unreplyCount" >未回复数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({monitorId:cur.params.monitorId});
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_ZWZX': columnTypeName = '政务咨询类栏目';break;
+            case 'columnType_DCZJ': columnTypeName = '调查征集类栏目';break;
+            case 'columnType_HDFT': columnTypeName = '互动访谈类栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+        return columnTypeName;
+
+    }
+
+    function columnName(obj) {
+        var rec = obj.record;
+        var columnName = rec.columnName;
+        var columnUrl = rec.columnUrl;
+
+        return "<a target='_blank' href='"+columnUrl+"' title='"+columnName+"' >"+columnName+"</a>";
+
+    }
+
+    function unreplyCount(obj) {
+        var rec = obj.record;
+        var unreplyCount = rec.unreplyCount;
+        var str = 0;
+        if(unreplyCount!=null&&unreplyCount!=""){
+            str = "<a href='javascript:void(0)' title='查看详情' onclick=viewDetail('"+rec.unreplyIds+"') ><font color='red'>"+unreplyCount+"</font></a>";
+        }
+        return str;
+    }
+
+    function viewDetail(unreplyIds) {
+        Ls.openWin('/monitor/index/manage/viewUnReplyDetail?contentIds=' + unreplyIds, {
+            id: 'viewBadDetail',
+            title: '超时未回复留言详情',
+            width: '800px',
+            height:'500px'
+        });
+    }
+
+</script>

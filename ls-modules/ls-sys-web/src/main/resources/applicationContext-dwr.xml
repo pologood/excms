@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dwr="http://www.directwebremoting.org/schema/spring-dwr"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.directwebremoting.org/schema/spring-dwr http://www.directwebremoting.org/schema/spring-dwr/spring-dwr-3.0.xsd">
+        
+	<!--dwr注解配置start-->
+	<!-- 注意这里新增加的dwr tag, 为使其生效，文件头中要声明namespace -->  
+	<!-- 要求dwr在spring容器中检查拥有@RemoteProxy 和 @RemoteMethod注解的类。注意它不会去检查Spring容器之外的类。 -->
+	<dwr:annotation-config id="dwrid"/>
+	<!-- 要求DWR将util.js和engine.js映射到dwrController -->
+	<dwr:url-mapping />
+	<!-- debug关闭 --> 
+    <dwr:controller id="dwrController">
+     	<!-- 使用polling和comet的方式 -->
+        <dwr:config-param name="pollAndCometEnabled" value="true" />
+        <!-- 使用comet的方式 -->
+        <dwr:config-param name="activeReverseAjaxEnabled" value="true" />
+        <!-- 使用polling的方式 -->
+		<dwr:config-param name="org.directwebremoting.extend.ServerLoadMonitor" value="org.directwebremoting.impl.PollingServerLoadMonitor" />
+        <!-- 页面默认的请求间隔时间是3秒 -->
+        <dwr:config-param name="disconnectedTime" value="3000" />
+		<dwr:config-param name="allowScriptTagRemoting" value="true" />
+		<!-- 不允许跨域请求 -->
+		<dwr:config-param name="crossDomainSessionSecurity" value="true" />
+		<dwr:config-param name="classes" value="java.lang.Object" />
+		<!-- script session 的超时设置 默认值：1800000(30分钟) -->
+		<dwr:config-param name="scriptSessionTimeout" value="3600000" />
+		<dwr:config-param name="initApplicationScopeCreatorsAtStartup" value="true" />
+        <!-- dwr监听管理 -->
+        <dwr:config-param name="org.directwebremoting.extend.ScriptSessionManager" value="cn.lonsun.dwr.CMSScriptSessionManager" />
+    </dwr:controller>
+	<!--dwr注解配置end-->
+</beans>

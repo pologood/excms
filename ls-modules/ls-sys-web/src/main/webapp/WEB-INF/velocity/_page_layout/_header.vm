@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>$!{_title}</title>
+    <link href="$!{sysStaticPath}/assets/css/bootstrap.min.css?v=$!{_version}" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/js/plugins/miniui/themes/default/miniui.min.css?v=$!{_version}" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/plugins.min.css?v=$!{_version}" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/components.min.css?v=$!{_version}" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/default.min.css?v=$!{_version}" rel="stylesheet" type="text/css"/>
+    #if($!rightsCode=="root")
+        <style>
+            .page-header.navbar {
+                background-color: #E6434E;
+            }
+
+            .page-header.navbar .hor-menu .navbar-nav > li.active > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.active > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.current > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.current > a {
+                background: #B23939 !important;
+            }
+
+            .page-header.navbar .page-logo {
+                background: #B51520;
+                background: inherit;
+            }
+
+            .page-header.navbar .top-menu .navbar-nav > li.dropdown.open .dropdown-toggle, .page-header.navbar .top-menu .navbar-nav > li.dropdown .dropdown-toggle:hover {
+                background-color: #B51520;
+            }
+
+        </style>
+    #end
+    <!-- END THEME LAYOUT STYLES -->
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <script>
+        //站点ID
+        var GLOBAL_SITEID = "$!{siteId}";
+        //session ID
+        var GLOBAL_SESSIONID = "$!{sessionId}";
+        //站点名称
+        var GLOBAL_SITENAME = "$!{site.name}";
+        //站点URL
+        var GLOBAL_SITEURI = "$!{site.uri}";
+        //上下文
+        var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERPATH = "$!{fileServerPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERNAMEPATH = "$!{fileServerNamePath}";
+        //静态文件地址
+        var GLOBAL_HTMLFILEPATH = "$!{site.uri}";
+        //静态资源地址
+        var GLOBAL_STATIC_PATH = "$!{sysStaticPath}";
+        //个人信息
+        var GLOBAL_PERSON = #if("$!{person}" != "")$!{person}#else{}#end;
+        //用户角色
+        var GLOBAL_RIGHTS = "$!{rightsCode}";
+        var OPT_SPLIT = "|";
+        //点站类型
+        var GLOBAL_SITETYPE = "$!{site.type}";
+    </script>
+</head>

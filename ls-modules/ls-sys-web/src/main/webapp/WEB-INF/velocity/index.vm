@@ -1,0 +1,342 @@
+#set($_title="EX8 系统管理")
+#set($_version="072418")
+#parse("_page_layout/_header.vm")
+<style>
+    .toast-top-right {
+        top: 76px;
+    }
+
+    #toast-container {
+        background-color: #569b48;
+    }
+
+    #toast-container > div {
+        width: 380px;
+        margin-bottom: 0;
+        box-shadow: none;
+        position: relative;
+        background-color: #569b48 !important;
+    }
+
+    #toast-container > :hover {
+        box-shadow: none;
+    }
+
+    #toast-container > div:after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        border-bottom: 1px solid #569b48;
+        width: 330px;
+    }
+
+    #toast-container > div:nth-last-child(2):after, #toast-container .head-top:after {
+        border-bottom: none;
+    }
+
+    #toast-container > .head-top + .toast {
+        padding-top: 0;
+    }
+
+    #toast-container .head-top {
+        padding: 0;
+        text-align: right;
+    }
+
+    #toast-container .container-close-button button {
+        top: 0;
+        right: 0.5rem;
+        line-height: 20px;
+    }
+
+    #toast-container .more {
+        padding: 0 10px 10px 10px;
+        text-align: right;
+    }
+</style>
+<body
+    class="overflow-hidden page-sidebar-closed-hide-logo page-header-fixed page-sidebar-fixed page-footer-fixed page-quick-sidebar-open">
+    #parse("_page_layout/_page_mask.vm")
+<div class="page-header navbar navbar-fixed-top">
+    <div class="page-header-inner">
+        <div class="page-header-inner-top clearfix">
+            <div class="page-logo">
+                <a href="javascript:void(0)">
+                    #if("$!{systemImg}" == "")
+                        #set($filePath = "$!{sysStaticPath} ")
+                    #else
+                        #if($systemImg.indexOf("/") !=-1)
+                            #set($filePath="")
+                        #elseif($systemImg.indexOf(".") !=-1)
+                            #set($filePath="$!{fileServerNamePath}")
+                        #else
+                            #set($filePath="$!{fileServerPath}")
+                        #end
+                    #end
+
+                    <img src="#if("$!{systemImg}" == "") $!{filePath}/assets/images/logo.png #else $!{filePath}$!{systemImg} #end" alt="logo"
+                         class="logo-default"/>
+                </a>
+            </div>
+
+
+            <div class="top-menu">
+                <ul class="nav navbar-nav pull-right">
+
+                ##                #if("$!{rightsCode}"!="root")
+                ##                    <li class="dropdown dropdown-extended dropdown-inbox" id="header_search_bar">
+                ##                        <a href="javascript:;" class="dropdown-toggle" title="当前站点搜索">
+                ##                            <i class="icon-magnifier"></i>
+                ##                        </a>
+                ##                    </li>
+                ##                #end
+
+                    #if("$!{rightsCode}"!="root")
+                        <!-- 消息 -->
+                        <li class="dropdown dropdown-extended dropdown-notification" id="header_notification_bar">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+                               data-close-others="true" title="消息中心">
+                                <i class="icon-bell"></i>
+                                <span class="badge badge-default badge-notification unReadInfo"> 0 </span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="external">
+                                    <h3>
+                                        <span class="bold"><span class="badge-notification unReadInfo">0</span> 条</span> 未读消息
+                                    </h3>
+                                    <a href="javascript:;" id="message_show_all">查看全部</a>
+                                </li>
+                                <li class="scroller" style="height: 250px;">
+                                #*<ul class="dropdown-menu-list scroller" style="height: 250px;"></ul>*#
+                                    <ul class="dropdown-menu-list">
+
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown dropdown-extended dropdown-notification publish" id="header_notification_bar">
+                            <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+                               data-close-others="true" title="发布中文章列表" id="publish_problem_list">
+                                <i class="fa fa-hourglass-start"></i>
+                                <span class="badge badge-default badge-notification " id="publish_problem"> 0 </span>
+                            </a>
+                        </li>
+
+                    #end
+
+                    <li class="dropdown dropdown-user">
+                        <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
+                           title="用户角色：#if("$!{rightsCode}"=="root")厂商#elseif("$!{rightsCode}"=="superAdmin")超级管理员#elseif("$!{rightsCode}"=="siteAdmin")站点管理员#elseif(
+                               "$!{rightsCode}"=="normal")信息维护员#end">
+                        ##                        <img class="img-circle" src="$!{sysStaticPath}/assets/images/avatar.png"/>
+                            <i aria-hidden="true" class="icon-user"></i>
+                            <span class="username #*username-hide-on-mobile*#">$!{userName}</span>
+                            <i class="fa fa-angle-down"></i>
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="javascript:indexMgr.editPersonalInfo();">
+                                    <i class="icon-user"></i> 修改资料
+                                </a>
+                            </li>
+                        #*<li>
+                            <a href="javascript:indexMgr.logout();">
+                                <i class="icon-logout"></i> 退出登录
+                                <span class="badge badge-success"> 7 </span>
+                            </a>
+                        </li>*#
+                        #*<li class="divider"></li>
+
+                        <li>
+                            <a href="javascript:;">
+                                <i class="icon-key"></i> Log Out </a>
+                        </li>*#
+                        </ul>
+                    </li>
+
+                    <li class="dropdown dropdown-quick-sidebar-toggler">
+                        <a href="javascript:void(0);" class="dropdown-toggle" id="logout" title="退出登录">
+                            <i class="icon-logout"></i>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="dropdown top-more">
+                <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
+                    <span>更 多</span>
+                    <i class="fa fa-angle-down"></i>
+                </a>
+                <ul class="dropdown-menu">
+
+                </ul>
+            </div>
+            <!--只有非超级管理员才能看到站点切换的功能-->
+            <!-- BEGIN MEGA MENU -->
+            #if("$!{rightsCode}"!="root")
+                <div class="hor-menu hor-menu-light hidden-sm hidden-xs">
+                    <ul class="nav navbar-nav">
+                        <li class="classic-menu-dropdown">
+                            <a href="javascript:;" data-close-others="false" data-toggle="dropdown" aria-expanded="false" id="site_menu" title="站点ID：$!{site.indicatorId}">
+                                <span id="G_SiteName">当前站点：$!{site.name}</span>
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                            <ul class="dropdown-menu pull-right" style="min-width: 260px; max-height: 400px; overflow: auto;">
+                                #foreach($s in $siteList)
+                                    #if($s)
+                                        <li>
+                                            <a href="javascript:void(0);" onclick="indexMgr.flushSite('$!{s.indicatorId}','$!{s.name}','$!{s.uri}','$!{s.type}');"
+                                               title="$!{s.name}&#10;站点ID：$!{s.indicatorId}"><i
+                                                class="fa fa-globe"></i>$!{s.name}
+                                            </a>
+                                        </li>
+                                    #end
+
+                                #end
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            #end
+            <!-- END MEGA MENU -->
+
+        #*<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse"
+       data-target=".navbar-collapse"></a>*#
+        </div>
+
+
+        <div class="page-header-inner-bottom clearfix">
+            #if($!rightsCode!="root")
+                <div class="search-box">
+                    <form class="navbar-search" id="global_search_form" method="post">
+                        <input class="form-control search-query" type="text" placeholder="搜索..." id="global_search_words">
+                        <span title="搜索" id="global_search_btns"><i class="fa fa-search"></i></span>
+                    </form>
+                </div>
+            #end
+
+            #menu("root")
+            #set($children=$root)
+            #if($!rightsCode!="root")
+                <!-- 菜单 -->
+                <div class="hor-menu hidden-sm hidden-xs hor-menu-top">
+                    <ul class="nav navbar-nav" id="top_menu_el">
+                    </ul>
+                </div>
+            #end
+        </div>
+
+    </div>
+#*<div class="page-header-menu">
+    <div class="container">
+
+        #menu("root")
+        #set($children=$root)
+        #if($!rightsCode!="root")
+            <!-- 菜单 -->
+            <div class="hor-menu *##*hidden-sm hidden-xs*##* hor-menu-top">
+                <ul class="nav navbar-nav" id="top_menu_el">
+                </ul>
+            </div>
+        #end
+    </div>
+</div>*#
+</div>
+<div class="page-container">
+    #parse("_page_layout/_navbar.vm")
+    <div class="page-content-wrapper">
+        <div id="page_content" class="page-content">
+            <div class="page-content-body #*clearfix*#" #*style="position: relative;"*#></div>
+        </div>
+    </div>
+</div>
+
+#*<div class="modal fade" id="global_search_modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">当前站点搜索</h4>
+            </div>
+            <div class="modal-body">
+
+                <form role="form" name="global_search_form" id="global_search_form">
+                    <div class="form-body">
+
+                        <div class="form-group">
+                            <label>搜索词：</label>
+                            <input name="global_search_words" id="global_search_words" class="form-control" type="text" placeholder="请输入...">
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+            ##                <button type="button" class="btn dark btn-outline" data-dismiss="modal">关 闭</button>
+                <button type="button" id="global_search_submit" class="btn green">搜 索</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>*#
+
+<iframe id="download_frame" name="download_frame" class="hide" src="about:blank"></iframe>
+<script id="top_menu_tpl" type="text/html">
+    <? for(var i=0,l=topMenu.length; i<l; i++){ ?>
+    <? var el = topMenu[i]; ?>
+    <li class="<? if(i==0){ ?>active<? } ?>" data-id="<?=el.id?>" id="top_menu_<?=el.id?>">
+        <a href="javascript:;">
+            <? if(!Ls.isEmpty(el.textIcon)){ ?>
+            <i class="fa fa-<?=el.textIcon?>"></i>
+            <? } ?>
+            <?=el.name?>
+            <span class="selected"> </span>
+        </a>
+    </li>
+    <? } ?>
+</script>
+<script id="left_menu_tpl" type="text/html">
+    <li class="sidebar-toggler-wrapper hide">
+        <div class="sidebar-toggler"></div>
+    </li>
+    <? var el, ell, start, tmpId = 0, uri = "", textIcon = "";?>
+    <? for(var i=0,l=leftMenu.length; i<l; i++){ ?>
+    <? el = leftMenu[i]; ?>
+    <? start = (i==0) || (tmpId>0 && tmpId!=el.pId) ? "start" : "" ; ?>
+    <? uri = el.uri ? el.uri : "javascript:;"; ?>
+    <? textIcon = el.textIcon ? el.textIcon : "folder-o"; ?>
+    <li data-id="<?=el.id?>" data-pid="<?=el.pId?>" class="nav-item menu-item menu_<?=el.pId?> <?=start?>" <? if(GLOBAL_RIGHTS!="root"){ ?>style="display:none;"<? } ?>>
+    <a data-id="m_<?=el.id?>" href="<?=uri?>" class="nav-link nav-toggle <? if(!Ls.isEmpty(el.uri)){ ?>ajaxify<? } ?>">
+        <i class="fa fa-<?=textIcon?>"></i>
+        <span class="title"><?=el.name?></span>
+        <span class="selected"></span>
+        <span class="arrow <? if(el.children){ ?>open<? } ?>"></span>
+    </a>
+    <? if(el.children){ ?>
+    <ul class="sub-menu" style="display:none;">
+        <? for(var ii=0,ll=el.children.length; ii<ll; ii++){ ?>
+        <? ell = el.children[ii]; ?>
+        <li class="nav-item">
+            <a href="<?=ell.uri?>" data-id="sm_<?=ell.id?>" class="nav-link ajaxify" data-rights="<?=ell.rights?>">
+                <span class="title"><?=ell.name?></span>
+            </a>
+        </li>
+        <? } ?>
+    </ul>
+    <? } ?>
+    <? tmpId = el.pId; ?>
+    </li>
+    <? } ?>
+</script>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/dwr/util.js"></script>
+<script src="$!{rc.contextPath}/dwr/engine.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/indexMgr.js"></script>
+</body>
+</html>

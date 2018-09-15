@@ -1,0 +1,280 @@
+<style>
+    .pagination {
+        display: block;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="editSpecial()">新建专题</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="name" name="name" class="form-control"
+                                           placeholder="专题名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="special_list" class="special-list clearfix"></div>
+
+            #*<div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                 url="/special/getPagination?dataFlag=1" sizeList="[5,10,20,50]" pageSize="10"
+                 idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                <div property="columns">
+                    <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                    <div field="name" width="100%" align="center" headerAlign="center">专题名称</div>
+                    <div width="200" align="center" headerAlign="center" renderer="renderTheme">主题</div>
+                    <div width="120" field="createDate" align="center" headerAlign="center" dateFormat="yyyy-MM-dd">创建日期</div>
+                    <div width="200" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                </div>
+            </div>*#
+
+            </div>
+        </div>
+    </div>
+</div>
+##<script src="$!{sysStaticPath}/assets/js/plugins/lightbox/lightbox-min.js"></script>
+<script id="special_list_tpl" type="text/html">
+    <?
+    if(data && data.length > 0) {
+    ?>
+    <ul class="clearfix">
+        <?
+        for(var i=0,l=data.length; i<l; i++){
+            var el = data[i], NoImgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg";
+        ?>
+        <li>
+            <div class="thumbnail">
+                <?
+                if (el.thumb && el.thumb.length > 0) {
+                for(var ii=0,ll=el.thumb.length; ii
+                <ll ; ii++) {
+                    var ell=el.thumb[ii],imgPath
+                = "";
+                if(ell.path==null && ell.path.length<=0){
+                imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+                }else{
+                if(ell.path.indexOf("/") !=-1){
+                imgPath = ell.path;
+                } else if (ell.path.indexOf(".") !=-1){
+                imgPath = (GLOBAL_FILESERVERNAMEPATH||"") + ell.path;
+                } else {
+                imgPath = (GLOBAL_FILESERVERPATH||"") + ell.path;
+                }
+                }
+                ?>
+                <a href="/design/previewThumbnail?id=<?=el.themeId?>" data-title="<?=ell.name?>" style="display: <? if(!ell.defaults){ ?>none<? } ?>" target="_blank">
+                    <? if(ell.defaults){ ?>
+                    <img src="<?=imgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;" <? if(el.specialStatus+""=="1"){ ?>
+                    class="dom-gray"<? }?>>
+                    <? } else { ?>
+                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;" <? if(el.specialStatus+""=="1"){ ?>
+                    class="dom-gray"<? }?>>
+                    <? } ?>
+                </a>
+                <?
+                    }
+                } else {
+                ?>
+                <a href="javascript:void(0)">
+                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;" <? if(el.specialStatus+""=="1"){ ?>
+                    class="dom-gray"<? }?>>
+                </a>
+                <? } ?>
+                <div class="caption">
+                    <h4 <? if(el.specialStatus+""=="1"){ ?>style="text-decoration: line-through; color:#CCC; "<? }?>><?=el.name?></h4>
+                #*<p>&nbsp;</p>*#
+                    <p class="text-right">
+                        <a href="javascript:void(0)" onclick="deleteSpecial(<?=el.id?>)" style="color: #fff!important;">*</a>
+                        <? if(el.specialStatus+""=="0"){ ?>
+                        <a href="/design/index?themeId=<?=el.themeId?>&specialId=<?=el.id?>&tplId=<?=el.tplId?>&columnId=<?=el.columnId?>" class="btn btn-info" role="button"
+                           target="_blank">设计</a>
+                        <? } ?>
+                        <a href="javascript:void(0)" class="btn btn-default" role="button" onclick="editSpecial(<?=el.id?>)">修改</a>
+                        <a href="javascript:void(0)" class="btn <? if(el.specialStatus+""=="1"){ ?>btn-default<? } else { ?>btn-default<? } ?>" role="button"
+                        onclick="changeSpecial(<?=el.id?>,'<?=el.specialStatus?>')">
+                        <? if(el.specialStatus+""=="1"){ ?>已归档<?} else {?>归档<? }?>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </li>
+        <?
+        }
+        ?>
+    </ul>
+    <?} else {?>
+    <div class="alert alert-info" role="alert">暂无信息！</div>
+    <? } ?>
+    <div id="pagination" class="pagination text-right mr22"></div>
+</script>
+<script>
+    mini.parse();
+    var cur = {
+        name: $('#name'),
+        url: {
+            specialEdit: '/special/specialEdit'
+        },
+        grid: {
+            pageIndex: 0,
+            pageSize: 8,
+            name: "",
+            dataFlag: 1
+        }
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        getData(cur.grid);
+        return false;
+    })
+
+    //分页回调方法
+    function pageCallback(page_index) {
+        cur.grid.pageIndex = page_index - 1;
+        getData(cur.grid);
+        return false;
+    }
+
+    //拉取数据
+    function getData(param) {
+        return Ls.ajaxGet({
+            url: "/special/getPagination",
+            data: param
+        }).done(function (d) {
+
+            var listHtml = Ls.template("special_list_tpl", d);
+            $("#special_list").html(listHtml)
+
+            //创建分页
+            var pIndex = d.pageIndex;
+            if (pIndex == 0) {
+                pIndex = 1;
+            } else {
+                pIndex = pIndex + 1;
+            }
+            Ls.pagination3("#pagination", function (pageIndex) {
+                pageCallback(pageIndex - 1);
+            }, {
+                currPage: pIndex,
+                pageCount: d.pageCount,
+                total: d.total,
+                isTotal: true
+            });
+
+        });
+    }
+
+    function editSpecial(id) {
+        var url = cur.url.specialEdit,
+            title = '新建专题';
+
+        if (id) {
+            url = url + '?id=' + id;
+            title = '编辑专题';
+        }
+        Ls.openWin(url, '920px', '450px', {
+            title: title
+        });
+    }
+
+    function changeSpecial(id, status) {
+        if (status == 0 && !confirm('是否确定归档此专题?')) {
+            return false;
+        }
+        Ls.ajax({
+            type: "POST",
+            data: {
+                id: id,
+                specialStatus: status == 1 ? 0 : 1
+            },
+            url: "/special/changeSpecial",
+            success: function (json) {
+                if (json.status == 1) {
+                    search();
+                    Ls.tipsOk("操作成功");
+                } else {
+                    Ls.tipsErr(json.desc);
+                }
+            }
+        });
+
+    }
+
+    function deleteSpecial(id) {
+        if (!confirm('确定删除吗？删除包括（模板、模型、栏目、新闻）,且数据不可恢复。')) {
+            return false;
+        }
+        if (!confirm('请再次确定删除？')) {
+            return false;
+        }
+        Ls.ajax({
+            type: "POST",
+            data: {id: id},
+            url: "/special/deleteSpecial",
+            success: function (json) {
+                if (json.status == 1) {
+                    search();
+                    Ls.tipsOk("操作成功");
+                }
+            }
+        });
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var designUrl = '/design/index?themeId=' + record.id + '&theme=' + record.themePath + '&tplId=' + record.tplId;
+        var designBtn = '<a  class="btn btn-default btn-sm btn-info" href="' + designUrl + '" target="_blank">设计</a> ';
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-info" onclick="editSpecial(' + record.id + ')">修改</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-info" onclick="deleteSpecial(' + record.id + ')">删 除</button>';
+        return designBtn + edit + del;
+    }
+
+    function renderTheme(obj) {
+        var record = obj.record;
+        var str = '';
+        if (!Ls.isEmpty(record.themeName)) {
+            str += record.themeName;
+        }
+        if (!Ls.isEmpty(record.themeImgPath)) {
+            var path = "";
+            if (record.themeImgPath.indexOf(".") == -1) {
+                path = GLOBAL_FILESERVERPATH + record.themeImgPath;
+            } else {
+                path = GLOBAL_FILESERVERNAMEPATH + record.themeImgPath;
+            }
+            str += '<div style="margin-bottom: 5px;"><img width="80" height="80" src="' + path + '" /><div/>'
+        }
+
+        return str;
+    }
+
+    function search() {
+        var name = cur.name.val();
+        cur.grid.name = name;
+        getData(cur.grid);
+    }
+
+    function showAll() {
+        cur.name.val('');
+        search();
+    }
+</script>

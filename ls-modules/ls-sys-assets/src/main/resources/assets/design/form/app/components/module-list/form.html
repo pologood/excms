@@ -1,0 +1,71 @@
+<style>
+    .moduleList {
+        padding-top: 10px;
+        padding-left: 15px;
+        margin: 0 auto;
+        overflow: auto;
+        height: 426px;
+    }
+
+    .moduleList ul li {
+        width: 186px;
+        height: 174px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+        cursor: pointer;
+        text-align: center;
+        overflow: hidden;
+        border: 1px solid #fff;
+        float: left;
+        list-style: none;
+    }
+
+    .moduleList .moduleIcon{
+        /*text-indent: -999px;*/
+        font-size: 15px;
+        color: #919394;
+    }
+
+    .moduleList ul li.active,
+    .moduleList ul li:hover {
+        background: #fffce1;
+        border: 1px solid #f8881a;
+    }
+    .list-wrapper ul {
+        display: none;
+    }
+    .list-wrapper ul.active {
+        display: block;
+    }
+    .dialog-content {
+        overflow: hidden !important;
+    }
+</style>
+<ul class="sui-nav nav-tabs nav-large" style="margin: 15px 15px 20px;font-size: 14px;">
+    <li class="active"><a href="#tab1" data-toggle="tab">文字</a></li>
+    <li><a href="#tab2" data-toggle="tab">图片</a></li>
+    <li><a href="#tab3" data-toggle="tab">其他</a></li>
+</ul>
+<div class="moduleList" id="attrForm">
+
+
+    <div id="addNewModuleUL" class="list-wrapper">
+        <ul id="tab1" class="active clearfix">
+            <li v-for="el in moduleList.TEXT" :class="{'active':el.active}" v-on:click="selected(el)">
+                <a :class="el.className" :dataType="el.type"><span>{{el.name}}</span></a>
+            </li>
+        </ul>
+        <ul id="tab2" class="clearfix">
+            <li v-for="el in moduleList.IMG" :class="{'active':el.active}" v-on:click="selected(el)">
+                <a :class="el.className" :dataType="el.type">{{el.name}}</a>
+            </li>
+        </ul>
+        <ul id="tab3" class="clearfix">
+            <li v-for="el in moduleList.OTHER" :class="{'active':el.active}" v-on:click="selected(el)">
+                <a :class="el.className" :dataType="el.type">{{el.name}}</a>
+            </li>
+        </ul>
+    </div>
+
+</div>

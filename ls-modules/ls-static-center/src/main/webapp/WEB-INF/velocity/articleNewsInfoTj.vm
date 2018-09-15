@@ -1,0 +1,54 @@
+<div class="xxgk_lmcon" id="xxgk_lmcon">
+	<table border="0" cellpadding="0" cellspacing="1" width="100%" bgcolor="#dddddd" style="font-size:14px;">
+	<tbody>
+	#set($xxgkData=$resultObj.data)
+	#if($xxgkData && $xxgkData.size() > 0)
+		<tr class="lmcj_title" bgcolor="#fff9e1">
+			<td width="397" height="84" align="center" bgcolor="#f1f1f1" rowspan="2"><strong>单位名称</strong></td>
+	  		<td height="42" align="center" bgcolor="#f1f1f1" colspan="5">
+				<select id="type" name="type">
+##					<option value="">请选择排序方式</option>
+                    <option value="1" #if("$!{paramObj.type}"=="1") selected="selected" #end>按本年发布文章数</option>
+                    <option value="2" #if("$!{paramObj.type}"=="2") selected="selected" #end>按上年发布文章数</option>
+                    <option value="3" #if("$!{paramObj.type}"=="3") selected="selected" #end>按本月发布文章数</option>
+                    <option value="0" #if("$!{paramObj.type}"=="0") selected="selected" #end>按发布文章总数</option>
+				</select>
+				<button onclick="queryTj()">排序</button>
+			</td>
+		</tr>
+		<tr>
+            <td width="222" height="41" align="center" bgcolor="#f1f1f1"><strong>序号</strong></td>
+            <td width="242" height="41" align="center" bgcolor="#f1f1f1"><strong>本年发布文章数</strong></td>
+            <td width="207" height="41" align="center" bgcolor="#f1f1f1"><strong>本月发布文章数</strong></td>
+            <td width="255" height="41" align="center" bgcolor="#f1f1f1"><strong>上年发布文章数</strong></td>
+            <td width="235" height="41" align="center" bgcolor="#f1f1f1"><strong>发布文章总数</strong></td>
+            
+	  </tr>
+		#foreach($vo in $xxgkData)
+			<tr>
+				<td height="30" align="center" bgcolor="#FFFFFF"><a href="/site/tpl/2676909?organId=$!{vo.organId}" title="$!{vo.organName}" target="_blank">$!{vo.organName}</a></td>
+				<td align="center" bgcolor="#FFFFFF">$!{velocityCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.thisYearCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.thisMonthCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.lastYearCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.total}</td>
+               
+			</tr>
+		#end
+		<tr>
+			<td align="center" bgcolor="#F1F1F1" height="34"><strong>合计：&nbsp;$!{resultObj.organCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong></strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.thisYearCount}</strong></td>
+            <td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.thisMonthCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.lastYearCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.total}</strong></td>
+            
+		</tr>
+	#else
+		<tr>
+		  <td align="center" bgcolor="#F1F1F1" height="34" colspan="6"><strong>暂无相关数据</strong></td>
+		</tr>
+	#end
+    </tbody>
+    </table>
+</div>

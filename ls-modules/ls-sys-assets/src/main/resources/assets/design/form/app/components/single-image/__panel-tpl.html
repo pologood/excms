@@ -1,0 +1,11 @@
+<div class="panel {{moduleId}}_panel">
+    <div class="panel-body clearfix">
+        {{if conf.href&&conf.href!="#"}}
+        <a href="{{conf.href}}" target="{{conf.target}}">
+            <img src="{{conf.src}}" options="{{ placeholderOpt }}" class="{{placeholderClass}}" title="{{conf.title}}">
+        </a>
+        {{else}}
+        <img src="{{conf.src}}" options="{{ placeholderOpt }}" class="{{placeholderClass}}" title="{{conf.title}}">
+        {{/if}}
+    </div>
+</div>

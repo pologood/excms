@@ -1,0 +1,7 @@
+#foreach($eo in $resultObj)
+<ul>
+  <li class="t1"><span class="red">$velocityCount</span></li>
+  <li class="t2">$!{eo.organName}</li>
+  <li class="t3"><img src="/images/ph_top.gif" width="7" height="7">&nbsp;$!{eo.dealCount}</li>
+</ul>
+#end

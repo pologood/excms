@@ -1,0 +1,293 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">互动回应情况</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="row">
+            <div class="col-md-15">
+                <form id="configForm" role="form">
+                    <input type="hidden" value="after" name="monitoredType">
+                    <input type="hidden" value="$!{typeCode}" name="typeCode">
+                    <div class="tab-content">
+                        <!-- 站点无法访问 -->
+                        <div class="tab-pane active" id="tab_1_2">
+                            <div class="form-body">
+                                <div class="portlet light">
+                                    <div class="portlet-body form">
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                            <p>&nbsp;</p>
+                                            <p style="font-family: '微软雅黑';font-weight: 600;margin-top:10px;color:#333;">政务咨询类栏目扣分细则：</p>
+                                            <p>&nbsp;&nbsp;1.未开设栏目的，扣5分；</p>
+                                            <p>&nbsp;&nbsp;2.开设了栏目，但监测时间点前1年内栏目中无任何有效信件、留言的，扣5分。</p>
+                                            <p style="font-family: '微软雅黑';font-weight: 600;margin-top:10px;color:#333;">调查征集类栏目扣分细则：</p>
+                                            <p>&nbsp;&nbsp;1.未开设栏目的，扣5分；</p>
+                                            <p>&nbsp;&nbsp;2.开设了栏目，但栏目不可用或监测时间点前1年内未开展调查征集活动的，扣5分；</p>
+                                            <p>&nbsp;&nbsp;3.开设了栏目且监测时间点前1年内开展了调查征集活动，但开展次数较少的（地方政府及国务院各部门门户网站少于6次，其他政府网站少于3次），扣3分。</p>
+                                            <p style="font-family: '微软雅黑';font-weight: 600;margin-top:10px;color:#333;">互动访谈类栏目扣分细则：</p>
+                                            <p>&nbsp;&nbsp;1.开设了栏目，但栏目不可用或监测时间点前1年内未开展互动访谈活动的，扣5分；</p>
+                                            <p>&nbsp;&nbsp;2.开设了栏目且监测时间点前1年内开展了互动访谈活动，但开展次数较少的（地方政府及国务院各部门门户网站少于6次，其他政府网站少于3次），扣3分。</p>
+                                        </div>
+                                        <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                                             url="/monitor/vetoConfig/getDataPageByCode" sizeList="[5,10,20,50]" pageSize="10"
+                                             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height:300px;"
+                                                >
+                                            <div property="columns">
+                                                <div type="checkcolumn" headerAlign="center" width="50"></div>
+                                                <div field="columnTypeCode" width="130" align="center" headerAlign="center">栏目类别编码</div>
+                                                <div field="columnTypeName" width="150" align="center" headerAlign="center">栏目类别名称</div>
+                                                <div width="150" align="center" headerAlign="center" renderer="renderMonitoredType">扣分方式</div>
+                                                <div width="200" align="center" headerAlign="center" renderer="renderNoActivity">扣分方式(活动未开展)</div>
+                                                <div width="200" align="center" headerAlign="center" renderer="renderActivity">扣分方式(活动已开展)</div>
+##                                                <div width="100" align="center" headerAlign="center" renderer="renderStatus">状态</div>
+                                                <div width="100" align="center" headerAlign="center" allowSort="false" renderer="opt">操作</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        typeCode: "$!{typeCode}",
+        ser_key: '',
+        dialog: Ls.getWin.dialog
+    };
+
+    function search() {
+        cur.grid.load({"dataFlag": 1, "typeCode": cur.typeCode});
+    }
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+//        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load({"dataFlag": 1, "typeCode": cur.typeCode});
+    })
+
+    function renderStandardCode(e) {
+        var record = e.record;
+        var str = "";
+        if (record.standardCode == "notUpdateColumnNum") {
+            str = str + "未更新栏目数量×分数";
+        } else if (record.standardCode == "updateNum") {
+            str = str + "更新信息数量";
+        }
+//        str=str+record.num+'个';
+        return str;
+    }
+
+    function numDefault(str) {
+        if (str == undefined || str == null || str == '') {
+            return 0;
+        }
+        return str;
+    }
+
+
+    function renderMonitoredType(e) {
+        var record = e.record;
+        var columnType = record.columnTypeCode;
+        var str = "";
+        if (columnType == "columnType_ZWZX") {
+            str = dealData(record, columnType);
+        } else {
+            str = "无配置!";
+        }
+
+        return str;
+    }
+
+    function renderActivity(e) {
+        var record = e.record;
+        var columnType = record.columnTypeCode;
+        var str = "";
+        if (columnType == "columnType_DCZJ" || columnType == "columnType_HDFT") {
+            str = dealActivityData(record, columnType);
+        } else {
+            str = "无配置!";
+        }
+        return str;
+    }
+
+    function renderNoActivity(e) {
+        var record = e.record;
+        var columnType = record.columnTypeCode;
+        var str = "";
+        if (columnType == "columnType_DCZJ" || columnType == "columnType_HDFT") {
+            str = dealNoActivityData(record, columnType);
+        } else {
+            str = "无配置!";
+        }
+        return str;
+    }
+
+    function dealActivityData(record, columnType) {
+
+        var str = '';
+        if (record.monitoredType == 'before') {
+            str = str + '开始检测之前';
+
+        } else if (record.monitoredType == 'after') {
+            str = str + '开始检测之后';
+        }
+        str = str + numDefault(record.activityAonitoredNum);
+        if (record.activityTimeType == 'year') {
+            str = str + '年';
+
+        } else if (record.activityTimeType == 'month') {
+            str = str + '月';
+        } else if (record.activityTimeType == 'week') {
+            str = str + '周';
+        } else if (record.activityTimeType == 'day') {
+            str = str + '天';
+        }
+        str = str + "开展<" + numDefault(record.activityLimitNum) + "次"
+        str = str + "扣" + numDefault(record.activityNum) + '分';
+        return str;
+    }
+
+
+    function dealNoActivityData(record, columnType) {
+        console.log(record);
+        var str = '';
+        if (record.monitoredType == 'before') {
+            str = str + '开始检测之前';
+
+        } else if (record.monitoredType == 'after') {
+            str = str + '开始检测之后';
+        }
+        str = str + numDefault(record.noActivityAonitoredNum);
+        if (record.noActivityTimeType == 'year') {
+            str = str + '年';
+
+        } else if (record.noActivityTimeType == 'month') {
+            str = str + '月';
+        } else if (record.noActivityTimeType == 'week') {
+            str = str + '周';
+        } else if (record.noActivityTimeType == 'day') {
+            str = str + '天';
+        }
+
+        str = str + "扣" + numDefault(record.noActivityNum) + '分';
+        return str;
+    }
+
+
+    function dealData(record, columnType) {
+
+        var str = '';
+        if (record.monitoredType == 'before') {
+            str = str + '开始检测之前';
+
+        } else if (record.monitoredType == 'after') {
+            str = str + '开始检测之后';
+        }
+        str = str + numDefault(record.monitoredNum);
+        if (record.monitoredTimeType == 'year') {
+            str = str + '年';
+
+        } else if (record.monitoredTimeType == 'month') {
+            str = str + '月';
+        } else if (record.monitoredTimeType == 'week') {
+            str = str + '周';
+        } else if (record.monitoredTimeType == 'day') {
+            str = str + '天';
+        }
+
+        str = str + "扣" + numDefault(record.num) + '分';
+        return str;
+    }
+
+
+    function editEO(id) {
+        Ls.openWin("/monitor/vetoConfig/vetoEdit?id=" + id + "&typeCode=" + cur.typeCode, '600px', '350px', {
+            title: "编辑"
+        });
+    }
+
+
+    function batchDel(id) {
+        var ids = [];
+
+        if (id != null && id != "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tipsInfo("请选择一条记录!");
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].typeId);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/monitor/columnCon/delEOs",
+                data: {
+                    "ids[]": ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips("删除成功", {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons: "error", times: 2});
+                    }
+                    cur.grid.load({"dataFlag": 1});
+                }
+            });
+        }
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+//        var disable  = '<button id="disable_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="changeStatus('+record.id+',0)">禁用</button> ';
+//        var enable = '<button id="enable_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="changeStatus('+record.id+',1)">启用</button> ';
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editEO(' + record.id + ')">规则配置</button> ';
+//        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel(' + record.typeId + ')">删除</button>';
+
+//        if(record.status == 0) {
+//            return enable + edit + del;
+//        } else {
+//            return disable + edit + del;
+//        }
+        return edit;
+    }
+
+    function renderStatus(e) {
+        var statue = e.record.statues;
+        var str = "";
+        if (statue == 0) {
+            str = "<font style='color: red' >禁用</font>"
+        }
+        else if (statue == 1) {
+
+            str = "<font >启用 </font>"
+        }
+        return str;
+    }
+
+
+</script>

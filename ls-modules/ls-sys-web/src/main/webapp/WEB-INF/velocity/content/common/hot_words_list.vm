@@ -1,0 +1,110 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;page-body-white" class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+				#*
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <button id="adduser_btn" class="btn btn-default btn-replace" onclick="replaces()">批量加热点</button>
+                            <button id="adduser_btn" class="btn btn-default btn-neglect" onclick="neglectAll()"> 忽略</button>
+                        </div>
+                    </div>
+                </div>
+				*#
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     sizeList="[20,30,50]" pageSize="10" showPager="false"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <!--<div type="indexcolumn"></div> -->
+                        ##<div type="checkcolumn" width="50"></div>
+                        <div field="hotName" width="20%" headerAlign="center" allowSort="false">热词</div>
+                        <div width="40%" headerAlign="center" allowSort="false" renderer="hotUrl">热点链接</div>
+                        <div width="40%" headerAlign="center" allowSort="false" renderer="hotDesc">热点描述</div>
+						##<div width="115" headerAlign="center" allowSort="false" renderer="renderOp" align="center">操作</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+    var content = Ls.getWin.win.eweb.getHtml();
+    var grid = mini.get("datagrid1");
+
+    grid.load({dataFlag: 1, flag: "HOT", content: content});
+
+    grid.setUrl("/content/getCheckList");
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid, 60);
+    $(document).ready(function () {
+
+    })
+
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        tgBtn = '<button class="btn btn-sm btn-default btn-edit"  onclick="replaceOpr(' + rec._uid + ',' + rec.id + ',\'' + rec.hotName + '\')">替 换</button> '
+        qsBtn = '<button class="btn btn-sm btn-default btn-delete" onclick="deleteOpr(' + rec._uid + ')">忽 略</button>'
+        str += tgBtn + qsBtn;
+        return str;
+    }
+
+    function hotUrl(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<input id="' + rec.id + '_url" value="' + rec.hotUrl + '" class="form-control" style="height:18px"></input>';
+        return str;
+    }
+
+    function hotDesc(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<input id="' + rec.id + '_desc" value="' + (rec.urlDesc || '') + '" class="form-control" style="height:18px"></input>';
+        return str;
+    }
+
+    function deleteOpr(uid) {
+        var row = grid.getRowByUID(uid);
+        grid.removeRow(row);
+    }
+
+    function replaceOpr(uid, id, hotName) {
+        var url = $("#" + id + "_url").val();
+        var desc = $("#" + id + "_desc").val();
+        var hot = '<a target="_blank" href="' + url + '" title="' + desc + '">' + hotName + '</a>';
+        content = content.replaceAll(hotName, hot);
+        Ls.getWin.win.eweb.setHtml(content);
+        var row = grid.getRowByUID(uid);
+        grid.removeRow(row);
+    }
+
+    function replaces() {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            for (var i = 0; i < rows.length; i++) {
+                var replaceWords = $("#" + rows[i].id + "_url").val();
+                var desc = $("#" + rows[i].id + "_desc").val();
+                replaceWords = '<a href="'+replaceWords+'" title="' + desc + '">' + rows[i].hotName + '</a>';
+                var reg = new RegExp(rows[i].hotName, "gm");
+                content = content.replaceAll(reg, replaceWords);
+                var row = grid.getRowByUID(rows[i].uid);
+                grid.removeRow(rows[i]);
+            }
+            Ls.getWin.win.eweb.setHtml(content);
+        }
+    }
+
+    function neglectAll() {
+        Ls.winClose();
+    }
+</script> 

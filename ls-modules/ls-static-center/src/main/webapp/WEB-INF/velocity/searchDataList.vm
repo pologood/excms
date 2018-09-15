@@ -1,0 +1,65 @@
+#set($Integer=0)
+#set($titleLength="$!{paramObj.titleLength}")
+#set($contentLength="$!{paramObj.contentLength}")
+#set($titleLength=$Integer.parseInt($titleLength))
+#set($contentLength=$Integer.parseInt($contentLength))
+#set($count=$Integer.parseInt("$!{paramObj.count}"))
+#set($pageSize=$Integer.parseInt("$!{paramObj.pageSize}"))
+#foreach($eo in $resultObj)
+<ul class="search-list">
+    <li class="search-title">
+        <a href="$!{eo.link}" target="_blank" title="#filterHtml($!{eo.title})">$!{eo.title}</a>
+    </li>
+    <li class="search-info">
+        #if("$!{paramObj.showType}"=="1")
+            #if("$!{eo.remark}" != "")
+            #cutstr("#filterHtml($!{eo.remark})",$!{contentLength})
+        #end
+        #else
+            #if("$!{eo.content}" != "")
+                #set($content = "#filterHtmlTag($!{eo.content},'img')")
+                #cutstr("#filterHtml(${content})",$!{contentLength})
+            #end
+        #end
+    </li>
+    #if("$!{paramObj.typeCode}" != "public_content")
+        <li class="search-column">
+            所在栏目：$!{eo.columnName}
+        </li>
+    #end
+    <li class="search-url">
+        <a href="$!{eo.link}" target="_blank">
+            $!{eo.link}
+        </a>
+        <span class="date">$!{eo.createDate}</span>
+    </li>
+</ul>
+#end
+#if($count == 0)
+<div class="warm-prompt">
+    很抱歉，没有找到和您的查询相匹配的结果。<br>
+    您可以尝试更换检索词，重新检索。
+##        抱歉，没有找到<font color="red">$!{keywords}</font>
+##        相关结果。建议： <br>
+##        1.请您检查输入是否错误<br>
+##        2.请您尝试简化输入词<br>
+##        3.请您尝试用相似词或常见词<br>
+##        4.请点击切换搜索范围下分类查看<br>
+</div>
+#elseif($count > $pageSize)
+<div id="page_$!{siteId}" class="pagination"></div>
+<script>
+    #if($!{paramObj.url}&&$!{paramObj.url}!="")
+        #set($url = $!{paramObj.url})
+    #else
+        #set($url = "/site/search/$!{siteId}")
+    #end
+    Ls.pagination("#page_$!{siteId}", function (pageIndex) {
+        location.href = "$!url?columnId=$!{columnId}&columnIds=$!{columnIds}&typeCode=$!{typeCode}&beginDate=$!{beginDate}&endDate=$!{endDate}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=$!{excColumns}&datecode=$!{datecode}&sort=$!{sort}&type=$!{type}&tableColumnId=$!{tableColumnId}&indexNum=$!{indexNum}&fileNum=$!{fileNum}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}&pageIndex=" + pageIndex + "&pageSize=" + $pageSize;
+    }, {
+        pageCount:$!{paramObj.pageCount},
+        currPage:$!{pageIndex}
+    })
+</script>
+#else
+#end

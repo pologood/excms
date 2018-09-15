@@ -1,0 +1,67 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://chuzhou.lonsunsoft.cn/css/lonsun.css">
+    <link rel="stylesheet" type="text/css" href="http://chuzhou.lonsunsoft.cn/assets/css/core-min.css">
+    <script type="text/javascript" src="http://chuzhou.lonsunsoft.cn/assets/js/jquery-min.js"></script>
+    <script type="text/javascript" src="http://chuzhou.lonsunsoft.cn/assets/js/core-min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="http://chuzhou.lonsunsoft.cn/images/favicon.ico">
+    <style>
+        #m1, #m2 { padding-bottom: 32767px !important; margin-bottom: -32767px !important; }
+        @media all and (min-width: 0px) {
+            #m1, #m2 { padding-bottom: 0 !important; margin-bottom: 0 !important; }
+            #m1:before, #m2:before { content: '[DO NOT LEAVE IT IS NOT REAL]'; display: block; background: inherit; padding-top: 32767px !important; margin-bottom: -32767px !important; height: 0; }
+    </style>
+</head>
+<body style="background: none">
+#set($Integer=0)
+##如果消息不为空
+#if("$!{msg}" != "")
+    <font size="3" class="empty_msg">$!{msg}</font>
+#else
+<div class="listnews">
+    <ul class="doc_list list-2654179">
+        #foreach($eo in $page.data)
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <li class="$!{css}">
+                <a href="$!{eo.link}" target="_blank" title="$!{eo.title}" class="left">
+                    #set($style="")
+                    #if("$!{eo.isBold}" == "1")
+                        #set($style="font-weight:bold;")
+                    #end
+                    #if("$!{eo.isTilt}" == "1")
+                        #set($style=$style+"font-style:italic;")
+                    #end
+                    #if("$!{eo.isUnderline}" == "1")
+                        #set($style=$style+"text-decoration:underline;")
+                    #end
+                    #set($new_length=0)
+                    #if("$!{eo.isNew}" == "1")
+                        #set($new_length=$!{length} - 2)
+                    #else
+                        #set($new_length=$!{length})
+                    #end
+                    #if("$!{eo.titleColor}" != "#000000")
+                        #set($style=$style+"color:$!{eo.titleColor};")
+                    #end
+                    #set($title=$!{eo.title})
+                    <span style='$style'>$title</span>
+                </a>
+                #if("$!{eo.isNew}" == "1")
+                    <img src="/images/news.gif">
+                #end
+                #if("$isHit"=="true")<span class="right hit">[$!{eo.hit}]</span>#end
+                #if("$isDate"=="true")<span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>#end
+            </li>
+        #end
+    </ul>
+<div>
+#end
+</body>
+</html>

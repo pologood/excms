@@ -1,0 +1,90 @@
+#parse("_page_layout/_header.vm")
+<form role="form" id="form1">
+    <fieldset style="width:440px;border:solid 1.5px #aaa;margin-top:8px;position:relative;">
+        <legend><b>用户认证设置</b></legend>
+        <div id="rbl" class="mini-radiobuttonlist b" repeatItems="1" repeatLayout="table" repeatDirection="vertical" style="margin:0px 60px;"
+             textField="text" valueField="value" value="$!{UserAuth.key}"
+             data="[{value:'local_auth',text:'使用本地认证登录'},{value:'sso_auth',text:'使用远程单点登录（SSO）'}]">
+        </div>
+        </br>
+        <div id="content">
+            <table class="tform w98p">
+                #foreach($ai in ${AuthItem})
+                    <tr>
+                        <td class="tdlabel b"><label for="$ai.key$text">$!ai.itemName：</label></td>
+                        <td>
+                            <input name="$!ai.key" id="$!ai.itemId"
+                                   #if($!ai.dataType=="string")class="mini-textbox" #elseif($!ai.dataType=="pass")class="mini-password" #end
+                                   required="true" width="250px" requiredErrorText="内容不能为空" value="$!ai.value"/>
+                        </td>
+                    </tr>
+                #end
+            </table>
+        </div>
+        </br>
+        <div class="form-actions" style="text-align:center">
+            <button type="button" class="btn22_blue h30 f14 mr15" onclick="saveConfig()">保存</button>
+            <button type="button" class="btn22_gray h30 f14" onclick="cancel()">重置</button>
+        </div>
+    </fieldset>
+
+
+    #parse("_page_layout/_footer.vm")
+</form>
+<script>
+
+    $(document).ready(function () {
+        mini.parse();
+        if ('$!{UserAuth.key}' == 'local_auth') {
+            $("#content").hide();
+        } else if ('$!{UserAuth.key}' == 'sso_auth') {
+            $("#content").show();
+        }
+        var rbl = mini.get("rbl");
+        rbl.on("valuechanged", function (e) {
+            if (this.getValue() == 'local_auth') {
+                $("#content").hide();
+            } else if (this.getValue() == 'sso_auth') {
+                $("#content").show();
+            }
+        });
+
+    })
+
+    var form = new mini.Form("#form1");
+    function cancel() {
+        form.reset();
+        if ('$!{UserAuth.key}' == 'local_auth') {
+            $("#content").hide();
+        } else if ('$!{UserAuth.key}' == 'sso_auth') {
+            $("#content").show();
+        }
+    }
+
+    function saveConfig() {
+        var rb = mini.get("rbl");
+        var el = form.el;
+        var config = [];
+        var data = "";
+        var val = rb.getValue();
+        for (a in el) {
+            if (el[a] && el[a].type == "text" || el[a] && el[a].type == "password") {
+                var obj = "";
+                obj = el[a].name + "|" + el[a].value;
+                config.push(obj);
+            }
+        }
+        data = {type: val, config: config};
+        Ls.ajax({
+            url: "/globConfig/saveAuthConfig",
+            data: data
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                //	window.CloseOwnerWindow();
+            }
+        })
+    }
+</script>

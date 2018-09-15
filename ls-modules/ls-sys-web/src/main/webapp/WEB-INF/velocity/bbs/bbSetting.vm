@@ -1,0 +1,107 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" ms-controller="formId" id="formId" name="formId">
+                    <div class="form-body">
+                        <!--    论坛配置开始   -->
+                        <div class="form-group bbs">
+                            <label>发帖限制</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isIssue" value="1" ms-duplex-string="isIssue">禁止发布主题 </label>
+                                <label class="radio-inline"><input type="radio" name="isIssue" value="0" ms-duplex-string="isIssue">允许发布主题</label>
+                                <label class="radio-inline"><input type="radio" name="isReply" value="1" ms-duplex-string="isReply">禁止回复帖子</label>
+                                <label class="radio-inline"><input type="radio" name="isReply" value="0" ms-duplex-string="isReply">允许回复帖子</label>
+                            </div>
+                        </div>
+                        <div class="form-group bbs">
+                            <label>限制回帖年份</label>
+                            <input type="text" name="year" ms-duplex="year" class="form-control" placeholder="如果设定，在设定年以前的帖子将禁止回复">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>禁止发帖IP</label>
+                            <textarea name="ips" class="form-control" rows="1" placeholder="格式为 (IP地址),多个，请用'#'分隔符分隔" ms-duplex="ips"></textarea>
+                        </div>
+                        <div class="form-group bbs">
+                            <label>注册会员积分</label>
+                            <input type="text" name="registerNum" ms-duplex="registerNum" class="form-control" placeholder="注册会员积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>会员登录积分</label>
+                            <input type="text" name="loginNum" ms-duplex="loginNum" class="form-control" placeholder="会员登录积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>发帖积分</label>
+                            <input type="text" name="postedNum" ms-duplex="postedNum" class="form-control" placeholder="用户发帖时积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>回复积分</label>
+                            <input type="text" name="replyNum" ms-duplex="replyNum" class="form-control" placeholder="用户回帖时积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>审核通过积分</label>
+                            <input type="text" name="checkNum" ms-duplex="checkNum" class="form-control" placeholder="用户发帖被审核通过时积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>删贴积分</label>
+                            <input type="text" name="delNum" ms-duplex="delNum" class="form-control" placeholder="用户帖子别删除时积分减少">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>固顶积分</label>
+                            <input type="text" name="topNum" ms-duplex="topNum" class="form-control" placeholder="用户帖子被固顶时积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>推荐积分</label>
+                            <input type="text" name="essenceNum" ms-duplex="essenceNum" class="form-control" placeholder="用户帖子被推荐时积分增加">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>按时回复时间 (超时状态天数)</label>
+                            <input type="text" name="replyDay" ms-duplex="replyDay" class="form-control" placeholder="设置成超时状态天数">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>红牌期限 (红牌状态天数)</label>
+                            <input type="text" name="redDay" ms-duplex="redDay" class="form-control" placeholder="设置成红牌状态天数">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>黄牌期限 (黄牌状态天数)</label>
+                            <input type="text" name="yellowDay" ms-duplex="yellowDay" class="form-control" placeholder="设置成黄牌状态天数">
+                        </div>
+                        <div class="form-group bbs">
+                            <label>日期池 (节假日 [2015-03-13 ，日期间用'#'号分隔])</label>
+                            <textarea name="times" class="form-control" rows="1" placeholder="节假日 [2015-03-13 ，日期间用'#'号分隔]" ms-duplex="times"></textarea>
+                        </div>
+                        <!--    论坛配置结束   -->
+                    </div>
+                    <div class="form-actions noborder hide">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default btn-cancle" onclick="doCancle()">取 消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    $(document).ready(function () {
+        var dialog = art.dialog,
+            api = art.dialog.open.api;
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'saveBtn',
+                focus: true,
+                callback: function () {
+                    $("form").submit();
+                    return false;
+                }
+            }
+        );
+    });
+</script>

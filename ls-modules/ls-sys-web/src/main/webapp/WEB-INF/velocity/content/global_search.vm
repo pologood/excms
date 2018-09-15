@@ -1,0 +1,17 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    #parse("content/global_search_body.vm")
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/global_search.js"></script>
+<script>
+    $(document).ready(function () {
+        global_search.init();
+    })
+
+    function callBack(msg) {
+        Ls.tips(msg);
+    }
+</script>
+</body>
+</html>

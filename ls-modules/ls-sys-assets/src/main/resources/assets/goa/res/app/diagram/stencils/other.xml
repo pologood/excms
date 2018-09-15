@@ -1,0 +1,38 @@
+<shapes name="mxGraph.flowchart" >
+  <shape name="Rounded Rectangular Callout" h="60" w="98" aspect="variable" strokewidth="inherit">
+  	<!-- 设置固定点,用于连接线 -->
+    <connections>
+      <constraint x="0.5" y="0" perimeter="0" name="N"/>
+      <constraint x="0.5" y="0.715" perimeter="0" name="S"/>
+      <constraint x="0" y="0.355" perimeter="0" name="W"/>
+      <constraint x="1" y="0.355" perimeter="0" name="E"/>
+      <constraint x="0.04" y="1" perimeter="0" name="SW"/>
+    </connections>
+	<!-- 背景设置 -->
+    <background>
+      <miterlimit limit="15"/>
+      <path>
+        <move x="15.5" y="43"/>
+        <line x="5" y="43"/>
+        <arc rx="5" ry="5" x-axis-rotation="0" large-arc-flag="0" sweep-flag="1" x="0" y="38"/>
+        <line x="0" y="5"/>
+        <arc rx="5" ry="5" x-axis-rotation="0" large-arc-flag="0" sweep-flag="1" x="5" y="0"/>
+        <line x="93" y="0"/>
+        <arc rx="5" ry="5" x-axis-rotation="0" large-arc-flag="0" sweep-flag="1" x="98" y="5"/>
+        <line x="98" y="38"/>
+        <arc rx="5" ry="5" x-axis-rotation="0" large-arc-flag="0" sweep-flag="1" x="93" y="43"/>
+        <line x="29" y="43"/>
+        <arc rx="30" ry="30" x-axis-rotation="0" large-arc-flag="0" sweep-flag="1" x="4" y="60"/>
+        <arc rx="30" ry="30" x-axis-rotation="0" large-arc-flag="0" sweep-flag="0" x="15.5" y="43"/>
+        <close/>
+      </path>
+    </background>
+	
+    <foreground>
+      <fillstroke/>
+	  <strokecolor color="#a4a4a4"/>
+		<fillcolor color="#e3e3e4"/>
+
+    </foreground>
+  </shape>
+</shapes>

@@ -1,0 +1,21 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width: 100%;height: 100%;">
+    <div region="center" style="border:none; overflow: auto;padding: 5px">
+        <textarea id="content" style="width: 100%;height: 100%;" readonly class="form-control readonly">$!{regexStr}</textarea>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    };
+    $(document).ready(function () {
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<style>
+    .bgList{
+        padding-top: 10px;
+        padding-left: 15px;
+        margin: 0 auto;
+    }
+    .bgList ul li{
+        width:200px;
+        height:60px;
+        padding: 5px;
+        margin-bottom: 10px;
+        margin-left: 15px;
+        cursor: pointer;
+        text-align: center;
+        overflow: hidden;
+        border: 1px solid #fff;
+        float: left;
+    }
+    .bgList ul li img{
+        width: 100%;
+        height:100%;
+    }
+    .bgList ul li.active,
+    .bgList ul li:hover{
+        background: #fffce1;
+        border: 1px solid #f8881a;
+    }
+</style>
+<div id="attrForm" class="bgList">
+   <ul>
+       <li id="addHeaderBgBtn"><img class="placeholder" options="size=130x40&text=上传自定义背景&bgcolor=#F3F3F3&color=#cccccc"> </li>
+       <li v-for="el in list" class="headerBgList">
+           <img :src="el.src" @click="setBg(el)">
+       </li>
+   </ul>
+</div>

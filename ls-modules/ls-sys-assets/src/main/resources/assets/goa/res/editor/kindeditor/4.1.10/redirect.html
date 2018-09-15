@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>  
+<head>  
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+<title></title>  
+<script src="/assets/core/jquery.min.js"></script>
+<script src="/assets/core/boot.js"></script>
+<script>  
+//获取url参数  
+function getParameter(val) {  
+	var uri = window.location.search;  
+	var re = new RegExp("" + val + "=([^&?]*)", "ig");  
+	return ((uri.match(re)) ? (uri.match(re)[0].substr(val.length + 1)) : null);  
+}  
+
+
+var upload_callback = function(){  
+	var data = Ls.url.get("s");
+
+		// 上传回调
+	  	if(Ls.browser.IS_IE){
+	  		if(!Ls.isNul(data))data=Ls.string.decode(data);
+	  		document.getElementsByTagName("body")[0].innerHTML = '<pre>' + data  + '</pre>';  
+	  	}else{
+	  		var location_hash=location.hash;  
+	  		//ie6取不到hash???用那个方式取？暂使用url传参数s  
+	  		if(location_hash!=null && location_hash!="" && location_hash){  
+	  		     //alert(location_hash);
+	  			 var data = location.hash ? location.hash.substring(1) : '';  
+	  			 document.getElementsByTagName("body")[0].innerHTML = '<pre>' + data  + '</pre>';  
+	  		}else{  
+	  			 var data=getParameter("s");  
+	  			 //alert(data);
+	  			 document.getElementsByTagName("body")[0].innerHTML = '<pre>' + data  + '</pre>';  
+	  		}
+	  		
+	  	}
+	
+	
+};  
+</script>  
+</head>  
+<body onload="upload_callback();">  
+</body>  
+</html>  

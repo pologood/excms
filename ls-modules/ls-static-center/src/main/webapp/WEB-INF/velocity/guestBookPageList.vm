@@ -1,0 +1,126 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+###set($action="$!{paramObj.action}")
+#set($isHit="$!{paramObj.isHit}")
+#if($action== 'new')
+    #set($eo=$resultObj)
+    #parse("guestBookForm.vm")
+#elseif($action== 'singleList')
+    #if($resultObj.data.size()>0)
+    <div class="guestbook-table">
+
+        <ul class="guestbook_title">
+            <li class="t1">主题</li>
+            <li class="t2">留言人</li>
+            <li class="t3">发布时间</li>
+            <li class="t4">处理状态</li>
+            #if($isHit== 'true')
+                <li class="t5">点击数</li>
+            #end
+        </ul>
+        #foreach($eo in $resultObj.data)
+            #set($title=$!{eo.title})
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css}">
+                <li class="t1">
+                    <a href="$!{eo.link}" title="${title}" target="_blank">
+                        <font>#cutstr($title,$length)</font>
+                    </a></li>
+                <li class="t2">$!{eo.personName}</li>
+                <li class="t3">[#date_format("$!{eo.addDate}","$!{paramObj.dateFormat}")]</li>
+                <li class="t4">
+                    #if($!{eo.statusName})
+                        <span class="s1">【$!{eo.statusName}】</span>
+                    #else
+                        <span class="s2">【未办理】</span>
+                    #end
+                </li>
+                #if($isHit== 'true')
+                    <li class="t5">$!{eo.hit}</li>
+                #end
+            </ul>
+        #end
+
+    </div>
+        #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+        <div id="page_$!{context.columnId}" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+            }, {
+                currPage: ($!{resultObj.pageIndex}+1),
+                pageCount:$!{resultObj.pageCount}
+            });
+        </script>
+        #end
+    #else
+        $!{msgPage}
+    #end
+#elseif($action== 'list')
+    #if($resultObj.data.size()>0)
+    <div class="guestbook-table">
+
+        <ul class="guestbook_title">
+            <li class="t1">主题</li>
+            <li class="t2">留言人</li>
+            <li class="t3">发布时间</li>
+            <li class="t4">处理状态</li>
+            #if($isHit== 'true')
+                <li class="t5">点击数</li>
+            #end
+        </ul>
+        #foreach($eo in $resultObj.data)
+            #set($title=$!{eo.title})
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css} refresh-guestbook-hit" data-id="$!{eo.baseContentId}">
+                <li class="t1">
+                    <a href="$!{eo.link}" title="${title}" target="_blank">
+                        <font>#cutstr($title,$length)</font>
+                    </a></li>
+                <li class="t2">$!{eo.personName}</li>
+                <li class="t3">[#date_format("$!{eo.addDate}","$!{paramObj.dateFormat}")]</li>
+                <li class="t4">
+                    #if($!{eo.statusName})
+                        <span class="s1">【$!{eo.statusName}】</span>
+                    #else
+                        <span class="s2">【未办理】</span>
+                    #end
+                </li>
+                #if($isHit== 'true')
+                    <li class="t5" data-id="$!{eo.baseContentId}">$!{eo.hit}</li>
+                #end
+            </ul>
+        #end
+
+    </div>
+        #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+        <div id="page_$!{context.columnId}" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+            }, {
+                currPage: ($!{resultObj.pageIndex}+1),
+                pageCount:$!{resultObj.pageCount}
+            });
+        </script>
+        #end
+    #else
+        $!{msgPage}
+    #end
+    #parse("guestBookForm.vm")
+
+#else
+    #set($eo=$resultObj)
+    #if($eo=="0"||$eo=="1"||$eo=="2")
+        $message
+    #else
+        #parse("guestBookInfo.vm")
+    #end
+#end

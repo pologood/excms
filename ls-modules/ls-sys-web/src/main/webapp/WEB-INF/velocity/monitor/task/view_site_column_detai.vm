@@ -1,0 +1,87 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getSiteColumnDetaiPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="siteName" width="150" align="center" headerAlign="center" >站点</div>
+                        <div field="columnName" width="270" align="left" headerAlign="center" >栏目名称</div>
+                        <div field="" width="250" align="center" headerAlign="left" renderer="columnUrl">栏目URL</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="columnType" >栏目类别</div>
+                        <div field="lastPublishDate" width="130" align="center" headerAlign="center" renderer="lastPublishDate" >最后更新日期</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+//            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load();
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_index': columnTypeName = '首页栏目';break;
+            case 'columnType_update': columnTypeName = '应更新栏目';break;
+            case 'columnType_DTYW': columnTypeName = '动态、要闻类栏目';break;
+            case 'columnType_TZZC': columnTypeName = '通知公告、政策文件类栏目';break;
+            case 'columnType_RSGH': columnTypeName = '人事、规划计划类栏目';break;
+            case 'columnType_BLANK': columnTypeName = '空白栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+
+        return columnTypeName;
+    }
+
+    function columnUrl(obj) {
+        var rec = obj.record;
+        var columnUrl = rec.columnUrl;
+
+        if(columnUrl!=null && columnUrl!=""){
+            return "<a href=\""+columnUrl+"\" target=\"_blank\" class=\"blue-txt\">"+columnUrl+"</a>";
+        }else{
+            return "--";
+        }
+    }
+
+    function isStatard(obj) {
+        var rec = obj.record;
+        var updateCount = rec.updateCount;
+        if(updateCount!=null && updateCount>0){
+            return "<span>是</span>";
+        }else{
+            return "<span style=\"color: #ff0000\">否<span>";
+        }
+    }
+
+    function lastPublishDate(obj) {
+        var rec = obj.record;
+        var lastPublishDate = rec.lastPublishDate;
+        if(lastPublishDate!=null && lastPublishDate!=""){
+            return Ls.dateFormat(lastPublishDate, "yyyy-MM-dd hh:mm");
+        }else{
+            return "--";
+        }
+    }
+
+</script>

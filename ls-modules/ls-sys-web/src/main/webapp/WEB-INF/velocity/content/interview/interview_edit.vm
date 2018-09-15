@@ -1,0 +1,636 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">访谈信息</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">图片轮播</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form id="formInterview" role="form" ms-controller="formInterview" autocomplete="off">
+                <table class="table table-bordered article-table">
+                    <tbody>
+                    <tr>
+                        <th>访谈标题：</th>
+                        <td>
+
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" name="title" ms-duplex="title" class="form-control"
+                                               placeholder="访谈标题不能为空">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                        <td class="w300" rowspan="6">
+
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg"
+                                         style="width:195px;height:150px;" alt="" id="imageLink"/>
+                                </div>
+                                <div class="thum-delete" id="delImg" onclick="del()"><i class="fa fa-trash"></i></div>
+                                <div class="thum-upload" id="uploadImg" onclick="fileUpload()"><i
+                                        class="fa fa-upload"></i></div>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>排序时间：</th>
+                        <td>
+                            <input type="datetime" name="sortNum" id="sortNum" ms-duplex="sortNum" class="form-control readonly" placeholder="排序时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>访谈分类：</th>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="type" value="3"
+                                                                   ms-duplex-string="type">访谈预告</label>
+                                <label class="radio-inline"><input type="radio" name="type" value="1"
+                                                                   ms-duplex-string="type">正在访谈</label>
+                                <label class="radio-inline"><input type="radio" name="type" value="2"
+                                                                   ms-duplex-string="type">历史回顾 </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>主持人：</th>
+                        <td>
+                            <input type="text" name="presenter" ms-duplex="presenter" class="form-control"
+                                   placeholder="主持人不能为空">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>访谈时间：</th>
+                        <td>
+                            <input type="text" name="time" ms-duplex="time" class="form-control" placeholder="访谈时间不能为空">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">访谈嘉宾：</th>
+                        <td colspan="2">
+              <textarea name="userNames" class="form-control" rows="2" placeholder="多位嘉宾姓名，请以“|”分割"
+                        ms-duplex="userNames"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>地点：</th>
+                        <td colspan="2">
+                            <input type="text" name="address" ms-duplex="address" class="form-control">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>直播地址：</th>
+                        <td colspan="2">
+                            <div class="form-group">
+                                <div class="input-group mb0">
+                                    <input type="text" name="liveLink" ms-duplex="liveLink" class="form-control">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn-default-upload"
+                                                onclick="uploadVideo()"><i class=" fa fa-upload">上传</i>
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-default-upload"
+                                                onclick="videoPlayer()"><i class=" fa fa-play-circle-o">播放</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>外链地址：</th>
+                        <td colspan="2">
+                            <input type="text" name="outLink" ms-duplex="outLink" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>主办单位：</th>
+                        <td colspan="2">
+                            <input type="text" name="organizer" ms-duplex="organizer" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>承办单位：</th>
+                        <td colspan="2">
+                            <input type="text" name="handleOrgan" ms-duplex="handleOrgan" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">单位简介：</th>
+                        <td colspan="2">
+              <textarea name="organDesc" class="form-control" rows="3" placeholder=""
+                        ms-duplex="organDesc"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">访谈摘要：</th>
+                        <td colspan="2">
+              <textarea name="content" class="form-control" rows="3" placeholder=""
+                        ms-duplex="content"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">访谈详情：</th>
+                        <td colspan="2">
+                            <textarea name="desc" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">访谈小结：</th>
+                        <td colspan="2">
+              <textarea name="summary" class="form-control" rows="3" placeholder=""
+                        ms-duplex="summary"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                        #if(${toolbar} == 'hide')
+                        #else
+                            <div class="form-actions noborder">
+                                <button class="publishBtn btn btn-default btn-save-release" type="button"
+                                        id="saveAndPublish">保存并发布
+                                </button>
+                                <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            </div>
+                        #end
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+        <div class="tab-pane" id="tab_1_2">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="pdr10">
+                            <button type="button" class="btn btn-default btn-upload" onclick="uploadPic()">
+                                <i class="fa fa-upload"></i> 上传图片
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover picture-upload">
+                <thead>
+                <tr>
+                    <th class="w50">排 序</th>
+                    <th class="w180"></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="picList">
+
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+<script>
+    var article={videoStatus:100};
+    var cur = {
+        interviewId: '$!{interviewId}',
+        eweb: '',
+        contentId:'',
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID
+        },
+        pageIndex:"$!{pageIndex}",
+        clickBtn: ''
+    }
+
+    $(document).ready(function () {
+
+        cur.eweb = Ls.editor("desc", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.params.columnId});
+        /*cur.editor = KindEditor.create('textarea[name="desc"]', {
+            uploadJson: '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: cur.params.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/interviewInfo/getInterviewInfo",
+                data: {
+                    interviewId: cur.interviewId,
+                    columnId: cur.params.columnId,
+                    siteId: cur.params.siteId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formInterview"
+                data.$id = cur.$id;
+                article.videoStatus=data.videoStatus;
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                cur.contentId = (data.contentId==null?'':data.contentId);
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0), cur.vm);
+//                cur.editor.html(data.desc);
+                cur.eweb.setHtml(data.desc);
+
+                if (!Ls.isEmpty(cur.vm.picUrl)){
+                    if(cur.vm.picUrl.indexOf('/') != -1){
+                        $("#imageLink").attr("src", cur.vm.picUrl)
+                    }else if(cur.vm.picUrl.indexOf('.') != -1){
+                        $("#imageLink").attr("src", "$!{fileServerNamePath}" + cur.vm.picUrl)
+                    }else{
+                        $("#imageLink").attr("src", "$!{fileServerPath}" + cur.vm.picUrl)
+                    }
+                    $("#uploadImg").hide();
+                }
+
+                if(!Ls.isEmpty(data.pics)){
+                    var pics = data.pics;
+                    $.each(pics,function(i,p){
+                        var filePath = "";
+                        if(p.path.indexOf('/') != -1){
+                            filePath = "";
+                        }else if(p.path.indexOf('.') != -1){
+                            filePath = "$!{fileServerNamePath}";
+                        }else{
+                            filePath = "$!{fileServerPath}";
+                        }
+                        p.path = filePath + p.path;
+                        p.thumbPath = filePath + p.thumbPath;
+                    })
+                    var d = {data:data.pics};
+                    var picHtml = rendePicList(d);
+                    $("#picList").html(picHtml);
+                }
+                try{
+                    if(data.interviewId == null || data.interviewId == ''){
+                        data.sortNum = parseInt(new Date().getTime()/1000);
+                    }
+                    if(data.sortNum != null && data.sortNum != ""){
+                        var d = new Date();
+                        d.setTime(data.sortNum * 1000);
+                        $("#sortNum").val(d.format('yyyy-MM-dd h:m:s'));
+                    }
+                }catch (e){
+                }
+            })
+        };
+        getData();
+    })
+    //上传视频
+    function uploadVideo() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                cur.vm.contentPath = filePath[0].mongoId;
+                var name = filePath[0].fileName;
+                var index = name.lastIndexOf(".");
+                if (index < 0) {
+                    Ls.tipsInfo("视频未上传成功");
+                    return;
+                }
+                cur.vm.quoteStatus=100;
+                cur.vm.liveLink = name.substring(0, index);
+                article.videoStatus=0;//上传后将状态改为0，标识未转换
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传视频',
+            upload_url: "/videoNews/uploadVideo",
+            post_params: {
+                "ASPSESSID": "<%=Session.SessionID %>",
+                "siteId": GLOBAL_SITEID,
+                "columnId": content_mgr.node.indicatorId,
+                "contentId": cur.contentId
+            },
+            file_size_limit: "500 MB",
+            file_types: "*.asx;*.asf;*.mpg;*.wmv;*.3gp;*.mov;*.avi;*.flv;*.mp4",
+            file_types_description: "Video Files",
+            file_upload_limit: 1,  //配置上传个数
+        })
+    }
+
+    function videoPlayer() {
+        var videoPath = cur.vm.contentPath;
+        var videoName = cur.vm.liveLink;
+        var status = cur.vm.quoteStatus;
+        if (videoName == null || videoName == '') {
+            Ls.tipsInfo("请先上传视频");
+            return;
+        } else {
+            if (status == -1) {
+                Ls.tipsInfo("视频转换失败，请重新上传");
+                return;
+            }
+            if (status != 1) {
+                if (cur.vm.interviewId == null) {
+                    Ls.tipsInfo("视频尚未转换格式，请先点击保存");
+                } else {
+                    Ls.tipsInfo("视频正在转换，请稍等");
+                }
+                return;
+            } else {
+                //直接输入
+                if (videoPath == null || videoPath == '') {
+                    videoPath = videoName;
+                }
+                Ls.openWin('/videoNews/playAfterTrans?videoPath=' + videoPath + "&&videoName=" + videoName, '600px', '400px', {
+                    id: 'video_player',
+                    title: videoName,
+                    padding: 0
+                });
+            }
+        }
+    }
+    $('#formInterview').validator({
+        fields: {
+            'title': '访谈标题:required;length[2~100]',
+            'presenter': '主持人:length[2~100]',
+            'handleOrgan': '主办单位:length[2~50]',
+            'organizer':'承办单位:length[2~80]',
+            'userNames': '访谈嘉宾:length[2~400]',
+            'sortNum': '排序:required;',
+            'time': '访谈时间:required;length[2~50]',
+            'address': '地点:length[2~100]',
+            'content': '访谈摘要:required;length[2~1000]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+//        data.desc = cur.editor.html()
+        data.desc = cur.eweb.getHtml();
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+        }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        //处理图片轮播
+        var picList = [];
+        $("#picList tr").each(function (index) {
+            var _this = $(this);
+            var imgList = {
+                "picId": _this.find(".picId").val(),
+                "picTitle": Ls.str2Json(_this.find(".picTitle").val()),
+                "description": Ls.str2Json(_this.find(".picDesc").val()),
+                "sortNum": (index + 1)
+            }
+            picList.push(imgList);
+        })
+        data.picList = JSON.stringify(picList);
+        data.pics=[];
+        if(Ls.isEmpty(data.liveLink)){
+            data.contentPath = '';
+            data.quoteStatus=1;
+        }
+        data.videoStatus=article.videoStatus;
+        Ls.ajax({
+            url: "/interviewInfo/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    $("#saveArticle").click(function () {
+        cur.clickBtn = 0;
+        cur.vm.issued = 0;
+        $('#formInterview').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        cur.clickBtn = 1;
+        cur.vm.issued = 1;
+        $('#formInterview').submit();
+    })
+
+    function goBack() {
+        content_mgr.getContentApp("/interviewInfo/index?indicatorId=&pageIndex="+cur.pageIndex);
+    }
+
+
+    function del() {
+        if (cur.vm.picUrl == null) {
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.picUrl
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.picUrl = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+    //上传缩略图
+    function fileUpload() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+##                cur.vm.picUrl = data[0].mongoId;
+##                $("#imageLink").attr("src", '$!{fileServerPath}' + cur.vm.picUrl)
+                cur.vm.picUrl = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + cur.vm.picUrl)
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "siteId":GLOBAL_SITEID,
+                "columnId": content_mgr.node.indicatorId
+            },
+        })
+    }
+
+
+    /*-------------------------------------------- 图片轮播处理-------------------------------------------------------*/
+
+    function uploadPic() {
+        Ls.uploadFile(function (filePath) {
+            var paths = [];
+            for (var i = 0; i < filePath.length; i++) {
+//                paths.push(filePath[i].mongoId);
+                paths.push(filePath[i].fileName);
+            }
+            getPaths(paths);
+            return true;
+        }, {
+            upload_url: '/pictureNews/saveNewsPic',
+            post_params: {
+                "siteId": cur.params.siteId,
+                "columnId": cur.params.columnId,
+                "desc": "图片新闻轮播图片",
+                "contentId": cur.contentId,
+            }
+        })
+    }
+
+    function getPaths(paths) {
+        Ls.ajax({
+            data: {paths: paths},
+            url: "/pictureNews/getListByPath",
+            success: function (text) {
+                if (text.status == 1) {
+                    text.GLOBAL_FILESERVERNAMEPATH = GLOBAL_FILESERVERNAMEPATH;
+                    text.GLOBAL_FILESERVERPATH = GLOBAL_FILESERVERPATH;
+                    $("#picList").append(rendePicList(text));
+                } else {
+                    Ls.tipsErr(text.desc);
+                }
+            }
+        });
+    }
+
+    var rendePicList = Ls.compile(
+            '<? for(var i=0,l=data.length; i<l; i++){ ?>' +
+            '<? var el = data[i] ?>' +
+            '<tr id="<?=el.picId?>">' +
+            '  <td class="arrow_move">' +
+            '   <div class="rows text-center"><a href="javascript:;"><i class="fa fa-arrows"></i></a></div>' +
+            '  </td>' +
+            '  <td>' +
+            '    <div class="pic_thumb">' +
+            '		<img id="thumb_<?=el.picId?>" class="mongoId" data-mogonId="<?=el.thumbPath?>" src="<?=' +
+            'el.thumbPath.indexOf("/") != -1? el.thumbPath:(el.thumbPath.indexOf(".") != -1 ?(GLOBAL_FILESERVERNAMEPATH + el.thumbPath):GLOBAL_FILESERVERPATH + el.thumbPath) ?>"/>' +
+            '    </div>' +
+            '    <div class="pic_tools">' +
+            '      <button class="btn btn-default btn-show-img" onclick="previewPic(<?=el.picId?>,\'<?=el.path?>\')" type="button" title="查看图片">' +
+            '        <i class="fa fa-search-plus"></i></button>' +
+            '     <button class="btn btn-default ml2 btn-delete-img" onclick="deletePic(<?=el.picId?>)" type="button" title="删除图片">' +
+            '        <i class="fa fa-trash"></i></button>' +
+            '    </div>' +
+            '  </td>' +
+            '  <td><input type="hidden" class="picId" value="<?=el.picId?>"/>' +
+            '    <div class="pic_title">' +
+            '      <input value="<?=el.picTitle?>" type="text" class="form-control picTitle" maxlength="30" placeholder="">' +
+            '    </div>' +
+            '    <div class="pic_info">' +
+            '      <textarea class="form-control picDesc" rows="4" maxlength="50"><?=el.description?></textarea>' +
+            '    </div>' +
+            '  </td>' +
+            '  </tr>' +
+            '<?}?>'
+    )
+
+
+    //预览
+    function previewPic(picId, path) {
+        art.dialog.data("path", path);
+        art.dialog.open('/pictureNews/previewPic?picId=' + picId, {
+            width: '780px',
+            height: '640px',
+            lock: true,
+            title: '图片预览'
+        });
+    }
+    //删除图片
+    function deletePic(picId) {
+        Ls.ajax({
+            data: {
+                picId: picId
+            },
+            url: "/pictureNews/delPic",
+            success: function (text) {
+                if (text.status == 1) {
+                    $("#" + picId).remove();
+                    Ls.tipsOk("删除成功");
+                } else {
+                    Ls.tipsErr(text.desc);
+                }
+            }
+        });
+    }
+
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+</script>

@@ -1,0 +1,90 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($noteLength="$!{paramObj.noteLength}")
+#set($noteLength=$Integer.parseInt($noteLength))
+#set($width="$!{paramObj.width}")
+#set($height="$!{paramObj.height}")
+#set($showType="$!{paramObj.showType}")
+#set($showTitle="$!{paramObj.showTitle}")
+#set($showNote="$!{paramObj.showNote}")
+#set($isLi="$!{paramObj.isLi}")
+#foreach($eo in $resultObj)
+    #set($title="$!{eo.title}")
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+    #if($eo.imageLink.indexOf(".")==-1)
+        #if($eo.imageLink.indexOf("/")>=0)
+            #set($filePath="")
+        #elseif($eo.imageLink.indexOf(".")>=0)
+            #set($filePath="$!{fileServerNamePath}")
+        #else
+            #set($filePath="$!{fileServerPath}")
+        #end
+    #else
+        #set($filePath="")
+    #end
+
+    #set($style="")
+    #if("$!{eo.isBold}" == "1")
+        #set($style="font-weight:bold;")
+    #end
+    #if("$!{eo.isTilt}" == "1")
+        #set($style=$style+"font-style:italic;")
+    #end
+    #if("$!{eo.isUnderline}" == "1")
+        #set($style=$style+"text-decoration:underline;")
+    #end
+    #if("$!{eo.titleColor}" != "#000000")
+        #set($style=$style+"color:$!{eo.titleColor};")
+    #end
+
+    #if("$!{isLi}"=="1")
+    <li>
+        <a class="img" href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" target="$!{paramObj.target}" title="$!{eo.title}">
+            <img src="$!{filePath}$!{eo.imageLink}" alt="$!{eo.title}" #if("$!{width}" != "" && "$!{width}" != "0")width="$!{width}"#end #if("$!{height}" != "" && "$!{height}" != "0")height="$!{height}"#end/>
+        </a>
+
+        #if("$!{showTitle}"=="1")
+            <h4 class="title">
+                <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end">
+                    <span class="title" style='$style'>#cutstr($title,$length)</span>
+                </a>
+            </h4>
+        #end
+
+        #if("$!{showNote}"=="1")
+            #if("$!{showType}"=="1")
+                <p class="note">#cutstr("#filterHtml($!{eo.article})",$noteLength)</p>
+            #else
+                <p class="note">#cutstr("#filterHtml($!{eo.remarks})",$noteLength)</p>
+            #end
+        #end
+
+    </li>
+    #else
+    <ul class="list-images clearfix">
+        <a class="img" href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" target="$!{paramObj.target}" title="$!{eo.title}">
+            <img src="$!{filePath}$!{eo.imageLink}" alt="$!{eo.title}" #if("$!{width}" != "" && "$!{width}" != "0")width="$!{width}"#end #if("$!{height}" != "" && "$!{height}" != "0")height="$!{height}"#end/>
+        </a>
+
+        #if("$!{showTitle}"=="1")
+            <h4 class="title">
+                <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end">
+                    <span class="title" style='$style'>#cutstr($title,$length)</span>
+                </a>
+            </h4>
+        #end
+
+        #if("$!{showNote}"=="1")
+            #if("$!{showType}"=="1")
+                <p class="note">#cutstr("#filterHtml($!{eo.article})",$noteLength)</p>
+            #else
+                <p class="note">#cutstr("#filterHtml($!{eo.remarks})",$noteLength)</p>
+            #end
+        #end
+    </ul>
+    #end
+#end

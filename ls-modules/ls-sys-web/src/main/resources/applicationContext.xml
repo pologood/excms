@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+      http://www.springframework.org/schema/mvc  
+      http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+      http://www.springframework.org/schema/util  
+      http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	<!-- 静态资源访问，方案1 -->
+	<mvc:resources location="/assets/js/pages/" mapping="/assets/js/pages/**" />
+	<mvc:resources location="/assets/design/page/" mapping="/assets/design/page/**" />
+	<mvc:resources location="classpath:/assets/" mapping="/assets/**" />
+	<!--<mvc:resources location="/assets/" mapping="/assets/**" />-->
+	<mvc:resources location="/ewebeditor/" mapping="/ewebeditor/**" />
+	<mvc:resources location="/upload/" mapping="/upload/**" />
+	<mvc:resources location="/favicon.ico" mapping="/favicon.ico" />
+	<mvc:resources location="/crossdomain.xml" mapping="/crossdomain.xml" />
+	<!-- SWF上传组件跨域上传的授权配置文件 -->
+
+	<!-- spring上下文 -->
+	<bean class="cn.lonsun.core.util.SpringContextHolder" />
+	<!-- 初始化分词器 -->
+	<bean class="cn.lonsun.site.words.util.SpliterInitBean"></bean>
+	<!-- 初始化自定义缓存容器 -->
+	<bean class="cn.lonsun.common.cache.AutoCacheInit"></bean>
+	<!-- 初始化系统缓存 -->
+	<bean class="cn.lonsun.common.cache.CacheInit"></bean>
+	<!-- 初始化系统缓存切面 -->
+	<bean class="cn.lonsun.common.cache.CacheAspect"></bean>
+	<!-- 初始化定时任务工厂 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" />
+	<!-- 初始化定时任务 -->
+	<bean class="cn.lonsun.common.job.JobInit" init-method="init"></bean>
+
+	<!-- mq监听交给Spring 代理 -->
+	<bean class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="messageJmsFactory"/>
+		<property name="destination" ref="systemMessage"/>
+		<property name="messageListener" ref="systemMessageListener"/>
+		<property name="taskExecutor" ref="taskExecutor"></property>
+		<!--接收消息超时时间-->
+		<property name="receiveTimeout" value="10000" />
+		<!--默认5个消费者来处理消息-->
+		<property name="concurrentConsumers" value="5"></property>
+		<!--最大消费者数量，并发数量-->
+		<property name="maxConcurrentConsumers" value="50"></property>
+	</bean>
+	<!-- 初始化消息监听 update: 替换为上面的配置 -->
+	<!--<bean class="cn.lonsun.message.MessageListener"></bean>-->
+	<!--初始化数据库注入-->
+	<!--<bean class="cn.lonsun.db.aspect.DbInjectAspect" />-->
+	<import resource="/beans/encryptKey.xml" />
+	<import resource="classpath:applicationContext-dwr.xml" />
+	<import resource="classpath*:conf/**/applicationContext-*.xml" />
+
+	<!-- shiro配置 -->
+
+
+	<bean id="shiroRealm" class="cn.lonsun.shiro.login.MgrShiroRealm" />
+
+    <bean class="cn.lonsun.shiro.security.interceptor.LsAuthorizationAttributeSourceAdvisor">
+        <constructor-arg name="annotationHandlers">
+            <util:map>
+                <!--注解权限处理类-->
+                <entry key="org.springframework.web.bind.annotation.RequestMapping"
+                       value="cn.lonsun.shiro.security.interceptor.RequestMappingPermissionMethodInterceptor" />
+            </util:map>
+        </constructor-arg>
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+	<bean id="formAuthenticationFilter" class="cn.lonsun.shiro.filter.MgrFormAuthenticationFilter" />
+	<bean id="casFilter" class="org.apache.shiro.cas.CasFilter">
+		<property name="failureUrl" value="/login" />
+	</bean>
+	<bean id="logoutFilter" class="cn.lonsun.shiro.filter.MgrLogoutFilter">
+		<property name="redirectUrl" value="/login" />
+	</bean>
+
+    <bean id="shiroFilter" class="cn.lonsun.shiro.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login" />
+		<property name="successUrl" value="/index" />
+		<property name="unauthorizedUrl" value="/login" />
+		<property name="filters">
+			<util:map>
+				<entry key="anon" value-ref="anonFilter" />
+				<entry key="logout" value-ref="logoutFilter" />
+				<entry key="authc" value-ref="formAuthenticationFilter" />
+			</util:map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/assets/** = anon
+				/dwr/** = anon
+				/ie_update/** = anon
+				/favicon.ico = anon
+				/crossdomain.xml = anon
+				/services/** = anon
+				/login/getCode = anon
+				/weChat/api = anon
+				/mobile/saveGuestBook = anon
+				/mobile/saveMessageBoard = anon
+				/loginForOA = anon
+				/getPublicKey = anon
+				/logout = logout
+				/ssoLogin/login = anon
+				/** = authc
+
+			</value>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,375 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-default btn-add" onclick="edit('')">添 加</button>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn"><a href="javascript:issuedOpt('1');">批量发布</a></li>
+                            <li class="publishBtn"><a href="javascript:issuedOpt('0');">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="editBtn" id="deletes"><a href="javascript:deleteAll();">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchType(1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchType(0)">未发布</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+
+                    <form class="form-inline tr" role="form">
+                        <div class="form-group">
+                            <label></label>
+                            <input type="text" id="searchText" name="searchText" class="form-control w140" placeholder="标题" maxlength="50">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onClick="search()">搜 索</button>
+                        <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid ls-mini-grid-cell" style="width:100%;height:500px;" multiSelect="true" allowCellWrap="true"
+             idField="id" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" onlyCheckSelection="true"
+             url="/collectInfo/getPage" allowCellWrap="true" allowHeaderWrap="true">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+                <div width="50" field="" headerAlign="center" align="center" allowSort="false" renderer="renderSort">排序</div>
+                <div field="" width="100%" headerAlign="center" align="left" renderer="renderTitle">标题</div>
+                <div field="" width="240" headerAlign="center" align="center" renderer="renderIime">征集时间</div>
+                <div field="" width="70" headerAlign="center" align="center" renderer="renderIdeaCount">留言数</div>
+                <div field="" width="50" headerAlign="center" align="center" renderer="renderIssued">发布</div>
+                <div width="120" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    var cur = {
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID,
+            typeCode:'collectInfo',
+            dataFlag: 1
+        }
+    }
+
+    $(document).ready(function () {
+
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load(cur.params);
+        cur.grid.on("beforeselect", function (e) {
+            var disabledStr = Ls.publishStatus(e.record.isIssued);
+            if (disabledStr) {
+                e.cancel = true
+            }
+        });
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+
+    })
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        cur.grid.findRows(function (row) {
+            if ($.inArray(row.contentId, d.contentIds) >= 0) return true;
+        }).filter(function (v, i) {
+            v.isIssued = d.isPublish;
+            cur.grid.updateRow(v);
+        });
+    }
+
+    function renderTitle(e){
+        var rec = e.record, linkUrl = rec.linkUrl,str = rec.title;
+        if(linkUrl != "" && linkUrl != null && linkUrl != "null"){
+            str = "<span style='color:red;'>[转]</span>" + str;
+        }
+        //return '<a  target="_blank" style="text-decoration:underline;color:blue;" onclick="edit(' + rec.collectInfoId + ')">' + str + '</a>'
+        var editStr = '<a  target="_blank" style="text-decoration:underline;color:blue;" onclick="edit(' + rec.collectInfoId + ')">' + str + '</a>';
+        editStr += '<span id="publish_' + rec.contentId + '" class="publish-status">';
+        var status = Ls.publishStatus(rec.isIssued);
+        if (status != "") {
+            editStr += '[生成中...]';
+        }
+        return editStr+"</span>";
+    }
+
+    function renderSort(e) {
+        var rec = e.record,sortNum=rec.sortNum;
+        var str = '<div class="rows text-center">',
+                up = '<a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',1)" href="javascript:;"><i class="fa fa-long-arrow-up" style="margin-top:-3px" title="'+sortNum+'"></i></a>',
+                down = ' <a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',0)" href="javascript:;"><i class="fa fa-long-arrow-down" title="'+sortNum+'"></i></a>';
+
+        var index = (e.rowIndex + 1) + (cur.grid.pageSize * cur.grid.pageIndex);
+        if (index == 1) {
+            str += down;
+        } else if (cur.grid.totalCount == index) {
+            str += up;
+        } else {
+            str += up + down;
+        }
+        str += '</div>';
+        return str;
+    }
+
+
+    function moveSort(id, sortNum, operate) {
+        var operate = operate == '1' ? "up" : "down";
+        Ls.ajaxGet({
+            url: "/content/updateSort",
+            data: {
+                id: id, sortNum: sortNum,
+                operate: operate,
+                columnId: cur.params.columnId,
+                siteId: cur.params.siteId,
+                typeCode: cur.params.typeCode
+            },
+            success: function (text) {
+                Ls.tipsOk("操作成功")
+                cur.grid.reload();
+            }
+        });
+    }
+
+    //描述
+    function renderopt(e) {
+        var rec = e.record, editStr = '';
+       // editStr += '<a class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.collectInfoId + ')">修 改</a> ';
+       // editStr += '<a class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.collectInfoId + ',' + rec.contentId + ')">删 除</a> '
+        var disabledStr = Ls.publishStatus(rec.isIssued);
+        var publishStr = '';
+        if (rec.isIssued == '1') {
+            publishStr = '       <li><a href="javascript:void(0)" onclick="rePublish(' + rec.contentId + ',1)">重新发布</a></li>';
+        }
+        editStr =
+                '<div class="btn-group" role="group">' +
+                '   <button ' + disabledStr + ' type="button" class="btn btn-default btn-sm" onclick="edit(' + rec.collectInfoId + ')">修 改</button> ' +
+                '   <button ' + disabledStr + ' type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+                '       <i class="fa fa-angle-down"></i>' +
+                '   </button>' +
+                '   <ul class="dropdown-menu pull-right">' + publishStr +
+                '       <li><a href="javascript:void(0)" onclick="del(' + rec.collectInfoId + ',' + rec.contentId + ')">删 除</a></li>' +
+                '   </ul>' +
+                '</div>';
+        return editStr;
+    }
+
+    function rePublish(id, status) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("您确定重新发布？")) {
+            Ls.ajax({
+                type: "POST",
+                data: {ids: ids, siteId: GLOBAL_SITEID, columnId: cur.params.columnId, type: status},
+                url: "/articleNews/publishs",
+                success: function (text) {
+                    Ls.tipsOk("正在生成处理中")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+
+    function renderIime(e) {
+        var rec = e.record, isTimeOut = rec.isTimeOut, str = '';
+        if (isTimeOut == '2') {
+            str = '<span style="color:blue">'
+        } else if (isTimeOut == '3') {
+            str = '<span style="color:red">'
+        } else {
+            str = '<span style="">'
+        }
+        str += rec.startTime + " 至 " + rec.endTime;
+        str += '</span>'
+        return str;
+    }
+
+    function renderIssued(e) {
+        var rec = e.record,
+            isIssued = rec.isIssued,
+            str = "";
+        var disabledStr = Ls.publishStatus(rec.isIssued);
+        if (isIssued == '1') {
+            //  str = '<a onclick="isLinkClick(' + rec.contentId + ',0)"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/click.gif" border="0" title="取消发布" ></a>';
+            str = '<button ' + disabledStr + ' type="button" class="btn btn-sm btn-default btn-ok" onclick="isLinkClick(' + rec.contentId + ',0)" title="取消发布"><span class="glyphicon glyphicon-ok"></span></button>';
+
+        } else {
+            // str = '<a onclick="isLinkClick(' + rec.contentId + ',1)"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/noclick.gif" border="0" title="发布"></a>';
+            str = '<button ' + disabledStr + ' type="button" class="btn btn-sm btn-default btn-remove" onclick="isLinkClick(' + rec.contentId + ',1)" title="发布"><span class="glyphicon glyphicon-ok"></span></button>';
+        }
+        return str
+    }
+
+    function renderIdeaCount(e) {
+        var rec = e.record, ideaCount = rec.ideaCount, str = "";
+        return '<a  target="_blank" style="text-decoration:underline;color:blue;" onclick="viewIdeaCount(' + rec.collectInfoId + ')">' + ideaCount + '</a>';
+    }
+
+    function viewIdeaCount(collectInfoId) {
+        Ls.openWin("/collectIdea/list?collectInfoId=" + collectInfoId, "1000px", "500px", {
+            type: 2,
+            title: '留言列表',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+
+    }
+
+    function isLinkClick(contentId, isPublish) {
+        var ids = [];
+        ids.push(contentId)
+        ids = ids.join(",");
+        var str = (isPublish == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: isPublish
+                },
+                success: function (text) {
+                    Ls.tipsOk("正在生成处理中")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    var deleteAll = function () {
+        var ids = getIDS();
+        var contentIds = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定删除吗")) {
+            Ls.ajaxGet({
+                url: "/collectInfo/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("批量删除完成，正在生成处理中")
+                    cur.grid.reload();
+                }
+            });
+
+        }
+
+    }
+
+    // 删除
+    var del = function (id, contentId) {
+        var ids = [];
+        var contentIds = [];
+        ids.push(id)
+        contentIds.push(contentId)
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/collectInfo/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除完成，正在生成处理中")
+                    cur.grid.reload();
+                    cur.grid.deselectAll(true);
+                }
+            });
+        }
+    }
+
+    //修改
+    var edit = function (id) {
+        content_mgr.getContentApp("/collectInfo/edit?infoId=" + id)
+    };
+
+    //清除条件
+    var search = function () {
+        var searchText = $("#searchText").val();
+        cur.params.searchText = searchText;
+        cur.params.isPublish = '';
+        cur.grid.load(cur.params);
+    }
+
+    var searchType = function (issued) {
+        cur.params.isPublish = issued;
+        cur.params.searchText = '';
+        cur.grid.load(cur.params);
+    }
+
+    var searchClear = function () {
+        $("#searchText").val("");
+        cur.params.searchText = '';
+        cur.params.isPublish = '';
+        cur.grid.load(cur.params);
+    }
+
+    function issuedOpt(status) {
+        var ids = getContentIdS();
+        var contentIds = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                   // Ls.tipsOk("操作成功！")
+                    str="批量"+str+"完成，正在生成处理中"
+                    Ls.tipsOk(str);
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+    //循环选中的行
+    function getIDS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].collectInfoId);
+        }
+        return ids;
+    }
+
+    function getContentIdS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].contentId);
+        }
+        return ids;
+    }
+</script>

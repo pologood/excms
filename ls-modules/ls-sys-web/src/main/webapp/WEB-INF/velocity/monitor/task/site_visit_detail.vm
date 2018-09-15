@@ -1,0 +1,65 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <p><strong>考察点：</strong>首页打不开的次数占全部监测次数的比例。</p>
+                    <p><strong>普查扣分细则：</strong>监测一周,每天间隔性访问20次以上,超过15秒网站仍打不开的次数比例累计超过(含)5%,即单项否决。</p>
+                    <p><strong>本站监测扣分细则：</strong>监测【<span id="monitoredNum">$!{monitoredNum}</span>】周，每天间隔性访问【<span id="dayMonitoredCount">$!{dayMonitoredCount}</span>】次，
+                    超过（含）【<span id="monitoredOvertime">$!{monitoredOvertime}</span>】秒网站仍打不开的次数比例累计超过（含）【<span id="notOpenRate">$!{notOpenRate}</span>】%，即单项否决。</p>
+                </div>
+                <div>小计：监测点前一周累计访问<span class="red">$!{total}</span>次，不可访问次数<span class="red">$!{failure}</span>次，不可访问占比：<span class="red">$!{failRate}%</span></div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getSiteVisitPage?dataFlag=1" showPager="true" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="visitUrl" width="150" align="center" headerAlign="center" >地址</div>
+                        <div field="monitorDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="respCode" width="100" align="center" headerAlign="center" >返回编码</div>
+                        <div field="" width="90" align="center" headerAlign="center" renderer="isVisitable">是否可访问</div>
+                        <div field="reason" width="100" align="center" headerAlign="center">原因</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            taskId:Ls.getWin.dialog.data("taskId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.params.taskId});
+    })
+
+    function isVisitable(obj) {
+        var rec = obj.record;
+        var status = rec.respCode;
+        if(status == 200) {
+            return '<span style="color: green">是</span>';
+        } else {
+            return '<font style="color:red">否</font>';
+        }
+    }
+</script>

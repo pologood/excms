@@ -1,0 +1,197 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+        position: relative;
+        padding-bottom: 26px;
+    }
+    .alert-wrapper {
+        height: 78px;
+        overflow: hidden;
+    }
+    .alert .icon {
+        width: 50px;
+        height: 26px;
+        margin-left: -25px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+    }
+    .alert .fa {
+        line-height: 28px;
+        font-size: 22px;
+    }
+    .alert .icon:hover .fa {
+        font-size: 26px;
+    }
+    .mb5 {
+        margin-bottom: 5px;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <div class="alert-wrapper">
+                        <div class="mb5"><strong>考察点：</strong>
+                            <div >
+                                1.首页打不开的次数占全部监测次数的比例。<br>
+                                2.首页及其他页面不能正常访问的链接数量。
+                            </div>
+                        </div>
+                        <div class="mb5"><strong>普查扣分细则：</strong>
+                            <div>
+                                1.监测1周，每天间隔性访问20次以上，累计超过（含）15秒网站仍打不开的次数比例每1%扣5分（累计超过（含）5%的，直接列入单项否决）。<br>
+                                2.首页上的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣1分；如首页仅为网站栏目导航入口，则检查所有二级页面上的链接。<br>
+                                3.其他页面的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣0.1分。
+                            </div>
+                        </div>
+                        <div><strong>本站监测扣分细则：</strong>
+                            <div>
+                                1.监测【<span id="monitoredNum">$!{monitoredNum}</span>】【<span id="monitoredTimeType">周</span>】，每天间隔性访问【<span id="dayMonitoredCount">$!{dayMonitoredCount}</span>】次以上，网站打不开的次数比例每1%扣【<span id="notOpenNum">5</span>】分（累计超过（含）5%的，直接列入单项否决）。<br>
+                                2.首页上的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣【<span id="indexErrorNum">$!{indexErrorNum}</span>】分；如首页仅为网站栏目导航入口，则检查所有二级页面上的链接。
+                                3.其他页面的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣【<span id="otherErrorNum">$!{otherErrorNum}</span>】分。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon text-center" onclick="toggle()"><i class="fa fa-angle-double-down"></i></div>
+                </div>
+                <div>小计：<br>
+                    #set($i=1)
+                    #if($failrate!=0)
+                        （$i）不可访问占比<span class="red">$!{failrate}%</span>，每1%扣5分 扣<span class="red">$!{failScore}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($indexErrLinkCount>0)
+                        （$i）首页错链<span class="red">$!{indexErrLinkCount}</span>个，每错链扣$!{indexErrorNum}分 扣<span class="red">$!{indexErrLinkScore}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($otherErrLinkCount>0)
+                        （$i）其他错链<span class="red">$!{otherErrLinkCount}</span>个，每错链扣$!{otherErrorNum}分 扣<span class="red">$!{otherErrLinkScore}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($i==1)
+                        暂无扣分项
+                    #end
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getHrefUseablePage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div renderer="visitUrl" width="150" align="center" headerAlign="center" >链接</div>
+                        <div renderer="parentUrl" width="150" align="center" headerAlign="center" >父链接</div>
+                        <div field="monitorDate" width="120" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="respCode" width="60" align="center" headerAlign="center" >返回编码</div>
+                        <div field="" width="140" align="center" headerAlign="center" renderer="errDesc">结果</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="isIndex">是否首页</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="optDiy">定位</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            taskId:Ls.getWin.dialog.data("taskId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.params.taskId});
+    })
+
+    function visitUrl(obj) {
+        var record = obj.record;
+        return '<a href="' + record.visitUrl + '" target="_blank"><u>' + record.visitUrl + '</u></a>'
+    }
+
+    function parentUrl(obj) {
+        var record = obj.record;
+        return '<a href="' + record.parentUrl + '" target="_blank"><u>' + record.parentUrl + '</u></a>'
+    }
+
+    function errDesc(obj) {
+        var record = obj.record;
+        var errCode = record.respCode;
+        var desc = "错误链接";
+        if (errCode == '400') {
+            desc = "错误请求";
+        } else if (errCode == '403') {
+            desc = "服务器拒绝请求";
+        } else if (errCode == '404') {
+            desc = "服务器找不到请求的网页";
+        } else if (errCode == '405') {
+            desc = "禁用请求中指定的方法";
+        } else if (errCode == '406') {
+            desc = "无法使用请求的内容特性响应请求的网页";
+        } else if (errCode == '407') {
+            desc = "指定请求者应当授权使用代理";
+        } else if (errCode == '408') {
+            desc = "服务器等候请求时发生超时";
+        } else if (errCode == '409') {
+            desc = "服务器在完成请求时发生冲突";
+        } else if (errCode == '410') {
+            desc = "资源已删除";
+        } else if (errCode == '500') {
+            desc = "服务器遇到错误，无法完成请求";
+        } else if (errCode == '501') {
+            desc = "服务器不具备完成请求的功能";
+        } else if (errCode == '502') {
+            desc = "错误网关";
+        } else if (errCode == '503') {
+            desc = "服务不可用";
+        } else if (errCode == '504') {
+            desc = "网关超时";
+        } else if (errCode == '505') {
+            desc = "HTTP 版本不受支持";
+        }
+        return desc;
+    }
+
+    function isIndex(obj) {
+        var rec = obj.record;
+        var isIndex = rec.isIndex;
+        if(isIndex == 0) {
+            return '<font style="color:green">否</font>';
+        } else {
+            return '<span style="color: red">是</span>';
+        }
+    }
+
+    function optDiy(obj) {
+        var record = obj.record;
+        var location = '<a href="/href/useable/errLocation?resultId=' + record.id + '" target="_blank"><img src="$!{rc.contextPath}/assets/images/location.png" border="0" title="页面定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var code = '<a href="/href/useable/htmlLocation?resultId=' + record.id + '" target="_blank"><img src="$!{rc.contextPath}/assets/images/code.png" border="0" title="源码定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        return location + code;
+    }
+
+    function toggle() {
+        var $ele = $(".alert-wrapper");
+        if($ele.hasClass("on")){
+                $ele.removeClass("on").css("height","78px");
+            $(".fa").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+        }else {
+                $ele.addClass("on").css("height","auto");
+            $(".fa").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+        }
+    }
+
+</script>

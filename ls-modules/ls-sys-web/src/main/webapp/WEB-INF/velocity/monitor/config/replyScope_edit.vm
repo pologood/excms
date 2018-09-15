@@ -1,0 +1,355 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <form id="config_edit_form" role="form" ms-controller="config_edit_form">
+            <div class="form-body">
+                <table  class="table table-bordered article-table" style="margin-bottom: 0px; width: 95%;margin-top:15px;">
+                    <tr>
+                        <input type="hidden" value="before" name="monitoredType">
+                        <input type="hidden" value="$!{id}" name="id">
+                        <input type="hidden" value="$!{typeCode}" name="typeCode">
+                        <th><font color="red"></font>栏目类别:</th>
+                        <td>
+                            <input type="text" id="columnTypeName" readonly name="columnTypeName"  ms-duplex="columnTypeName" value=""  class="form-control input-sm" ></input>
+
+                        ##                            <select class="form-control" id="columnTypeCode" name="columnTypeCode" ms-duplex="columnTypeCode">
+                        ##                                #foreach($vo in $dictVOs)
+                        ##                                    <option value="$!{vo.typeCode}">$!{vo.typeName}</option>
+                        ##                                #end
+                        ##                            </select>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th><font color="red"></font>类别编码:</th>
+                        <td>
+                            <input type="text" id="columnTypeCode" readonly  name="columnTypeCode" ms-duplex="columnTypeCode" value="" class="form-control input-sm" ></input>
+                        </td>
+                    </tr>
+                    <tr class="normalTable" hidden="hidden">
+                        <th><span style="float:left" class="bold"></span>监测周期:</th>
+
+                        <td>
+                            <span >监测点开始之前:</span>  <input type="text "  ms-duplex="monitoredNum" name="monitoredNum" id="monitoredNum" value="" class
+                                =""  placeholder=""
+                                >
+                            <select class="" id="monitoredTimeType" ms-duplex="monitoredTimeType" name="monitoredTimeType" >
+                                <option value="">单位</option>
+                                <option value="day">天</option>
+                                <option value="week">周</option>
+                                <option value="month">月</option>
+                                <option value="year">年</option>
+                            </select>
+                        </td>
+
+                    </tr>
+                    <tr class="normalTable" hidden="hidden"><td></td>
+                        <td>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;扣&nbsp; <input type="text"  ms-duplex="num"  name="num" id="num" value="" class="" placeholder=""> &nbsp;分
+                        </td>
+                    </tr>
+
+
+                    <tr class="activityTable" hidden="hidden">
+                        <th><span style="float:left" class="bold"></span>扣分方式:</th>
+
+                        <td>
+                            监测点开始之前: <input type="text "  ms-duplex="noActivityAonitoredNum" name="noActivityAonitoredNum" id="noActivityAonitoredNum" value="" class
+                                =""  placeholder=""
+                                >
+                            <select class="" id="noActivityTimeType" ms-duplex="noActivityTimeType" name="noActivityTimeType" >
+                                <option value="">单位</option>
+                                <option value="day">天</option>
+                                <option value="week">周</option>
+                                <option value="month">月</option>
+                                <option value="year">年</option>
+                            </select>&nbsp;未开始活动
+                        </td>
+
+                    </tr>
+                    <tr class="activityTable" hidden="hidden"><td></td>
+                        <td>
+                            &nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;扣&nbsp;<input type="text"  ms-duplex="noActivityNum"  name="noActivityNum" id="noActivityNum" value="" class="" placeholder="">&nbsp;分
+                        </td>
+                    </tr>
+
+                    <tr class="activityTable" hidden="hidden">
+                        <th></th>
+
+                        <td>
+                            监测点开始之前: <input type="text "  ms-duplex="activityAonitoredNum" name="activityAonitoredNum" id="activityAonitoredNum" value="" class
+                                =""  placeholder=""
+                                >
+                            <select class="" id="activityTimeType" ms-duplex="activityTimeType" name="activityTimeType" >
+                                <option value="">单位</option>
+                                <option value="day">天</option>
+                                <option value="week">周</option>
+                                <option value="month">月</option>
+                                <option value="year">年</option>
+                            </select>
+                        </td>
+
+                    </tr>
+                    <tr class="activityTable" hidden="hidden">
+                        <td></td>
+                     <td>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;开展 &lt; <input type="text "  ms-duplex="activityLimitNum" name="activityLimitNum" id="activityLimitNum" value="" class=""  placeholder=""> &nbsp;次
+                     </td>
+
+                    </tr>
+                    <tr class="activityTable" hidden="hidden"><td></td>
+                        <td>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;扣&nbsp;<input type="text"  ms-duplex="activityNum"  name="activityNum" id="activityNum" value="" class="" placeholder="">&nbsp;分
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "config_edit_form",
+        form: $('#config_edit_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        typeCode:"$!{typeCode}",
+        id:'$!{id}'
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+                {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+                {id:'syn',className:'btn-save',focus:true,name:'同步',callback:function(){syn();return false;}},
+                {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+        $("#columnTypeCode").on('change',function(){
+
+            $("#noActivityAonitoredNum").val('');
+            $("#noActivityNum").val('');
+            $("#noActivityTimeType").val('');
+            $("#activityTimeType").val('');
+            $("#activityNum").val('');
+            $("#activityAonitoredNum").val('');
+            $("#activityLimitNum").val('');
+            $("#monitoredNum").val('');
+            $("#monitoredTimeType").val('');
+            $("#num").val('');
+
+
+
+            var typeCode =$("#columnTypeCode").val();
+            if(typeCode=='columnType_ZWZX'){
+                $(".normalTable").show();
+                $(".activityTable").hide();
+            }else{
+                $(".normalTable").hide();
+                $(".activityTable").show();
+            }
+
+        });
+
+
+        setData();
+    })
+
+    function setData() {
+        Ls.ajax({
+            url: "/monitor/vetoConfig/getDataByCode",
+            data: {
+                id: cur.id,
+                typeCode:cur.typeCode
+            },
+            type:"get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data=resp.data;
+                    cur.init = Ls.initFORM(cur.vm_id,data);
+                    //如果模型已经绑定，不再绑定
+                    cur.vm = avalon.vmodels[cur.vm_id];
+                    cur.vm = avalon.define(cur.init);
+                    //avalon.scan(document.body, curr.vm);
+                    avalon.scan(cur.form.get(0), cur.vm);
+                    if(""!=data.id&&null!=data.id){
+//                        $("#columnTypeCode").attr("disabled",true);
+//                        $("#columnTypeCodeHidden").val(data.columnTypeCode);
+
+                        if(data.columnTypeCode=='columnType_ZWZX'){
+                            $(".normalTable").show();
+                        }else{
+                            $(".activityTable").show();
+                        }
+                    }
+                    if(""==data.id||null==data.id){
+                        $("#columnTypeCode").val("columnType_ZWZX");
+                        $(".normalTable").show();
+
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+
+        })
+    }
+
+    function syn(){
+        Ls.ajax({
+            url: "/monitor/vetoConfig/synByCode",
+            data: {
+                baseCode:'scop',
+                columnTypeCode:$("#columnTypeCode").val(),
+                typeCode:cur.typeCode
+            },
+            type:"get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data=resp.data;
+                    $("#noActivityAonitoredNum").val(data.noActivityAonitoredNum);
+                    $("#noActivityNum").val(data.noActivityNum);
+                    $("#noActivityTimeType").val(data.noActivityTimeType);
+                    $("#activityTimeType").val(data.activityTimeType);
+                    $("#activityNum").val(data.activityNum);
+                    $("#activityAonitoredNum").val(data.activityAonitoredNum);
+                    $("#activityLimitNum").val(data.activityLimitNum);
+                    $("#monitoredNum").val(data.monitoredNum);
+                    $("#monitoredTimeType").val(data.monitoredTimeType);
+                    $("#num").val(data.num);
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+
+        })
+    }
+
+
+    function saveSubmit() {
+        $("#config_edit_form").submit();
+
+    }
+    function judge(data){
+        if(""==data||null==data){
+            return false;
+        }
+        var reg = new RegExp("^[0-9]+$");
+        if(!reg.test(data)){
+//            Ls.tips("请填写正确数字!");
+            return false;
+        }
+        return true;
+
+    }
+     function clearData(typeCode){
+         if(typeCode=='columnType_ZWZX'){
+             $("#noActivityAonitoredNum").val('');
+             $("#noActivityNum").val('');
+             $("#noActivityTimeType").val('');
+             $("#activityTimeType").val('');
+             $("#activityNum").val('');
+             $("#activityAonitoredNum").val('');
+             $("#activityLimitNum").val('');
+         }else{
+             $("#monitoredNum").val('');
+             $("#monitoredTimeType").val('');
+             $("#num").val('');
+
+         }
+     }
+    function saveData() {
+        var typeCode =$("#columnTypeCode").val();
+        clearData(typeCode);
+        if(typeCode=='columnType_ZWZX'){
+            var monitoredNum =$("#monitoredNum").val();
+            var monitoredTimeType =$("#monitoredTimeType option:selected").val();
+            var num = $("#num").val();
+            if(!judge(monitoredNum)){
+                Ls.tipsErr("请填写正确监测时长!");
+                return;
+            }
+            if(""==monitoredTimeType||null==monitoredTimeType){
+                Ls.tipsErr("请选择监测时长单位!");
+                return;
+            }
+            if(!judge(num)){
+                Ls.tipsErr("请填写正确扣分方式分数!");
+                return;
+            }
+        }else{
+            var noActivityAonitoredNum= $("#noActivityAonitoredNum").val();
+            if(!judge(noActivityAonitoredNum)){
+                Ls.tipsErr("请填写未开始活动正确监测时长!");
+                return;
+            }
+            var noActivityTimeType = $("#noActivityTimeType option:selected").val();
+
+            if(""==noActivityTimeType||null==noActivityTimeType){
+                Ls.tipsErr("请选择未开始活动监测时长单位!");
+                return;
+            }
+
+            var noActivityNum =  $("#noActivityNum").val();
+            if(!judge(noActivityNum)){
+                Ls.tipsErr("请填写未开始活动正确扣分方式分数!");
+                return;
+            }
+            var activityAonitoredNum = $("#activityAonitoredNum").val();
+            if(!judge(activityAonitoredNum)){
+                Ls.tipsErr("请填写开始活动正确监测时长!");
+                return;
+            }
+            var activityTimeType =  $("#activityTimeType option:selected").val();
+            if(""==activityTimeType||null==activityTimeType){
+                Ls.tipsErr("请选择开始活动监测时长单位!");
+                return;
+            }
+            var activityNum = $("#activityNum").val();
+            if(!judge(activityNum)){
+                Ls.tipsErr("请填写开始活动正确扣分方式分数!");
+                return;
+            }
+            var activityLimitNum = $("#activityLimitNum").val();
+            if(!judge(activityLimitNum)){
+                Ls.tipsErr("请填写开始活动开展次数正确数值!");
+                return;
+            }
+
+        }
+
+        var data =$("#config_edit_form").serializeObject();
+
+        Ls.ajax({
+            url: "/monitor/vetoConfig/saveData",
+            data: {content:JSON.stringify(data),typeCode:data.typeCode},
+            type:"POST",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tipsOk("保存成功",function(){
+                        cur.win.search();
+                        Ls.winClose();
+                    });
+
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+
+
+
+
+</script>

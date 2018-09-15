@@ -1,0 +1,100 @@
+#if($msg)
+    $msg
+#else
+<span class="hide"><script src="/content/hit/$!{eo.baseContentId}"></script></span>
+<div class="guestbook-show">
+    <div class="guestbook-title title1"><span>来信信息</span></div>
+    <div class="guestbook-table table1">
+        <table class="tb1">
+            <tbody>
+            <tr>
+                <th>信件编号：</th>
+                <td>$!{resultObj.docNum}</td>
+            </tr>
+            <tr>
+                <th>信件类型：</th>
+                <td>$!{resultObj.className}</td>
+            </tr>
+            <tr>
+                <th>来信标题：</th>
+                <td>$!{resultObj.title}</td>
+            </tr>
+            <tr>
+                <th>来信时间：</th>
+                <td>#date_format("$!{resultObj.createDate}","$!{paramObj.dateFormat}")</td>
+            </tr>
+            <tr>
+                <th>来信内容：</th>
+                <td>
+                    <div class="content">
+                        $!{resultObj.messageBoardContent}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>姓名：</th>
+                <td> $!{resultObj.personName}</td>
+            </tr>
+            <tr>
+                <th>转办情况：</th>
+                <td>
+                #foreach($eo1 in $resultObj.forwardVOList)
+                    #set($receiveUnitName=$!{eo1.receiveUnitName})
+                    #cutstr($receiveUnitName,$length)
+                #end
+                </td>
+            </tr>
+            <tr>
+                <th>答复意见：</th>
+                <td>
+                    #foreach($eo in $resultObj.replyVOList)
+                        #set($replyContent=$!{eo.replyContent})
+                        #cutstr($replyContent,$length)
+                    #end
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        using("validator", function () {
+            $("#guestbook_comment").validator({
+                fields: {
+                    randomCode: "查询密码:required",
+                    commentCode: "评价结果:required"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            var saveData = function () {
+                var data = $("#guestbook_comment").getFromJSON();
+                Ls.ajax({
+                    url: "/frontGuestBook/saveComment",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 0) {
+                        Ls.tipsInfo(d.desc);
+                    } else {
+                        Ls.tipsOk("评价成功!");
+                        var listHtml = template("comment_tpl", d.data);
+                        $("#myComment").html(listHtml);
+                    }
+                })
+            };
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#guestbook_comment").trigger("validate");
+        });
+    });
+</script>
+#end

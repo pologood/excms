@@ -1,0 +1,176 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light" style="display: none;">
+            <div class="portlet-title">
+                <div class="caption font-grey-silver">
+                    <span class="caption-subject bold uppercase">论坛版块管理</span>
+                </div>
+
+            </div>
+            <div class="portlet-body form">
+
+                <form id="bbsPlate_form" role="form" ms-controller="bbsPlate_form" class="col-md-8" style="padding-left: 0;">
+                    <div class="form-body">
+                        <input name="plateId" id="plateId" class="form-control" ms-duplex="plateId"
+                               type="hidden"></input>
+                        <input name="parentId" class="form-control" ms-duplex="parentId" type="hidden"></input>
+                        <input name="oldParentId" class="form-control" ms-duplex="parentId" type="hidden"></input>
+                        <input name="parentIds" class="form-control" ms-duplex="parentIds" type="hidden"></input>
+                        <input name="siteId" class="form-control" ms-duplex="siteId" type="hidden"></input>
+                        <input name="unitIds" class="form-control" ms-duplex="unitIds" type="hidden"></input>
+                        <input name="isScreen" class="form-control" ms-duplex="isScreen" type="hidden"></input>
+                        <input name="hasChild" class="form-control" ms-duplex="hasChild" type="hidden"></input>
+
+##                        <div class="form-group">
+##                            <label>上级版块</label>
+##                            <select id="parentId" class="form-control" name="parentId" ms-duplex="parentId">
+##                                <option value="">请选择上级版块</option>
+##                                #foreach($s in $plates)
+##                                    <option value="$!{s.plateId}">$!{s.name}</option>
+##                                #end
+##                            </select>
+##                        </div>
+                        <div class="form-group">
+                            <label>版块名称</label>
+                            <input name="name" type="text" class="form-control" placeholder="" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>排列序号</label>
+                            <input name="sortNum" type="text" class="form-control" placeholder="数字越大越靠前"
+                                   ms-duplex="sortNum">
+                        </div>
+                        <div class="form-group">
+                            <label>本版块版主</label>
+                            <input name="manager" type="text" class="form-control" placeholder="" ms-duplex="manager">
+                            <label>设置本版块中允许管理的版主会员名，多个会员名之间用半角逗号 "," 分割。</label>
+                        </div>
+##                        <div class="form-group">
+##                            <label>版块图标</label>
+##                            <input name="icon" class="form-control" ms-duplex="icon">
+##                            <label>填写图标相对地址。</label>
+##                        </div>
+                        <div class="form-group">
+                            <label>主题默认排序字段</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="sortField" value="0"  ms-duplex-string="sortField"> 创建时间</label>
+                                <label class="radio-inline"><input type="radio" name="sortField" value="1"  ms-duplex-string="sortField"> 审核时间</label>
+                                <label class="radio-inline"><input type="radio" name="sortField" value="2"  ms-duplex-string="sortField"> 浏览数量</label>
+                                <label class="radio-inline"><input type="radio" name="sortField" value="3"  ms-duplex-string="sortField"> 回复数量</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>主题默认排序方式</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="sortMode" value="0" ms-duplex-string="sortMode"> 按降序排列</label>
+                                <label class="radio-inline"><input type="radio" name="sortMode" value="1" ms-duplex-string="sortMode"> 按升序排列</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>权限设置</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="checkbox" id="canThread" name="canThread" value="1" ms-attr-checked="canThreadC" > 允许发帖</label>
+                                <label class="radio-inline"><input type="checkbox" id="canPost" name="canPost" value="1" ms-attr-checked="canPostC" > 允许回复</label>
+                                <label class="radio-inline"> <input type="checkbox" id="canUpload" name="canUpload" value="1" ms-attr-checked="canUploadC" > 允许上传附件</label>
+##                                <label class="radio-inline"> <input type="checkbox" id="userCanView" name="userCanView" value="1" ms-attr-checked="userCanViewC" > 仅系统用户可见</label>
+##                                <label class="radio-inline"> <input type="checkbox" id="managerCanView" name="managerCanView" value="1" ms-attr-checked="managerCanViewC" > 仅版主用户可见</label>
+                                <label class="radio-inline"> <input type="checkbox" id="status" name="status" value="1" ms-attr-checked="statusC" > 激活此板块</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>版块简介</label>
+            <textarea name="description" class="form-control" rows="3" placeholder=""
+                      ms-duplex="description"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>版块规则</label>
+            <textarea name="rule" class="form-control" rows="3" placeholder=""
+                      ms-duplex="rule"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>内容模型</label>
+                            <select id="contentModelCode" class="form-control" name="contentModelCode"
+                                    ms-duplex="contentModelCode" placeholder="请选择内容模型">
+                                <option ms-repeat-option="contentModels" ms-attr-value="code">{{name}}</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-actions noborder">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                    #*  <button type="button" class="btn btn-default" onclick="screenOpt();">屏 蔽</button>
+                      <button type="button" class="btn btn-default" onclick="moveOpt();">移 动</button>
+                      <button type="reset" class="btn btn-default">重 置</button>*#
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/bbs_manage.js"></script>
+<script>
+    $(document).ready(function () {
+        bbsManage.bbsPlate();
+    })
+
+    function screenOpt() {
+        var data = Ls.toJSON(cur.vm.$model);
+        data.isScreen = 1;
+        var url = "/bbsPlate/save";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                bbsManage.bbsPlate();
+                Ls.tipsOk("屏蔽成功！");
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+        return false;
+    }
+
+    function moveOpt() {
+        Ls.openWin('/bbsPlate/movePlate', '400px', '380px', {
+            id: 'move',
+            title: '移动',
+            padding: 0,
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.doOk();
+                if (data != null) {
+                    var data1 = Ls.toJSON(cur.vm.$model);
+                    data1.parentId = data.plateIds;
+                    Ls.tipsOk("版块移动中,请稍后...");
+                    Ls.ajax({
+                        url: "/bbsPlate/move",
+                        data: data1
+                    }).done(function (d) {
+                        if (d.status == 1) {
+                            bbsManage.bbsPlate();
+                            Ls.tipsOk("操作成功!");
+                        } else {
+                            Ls.tipsErr(d.desc);
+                        }
+                    })
+                }
+            }
+        });
+    }
+
+</script>

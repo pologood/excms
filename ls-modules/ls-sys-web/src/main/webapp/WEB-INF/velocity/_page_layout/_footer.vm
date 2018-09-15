@@ -1,0 +1,21 @@
+<!--[if lt IE 9]>
+<script src="$!{sysStaticPath}/assets/js/patch.min.js"></script>
+<![endif]-->
+<!-- BEGIN CORE PLUGINS -->
+<script src="$!{rc.contextPath}/pageStyle/getAllConfig"></script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js?v=$!{_version}"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading common..."</script>#end
+<script src="$!{sysStaticPath}/assets/js/plugins/miniui/miniui.min.js"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading miniui..."</script>#end
+<script src="$!{sysStaticPath}/assets/js/plugins/datePicker/WdatePicker.min.js"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading WdatePicker..."</script>#end
+#*<script src="$!{sysStaticPath}/assets/js/plugins/kindeditor/kindeditor.min.js"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading kindeditor..."</script>#end*#
+<script src="$!{rc.contextPath}/ewebeditor/ewebeditor.js"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading ewebeditor..."</script>#end
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js?v=$!{_version}"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading plugins..."</script>#end
+<script src="$!{sysStaticPath}/assets/js/app.min.js?v=$!{_version}"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading app..."</script>#end
+<script src="$!{sysStaticPath}/assets/js/core.min.js?v=$!{_version}"></script>
+#if($!{isIndex})<script>document.getElementById("loading_msg").innerHTML = "Loading core..."</script>#end

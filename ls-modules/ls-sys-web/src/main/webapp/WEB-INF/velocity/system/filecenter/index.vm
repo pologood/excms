@@ -1,0 +1,149 @@
+<style>
+    u{text-decoration: none;}
+    a{color: #555;}
+    a:hover{color: #1E90FF;}
+    .libk {
+        background-color: #D7D7D7;
+        color: black;
+        font-weight: 500;
+    }
+
+    .liover {
+        background-color: #E0E0E0;
+        color: white;
+    }
+
+    #muLi li {
+        margin: 5px 0
+    }
+
+    .checkImg {
+        border: 1px solid #1E90FF;
+    }
+
+    .unCheckImg {
+        border: 1px solid #C4C5BD;
+    }
+
+    .checkFile {
+        background: #000000 url($!{sysStaticPath}/assets/images/checkbox.png) no-repeat scroll -36px -42px;
+    }
+
+    .unCheckFile {
+        background: #000000 url($!{sysStaticPath}/assets/images/checkbox.png) no-repeat scroll 0px -42px;
+    }
+</style>
+<div id="content_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" showCollapseButton="true" splitSize="0" width="160"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding: 5px;">
+
+            <div class="sidebar-box sidebar-filecenter">
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="javascript:;" class="pl5" data-type="all">
+                            <i class="fa fa-folder-open-o"></i> 全部文件
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="image">
+                            <i class="fa fa-image"></i> 图片
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="text">
+                            <i class="fa fa-file-text-o"></i> 文档
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="video">
+                            <i class="fa fa-file-video-o"></i> 视频
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="audio">
+                            <i class="fa fa-file-sound-o"></i> 音频
+                        </a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="other">
+                            <i class="fa fa-inbox"></i> 其他
+                        </a>
+                    </li>
+                    <li class="pb3">
+                        <hr/>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-type="noRef">
+                            <i class="fa fa-exchange"></i> 未引用文件
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+    <div region="center" style="border:none; overflow: auto;height:auto;">
+
+        <div id="content_body" style="height:100%">
+
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/fileCenter/left_menu.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/system/fileCenter/file_list.js"></script>
+<script>
+    var cur = {
+        pageSize: 27,
+        pageIndex: 0,
+        type: "",
+        dataFlag: 1
+    };
+    //图片展示变量
+    var imgHtml = "";
+    //列表展示切换 1：列表展示 2：缩略图展示
+    var showStatus = 1;
+    $(document).ready(function () {
+        mini.parse();
+        file_mgr.init();
+        //file_manage.init();
+        file_mgr.getContentApp("/fileCenter/fileListPage");
+
+        $(".sidebar-nav").on('click', 'a', function () {
+            var $this = $(this), code = $this.data("type");
+            $this.parent('li').addClass('active').siblings().removeClass('active');
+            getPageByType(code);
+        })
+
+    })
+
+    function getPageByType(type) {
+        //file_mgr.getContentApp("/fileCenter/fileListPage");
+        cur.pageIndex = 0;
+        cur.type = type;
+        cur.startDate = "";
+        $("#startDate").val("");
+        cur.endDate = "";
+        $("#endDate").val("");
+        cur.fileName = "";
+        $("#searchKey").val("")
+        $("#muLi").find("li").removeClass("libk");
+        $("#" + type).addClass("libk");
+        imgHtml = "";
+        if (cur.type == "image") {
+            showStatus = 2;
+            $("#showStatus").find("img").attr("src", "$!{sysStaticPath}/assets/images/showThumb.png");
+        }
+        file_manage.getData();
+    }
+
+    function mouseOver(t) {
+        $("#" + t).addClass("liover");
+    }
+
+    function mouseOut(t) {
+        $("#" + t).removeClass("liover");
+    }
+</script>

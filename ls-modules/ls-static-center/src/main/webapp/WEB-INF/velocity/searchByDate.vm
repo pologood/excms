@@ -1,0 +1,21 @@
+#if($!{paramObj.url}&&$!{paramObj.url}!="")
+    #set($url = $!{paramObj.url})
+#else
+    #set($url = "/site/search/$!{siteId}")
+#end
+#set($baseurl="$!url?columnId=$!{columnId}&columnIds=$!{columnIds}&typeCode=$!{typeCode}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=$!{excColumns}&sort=$!{sort}&type=$!{type}&tableColumnId=$!{tableColumnId}&beginDate=$!{beginDate}&endDate=$!{endDate}&indexNum=$!{indexNum}&fileNum=$!{fileNum}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}")
+<li class="class-title">
+    <a href="$baseurl&datecode=">全部</a>
+</li>
+<li>
+    <a href="$baseurl.trim()&datecode=day" target="_self" #if("$!{datecode}" == "day") class="active" #end>一天内</a>
+</li>
+<li>
+    <a href="$baseurl.trim()&datecode=week" target="_self"#if("$!{datecode}" == "week") class="active" #end>一周内</a>
+</li>
+<li>
+    <a href="$baseurl.trim()&datecode=month" target="_self"#if("$!{datecode}" == "month") class="active" #end>一月内</a>
+</li>
+<li>
+    <a href="$baseurl.trim()&datecode=year" target="_self" #if("$!{datecode}" == "year") class="active" #end>一年内</a>
+</li>

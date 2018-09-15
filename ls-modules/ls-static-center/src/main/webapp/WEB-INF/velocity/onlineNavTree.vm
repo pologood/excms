@@ -1,0 +1,18 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    <div class="bs_vertical">
+        <a class="bs_vertical_a $!{eo.active}">#cutstr($!{eo.name},$length)</a>
+        #if ($eo.childs)
+            <div class="bs_vertical_body" style="display: #if($eo.active!='active')none#end ;">
+                <ul>
+                    #foreach($child in $eo.childs)
+                        <li><a href="/content/column/$!{child.indicatorId}" title="$!{child.name}" class="$!{child.active}">#cutstr($!{child.name},$length)</a></li>
+                    #end
+                </ul>
+            </div>
+        #end
+    </div>
+#end

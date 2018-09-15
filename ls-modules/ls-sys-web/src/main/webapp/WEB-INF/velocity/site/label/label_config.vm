@@ -1,0 +1,120 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+
+<div id="layout1" class="mini-layout" style="width: 100%; height: 100%; border: none;">
+    <div title="center" region="center" style="border:0;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <form id="labelForm" role="form" ms-controller="labelForm">
+                    <div class="form-body">
+
+                        <div class="form-group">
+                            <label>属性名称</label>
+                            <input type="text" name="fieldname" class="form-control" ms-duplex="fieldname" placeholder="" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>数据类型</label>
+                            <select class="form-control" name="datatype" id="datatype" ms-duplex="datatype" placeholder="">
+                                <option value="string">string</option>
+                                <option value="integer">integer</option>
+                                <option value="boolean">boolean</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>允许值</label>
+                            <input type="text" name="allowval" class="form-control" ms-duplex="allowval" placeholder="" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>默认值</label>
+                            <input type="text" name="defaultval" class="form-control" ms-duplex="defaultval" placeholder="" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="description" ms-duplex="description" rows="3" placeholder=""></textarea>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+
+    var cur = {
+        uid: $!{uid},
+        rowData: {},
+        formId: "labelForm"
+    }
+
+    var dialog = art.dialog, W = dialog.opener, api = dialog.open.api;
+
+    mini.parse();
+
+    $(document).ready(function () {
+        cur.rowData = W.label_mgr.grid.getRowByUID(cur.uid) || Ls.initFORM(cur.formId);
+        cur.rowData.$id = cur.formId;
+
+        cur.vm = avalon.define(cur.rowData);
+        avalon.scan($("#" + cur.formId).get(0), cur.vm);
+
+        var datatype = $("#datatype")
+        cur.vm.allowval = datatype.val();
+
+        datatype.on('change', function (e) {
+            cur.vm.allowval = $(this).val();
+        })
+
+        $('#' + cur.formId).validator({
+            fields: {
+                'fieldname': '属性名称:required;',
+                'datatype': '数据类型:required;',
+                'allowval': '允许值:required;'
+            },
+            valid: function () {
+                Refresh_Grid();
+            }
+        });
+
+        api.button({
+            name: '保存',
+            callback: function () {
+                $("#" + cur.formId).submit();
+                return false;
+            }
+        })
+
+    })
+
+    function Refresh_Grid() {
+
+        var formData = GetData();
+
+        if (cur.uid == 0) {
+            W.label_mgr.gridData.push(formData);
+            W.setFormData();
+        } else {
+            var row = Ls.extend(cur.rowData, formData);
+            W.label_mgr.grid.updateRow(cur.rowData);
+        }
+        W.saveData();
+        api.close();
+    }
+
+    function GetData() {
+        var o = Ls.toJSON(cur.vm);
+        return o;
+    }
+
+</script>
+</body>
+</html>

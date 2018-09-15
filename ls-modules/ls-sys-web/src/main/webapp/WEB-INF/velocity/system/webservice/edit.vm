@@ -1,0 +1,122 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="web_form" role="form" ms-controller="web_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>所属应用</label>
+                            <select id="systemCode" class="form-control" name="systemCode" ms-duplex="systemCode">
+                                #foreach($dataDict in $dataDictList)
+                                    <option value='$!{dataDict.code}'>$!{dataDict.key}</option>
+                                #end
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>服务编码</label>
+                            <input type="text" class="form-control" name="code" ms-duplex="code">
+                        </div>
+
+                        <div class="form-group">
+                            <label>服务地址</label>
+                            <input type="text" class="form-control" name="uri" placeholder="webservice访问地址" ms-duplex="uri">
+                        </div>
+
+                        <div class="form-group">
+                            <label>命名空间</label>
+                            <input type="text" class="form-control" name="nameSpace" ms-duplex="nameSpace">
+                        </div>
+
+                        <div class="form-group">
+                            <label>方法名</label>
+                            <input type="text" class="form-control" name="method" ms-duplex="method">
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="description" rows="3" ms-duplex="description"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "web_form"
+    }
+    $(document).ready(function () {
+        //获取数据
+        Ls.ajax({
+            url: "/cmswebservice/getService",
+            data: {
+                webServiceId: '$!{webServiceId}'
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                data.$id = cur.id;
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels[data.$id];
+                if (!cur.vm) {
+                    //绑定模型
+                    cur.vm = avalon.define(data);
+                }
+                avalon.scan($("#" + cur.id).get(0), cur.vm);
+            } else {
+                Ls.tipsErr("加载数据失败!");
+            }
+        });
+
+        //验证
+        $('#' + cur.id).validator({
+            fields: {
+                'code': '服务编码:required;',
+                'uri': '服务地址:required;',
+                'nameSpace': '命名空间:required;',
+                'method': '方法名:required;'
+            },
+            valid: function () {
+                var me = this;
+                // 提交表单之前，hold住表单，防止重复提交
+                me.holdSubmit();
+                var data = Ls.toJSON(cur.vm.$model);
+				data.systemCode = $("#systemCode").val();
+                var url = "/cmswebservice/update";
+                if ("$!{webServiceId}" == "") {
+                    url = "/cmswebservice/save";
+                }
+                // 提交
+                Ls.ajax({
+                    url: url,
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips('保存成功!', {
+                            icons: "success",
+                            callback: function () {
+                                Ls.getWin.api.close();
+                                Ls.getWin.win.cur.grid.reload();
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                me.holdSubmit(false);
+                            }
+                        });
+                    } else {
+                        Ls.tips(d.desc, {
+                            icons: "error",
+                            callback: function () {
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                me.holdSubmit(false);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>

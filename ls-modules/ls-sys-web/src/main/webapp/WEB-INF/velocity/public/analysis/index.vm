@@ -1,0 +1,277 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">单位排行</a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">依申请公开排行</a>
+                </li>
+##                <li>
+##                    <a href="#tab_1_3" data-toggle="tab">依申请公开回复排行</a>
+##                </li>
+                <li>
+                    <a href="#tab_1_4" data-toggle="tab">依申请公开回复状态排行</a>
+                </li>
+                <li>
+                    <a href="#tab_1_5" data-toggle="tab">重点信息统计</a>
+                </li>
+                <li>
+                    <a href="#tab_1_7" data-toggle="tab">信息公开报表统计</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1_1">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <button class="btn btn-default btn-export" onclick="publicAnalysisManage.exportExcel('organRankingForm','1')">导 出</button>
+                                ##                                    <div class="btn-group">
+                                ##                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选择<i class="fa fa-angle-down"></i></button>
+                                ##                                        <ul class="dropdown-menu">
+                                ##                                            <li class="publishBtn"><a onclick="publicAnalysisManage.searchOrgans(this.form,'1')">显示所有部门</a></li>
+                                ##                                        </ul>
+                                ##                                    </div>
+
+                                </div>
+                                <div class="col-md-10">
+
+                                    <form class="form-inline tr search-toolbar" role="form" id="organRankingForm">
+                                        <select id="isOrgans"  name="isOrgans" class="form-control">
+                                            <option value="0">默认单位</option>
+                                            <option value="1">所有单位</option>
+                                        </select>
+                                        <input type="datetime" id="startDate_organ" name="startDate" class="form-control w160"
+                                               placeholder="开始时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_organ\')||\'%y-%M-%d\'}'})" />
+                                        <input type="datetime" id="endDate_organ" name="endDate" class="form-control w160"
+                                               placeholder="结束时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_organ\')}',maxDate:'%y-%M-%d'})" />
+                                        <button type="button" class="btn btn-default btn-search" onclick="publicAnalysisManage.search(this.form,'1')">查询</button>
+                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'1')">重置</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="organRanking_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                             ondrawsummarycell="publicAnalysisManage.onDrawSummaryCell" url="/public/analysis/getOrganRanking?flag=1">
+                            <div property="columns">
+                                <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号</div>
+                                <div field="organName" width="100%" headerAlign="center" allowSort="flase" align="left">部门名称</div>
+                                <div field="publishCount" width="120" headerAlign="center" allowSort="flase" align="center">已发布数</div>
+                                <div field="notPublishCount" width="120" headerAlign="center" allowSort="flase" align="center">未发布数</div>
+                                <div field="total" width="120" headerAlign="center" allowSort="flase" align="center">总数</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab_1_2">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <button class="btn btn-default btn-export" onclick="publicAnalysisManage.exportExcel('applyRankingForm','2')">导 出</button>
+##                                    <div class="btn-group">
+##                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选择<i class="fa fa-angle-down"></i></button>
+##                                        <ul class="dropdown-menu">
+##                                            <li class="publishBtn"><a onclick="publicAnalysisManage.searchOrgans(this.form,'2')">显示所有部门</a></li>
+##                                        </ul>
+##                                    </div>
+                                </div>
+
+                                <div class="col-md-10">
+                                    <form class="form-inline tr search-toolbar" role="form" id="applyRankingForm">
+                                        <select id="isOrgans"  name="isOrgans" class="form-control">
+                                            <option value="0">默认单位</option>
+                                            <option value="1">所有单位</option>
+                                        </select>
+                                        <input type="datetime" id="startDate_apply" name="startDate" class="form-control w160"
+                                               placeholder="开始时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_apply\')||\'%y-%M-%d\'}'})" />
+                                        <input type="datetime" id="endDate_apply" name="endDate" class="form-control w160"
+                                               placeholder="结束时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_apply\')}',maxDate:'%y-%M-%d'})" />
+                                        <button type="button" class="btn btn-default btn-search" onclick="publicAnalysisManage.search(this.form,'2')">查询</button>
+                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'2')">重置</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="applyRanking_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                             ondrawsummarycell="publicAnalysisManage.onDrawSummaryCell" url="/public/analysis/getApplyRanking?flag=1">
+                            <div property="columns">
+                                <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号</div>
+                                <div field="organName" width="100%" headerAlign="center" allowSort="flase" align="left">部门名称</div>
+                                <div field="publishCount" width="120" headerAlign="center" allowSort="flase" align="center">已发布数</div>
+                                <div field="notPublishCount" width="120" headerAlign="center" allowSort="flase" align="center">未发布数</div>
+                                <div field="replyCount" width="110" headerAlign="center" allowSort="flase" align="center">已回复数</div>
+                                <div field="applyCount" width="110" headerAlign="center" allowSort="flase" align="center">总数</div>
+                            </div>
+                        </div>
+                    </div>
+##                    <div class="tab-pane" id="tab_1_3">
+##                        <div class="table-toolbar">
+##                            <div class="row">
+##                                <div class="col-md-5">
+##                                    <button class="btn btn-default btn-export" onclick="publicAnalysisManage.exportExcel('replyRankingForm','3')">导 出</button>
+####                                    <div class="btn-group">
+####                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选择<i class="fa fa-angle-down"></i></button>
+####                                        <ul class="dropdown-menu">
+####                                            <li class="publishBtn"><a onclick="publicAnalysisManage.searchOrgans(this.form,'3')">显示所有部门</a></li>
+####                                        </ul>
+####                                    </div>
+##                                </div>
+##
+##                                <div class="col-md-15">
+##                                    <form class="form-inline tr search-toolbar" role="form" id="replyRankingForm">
+##                                        <select id="isOrgans"  name="isOrgans" class="form-control">
+##                                            <option value="0">默认单位</option>
+##                                            <option value="1">所有单位</option>
+##                                        </select>
+##                                        <input type="datetime" id="startDate_apply" name="startDate" class="form-control w160"
+##                                               placeholder="开始时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_apply\')||\'%y-%M-%d\'}'})" />
+##                                        <input type="datetime" id="endDate_apply" name="endDate" class="form-control w160"
+##                                               placeholder="结束时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_apply\')}',maxDate:'%y-%M-%d'})" />
+##                                        <button type="button" class="btn btn-default btn-search" onclick="publicAnalysisManage.search(this.form,'3')">查询</button>
+##                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'3')">重置</button>
+##                                    </form>
+##                                </div>
+##                            </div>
+##                        </div>
+##
+##                        <div id="replyRanking_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+##                             ondrawsummarycell="publicAnalysisManage.onDrawSummaryCell" url="/public/analysis/getReplyRanking?flag=1">
+##                            <div property="columns">
+##                                <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号</div>
+##                                <div field="organName" width="100%" headerAlign="center" allowSort="flase" align="left">部门名称</div>
+##                                <div field="replyCount" width="110" headerAlign="center" allowSort="flase" align="center">总数</div>
+##                            </div>
+##                        </div>
+##                    </div>
+                    <div class="tab-pane" id="tab_1_4">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <button class="btn btn-default btn-export" onclick="publicAnalysisManage.exportExcel('replyStatusRankingForm','4')">导 出</button>
+##                                    <div class="btn-group">
+##                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">选择<i class="fa fa-angle-down"></i></button>
+##                                        <ul class="dropdown-menu">
+##                                            <li class="publishBtn"><a onclick="publicAnalysisManage.searchOrgans(this.form,'4')">显示所有部门</a></li>
+##                                        </ul>
+##                                    </div>
+                                </div>
+
+                                <div class="col-md-15">
+                                    <form class="form-inline tr search-toolbar" role="form" id="replyStatusRankingForm">
+                                        <select id="isOrgans"  name="isOrgans" class="form-control">
+                                            <option value="0">默认单位</option>
+                                            <option value="1">所有单位</option>
+                                        </select>
+                                        <input type="datetime" id="startDate_replyStatus" name="startDate" class="form-control w160"
+                                               placeholder="开始时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_replyStatus\')||\'%y-%M-%d\'}'})" />
+                                        <input type="datetime" id="endDate_replyStatus" name="endDate" class="form-control w160"
+                                               placeholder="结束时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_replyStatus\')}',maxDate:'%y-%M-%d'})" />
+                                        <select class="form-control w160" id="replyStatusRanking_replyStatusSelect" name="replyStatus"></select>
+                                        <button type="button" class="btn btn-default btn-search" onclick="publicAnalysisManage.search(this.form,'4')">查询</button>
+                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'4')">重置</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="replyStatusRanking_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                             ondrawsummarycell="publicAnalysisManage.onDrawSummaryCell" url="/public/analysis/getReplyStatusRanking?flag=1"></div>
+                    </div>
+                    <div class="tab-pane" id="tab_1_5">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <button class="btn btn-default btn-export" onclick="publicAnalysisManage.exportExcel('catalogRankingForm','5')">导 出</button>
+                                </div>
+
+                                <div class="col-md-11">
+                                    <form class="form-inline tr search-toolbar" role="form" id="catalogRankingForm">
+                                        <input type="datetime" id="startDate_apply" name="startDate" class="form-control w160"
+                                               placeholder="开始时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_apply\')||\'%y-%M-%d\'}'})" />
+                                        <input type="datetime" id="endDate_apply" name="endDate" class="form-control w160"
+                                               placeholder="结束时间" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_apply\')}',maxDate:'%y-%M-%d'})" />
+                                        <select class="form-control w160" id="catalogRanking_catalogSelect" name="catId" onchange="publicAnalysisManage.changeCatalogTreeSelect(this);"></select>
+                                        <div class="input-group" style="width:300px;">
+                                            <div id="public_catalog_content"
+                                                 style="display:none;position:absolute;top:34px;left:0px;height:300px;z-index:10000;border:solid 1px #c2cad8;border-top:0px;overflow:auto;background-color:InactiveBorder">
+                                                <ul id="public_catalog_tree" class="ztree"></ul>
+                                            </div>
+                                            <input id="public_catalog_ids" type="hidden" name="catIds" class="form-control"/>
+                                            <input id="public_catalog_childrenIds" type="hidden" name="childrenIds" class="form-control"/>
+                                            <input id="public_catalog_names" type="text" placeholder="请选择信息公开目录" class="form-control readonly" readonly onclick="publicAnalysisManage.showTree('public_catalog')"/>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-search" onclick="publicAnalysisManage.search(this.form,'5')">查询</button>
+                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'5')">重置</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="catalogRanking_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                             ondrawsummarycell="publicAnalysisManage.onDrawSummaryCell" url="/public/analysis/getCatalogRanking?flag=1"></div>
+                    </div>
+
+                    <div class="tab-pane" id="tab_1_7">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <button class="btn btn-default btn-export"
+                                            onclick="publicAnalysisManage.exportExcel('publicReportForm','7')">导 出
+                                    </button>
+                                </div>
+
+                                <div class="col-md-11">
+                                    <form class="form-inline tr search-toolbar" role="form" id="publicReportForm">
+                                        <input type="datetime" id="startDate_public_report" name="startDate" class="form-control w160"
+                                               placeholder="开始时间"
+                                               onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate_public_report\')||\'%y-%M-%d\'}'})"/>
+                                        <input type="datetime" id="endDate_public_report" name="endDate" class="form-control w160"
+                                               placeholder="结束时间"
+                                               onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'startDate_public_report\')}',maxDate:'%y-%M-%d'})"/>
+                                        <select class="form-control w160" id="public_report_catalogSelect" name="catId"></select>
+                                        <button type="button" class="btn btn-default btn-search"
+                                                onclick="publicAnalysisManage.search(this.form,'7')">查询
+                                        </button>
+                                        <button type="button" class="btn btn-default" onclick="publicAnalysisManage.searchClear(this.form,'7')">重置
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="publicReport_datagrid" class="mini-treegrid" style="width:100%;"
+                             showTreeIcon="true" treeColumn="taskname" idField="id" parentField="parentId" resultAsTree="false" expandOnLoad="true"
+                             url="/public/report/getPublicReportTjList">
+                            <div property="columns">
+                                <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号</div>
+                                <div name="taskname" field="title" width="100%" headerAlign="center" allowSort="flase" align="left">统计指标</div>
+                                <div field="unit" width="100" headerAlign="center" allowSort="flase" align="center">单位</div>
+                                <div field="result" width="120" headerAlign="center" renderer="publicAnalysisManage.rendererReportEmpty"
+                                     allowSort="flase" align="center">统计数
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_analysis_manage.js"></script>
+<script>
+    var cur = {
+        organRanking_datagrid:null,
+        applyRanking_datagrid:null,
+        replyRanking_datagrid:null,
+        replyStatusRanking_datagrid:null,
+        replyStatusList:null,//回复状态列表
+        catalogRanking_datagrid:null,
+        catalog_select_tree:null
+    }
+    $(document).ready(function(){
+        publicAnalysisManage.init();
+    });
+</script>

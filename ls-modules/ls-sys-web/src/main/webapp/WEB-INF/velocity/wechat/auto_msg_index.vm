@@ -1,0 +1,325 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;overflow: auto;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>关注回复</strong></a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_2" data-toggle="tab" onclick="initKeyWordsGrid()"><strong>关键词回复</strong></a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_3" data-toggle="tab" onclick="initJudge()"><strong>互动评价</strong></a>
+                </li>
+
+
+            </ul>
+            <div class="tab-content" style="padding: 10px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="alert alert-info pd10">
+                        <div>1、 粉丝在关注您的公众号时，会自动发送您设置的文字给粉丝。</div>
+                        <div>2、 回复内容最多可输入<font color="red">600</font>字，超出自动截取。</div>
+                    </div>
+                    <table class="table table-bordered picture-table">
+                        <tr>
+                            <td style="width:80px;">
+                                <div style="height:80px;width:80px;"><img id="headImg" height="80" width="80" src="$!{sysStaticPath}/assets/images/no.photo.jpg"/></div>
+                            </td>
+                            <td>
+                                <textarea id="subMsg" class="form-control" style="height:420px;width:400px"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-default btn-save" onclick="saveSubMsg()">保 存</button>
+                            </td>
+                        </tr>
+                </div>
+                        </table>
+
+            </div>
+
+            <div class="tab-pane" id="tab_1_2">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group">
+                                <button id="deletes" class="btn btn-default btn-add" onclick="addKeywords()"> 新 增</button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="关键词">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="keyWordsGrid" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged" allowCellWrap="true"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChat/autoMsg/keyWordsPage" sizeList="[10,30,50]" pageSize="10"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="keyWords" width="100" headerAlign="center" align="center" allowSort="flase" align="left">关键词</div>
+                        <div field="" width="100" headerAlign="center" allowSort="flase" renderer="renderType" align="center">类型</div>
+                        <div field="" width="100%" headerAlign="center" allowSort="flase" renderer="renderContent" align="left">内容</div>
+                        <div field="createDate" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                             align="center">创建时间
+                        </div>
+                        <div field="" width="105" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane " id="tab_1_3">
+                <div class="alert alert-info pd10">
+                    <div>1、 办理单位在回复信息时，会自动发送您设置的文字给粉丝。</div>
+                    <div>2、 回复内容最多可输入<font color="red">600</font>字，超出自动截取。</div>
+                </div>
+                <table class="table table-bordered picture-table">
+                    <tr>
+                        <td style="width:80px;">
+                            <div style="height:80px;width:80px;"><img id="img" height="80" width="80" src="$!{sysStaticPath}/assets/images/no.photo.jpg"/></div>
+                        </td>
+                        <td>
+                            <textarea id="judge" class="form-control" style="height:420px;width:400px"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-default btn-save" onclick="saveJudge()">保 存</button>
+                        </td>
+                    </tr>
+
+            </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var subMsg = {}
+    mini.parse();
+    var grid = mini.get("keyWordsGrid");
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid, 110);
+    $(document).ready(function () {
+        initSubMsg();
+        Ls.ajax({
+            type: "GET",
+            data: "",
+            url: "/weChat/getConfig",
+            success: function (text) {
+                if (text.status == 1) {
+                    var headImg = text.data.headImg;
+                    if(headImg.indexOf(".") != -1){
+                        $("#headImg").attr("src", GLOBAL_FILESERVERNAMEPATH + headImg);
+                    }else{
+                        $("#headImg").attr("src", GLOBAL_FILESERVERPATH + headImg);
+                    }
+                }
+            }
+        });
+
+    })
+
+    function initKeyWordsGrid() {
+        grid.load({dataFlag: 1});
+    }
+
+    function initJudge(){
+        Ls.ajax({
+            type: "GET",
+            data: "",
+            url: "/weChat/autoMsg/getJudge",
+            success: function (text) {
+                    subMsg = text.data;
+                    $("#judge").val(text.data.content);
+            }
+        });
+
+
+        Ls.ajax({
+            type: "GET",
+            data: "",
+            url: "/weChat/getConfig",
+            success: function (text) {
+                if (text.status == 1) {
+                    var headImg = text.data.headImg;
+                    if(headImg.indexOf(".") != -1){
+                        $("#headImg").attr("src", GLOBAL_FILESERVERNAMEPATH + headImg);
+                    }else{
+                        $("#headImg").attr("src", GLOBAL_FILESERVERPATH + headImg);
+                    }
+                }
+            }
+        });
+
+    }
+
+
+    function initSubMsg() {
+        Ls.ajax({
+            type: "GET",
+            data: "",
+            url: "/weChat/autoMsg/getSubMsg",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    subMsg = text.data;
+                    $("#subMsg").val(subMsg.content);
+                }
+            }
+        });
+    }
+
+    function deleteKeywords(id) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("确定删除？")) {
+            Ls.ajax({
+                type: "GET",
+                data: {ids: ids},
+                url: "/weChat/autoMsg/deleteKeywords",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr(text.desc);
+                    } else {
+                        Ls.tipsOk("删除成功");
+                        grid.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    function saveSubMsg() {
+        subMsg.content = $("#subMsg").val();
+        Ls.ajax({
+            type: "POST",
+            data: subMsg,
+            url: "/weChat/autoMsg/saveSubMsg",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    Ls.tipsOk("保存成功");
+                }
+            }
+        });
+    }
+
+
+
+    function saveJudge() {
+        var judge = $("#judge").val();
+        subMsg.content=judge;
+        Ls.ajax({
+            type: "POST",
+            data: subMsg,
+            url: "/weChat/autoMsg/saveJudge",
+            success: function (text) {
+                    Ls.tipsOk("保存成功");
+
+            }
+        });
+    }
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<button id="" class="btn btn-default btn-sm btn-edit" onclick="editKeywords(' + rec.id + ')">修改</button> '
+            + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="deleteKeywords(' + rec.id + ')">删除</button>';
+        return str;
+    }
+
+    //
+    function renderType(e) {
+        var str = "";
+        var rec = e.record.msgType;
+        if (rec == 'news') {
+            str = "图文消息";
+        } else {
+            str = "文字消息";
+        }
+        return str;
+    }
+
+
+    function renderContent(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.msgType == 'news') {
+            str = '<div style="width:300px;background-color:#F5F5F5;margin:auto;line-height:20px"><table align="center" width="300"><tbody id="article">';
+            var articles = rec.newsList;
+            if (articles[0] != null && articles.length > 0) {
+                var list = "";
+
+                for (var i = 0; i < articles.length; i++) {
+                    if (i == 0) {
+                        str += '<tr style="height:100px;"><td colspan="2"><div style="position:relative;margin:5px;"><img width="290" height="90" src="' + formatImgAddress(articles[i].thumbImg) + '"/>' +
+                            '<div style="width:290px;opacity:0.8;position:absolute;z-index:999;bottom:0px;background-color:gray;color:white;height:auto"> ' + articles[i].title + '</div></div></td></tr>';
+                    } else {
+                        str += '<tr><td style="width:220px;"><div style="margin-left:20px">' + articles[i].title + '</div></td><td style="width:80px;"><div  style="margin:5px 0"><img style="margin:5px;" width="80" height="65" src="' + formatImgAddress(articles[i].thumbImg) + '"/></div></td></tr>';
+                    }
+                }
+            }
+            str += "</tbody></table></div>";
+        } else if (rec.msgType == 'text') {
+            str = rec.content.split("\n").join("<br />");
+        }
+        return str;
+    }
+    function formatImgAddress(src){
+        if(src == undefined || src == null){
+            return "";
+        }
+        if(src.indexOf("/") != -1){
+            return src;
+        }
+        if(src.indexOf(".") != -1){
+            return GLOBAL_FILESERVERNAMEPATH + src;
+        }
+        return GLOBAL_FILESERVERPATH + src;
+    }
+
+    function addKeywords() {
+        Ls.openWin("/weChat/autoMsg/editKeywords", {
+            width: '600px',
+            height: '450px',
+            lock: true,
+            title: '新增关键词回复',
+        });
+    }
+
+    function editKeywords(id) {
+        Ls.openWin("/weChat/autoMsg/editKeywords?id=" + id, {
+            width: '600px',
+            height: '450px',
+            lock: true,
+            title: '修改关键词回复',
+        });
+    }
+
+    function search() {
+        var keyWords = $("#searchKey").val();
+        grid.load({keyWords: keyWords, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+</script>

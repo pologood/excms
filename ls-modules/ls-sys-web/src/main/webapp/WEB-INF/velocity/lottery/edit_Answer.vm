@@ -1,0 +1,206 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<form role="form" id="materiaForm" ms-controller="materiaForm">
+    <table class="table table-bordered video-table">
+        <tbody>
+        <tr>
+            <th>竞赛答案：</th>
+            <td>
+                <table class="w100p">
+                    <tbody>
+                    <tr>
+                        <td colspan="3"><input style="width:600px" type="text" name="answer" id="answer" ms-duplex="answer" maxlength="250" class="form-control"></td>
+                        <td rowspan="5" class="w300">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+
+        </tr>
+
+        <tr>
+            <th>答案选项：</th>
+            <td>
+                <div class="form-group">
+                    <div class="input-group mb0" style="width:600px">
+                        <select class="form-control" name="answerOption" id="answerOption" ms-duplex="answerOption" placeholder="请选择答案选项">
+                        </select>
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>竞赛答题：</th>
+            <td>
+                <div class="form-group">
+                    <div class="input-group mb0" style="width:600px">
+                        <select class="form-control" name="lotteryId" id="lotteryId" ms-duplex="lotteryId" placeholder="请选择答案选项">
+                        </select>
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <tr>
+                        <th>正确答案：</th>
+             <td>
+                 <div class="radio-group">
+                     <label class="radio-inline"><input type="radio" name="type" value="0" ms-duplex-string="isTrue">否</label>
+
+                     <label class="radio-inline"><input type="radio" name="type" value="1" ms-duplex-string="isTrue">是</label>
+                 </div>
+
+
+             </td>
+
+            </tr>
+
+
+        </tbody>
+    </table>
+</form>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var curr = {
+        vm: "",
+        id:"$!{answerId}",
+        opt: []
+    };
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    $(document).ready(function (){
+       getOption();
+
+
+
+        Ls.ajax({
+            type: "GET",
+            url: "/lotteryAnswer/getAnswerById",
+            data: {'answerId': curr.id},
+            success:function (d) {
+                var data= d.data;
+
+                //初始化表单字段
+                curr.init = Ls.initFORM("materiaForm",data);
+                //如果模型已经绑定，不再绑定
+                curr.vm = avalon.vmodels["materiaForm"];
+                curr.vm = avalon.define(curr.init);
+                //avalon.scan(document.body, curr.vm);
+                avalon.scan($("#materiaForm").get(0), curr.vm);
+
+            }
+        });
+        api.button(
+                {
+                    name: '保存',
+                    callback: function () {
+                        $("#materiaForm").submit();
+                        return false;
+                    },
+                    focus: true
+                }
+        )
+
+    });
+
+    function getOption(){
+          var option = $("#answerOption");
+          var str='<option value="">请选择答案选项</option> ';
+          var opt="";
+        Ls.ajax({
+            type: "GET",
+            url: "/lotteryAnswer/getOptions",
+            data: {},
+            success:function (d) {
+                var data= d.data;
+                $.each(data,function(i,n){
+                    opt=opt+' <option value=' + data[i].key + '>' + data[i].value + '</option> ';
+
+                });
+                option.append(str+opt);
+                getQuestionOption();
+
+            }
+        });
+
+    }
+
+
+    function  getQuestionOption(){
+
+        var option = $("#lotteryId");
+        var str='<option value="">请选择竞赛答题</option> ';
+        var opt="";
+        Ls.ajax({
+            type: "GET",
+            url: "/lotteryAnswer/getQuestions",
+            data: {},
+            success:function (d) {
+                var data= d.data;
+                $.each(data,function(i,n){
+                    opt=opt+' <option value=' + data[i].lotteryId + '>' + data[i].lotteryTitle + '</option> ';
+
+                });
+                option.append(str+opt);
+
+            }
+        });
+
+
+    }
+
+
+
+
+
+
+
+    $('#materiaForm').validator({
+        fields: {
+            'answer': '竞赛题目:required;',
+            'answerOption': '答题选项:required;',
+            'lotteryId': '竞赛题目:required;'
+
+        },
+        valid: function () {
+            doSave();
+        },
+        timely:1,
+        msgClass: "n-right"
+    });
+
+    function doSave() {
+//        curr.vm.typeName=$("#typeId option:selected").html();
+        curr.vm.lotteryTitle=$("#lotteryId option:selected").html();
+        var value = curr.vm;
+        value = Ls.toJSON(value);
+
+
+        Ls.ajax({
+            type: "POST",
+            url: "/lotteryAnswer/saveAnswer",
+            data: value
+        }).done(function (text) {
+            if (text.status!=1) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+
+            Ls.tipsOk("保存成功",function(){
+                Ls.getWin.win.grid.reload();
+                Ls.winClose();
+            });
+
+        });
+
+    }
+
+
+
+</script>

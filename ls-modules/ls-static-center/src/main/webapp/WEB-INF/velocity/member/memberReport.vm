@@ -1,0 +1,288 @@
+<!-- END HEAD -->
+<div class="wp_pos">会员撰稿</div>
+<div class="portlet light" hidden="hidden" id="formDiv">
+    <div class="portlet-body form">
+        <form role="form" id="msg_info_form" ms-controller="msg_info_form">
+            <div class="form-body">
+                <table class="table table-bordered article-table th80">
+                    <div class="user-tx user-bj">
+                        <div class="txt fl">缩略图：</div>
+                        <div class="imgup fr">
+                            <div class="user_Img fl">
+                                <img id="imageLink" src="/images/no_photo.jpg" width="194" height="194"/>
+                            </div>
+                            <div class="user_upload fl">
+                                <a class="delImg" href="javascript:void(0);" onclick="deletePic()" id="delImg">删除</a>
+                                <a class="upload" href="javascript:void(0);" onclick="uploadPic()" id="uploadImg">上传</a>
+                            </div>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <tbody>
+                    <!--<tr style="visibility:hidden">
+                        <th><span>*</span>所属网站：</th>
+                        <td>
+                            <select type="text" id="siteId" name="siteId" class="form-control"
+                                    placeholder="必填项"></select>
+                        </td>
+                    ##
+                    </tr>
+                    <tr style="visibility:hidden">
+                        <th>发布日期：</th>
+                        <td>
+                            <input type="text" ms-duplex="publishDate" id="publishDate" class="form-control readonly"
+                                   readonly/>
+                        </td>
+                    </tr>-->
+                    <tr>
+                        <th><span>*</span>标题：</th>
+                        <td>
+                            <input type="text" id="reportId" name="reportId" class="form-control" style="display: none">
+                            <input type="text" id="title" name="title" maxlength="40" class="form-control"
+                                   placeholder="标题名称">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><span>*</span>作者：</th>
+                        <td>
+                            <input type="text" id="author" name="author" maxlength="20" class="form-control"
+                                   placeholder=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>来源：</th>
+                        <td>
+                            <div class="input-group" id="resMark">
+                                <input type="text" id="provider" maxlength="20" name="provider" value="网站会员" readonly
+                                       class="form-control" placeholder=""/>
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;"><span>*</span>内容：</th>
+                        <td colspan="2">
+                            <textarea id="reportContent" name="reportContent"
+                                      style="width: 100%;height: 350px;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><span>*</span>验证码：</th>
+                        <td>
+                            <input class="verification" name="checkCode" id="checkCode" size="6" maxlength="4"
+                                   type="text">
+                            <img id="imgCode" class="imgcode" src="/member/getCode" width="82" height="31"
+                                 title="看不清楚，换个图片" align="absmiddle">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left">&nbsp;</td>
+                        <td align="left" class="btn_group">
+                            <input id="submitInfo" class="btn btn-submit" type="button" accesskey="S" value="确定(S)">
+                            <input id="back" class="btn btn-search" type="button" accesskey="C" value="返回(C)">
+                        </td>
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+
+            </div>
+        </form>
+    </div>
+</div>
+#parse("_footer.vm")
+<script>
+    var editor;
+    var cur = {
+        imageLink: "",
+        reportId: "$!{reportId}",
+        vm_id: "msg_info_form",
+        form: $('#msg_info_form'),
+        vm: ""
+    };
+    $(document).ready(function () {
+        editor = KindEditor.create('textarea[name="reportContent"]', {
+            width: '350px',
+            hight: '700px',
+            items: [
+                'source', '|', 'cut', 'copy', 'paste',
+                'plainpaste', '|', 'justifyleft', 'justifycenter', 'justifyright',
+                'justifyfull', 'indent', 'outdent',
+                'selectall',
+                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold',
+                'underline'
+            ],
+
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+
+
+        });
+
+        $("#submitInfo").on('click', function () {
+            $("#msg_info_form").trigger("validate");
+        });
+        $("#back").on('click', function () {
+            location.href = "/member/center/" + 4697368 + "?param=5";
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        Ls.ajax({
+            type: "get",
+            url: "/member/isLogin"
+        }).done(function (d) {
+            if (d.status && d.data != null && d.data.isLogin == 1) {
+                $("#formDiv").show();
+                Ls.ajax({
+                    type: "get",
+                    url: "/member/getSiteInfo"
+                }).done(function (d) {
+                    var data = d.data;
+                    var str = '<option value=""> 请选择站点 </option> ';
+                    if (data != null) {
+                        var length = data.length;
+                        if (length > 0) {
+                            for (i = 0; i < length; i++) {
+                                str += ' <option value=' + data[i].indicatorId + '>' + data[i].name + '</option> '
+                            }
+
+                        }
+                    }
+                    $("#siteId").html(str);
+
+                    //获取信息
+                    Ls.ajax({
+                        type: "get",
+                        data: {id: cur.reportId},
+                        url: "/member/getInfo"
+                    }).done(function (d) {
+                        var data = d.data;
+                        $("#siteId").val(data.siteId);
+                        $("#author").val(data.author);
+                        $("#title").val(data.title);
+                        $("#reportId").val(data.id)
+                        editor.html(data.article);
+                        console.info(data.imageLink)
+                        if (data.imageLink != null && data.imageLink != "") {
+                            cur.imageLink = data.imageLink
+                            $("#imageLink").attr("src", '$!{fileServerPath}' + data.imageLink);
+                        }
+
+                    })
+
+                })
+
+            } else {
+                Ls.tipsErr("请重新登录", function () {
+                    location.href = "/member/login/" + 4697368;
+
+                })
+            }
+        })
+
+    })
+
+    //
+
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.imageLink = data[0].mongoId;
+                $("#imageLink").attr("src", '$!{fileServerPath}' + data[0].mongoId);
+                Ls.tipsOk("上传成功！");
+            }
+            return true
+        }, {
+            post_params: {
+                "siteId": 4697368
+            },
+            lock: true,
+            title: '上传图片',
+            file_size_limit: "5 MB",
+            file_types: "*.png;*.jpg;*.jpeg,*.gif",
+            file_upload_limit: 1
+        })
+    }
+    function deletePic() {
+
+        Ls.ajaxGet({
+            url: "/upload/deleteByMongoId",
+            data: {
+                mongoId: cur.imageLink
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                cur.imageLink = ''
+                $("#imageLink").attr("src", '/images/no_photo.jpg');
+                Ls.tipsOk("删除成功！", {
+                    callback: function () {
+                    }
+                });
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    using("save", function () {
+
+        $("#msg_info_form").validator({
+            fields: {
+                //siteId: "所属网站:required",
+                title: "标题:required;",
+                author: "作者:required;",
+                //content: "内容:required;length[5~1500];",
+                checkCode: "验证码:required;"
+            },
+            valid: function () {
+
+                saveData()
+            },
+            msgClass: 'n-right',
+            timely: 1
+        });
+
+        function saveData() {
+            var content = editor.html();
+            return Ls.ajax({
+                type: 'POST',
+                url: "/member/saveVO",
+                data: {
+                    imageLink: cur.imageLink,
+                    reportId: $("#reportId").val(),
+                    "provider": $("#provider").val(),
+                    "siteId": 4697368,
+                    "author": $("#author").val(),
+                    "title": $("#title").val(),
+                    "content": content,
+                    "checkCode": $("#checkCode").val()
+                }
+            }).done(function (d) {
+                if (d.status == 0) {
+                    Ls.tipsErr(d.desc);
+                } else {
+                    Ls.tipsOk("提交成功！", function () {
+                        location.href = "/member/center/" + 4697368 + "?param=5";
+                    });
+                }
+            }).always(function () {
+                $("#imgCode").click();
+            });
+        };
+
+    });
+</script>

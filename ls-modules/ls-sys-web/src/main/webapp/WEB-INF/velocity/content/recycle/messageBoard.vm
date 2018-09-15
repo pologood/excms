@@ -1,0 +1,67 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="guestbook_form" ms-controller="guestbook_form">
+            <!--<div class="form-body">
+				 <div class="form-group">
+					<label>留言标题:</label>
+					<input class="form-control" id="title" style="border-style:none" value ="$!{title}" name="title" placeholder="" ms-duplex="title"></input>
+				 </div>
+				 <div class="form-group">
+					<label>留言内容:</label>
+					<input class="form-control" id="content" style="border-style:none" value ="$!{guestBookContent}" name="content" placeholder="" ms-duplex="content"></input>
+				 </div>-->
+
+            <div class="form-group">
+                <label>所属类型：</label>
+                <input type="text" name="className" style="width:200px;" class="form-control"
+                       value="$!{vo.className}" placeholder=""/>
+            </div>
+            <div class="form-group">
+                <label>留言时间：</label>
+                <input type="text" name="addDate" id="addDate" style="width:200px;" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label>留言人姓名：</label>
+                <input type="text" name="personName"  style="width:200px;" class="form-control"
+                       value="$!{vo.personName}" placeholder="$!{vo.personName}"/>
+            </div>
+
+            <div class="form-group">
+                <label>留言者IP：</label>
+                <input type="text" name="personIp"  style="width:200px;" class="form-control"
+                       value="$!{vo.personIp}" placeholder="$!{vo.personIp}"/>
+            </div>
+
+            <div class="form-group">
+                <label>留言标题:</label>
+                <input class="form-control" value="$!{vo.title}" name="title" placeholder="" ms-duplex="title"></input>
+            </div>
+
+            <div class="form-group">
+                <label>留言内容：</label>
+        <textarea class="form-control"  name="content" rows="5" placeholder=""
+                  ms-duplex="messageBoardContent">$!{vo.messageBoardContent}</textarea>
+            </div>
+
+
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    var addDate= "$!{vo.addDate}";
+    var str="";
+    if(!Ls.isEmpty(addDate)){
+        var index=addDate.lastIndexOf(".");
+        if(index>0){
+            addDate=addDate.substring(0, index);
+        }
+    }
+    Ls.log(addDate);
+    $("#addDate").val(addDate);
+    //document.getElementById("addDate").innerHTML=addDate;
+</script>

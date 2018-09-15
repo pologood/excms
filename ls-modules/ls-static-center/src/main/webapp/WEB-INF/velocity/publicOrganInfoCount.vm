@@ -1,0 +1,3 @@
+#foreach($vo in $resultObj)
+<li><a href="/public/column/$!{vo.organId}?type=4&action=list" target="_blank">$!{vo.organName}</a><span>$!{vo.counts}</span></li>
+#end

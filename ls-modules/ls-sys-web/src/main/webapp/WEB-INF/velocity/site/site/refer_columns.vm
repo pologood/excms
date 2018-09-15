@@ -1,0 +1,152 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <ul class="ztree" id="treeview2">
+                    <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+  mini.parse();
+
+  var setting = {
+    async: {
+      enable: false
+    },
+    isEdit: true,
+    view: {},
+    check: {
+      enable: true,
+      autoCheckTrigger: false,
+      nocheckInherit : false,
+      chkboxType: {"Y": "p", "N": "p"}
+    },
+    data: {
+      simpleData: {
+        enable: true,
+        idKey: 'columnStrId',
+        pIdKey: 'parentStrId'
+      }
+    },
+    callback: {
+        onClick: function (event, treeId, node) {
+            var tree = $.fn.zTree.getZTreeObj(treeId);
+            if (node.nocheck) {
+                tree.expandNode(node, !node.open, false, true, true);
+                tree.cancelSelectedNode(node);
+            } else {
+                tree.checkNode(node, !node.checked);
+            }
+        }
+    }
+  };
+
+  var siteId =${siteId};
+  var synColumnIds = '${synColumnIds}';
+  var columnTypeCode = '${columnTypeCode}';
+  var indicatorId = '${indicatorId}';
+  var checkedColumnStrId = [];
+  $(document).ready(function () {
+    var dialog = art.dialog,
+      api = art.dialog.open.api;
+    if (!api) return;
+    // 操作对话框
+    /* api.button(
+       {
+         name: '保存',
+         id: 'saveBtn',
+         focus: true,
+         callback: function () {
+           doOk();
+         }
+       }
+     );*/
+    SetData();
+  });
+
+  function SetData() {
+      Ls.ajax({
+        url: "/siteMain/getColumnTreeByType",
+        data: {
+//          siteId: siteId,
+          columnTypeCode: columnTypeCode
+        },
+      }).done(function (json) {
+        if (!json.status) {
+          Ls.tipsErr(json.desc);
+          return;
+        }
+        var data = json.data;
+        if (data != null) {
+          Ls.treeDataFilter(data, Ls.treeDataType.SITE);
+        }
+          var strId = indicatorId + "_" + siteId;
+          for (var i = 0; i < data.length; i++) {
+              var node = data[i];
+              node.nocheck = true;
+              if (!node.isParent) {// 叶子节点
+                  node.isHidden = true;
+                  if (node.columnTypeCode == columnTypeCode && node.columnStrId != strId) {// 类型必须一致，不能选择自己
+                      node.nocheck = false;
+                      node.isHidden = false;
+                      if (synColumnIds.indexOf(node.indicatorId) > -1) {
+                          node.checked = true;
+                      }
+                  }
+              }
+              //新增文章页同步信息回显
+              if (synColumnIds.indexOf(node.columnStrId) >= 0) {
+                  node.checked = true;
+                  checkedColumnStrId.push(node.columnStrId);
+              }
+          }
+          var tree = $.fn.zTree.init($("#treeview2"), setting, data);
+
+          if (checkedColumnStrId.length > 0) {//展开选中节点的父节点
+              for (var i = 0, l = checkedColumnStrId.length; i < l; i++) {
+                  var node = tree.getNodeByParam("columnStrId", checkedColumnStrId[i], null);
+                  tree.selectNode(node);
+              }
+          }
+      });
+      return;
+  }
+
+  function doOk() {
+    var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+    // var  nodes = zTree.getSelectedNodes();
+    var nodes = zTree.getCheckedNodes(true);
+    var newNodes = [];
+    var ids = "";
+    var names = "";
+    if (nodes != null && nodes != "") {
+      for (i = 0; i < nodes.length - 1; i++) {
+        newNodes.add(nodes[i]);
+        ids += nodes[i].columnStrId + ",";
+        names += nodes[i].name + ",";
+      }
+      ids += nodes[nodes.length - 1].columnStrId;
+      names += nodes[nodes.length - 1].name;
+    }
+    var arr = {"ids": ids, "names": names};
+    return arr;
+  }
+
+  function onCancel() {
+    art.dialog.close();
+  }
+  function initSlimScroll() {
+    //添加模拟滚动条
+    var ui_tree = $('#treeview2');
+    var ui_layout = $(".mini-layout-region-body");
+    ui_tree.attr("data-height", ui_layout.height() - 10)
+    App.initSlimScroll(ui_tree);
+  }
+</script>

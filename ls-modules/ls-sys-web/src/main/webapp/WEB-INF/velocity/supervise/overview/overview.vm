@@ -1,0 +1,337 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">栏目更新监控概览
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">留言未回复
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_c" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">错链监控概览
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_b" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    mini.parse();
+    var cur = {
+        dialog: Ls.getWin.dialog
+    };
+    $(document).ready(function () {
+
+        Ls.parseEcharts(function () {
+            unupdateColumnStatic(); //栏目未更新统计
+            unreplyStatic();//未回复留言数统计
+            errHrefStatic();//错链统计
+        })
+
+    })
+
+    function unupdateColumnStatic() {
+        var nodes = [];
+        require([
+                'echarts',
+                'echarts/chart/line',   // 按需加载所需图表，如需动态类型切换功能，别忘了同时加载相应图表
+                'echarts/chart/bar'
+            ], function (ec) {
+                var echarts = ec.init(document.getElementById('statistics_a'));
+                var option = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['计划更新', '实际更新']
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: []
+                    },
+                    yAxis: [{
+                        type: 'value',
+                        name: '单位(个)',
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    }],
+                    series: []
+                };
+                echarts.setOption(option, true);
+                echarts.on('click', function (params) {
+                    /*var index = params.dataIndex;
+                    var node = nodes[index];
+                    cur.dialog.data("taskId",node.id);
+                    cur.dialog.data("taskType",node.taskType);
+                    Ls.openWin("/column/update/checkResult", '800px', '500px', {
+                        title: "查看详细"
+                    });*/
+                });
+
+                Ls.ajax({
+                    url: "/supervise/getColumnWarnStatic",
+                    data: {
+                        types: 'articleNews'
+                    },
+                    success: function (resp) {
+                        if (resp && resp.status == 1) {
+                            var data = resp.data;
+                            var xdata = [];
+                            var xiddata = [];
+                            var seriesplandata = [];
+                            var seriesrealdata = [];
+                            for (var i = 0; i < data.length; i++) {
+                                var node = data[i];
+                                if (node && (typeof node === "object")) {
+                                    xdata.push(node.columnName);
+                                    nodes.push(node);
+                                    seriesplandata.push(node.planUpdateNum);
+                                    seriesrealdata.push(node.realUpdateNum);
+                                }
+                            }
+
+                            option.xAxis.data = xdata;
+                            option.series.push({
+                                name: '计划更新',
+                                type: 'bar',
+                                itemStyle: {
+                                    normal: {color: '#B5C334'}
+                                },
+                                data: seriesplandata
+                            }, {
+                                name: '实际更新',
+                                type: 'bar',
+                                itemStyle: {
+                                    normal: {color: '#C1232B'}
+                                },
+                                data: seriesrealdata
+                            });
+                            echarts.setOption(option);
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function errHrefStatic() {
+        var nodes = [];
+
+        require([
+                'echarts',
+                'echarts/chart/line',   // 按需加载所需图表，如需动态类型切换功能，别忘了同时加载相应图表
+                'echarts/chart/bar'
+            ], function (ec) {
+                var echarts = ec.init(document.getElementById('statistics_b'));
+                var option = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        borderColor: '#3333',
+                        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        },
+                        formatter: function (params, ticket, callback) {
+                            var res = '点击查看详情';
+                            for (var i = 0, l = params.length; i < l; i++) {
+                                if (res != '') {
+                                    res += '<br/>';
+                                }
+                                res += '错链数量 : ' + params[i].value;
+                            }
+                            return res;
+                        }
+                    },
+                    legend: {
+                        data: ['错链数量']
+                    },
+                    xAxis: {
+                        data: []
+                    },
+                    yAxis: {},
+                    series: []
+                };
+                echarts.setOption(option, true);
+                echarts.on('click', function (params) {
+                    var index = params.dataIndex;
+                    var node = nodes[index];
+                    cur.dialog.data("taskId", node.id);
+                    cur.dialog.data("taskName", node.taskName);
+                    Ls.openWin("/err/href/checkResult", '1000px', '490px', {
+                        title: "错链结果"
+                    });
+                });
+
+                Ls.ajax({
+                    url: "/supervise/getErrhrefStatic",
+                    data: {},
+                    success: function (resp) {
+                        if (resp && resp.status == 1) {
+                            var data = resp.data;
+                            var xdata = [];
+                            var xiddata = [];
+                            var seriesdata = [];
+                            for (var i = 0; i < data.length; i++) {
+                                var node = data[i];
+                                if (node && (typeof node === "object")) {
+                                    xdata.push(node.taskName);
+                                    nodes.push(node);
+                                    seriesdata.push(node.checkResultNum);
+                                }
+                            }
+
+                            option.xAxis.data.push(xdata);
+                            option.series.push({
+                                name: '错链数量',
+                                type: 'bar',
+                                itemStyle: {
+                                    normal: {color: '#C1232B'}
+                                },
+                                data: seriesdata
+                            });
+                            echarts.setOption(option);
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function unreplyStatic() {
+        var nodes = [];
+
+        require([
+                'echarts',
+                'echarts/chart/line',   // 按需加载所需图表，如需动态类型切换功能，别忘了同时加载相应图表
+                'echarts/chart/bar'
+            ], function (ec) {
+                var echarts = ec.init(document.getElementById('statistics_c'));
+                var option = {
+                    title: {
+                        text: ''
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        borderColor: '#3333',
+                        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['未回复留言数']
+                    },
+                    xAxis: {
+                        data: []
+                    },
+                    yAxis: {},
+                    series: []
+                };
+                echarts.setOption(option, true);
+                echarts.on('click', function (params) {
+                    var index = params.dataIndex;
+                    var node = nodes[index];
+
+                    cur.dialog.data("resultId", node.id);
+                    cur.dialog.data("siteId", node.siteId);
+                    cur.dialog.data("columnId", node.columnId);
+                    cur.dialog.data("record", node);
+                    Ls.openWin("/unreply/guest/index", '850px', '450px', {
+                        id: "unreplyGuest",
+                        title: "未及时回复留言"
+                    });
+                });
+
+                Ls.ajax({
+                    url: "/supervise/getColumnWarnStatic",
+                    data: {
+                        types: 'guestBook,messageBoard'
+                    },
+                    success: function (resp) {
+                        if (resp && resp.status == 1) {
+                            var data = resp.data;
+                            var xdata = [];
+                            var xiddata = [];
+                            var seriesdata = [];
+                            for (var i = 0; i < data.length; i++) {
+                                var node = data[i];
+                                if (node && (typeof node === "object")) {
+                                    xdata.push(node.columnName);
+                                    nodes.push(node);
+                                    seriesdata.push(node.unreplyGuestNum);
+                                }
+                            }
+                            option.xAxis.data = xdata;
+                            option.series.push({
+                                name: '未回复留言数',
+                                type: 'bar',
+                                itemStyle: {
+                                    normal: {color: '#C1232B'}
+                                },
+                                data: seriesdata
+                            });
+                            echarts.setOption(option);
+                        }
+                    }
+                });
+            }
+        );
+    }
+</script>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+      http://www.springframework.org/schema/context  
+      http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+      http://www.springframework.org/schema/mvc  
+      http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	<!-- SendMail服务配置 -->
+	<!-- <import resource="/beans/mail-server-config.xml"/> -->
+	<!-- rbac模块配置文件 -->
+	<!-- <import resource="rbac_applicationContext.xml" /> -->
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="false" />
+		<property name="locations">
+			<list>
+				<value>classpath*:/db-config.properties</value>
+				<value>classpath*:/memcached.properties</value>  
+			</list>
+		</property>
+	</bean>
+	<!-- 开启注解 -->
+	<!-- <mvc:annotation-driven />-->
+	<!-- 开启aop -->
+	<aop:aspectj-autoproxy />
+	<!-- 注解扫描的包 ，有此配置后就可以移除<context:annotation-config /> -->
+	<context:component-scan base-package="cn.lonsun" />
+	<!-- 静态资源访问，方案1 -->
+	<mvc:resources location="/assets/" mapping="/assets/**" />
+	<mvc:resources location="/app/" mapping="/app/**" />
+	<mvc:resources location="/upload/" mapping="/upload/**" />
+	<mvc:resources location="/upload/indicator/" mapping="/upload/indicator/**" />
+	<mvc:resources location="/app/common/weboffice/" mapping="/weboffice/**" />
+	<mvc:resources location="/api/" mapping="/api/**" />
+	<mvc:resources location="/images/" mapping="/images/**" />
+	<mvc:resources location="/js/" mapping="/js/**" />
+	<mvc:resources location="/css/" mapping="/css/**" />
+	<mvc:resources location="/" mapping="/**.*html" />
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<!-- 启动SpringMVC的注解功能，它会自动注册HandlerMapping、 HandlerAdapter、ExceptionResolver的相关实例 -->
+	<!-- 解决spring3 mvc @ResponseBody String返回值类型的中文乱码 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">		    			 
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+               <constructor-arg value="UTF-8"/>
+			</bean>
+	   </mvc:message-converters>
+    </mvc:annotation-driven>
+	<!-- 日志服务 -->
+	<bean id="logClientService" class="cn.lonsun.webservice.log.impl.LogClientServiceImpl"></bean>
+	<bean id="conversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="url" value="${hibernate.connection.url}" />
+		<property name="username" value="${hibernate.connection.username}" />
+		<property name="password" value="${hibernate.connection.password}" />
+		<property name="maxActive" value="456" />
+		<property name="initialSize" value="30" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="30" />
+		<property name="timeBetweenEvictionRunsMillis" value="3000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- mysql 不支持 poolPreparedStatements <property name="poolPreparedStatements" 
+			value="true" /> <property name="maxPoolPreparedStatementPerConnectionSize" 
+			value="20" /> -->
+		<!-- 配置过滤器：wall——防注入攻击(WallFilter默认的防注入配置，也可以自己另外配置),stat-监控统计功能 -->
+		<property name="filters" value="wall,stat" />
+	</bean>
+
+
+	<!-- 配置hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!-- <property name="namingStrategy" ref="customNamingStrategy" />  -->
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.default_schema">${hibernate.default_schema}</prop>
+				<prop key="hibernate.show_sql">${hibernate.connection.show_sql}</prop>
+				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
+				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hiberante.format_sql">${hibernate.connection.format_sql}</prop>
+				<!-- 二级缓存EhCache配置 -->
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<!-- 项目启动时初始化CurrentSessionContext，用于获取session(sessionFactory.getCurrentSession()) -->
+				<prop key="hibernate.current_session_context_class">${hibernate.current_session_context_class}</prop>
+			</props>
+		</property>
+		<property name="packagesToScan" value="cn.lonsun.**.entity" />
+	</bean>
+	<!-- jdbc操作 <bean id="jdbcTemplate" class ="org.springframework.jdbc.core.JdbcTemplate"> 
+		<property name="dataSource"> <ref bean="dataSource"/> </property> </bean> -->
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 指定所上传文件的总大小不能超过200KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+		<property name="maxUploadSize" value="20000000" />
+	</bean>
+	<!-- 事务管理器 -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<tx:annotation-driven transaction-manager="txManager" />
+	<aop:config expose-proxy="true">
+		<aop:advisor advice-ref="txAdvice"
+			pointcut="execution(* cn.lonsun..service..*(..))" />
+	</aop:config>
+	<!-- Axis2用来读取Spring上下文的配置，否则会包Axis2 cannot find SpringContext错误 -->
+	<bean id="applicationContext" class="org.apache.axis2.extensions.spring.receivers.ApplicationContextHolder" />
+	<!-- processEngine start -->
+	<!-- processEngine end -->
+
+	<bean id="taskExecutor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="5" />
+		<property name="maxPoolSize" value="10" />
+		<property name="WaitForTasksToCompleteOnShutdown" value="true" />
+	</bean>
+	
+	<bean id="memcachedConfig" class="cn.lonsun.base.pojo.MemcachedConfig">  
+        <property name="host">  
+            <list>  
+                <value>192.168.1.32</value>  
+            </list>  
+        </property>  
+        <property name="port">  
+            <value>11211</value>  
+        </property>  
+    </bean>
+</beans>  

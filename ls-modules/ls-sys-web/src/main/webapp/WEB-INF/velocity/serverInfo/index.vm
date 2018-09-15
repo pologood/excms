@@ -1,0 +1,153 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">服务器信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="sub_serverinfo" role="form" ms-controller="sub_serverinfo" class="col-md-8"
+                      style="padding-left: 0;">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <div class="form-body">
+                                <div class="form-group hide">
+                                    <input type="text" name="id" ms-duplex="id" class="form-control" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>服务器简称</label>
+                                    <input type="text" name="name" class="form-control" ms-duplex="name"
+                                           data-rule="required;" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>IP地址</label>
+                                    <input type="text" name="ip" class="form-control" ms-duplex="ip"
+                                           data-rule="required;ip"
+                                           data-rule-ip="[/^((25[0-5]|2[0-4]\d|[01]?\d\d?)($|(?!\.$)\.)){4}$/, '请输入正确IP地址']"
+                                           placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>端口</label>
+                                    <input type="text" name="port" class="form-control" ms-duplex="port"
+                                           data-rule="required; integer(+)" placeholder="" maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>用户名</label>
+                                    <input type="text" name="username" class="form-control" ms-duplex="username"
+                                           data-rule="required;" placeholder="" maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>密码</label>
+                                    <input type="password" name="password" class="form-control" ms-duplex="password"
+                                           placeholder="" maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>Nginx命令路径</label>
+                                    <input type="text" name="nginxCmdPath" class="form-control" ms-duplex="nginxCmdPath"
+                                           data-rule="required;" placeholder="" maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>Nginx文件路径</label>
+                                    <input type="text" name="nginxFilePath" class="form-control"
+                                           ms-duplex="nginxFilePath" data-rule="required;" placeholder=""
+                                           maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>Nginx重启命令</label>
+                                    <input type="text" name="nginxCmd" class="form-control" ms-duplex="nginxCmd"
+                                           data-rule="required;" placeholder="" maxlength="50">
+                                </div>
+
+                                <div class="form-group">
+                                    <label><span style="color: red">*</span>Nginx模板</label>
+                                    <textarea type="text" id="template" name="template" class="form-control"
+                                              data-rule="required;" placeholder="{:domain}代表域名的通配符"
+                                              style="height: 220px"/>
+                                </div>
+
+                                <div class="form-actions noborder">
+                                    <button type="button" class="btn btn-default btn-save" onclick="doSave()">保 存
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/site_unit.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: 'sub_serverinfo',
+        template: $('#template')
+    }
+
+    $(document).ready(function () {
+        initForm();
+        getEO();
+    })
+
+    function initForm() {
+        cur.model = Ls.initFORM(cur.vm_id, {});
+        setData(cur.model);
+    }
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function doSave() {
+        if (!$('#sub_siteInfo').isValid()) {
+            return;
+        }
+        var value = cur.vm.$model;
+        value = Ls.toJSON(value);
+        value.template = cur.template.val();
+        Ls.ajax({
+            type: "POST",
+            url: "/serverInfo/updateServerInfo",
+            data: value
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+            }
+        });
+    }
+
+    function getEO() {
+        Ls.ajaxGet({
+            url: "/serverInfo/getServerInfo",
+            data: {}
+        }).done(function (resp) {
+            if (resp.status == 1) {
+                cur.template.val(resp.data.template);
+                //初始化表单字段
+                Ls.assignVM(cur.vm, resp.data);
+                //扫描模型
+                avalon.scan($("#sub_siteInfo").get(0), cur.vm);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,72 @@
+#set($_title="新闻详情")
+#parse("/mobile/parse_top.vm")
+<style>
+    video {
+        width: 100%;
+        height: auto;
+    }
+    #play{
+        position:absolute;
+		top:0;
+		left:0;
+		z-index:9999;
+	}
+</style>
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    #set($imageLink = "$!{videoVO.imageLink}")
+    #if("$imageLink"=="")
+        #set($imageLink = "/assets/images/video_null.jpg")
+    #end
+
+    <div class="content_title">$!{videoVO.title}</div>
+    <div class="content_date">#date_format("$!{videoVO.createDate}","yyyy-MM-dd HH:mm:ss")</div>
+    <div class="content_body">
+        $!{videoVO.remarks}
+    </div>
+
+    <div id="videocont">
+        <video id="movie" src="$!{videoVO.videoPath}" poster="$!{imageLink}" controls autobuffer></video>
+        <div id="buttonbar"><img src="/assets/images/playbutton.png" id="play"/></div>
+        <img id="videopic" style="display:none" src="$!{imageLink}" width='100%'/>
+    </div>
+
+</div>
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+<script>
+    function init() {
+        var video = document.getElementById("movie");
+        if (video.canPlayType) {
+            document.getElementById("buttonbar").style.display = "block";
+            function vidplay(evt) {
+                button = evt.target;
+                if (video.paused) {
+                    video.play();
+                    button.textContent = "||";
+                } else {
+                    video.pause();
+                    button.textContent = ">";
+                }
+            }
+
+            document.getElementById("play").addEventListener("click", vidplay, false);
+        }
+    }
+    window.onload = init();
+
+    $(window).load(function () {
+        var w = $("body").width();
+        var videopic = $("#videopic"), h = videopic.height();
+        $("#videocont video").css("height", "" + h + "px");
+        $("#play").css("height", "" + h + "px").click(function () {
+            $("#videopic,#play").hide();
+        });
+    });
+
+</script>
+</body>
+</html>

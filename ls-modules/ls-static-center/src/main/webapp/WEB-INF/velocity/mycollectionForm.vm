@@ -1,0 +1,97 @@
+<form method="post" name="mycollection_form" id="mycollection_form">
+    <input type="hidden" name="siteId" value="$!{resultObj}"/>
+    <table width="100%" class="correction-table">
+        <tbody>
+        <tr>
+            <th>标题：</th>
+            <td><input type="text" name="name" id="name" class="form-control" placeholder="" maxlength="200"></td>
+        </tr>
+        <tr>
+            <th>链接：</th>
+            <td><input type="text" name="link" id="link" class="form-control" placeholder="" maxlength="500"></td>
+        </tr>
+        <tr>
+            <td colspan="4" class="btn-group">
+                <input id="btn_mycollection_submit" class="btn btn-submit" type="button" value="确定(S)">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+    var cur = {
+        siteId: "$!{resultObj}"
+    }
+
+    function clickCode() {
+        $("#imgCode").attr("src", "/member/getCode?s=" + Math.random());
+    }
+
+    $(document).ready(function () {
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        })
+
+        var autoLink = Ls.url.get("autoLink");
+        if (!autoLink) {
+            try {
+                var link = parent.window.location.href;
+                var name = parent.document.title;
+                $("#link").val(link);
+                $("#name").val(name);
+            } catch (e) {
+            }
+        }
+        using("validator", function () {
+            $("#mycollection_form").validator({
+                fields: {
+                    name: "标题:required;length[2~250]",
+                    link: "链接地址:required;length[2~500]"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+                var data = {};
+                data.siteId = cur.siteId;
+                data.name = $("#name").val();
+                data.link = $("#link").val();
+                return Ls.ajax({
+                    data: data,
+                    url: "/member/saveMyCollection",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            top.Ls.tipsOk('加入收藏成功！');
+                            $('#mycollection_form')[0].reset();
+                            parent.Ls.dialog.get('dialog').close();
+                        } else {
+                            Ls.tipsErr(text.desc, {
+                                callback: function () {
+                                    parent.location.href = "/member/center/" + cur.siteId;
+                                }
+                            });
+                        }
+
+                    }
+                }).always(function () {
+                    //  $("#correction_code").click();
+                });
+            }
+        });
+
+        $("#btn_mycollection_submit").on('click', function () {
+            $("#mycollection_form").trigger("validate");
+        });
+
+    })
+
+</script>

@@ -1,0 +1,629 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sCaption = lang["DlgMap"];
+        document.write("<title>" + sCaption + "</title>");
+
+        var oControl;
+        var oSeletion;
+        var sRangeType;
+        var oMap = null;
+
+        var sSrc = "";
+        var sUseMap = "";
+        var sWidth = "";
+        var sHeight = "";
+
+        var aMapName = new Array();
+        var aArea = new Array();
+        var sBody = "";
+        var mapWindow;
+        var mapDocument;
+
+        oControl = EWEBSelection.GetSelectedElement();
+
+        sSrc = oControl.src;
+        sUseMap = oControl.useMap;
+        sWidth = oControl.offsetWidth;
+        sHeight = oControl.offsetHeight;
+
+        var oAllMap = EWEB.EditorDocument.body.getElementsByTagName("MAP");
+        for (var i = 0; i < oAllMap.length; i++) {
+            aMapName[i] = oAllMap[i].name.toUpperCase();
+            if (("#" + aMapName[i]) == sUseMap.toUpperCase()) {
+                oMap = oAllMap[i];
+            }
+        }
+
+        sBody = "<img id='SOURCEIMAGE' border=0 src='" + sSrc + "' width='" + sWidth + "' height='" + sHeight + "'>";
+        if (oMap) {
+            for (var i = 0; i < oMap.areas.length; i++) {
+                aArea[i] = new Object();
+                aArea[i].Href = GetProtectAttribute(oMap.areas[i], "href");
+
+                aArea[i].Target = oMap.areas[i].target;
+                aArea[i].Coords = oMap.areas[i].coords;
+                var a = aArea[i].Coords.split(",");
+                aArea[i].Left = parseInt(a[0]);
+                aArea[i].Top = parseInt(a[1]);
+                aArea[i].Width = parseInt(a[2]) - aArea[i].Left;
+                aArea[i].Height = parseInt(a[3]) - aArea[i].Top;
+                sBody += "<img id='area" + i + "' src='../sysimage/space.gif' class='area_normal' style='left:" + aArea[i].Left + "px;top:" + aArea[i].Top + "px;width:" + aArea[i].Width + "px;height:" + aArea[i].Height + "px;'>";
+            }
+        }
+
+        function doInit() {
+            mapWindow = $("mapIframe").contentWindow;
+            mapDocument = mapWindow.document;
+
+            mapDocument.open();
+            mapDocument.write("<head>"
+                + "<style>"
+                + "body{padding:0;margin:0;background-color:#ffffff;-moz-user-select:none} "
+                + ".area_normal{position:absolute;border:1px solid #000000;display:block;} "
+                + "div.ImgResize_Line{width:1px;height:1px;border:0;font-size:0;overflow:hidden;position:absolute;display:none;margin:0;padding:0;background-color:#C00;z-index:99;} "
+                + "div.ImgResize_C{position:absolute;display:none;left:0;top:0;background-color:#ffffff;margin:0;padding:0;border:0;width:5px;height:5px;_width:7px;_height:7px;font-size:0;overflow:hidden;border:1px solid #C00;z-index:100;-ms-box-sizing:content-box;box-sizing:content-box;} "
+                + "#ImgResize_C_LT{margin-top:-3px;margin-left:-3px;cursor:nw-resize} "
+                + "#ImgResize_C_CT{margin-top:-3px;margin-left:-2px;cursor:n-resize} "
+                + "#ImgResize_C_RT{margin-top:-3px;margin-left:-2px;cursor:ne-resize} "
+                + "#ImgResize_C_LM{margin-top:-2px;margin-left:-3px;cursor:w-resize} "
+                + "#ImgResize_C_RM{margin-top:-2px;margin-left:-2px;cursor:e-resize} "
+                + "#ImgResize_C_LB{margin-top:-2px;margin-left:-3px;cursor:sw-resize} "
+                + "#ImgResize_C_CB{margin-top:-2px;margin-left:-2px;cursor:s-resize} "
+                + "#ImgResize_C_RB{margin-top:-2px;margin-left:-2px;cursor:se-resize} "
+                + "</style>"
+                + "</head><body MONOSPACE>");
+            mapDocument.close();
+
+            sBody += '<div id="ImgResize_Line_L" class="ImgResize_Line" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_Line_R" class="ImgResize_Line" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_Line_T" class="ImgResize_Line" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_Line_B" class="ImgResize_Line" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_LT" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_LM" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_LB" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_CT" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_CB" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_RT" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_RM" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>'
+                + '<div id="ImgResize_C_RB" class="ImgResize_C" onmousedown="parent.EWEBImageResize.MD2(event)" onmousemove="parent.EWEBImageResize.MM2(event)" onmouseup="parent.EWEBImageResize.MU2(event)"></div>';
+
+            mapDocument.body.innerHTML = sBody;
+
+            EWEBImageResize._ReloadDoc();
+        }
+
+
+        var EWEBImageResize = (function () {
+            var _bOnResizing = false;
+            var _bOnShow = false;
+            var _bOnMoving = false;
+
+            var _nStartX;
+            var _nStartY;
+            var _oOnImg;
+            var _sOnDirFlag;
+            var _nStartWidth;
+            var _nStartHeight;
+            var _nStartLeft;
+            var _nStartTop;
+
+            var _oCornerLT, _oCornerLM, _oCornerLB, _oCornerCT, _oCornerCB, _oCornerRT, _oCornerRM, _oCornerRB;
+            var _oLineL, _oLineR, _oLineT, _oLineB;
+
+            var _bInit = false;
+            var _Init = function () {
+                _oLineL = mapDocument.getElementById("ImgResize_Line_L");
+                _oLineR = mapDocument.getElementById("ImgResize_Line_R");
+                _oLineT = mapDocument.getElementById("ImgResize_Line_T");
+                _oLineB = mapDocument.getElementById("ImgResize_Line_B");
+                _oCornerLT = mapDocument.getElementById("ImgResize_C_LT");
+                _oCornerLM = mapDocument.getElementById("ImgResize_C_LM");
+                _oCornerLB = mapDocument.getElementById("ImgResize_C_LB");
+                _oCornerCT = mapDocument.getElementById("ImgResize_C_CT");
+                _oCornerCB = mapDocument.getElementById("ImgResize_C_CB");
+                _oCornerRT = mapDocument.getElementById("ImgResize_C_RT");
+                _oCornerRM = mapDocument.getElementById("ImgResize_C_RM");
+                _oCornerRB = mapDocument.getElementById("ImgResize_C_RB");
+
+                EWEBTools.AddEventListener(document, 'mousedown', EWEBImageResize.MU2);
+                EWEBTools.AddEventListener(document, 'keydown', EWEBImageResize.MU2);
+
+                _bInit = true;
+            };
+
+            var _Hide = function () {
+                _bOnShow = false;
+                _bOnResizing = false;
+                _bOnMoving = false;
+                _oOnImg = null;
+                _SetDisplay("none");
+            };
+
+            var _EndDoing = function () {
+                if (_bOnResizing) {
+                    _bOnResizing = false;
+                }
+                if (_bOnMoving) {
+                    _bOnMoving = false;
+                }
+            };
+
+            var _SetDisplay = function (v) {
+                var a_Obj = [_oLineL, _oLineR, _oLineT, _oLineB, _oCornerLT, _oCornerLM, _oCornerLB, _oCornerCT, _oCornerCB, _oCornerRT, _oCornerRM, _oCornerRB];
+                for (var i = 0; i < a_Obj.length; i++) {
+                    a_Obj[i].style.display = v;
+                }
+            };
+
+            var _SetPos = function (el, n_ImgWidth, n_ImgHeight) {
+                var w = n_ImgWidth - 2;
+                var h = n_ImgHeight - 2;
+
+                var n_Left = 0;
+                var n_Top = 0;
+                while (el) {
+                    n_Left += el.offsetLeft;
+                    n_Top += el.offsetTop;
+                    el = el.offsetParent;
+                }
+
+                _oCornerLT.style.left = n_Left + "px";
+                _oCornerLT.style.top = n_Top + "px";
+
+                _oCornerCT.style.left = (n_Left + parseInt(w / 2)) + "px";
+                _oCornerCT.style.top = n_Top + "px";
+
+                _oCornerRT.style.left = (n_Left + w) + "px";
+                _oCornerRT.style.top = n_Top + "px";
+
+                _oCornerLM.style.left = n_Left + "px";
+                _oCornerLM.style.top = (n_Top + parseInt(h / 2)) + "px";
+
+                _oCornerRM.style.left = (n_Left + w) + "px";
+                _oCornerRM.style.top = (n_Top + parseInt(h / 2)) + "px";
+
+                _oCornerLB.style.left = n_Left + "px";
+                _oCornerLB.style.top = (n_Top + h) + "px";
+
+                _oCornerCB.style.left = (n_Left + parseInt(w / 2)) + "px";
+                _oCornerCB.style.top = (n_Top + h) + "px";
+
+                _oCornerRB.style.left = (n_Left + w) + "px";
+                _oCornerRB.style.top = (n_Top + h) + "px";
+
+                _oLineL.style.left = n_Left + "px";
+                _oLineL.style.top = n_Top + "px";
+                _oLineL.style.height = h + "px";
+
+                _oLineR.style.left = (n_Left + w + 1) + "px";
+                _oLineR.style.top = n_Top + "px";
+                _oLineR.style.height = h + "px";
+
+                _oLineT.style.left = n_Left + "px";
+                _oLineT.style.top = n_Top + "px";
+                _oLineT.style.width = w + "px";
+
+                _oLineB.style.left = n_Left + "px";
+                _oLineB.style.top = (n_Top + h + 1) + "px";
+                _oLineB.style.width = w + "px";
+            };
+
+            var _ConvertToPx = function (s_Value) {
+                if (!s_Value) {
+                    return 0;
+                }
+                if (isNaN(parseInt(s_Value))) {
+                    return 0;
+                }
+
+                s_Value = s_Value.toLowerCase();
+                if (parseFloat(s_Value) == 0) {
+                    return 0;
+                } else if (_EndsWith(s_Value, "px")) {
+                    return parseInt(s_Value);
+                } else if (_EndsWith(s_Value, "pt")) {
+                    return parseInt(parseFloat(s_Value) * 4 / 3);
+                } else if (_EndsWith(s_Value, "cm")) {
+                    //1cm=28.35pt
+                    return parseInt(parseFloat(s_Value) * 28.35 * 4 / 3);
+                } else if (_EndsWith(s_Value, "mm")) {
+                    return parseInt(parseFloat(s_Value) * 0.001 * 28.35 * 4 / 3);
+                } else {
+                    return 0;
+                }
+            };
+
+            var _EndsWith = function (v, s, b_ignoreCase) {
+                var L1 = v.length;
+                var L2 = s.length;
+
+                if (L2 > L1) {
+                    return false;
+                }
+
+                if (b_ignoreCase) {
+                    var oRegex = new RegExp(s + '$', 'i');
+                    return oRegex.test(v);
+                } else {
+                    return (L2 == 0 || v.substr(L1 - L2, L2) == s);
+                }
+            };
+
+
+            return {
+
+                _ReloadDoc: function () {
+                    EWEBTools.AddEventListener(mapDocument, 'keydown', EWEBImageResize._KeyDown);
+                    EWEBTools.AddEventListener(mapDocument, 'dblclick', EWEBImageResize._DblClick);
+                    EWEBTools.AddEventListener(mapDocument, 'mousedown', EWEBImageResize._MD);
+                    EWEBTools.AddEventListener(mapDocument, 'mouseup', EWEBImageResize.MU2);
+                    EWEBTools.AddEventListener(mapDocument, 'mousemove', EWEBImageResize.MM2);
+                    EWEBTools.AddEventListener(mapDocument, 'dragstart', EWEBTools.CancelEvent);
+                    EWEBTools.AddEventListener(mapDocument, 'selectstart', EWEBTools.CancelEvent);
+                    EWEBTools.AddEventListener(mapDocument, 'contextmenu', EWEBTools.CancelEvent);
+                },
+
+                _KeyDown: function (e) {
+                    if (!e) {
+                        e = mapIframe.event;
+                    }
+
+                    _EndDoing();
+
+                    var n_KeyCode = e.keyCode || e.which;
+
+                    //del
+                    if (n_KeyCode == 46) {
+                        EWEBImageResize._DelArea();
+                    }
+                },
+
+                _DelArea: function (e) {
+                    if (_oOnImg) {
+                        var n = parseInt(_oOnImg.id.substr(4));
+                        aArea[n].Href = "";
+                        aArea[n].Target = "";
+                        EWEBTools.RemoveNode(_oOnImg);
+                        _Hide();
+                    }
+                },
+
+                _DblClick: function (e) {
+                    if (!e) {
+                        e = mapIframe.event;
+                    }
+
+                    _EndDoing();
+
+                    var o_Target = e.target || e.srcElement;
+                    if (o_Target) {
+                        if ((o_Target.tagName == "IMG") && (o_Target.id.substr(0, 4) == "area")) {
+                            var sID = o_Target.id;
+                            var nID = parseInt(sID.substr(4));
+                            ReturnLinkObject.Href = aArea[nID].Href;
+                            ReturnLinkObject.Target = aArea[nID].Target;
+                            ReturnLinkObject.Index = nID;
+
+                            EWEBDialog.OpenDialog("hyperlink.htm?action=other&returnfieldflag=" + nID);
+                        }
+                    }
+                },
+
+                _MD: function (e) {
+                    if (!e) {
+                        e = mapIframe.event;
+                    }
+                    if (e.button == 2) {
+                        return;
+                    }
+
+                    var el = e.srcElement || e.target;
+                    if (!el) {
+                        return;
+                    }
+                    if (el.tagName != "IMG" || el.id.substr(0, 4) != "area") {
+                        return;
+                    }
+                    _oOnImg = el;
+
+                    if (!_bInit) {
+                        _Init();
+                    }
+
+                    _nStartWidth = _oOnImg.offsetWidth;
+                    _nStartHeight = _oOnImg.offsetHeight;
+                    _nStartLeft = _ConvertToPx(EWEBTools.GetCurrentElementStyle(_oOnImg, "left"));
+                    _nStartTop = _ConvertToPx(EWEBTools.GetCurrentElementStyle(_oOnImg, "top"));
+
+                    _SetPos(_oOnImg, _nStartWidth, _nStartHeight);
+
+                    _nStartX = e.screenX;
+                    _nStartY = e.screenY;
+
+                    _SetDisplay("block");
+                    _bOnShow = true;
+                    _bOnMoving = true;
+                },
+
+                MD2: function (e) {
+                    if (!e) {
+                        e = mapIframe.event;
+                    }
+
+                    if (_bOnResizing) {
+                        return;
+                    }
+
+                    _bOnResizing = true;
+
+                    _nStartX = e.screenX;
+                    _nStartY = e.screenY;
+
+                    var el = e.srcElement || e.target;
+                    _nStartWidth = _oOnImg.offsetWidth;
+                    _nStartHeight = _oOnImg.offsetHeight;
+                    _nStartLeft = _ConvertToPx(EWEBTools.GetCurrentElementStyle(_oOnImg, "left"));
+                    _nStartTop = _ConvertToPx(EWEBTools.GetCurrentElementStyle(_oOnImg, "top"));
+
+                    _sOnDirFlag = el.id.substr(12).toLowerCase();
+                },
+
+                MM2: function (e) {
+                    if (!e) {
+                        e = mapIframe.event;
+                    }
+
+                    if (_bOnResizing) {
+                        var x = e.screenX - _nStartX;
+                        var y = e.screenY - _nStartY;
+                        var w = _nStartWidth;
+                        var h = _nStartHeight;
+                        var l = 0;
+                        var t = 0;
+
+                        switch (_sOnDirFlag) {
+                            case "lt":
+                                w = w - x;
+                                h = h - y;
+                                l = x;
+                                t = y;
+                                break;
+                            case "lm":
+                                w = w - x;
+                                l = x;
+                                break;
+                            case "lb":
+                                w = w - x;
+                                h = h + y;
+                                l = x;
+                                break;
+                            case "ct":
+                                h = h - y;
+                                t = y;
+                                break;
+                            case "cb":
+                                h = h + y;
+                                break;
+                            case "rt":
+                                w = w + x;
+                                h = h - y;
+                                t = y;
+                                break;
+                            case "rm":
+                                w = w + x;
+                                break;
+                            case "rb":
+                                w = w + x;
+                                h = h + y;
+                                break;
+                        }
+
+                        if (l != 0) {
+                            l = _nStartLeft + l;
+                            if (l < 0) {
+                                l = 0;
+                            }
+                            _oOnImg.style.left = l + "px";
+                        }
+                        if (t != 0) {
+                            t = _nStartTop + t;
+                            if (t < 0) {
+                                t = 0;
+                            }
+                            _oOnImg.style.top = t + "px";
+                        }
+
+                        if (w < 5) {
+                            w = 5;
+                        }
+                        if (h < 5) {
+                            h = 5;
+                        }
+
+                        _oOnImg.style.width = (w - 2) + "px";
+                        _oOnImg.style.height = (h - 2) + "px";
+
+                        _SetPos(_oOnImg, w, h);
+                    }
+
+                    if (_bOnMoving) {
+                        var x = e.screenX - _nStartX;
+                        var y = e.screenY - _nStartY;
+
+                        var l = _nStartLeft + x;
+                        var t = _nStartTop + y;
+                        if (l < 0) {
+                            l = 0;
+                        }
+                        if (t < 0) {
+                            t = 0;
+                        }
+
+                        _oOnImg.style.left = l + "px";
+                        _oOnImg.style.top = t + "px";
+
+                        _SetPos(_oOnImg, _nStartWidth, _nStartHeight);
+                    }
+                },
+
+                MU2: function (e) {
+                    _EndDoing();
+                }
+
+            };
+
+        })();
+
+
+        var ReturnLinkObject = new Object();
+
+        function ISetReturnValue() {
+            aArea[ReturnLinkObject.Index].Href = ReturnLinkObject.Href;
+            aArea[ReturnLinkObject.Index].Target = ReturnLinkObject.Target;
+        }
+
+        function newMap() {
+            var n = aArea.length;
+            aArea[n] = new Object();
+            aArea[n].Href = "";
+            aArea[n].Target = "";
+
+            var o_Pos = EWEBTools.GetScrollPosition(mapWindow);
+            var o_Img = mapDocument.createElement('IMG');
+            o_Img.id = "area" + n;
+            o_Img.src = "../sysimage/space.gif";
+            o_Img.className = "area_normal";
+            o_Img.style.cssText = "width:20px;height:20px;";
+            o_Img.style.left = o_Pos.X + "px";
+            o_Img.style.top = o_Pos.Y + "px";
+
+            mapDocument.body.appendChild(o_Img);
+        }
+
+        function getAutoMapName() {
+            var b = true;
+            var n = 0;
+            var s = ""
+            while (b) {
+                n++;
+                s = "AutoMap" + f_RndUUID() + n;
+                if (isValidMapName(s)) {
+                    b = false;
+                }
+            }
+            return s;
+        }
+
+        function isValidMapName(str) {
+            str = str.toUpperCase();
+            for (var i = 0; i < aMapName.length; i++) {
+                if (aMapName[i] == str) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function f_RndUUID() {
+            return 'xxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function ok() {
+            var b = false;
+            for (var i = 0; i < aArea.length; i++) {
+                var obj = mapDocument.getElementById("area" + i);
+                if (obj) {
+                    b = true;
+                }
+            }
+
+            if (b) {
+                var html = "";
+                for (var i = 0; i < aArea.length; i++) {
+                    var o_Area = aArea[i];
+                    var obj = mapDocument.getElementById("area" + i);
+                    if (obj) {
+                        var nLeft = parseInt(obj.style.left);
+                        var nTop = parseInt(obj.style.top);
+                        var nWidth = obj.offsetWidth;
+                        var nHeight = obj.offsetHeight;
+                        var nRight = nLeft + nWidth;
+                        var nBottom = nTop + nHeight;
+                        html += "<area shape='rect' href='" + o_Area.Href + "' target='" + o_Area.Target + "' coords='" + nLeft + "," + nTop + "," + nRight + "," + nBottom + "'>";
+                    }
+                }
+
+                if (oMap) {
+                    oMap.innerHTML = html;
+                } else {
+                    sUseMap = getAutoMapName();
+                    oControl.useMap = "#" + sUseMap;
+                    EWIN.appendHTML("<map name='" + sUseMap + "'>" + html + "</map>");
+                }
+            } else {
+                if (oMap) {
+                    EWEBTools.RemoveNode(oMap);
+                }
+                oControl.useMap = "";
+            }
+
+            parent.Ok();
+        }
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+            doInit();
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+    </script>
+
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+
+            <table border=0 cellpadding=0 cellspacing=3 align=center width="600" height="400">
+                <tr>
+                    <td colspan=2 height="100%">
+                        <iframe ID="mapIframe" MARGINHEIGHT="1" MARGINWIDTH="1" width="100%" scrolling="yes" height="100%" src="blank.htm" unselectable='on'></iframe>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan=2 height=5></td>
+                </tr>
+                <tr>
+                    <td><input type=button class="dlgBtnCommon dlgBtn" value='' id=btnNew onclick="newMap()" lang=DlgMapNew>&nbsp;<input type=button class="dlgBtnCommon dlgBtn"
+                                                                                                                                         value='' id=btnDel
+                                                                                                                                         onclick="EWEBImageResize._DelArea()"
+                                                                                                                                         lang=DlgBtnDel>&nbsp;(<span
+                        lang=DlgMapDesc></span>)
+                    </td>
+                    <td align=right><input type=button class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                        class="dlgBtnCommon dlgBtn"
+                                                                                                                                                        value=''
+                                                                                                                                                        onclick="parent.Cancel()"
+                                                                                                                                                        lang=DlgBtnCancel></td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

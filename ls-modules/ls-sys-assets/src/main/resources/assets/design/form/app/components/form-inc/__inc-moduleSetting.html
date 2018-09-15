@@ -1,0 +1,18 @@
+<!--<sui-control-group title="标题高度" v-if="conf.isTitle">-->
+    <!--<sui-input v-model="conf.panelHeadingHeight" rules="required|digits|gt=-1|lt=500"  errmsg="大于等于0且小于500的整数" size="mini" > </sui-input>-->
+    <!--<span class="sui-msg msg-info">(单位:像素)</span>-->
+<!--</sui-control-group>-->
+
+<sui-control-group title="">
+    <sui-checkbox v-model="conf.isCustomPBH">自定义内容高度</sui-checkbox>
+</sui-control-group>
+<sui-control-group title="内容高度" v-if="conf.isCustomPBH">
+    <sui-input v-model="conf.panelBodyHeight" rules="required|digits|gt=-1|lt=5000"  errmsg="大于等于0且小于5000的整数" size="mini" > </sui-input>
+    <span class="sui-msg msg-info">(单位:像素)</span>
+</sui-control-group>
+
+<sui-control-group title="组件样式" v-if="isStyleList">
+    <sui-dropdown v-model="conf.className" @on-target-change="onStyleListChange"
+                  :items="styleList">
+    </sui-dropdown>
+</sui-control-group>

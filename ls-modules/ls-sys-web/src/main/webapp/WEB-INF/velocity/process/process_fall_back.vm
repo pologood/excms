@@ -1,0 +1,168 @@
+#parse("_page_layout/_header.vm")
+<link rel="stylesheet" href="/assets/goa/res/css/common.css">
+<link rel="stylesheet" href="/assets/goa/res/app/common/css/common.css">
+<link rel="stylesheet" href="/assets/goa/res/css/icons.css">
+<body style="background-color: inherit;font-size: 14px !important;">
+<div id="mainBody" class="wrap">
+  <div>
+    <table class="w100p" align="center" style="margin-top:10px;">
+      <tr>
+      <td style="width:70px;" colspan="2">退回原因:</td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <textarea class="form-control"  id="backReason" name="backReason" style="width:100%;height: 120px;" ></textarea>
+        </td>
+    </tr>
+    </table>
+
+    <table class="tlist w100p dn" align="center" style="margin-top:10px;word-break:break-all;word-wrap:break-word" id="fallbackOptionsTable">
+      <thead>
+      <tr>
+        <th width="45"></th>
+        <th>退回步骤</th>
+      </tr>
+      </thead>
+      <tbody id="list">
+
+      </tbody>
+      <input id="doSubmit" type="button" class="dn" onclick="CUR.fn.fullBack()" />
+    </table>
+  </div>
+</div> <!-- mainBody -->
+<script src="/assets/goa/core/jquery.min.js"></script>
+#parse("_page_layout/_footer.vm")
+
+<script id="tpl" type="text/html">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <? var el = data[i] ?>
+    <tr>
+        <td><input type="radio" name="actinstId" value="<?=el.activityInstId?>" data-activityName="<?=el.activityName?>" /></td>
+        <td><?=el.activityName?></td>
+    </tr>
+    <? } ?>
+</script>
+
+<script>
+  // 当前页面的全局操作对象
+  var CUR={
+    // 为KO准备的viewModel对象
+    viewModel : {},
+    // 所有当前页面级方法的命名空间对象
+    fn:{},
+    // 所有当前页面与服务端交互的action命名空间
+    action:{
+    },
+    // 所有当前获取jQuery的DOM对象的存储的命名空间对象
+    el:{},
+    // 获取当前页URL参数的命名空间对象
+    params:{
+      taskId : '$!{taskId}',
+      moduleCode : '$!{moduleCode}',
+      recordId:'$!{recordId}'
+    },
+    dg : Ls.getWin.api,
+    pWin : Ls.getWin.win,
+  };
+
+  jQuery(document).ready(function(){
+      
+    CUR.dg.button({
+        id: "do_submit",
+        name: "确定",
+        focus: true,
+        callback: function () {
+            CUR.fn.fullBack();
+            return false;
+        }
+    });
+    CUR.fn.getList();
+
+  });
+
+  CUR.fn.getList = function(){
+    try{
+      var data = CUR.pWin.CUR_PROCESS.fallbackOptions;
+      CUR.fallbackSet = data.fallbackSet;
+      if(CUR.fallbackSet == 'allHistoryStep'){
+        var json = {};
+        json.data = data.fallbackOptions;
+        if(json.data){
+          var listHtml = Ls.template("tpl", json);
+          $("#list").html(listHtml);
+        }
+        $("#fallbackOptionsTable").show();
+      }
+    }catch(e){}
+  };
+
+  //确定退回
+  CUR.fn.fullBack = function() {
+    var url = '/process/fallBack';
+    var backReason = $.trim($("#backReason").val());
+    if(Ls.isEmpty(backReason)){
+      Ls.tipsErr("请填写退回原因");
+      return false;
+    }else if(backReason.length > 100){
+      Ls.tipsErr("退回原因不能超过100个字");
+      return false;
+    }
+
+    if(CUR.fallbackSet == 'allHistoryStep'){
+        var activity = $("input[name='actinstId']:checked");
+        var actinstId = activity.val();
+        var backActivityName = activity.attr("data-activityName");
+        if (!actinstId) {
+          Ls.tipsErr("请选择退回的步骤");
+          return;
+        }
+        if(confirm('您确定退回到'+backActivityName+'步骤？')) {
+          var postData = {};
+          postData.actinstId = actinstId;
+          postData.taskId = CUR.params.taskId;
+          postData.moduleCode = CUR.params.moduleCode;
+          postData.recordId = CUR.params.recordId;
+          postData.backReason = backReason;
+          Ls.ajax({
+              type: "POST",
+              data: postData,
+              url: url,
+              success: function (json) {
+                  Ls.tipsOk("提交成功",function(){
+                      try {
+                          CUR.pWin.opener.CUR.grid.reload();
+                      } catch (e) {}
+                      CUR.pWin.close();
+                  });
+              }
+          });
+
+        }
+    }else if(CUR.fallbackSet == 'beforeStep'){
+        if(confirm('您确定退回到上一步骤？')) {
+          var postData = {};
+          postData.taskId = CUR.params.taskId;
+          postData.moduleCode = CUR.params.moduleCode;
+          postData.recordId = CUR.params.recordId;
+          postData.backReason = backReason;
+          Ls.ajax({
+              type: "POST",
+              data: postData,
+              url: url,
+              success: function (json) {
+                  Ls.tipsOk("退回成功",function(){
+                      try {
+                          CUR.pWin.opener.CUR.grid.reload();
+                      } catch (e) {}
+                      CUR.pWin.close();
+                  });
+              }
+          });
+        }
+    }
+  }
+</script>
+
+
+</body>
+</html>

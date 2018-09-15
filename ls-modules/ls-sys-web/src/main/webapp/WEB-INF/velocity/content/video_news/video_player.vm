@@ -1,0 +1,29 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="a1"></div>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/ckplayer/ckplayer.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var videoPath = "$!{videoPath}";
+        var videoName = "$!{videoName}";
+        var editor = "$!{editor}";
+        if (editor == null || editor == "") {
+            if (videoName != videoPath) {
+                videoPath = (videoPath.indexOf(".") != -1 ?"${fileServerNamePath}":"${fileServerPath}") + videoPath;
+            } else {
+                videoPath = videoName;
+            }
+        }
+
+        //var videoPath = "/assets/123.mp4"
+        var flashvars = {
+            f: videoPath,
+            c: 0
+        };
+        var params = {bgcolor: '#FFF', allowFullScreen: true, allowScriptAccess: 'always', wmode: 'transparent'};
+        CKobject.embedSWF('../assets/js/plugins/ckplayer/ckplayer.swf', 'a1', 'ckplayer_a1', '600', '400', flashvars, params);
+    });
+</script>
+</body>
+</html>

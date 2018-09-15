@@ -1,0 +1,2 @@
+<label><font size="15">$!{result}</font></label>
+<label>TOKEN：<font size="15">$!{token}</font>(请复制token到配置项中保存)</label>

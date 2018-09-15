@@ -1,0 +1,20 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{target}")
+#set($length=$Integer.parseInt($length))
+#if($page.data.size()>0)
+    #foreach($eo in $page.data)
+        <li><a href="/content/article/$!{eo.ContentId}?problemId=$!{eo.id}" title="$!{eo.name}">#cutstr($!{eo.title},$length)</a></li>
+    #end
+    #if($!{page.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{columnId}" class="pagination"></div>
+    <script>
+        Ls.pagination("#page_$!{columnId}", function (pageIndex) {
+            location.href = "$!{linkPrefix}?pageIndex=" + pageIndex;
+        }, {
+            pageCount:$!{page.pageCount},
+            currPage:$!{page.pageIndex} +1
+        })
+    </script>
+    #end
+#end

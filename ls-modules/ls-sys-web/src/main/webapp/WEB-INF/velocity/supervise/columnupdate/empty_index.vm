@@ -1,0 +1,161 @@
+<style>
+    .sp_result_area {
+        width: auto;
+        min-width: 350px;
+        padding: 10px 0;
+    }
+    .w350 {
+        width: 350px !important;
+    }
+</style>
+
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs" id="column_empty_manage">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">内容管理</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">信息公开</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab_1_1">
+                <div class="table-toolbar">
+                    <div class="row" style="margin-right: 0px;">
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <input type="hidden" name = 'typeCode' value="articleNews">
+                            <button type="button" class="btn btn-default btn-search"
+                                    onclick="searchByCondition(this.form,'1')">查询
+                            </button>
+                            <button type="button" class="btn btn-default" onclick="searchClear(this.form,'1')">显示全部
+                            </button>
+                            <button type="button" class="btn btn-default btn-export" onclick="exportByCondition(this.form,'1')">导出
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="column_empty_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                     url="/statistics/getEmptyColumnList">
+                    <div property="columns">
+                        <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号
+                        </div>
+                        <div field="organName" width="100%" headerAlign="center" allowSort="flase" align="left">栏目名称
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane" id="tab_1_2">
+                <div class="table-toolbar">
+                    <div class="row" style="margin-right: 0px;">
+                        <form class="form-inline tr search-toolbar" role="form">
+                        ##                            <select name="organId" class="form-control">
+                        ##                                #foreach($organ in $organList)
+                        ##                                    <option value="$!{organ.organId}">$!{organ.name}</option>
+                        ##                                #end
+                        ##                            </select>
+
+
+                            <input id="organId" name="organId" class="form-control w350" placeholder="请输入单位名检索或选择单位">
+
+                            <button type="button" class="btn btn-default btn-search"
+                                    onclick="searchByCondition(this.form,'2')">查询
+                            </button>
+                            <button type="button"   class="btn btn-default" onclick="searchClear(this.form,'2')">显示全部
+                            </button>
+                            <button type="button"   class="btn btn-default btn-export" onclick="exportByCondition(this.form,'2')">导出
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="public_empty_datagrid" class="mini-datagrid" style="width:100%;" showPager="false"
+                     url="/public/catalogUpdate/getEmptyCatalogByOrganId?flag=1">
+                    <div property="columns">
+                        <div type="indexcolumn" width="40" headerAlign="center" allowSort="flase" align="center">序号
+                        </div>
+                        <div field="name" width="100%" headerAlign="center" allowSort="flase" align="left">目录名称</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+</div>
+
+<script src="$!{sysStaticPath}/assets/js/plugins/selectPage/selectpage.min.js"></script>
+
+<script>
+    var cur = {
+        column_empty_datagrid: null,
+        public_empty_datagrid: null,
+        public_empty_isLoad: false
+    }
+
+    var organList = [];
+
+        #foreach($organ in $organList)
+        organList.push({id: $!{organ.organId}, name: "$!{organ.name}", desc: "$!{organ.name}"});
+        #end
+
+
+    function searchByCondition(form, columm) {
+        var json = $(form).serializeObject();
+        columm == 1 ? cur.column_empty_datagrid.load(json) : cur.public_empty_datagrid.load(json);
+    }
+
+    function searchClear(form, columm) {
+        $(form)[0].reset();
+        if(columm == '2') {
+            $("#organId").selectPageClear();
+        }
+        searchByCondition(form, columm);
+    }
+
+    function exportByCondition(form, columm) {
+        var json = $(form).serializeObject();
+        var params = [];
+        for (var key in json) {
+            params.push(key + "=" + json[key]);
+        }
+        if (columm == 1) {
+            params.push("isColumn = 1");
+            $('#download_frame').attr("src", "/statistics/exportEmptyColumnList?" + params.join("&"));
+        } else {
+            $('#download_frame').attr("src", "/public/catalogUpdate/exportEmptyCatalog?" + params.join("&"));
+        }
+    }
+
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.column_empty_datagrid = mini.get("column_empty_datagrid");
+        cur.public_empty_datagrid = mini.get("public_empty_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.column_empty_datagrid, 90);
+        Ls.mini_datagrid_height(cur.public_empty_datagrid, 90);
+        // 绑定
+        $('#column_empty_manage a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_2' && !cur.public_empty_isLoad) {
+                cur.public_empty_isLoad = true;
+                searchByCondition($("form:first", $("#tab_1_2")), 2);
+
+                if ($('.sp_result_area').length > 0) $('.sp_result_area').remove();
+                $('#organId').selectPage({
+                    showField: 'name',
+                    keyField: 'id',
+                    pagination: false, //关闭分页后，将会在列表中显示所有数据，上限为200个项目
+                    listSize: 15, //关闭分页的状态下，列表显示的项目个数，其它的项目以滚动条滚动方式展现
+                    data: organList
+                });
+            }
+        });
+        searchByCondition($("form:first", $("#tab_1_1")), 1);//默认触发第一个
+
+
+
+    });
+</script>

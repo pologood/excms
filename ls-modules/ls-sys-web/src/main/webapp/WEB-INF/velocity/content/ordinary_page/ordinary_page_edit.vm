@@ -1,0 +1,400 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="ordinaryPage" ms-controller="ordinaryPage">
+                <table class="table table-bordered ordinary-table">
+                    <tbody>
+                    <tr>
+                        <th>标题：</th>
+                        <td>
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control" maxlength="200"></td>
+                                    <td class="w150 text-center">
+                                        <button type="button" id="colorpicker" class="btn btn-default btn-font" title="字体颜色"><i class="fa fa-font"></i>
+                                        </button>
+                                        <input type="hidden" id="mycolor" class="colorPicker evo-cp0"/>
+                                        <button type="button" id="bold" class="btn btn-default btn-bold" title="加粗"><i class="fa fa-bold"></i></button>
+                                        <button type="button" id="italic" class="btn btn-default btn-italic" title="倾斜"><i class="fa fa-italic"></i>
+                                        </button>
+                                        <button type="button" id="underline" class="btn btn-default btn-underline" title="下划线"><i class="fa fa-underline"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="w300" rowspan="2">
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                                </div>
+                                <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="picChange()"></i></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>摘要：</th>
+                        <td>
+                            <textarea name="remarks" ms-duplex="remarks" class="form-control h105"></textarea>
+                        </td>
+                    </tr>
+                    <tr class="dn">
+                        <th>发布时间：</th>
+                        <td>
+                            <input type="datetime" ms-duplex="publishDate" class="form-control" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+                        <td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td colspan="2">
+                            <textarea id="video_content" name="content" class="form-control" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                        ##<button class="btn btn-default btn-save" type="submit"> 保 存</button>
+                            <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                            <a href="javascript:void(0);" target="_blank" class="btn btn-default btn-preview" title="请保存并发布预览"> 预 览 </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    var curr = {
+        vm: "",
+        editor: '',
+        opt: []
+    };
+    var siteId = GLOBAL_SITEID;
+    var columnId = content_mgr.node.indicatorId;
+    var data = {
+        siteId: GLOBAL_SITEID,
+        columnId: content_mgr.node.indicatorId,
+        isBold: 0,
+        isUnderline: 0,
+        isTilt: 0,
+        titleColor: "#000000",
+        typeCode: 'ordinaryPage',
+        isPublish: 0,
+        content: '',
+        text: ''
+    }
+    var expand = 0;
+    var flag = 0;
+
+    var eweb;
+
+    $(document).ready(function () {
+
+        eweb = Ls.editor("content", {
+            cusdir: "/" + GLOBAL_SITEID + "/" + columnId,
+            height: "550"
+        });
+
+
+        /*editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/videoNews/upload?siteId=' + siteId + "&&columnId=" + columnId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });
+
+        //取色器
+        var K = KindEditor;
+        var colorpicker;
+        K('#colorpicker').bind('click', function (e) {
+            e.stopPropagation();
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+                return;
+            }
+            var colorpickerPos = K('#colorpicker').pos();
+            colorpicker = K.colorpicker({
+                x: colorpickerPos.x,
+                y: colorpickerPos.y + K('#colorpicker').height(),
+                z: 19811214,
+                selectedColor: 'default',
+                noColor: '无颜色',
+                click: function (color) {
+                    K('#title').css('color', color);
+                    colorpicker.remove();
+                    curr.vm.titleColor = color;
+                    colorpicker = null;
+                }
+            });
+        });
+
+        K(document).click(function () {
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+            }
+        });*/
+        //取色器
+        $("#mycolor").colorpicker({
+            color: "#000",
+            hideButton: true,
+            strings: " , , 无颜色 , , , , "
+        }).on('change.color', function (evt, color) {
+            $('#title').css('color', color);
+        });
+        $("#colorpicker").on("click", function (evt) {
+            evt.stopImmediatePropagation();
+            $("#mycolor").colorpicker("showPalette");
+        });
+        getEO();
+    });
+
+
+    $("#bold").click(function () {
+        var T = $("#title");
+        if (curr.vm.isBold == 0) {
+            T.css("font-weight", "bold");
+            curr.vm.isBold = 1;
+        } else {
+            T.css("font-weight", "normal");
+            curr.vm.isBold = 0;
+        }
+    });
+
+    $("#italic").click(function () {
+        var T = $("#title");
+        if (curr.vm.isTilt == 0) {
+            T.css("font-style", "italic");
+            curr.vm.isTilt = 1;
+        } else {
+            T.css("font-style", "normal");
+            curr.vm.isTilt = 0;
+        }
+    })
+
+    $("#underline").click(function () {
+        var T = $("#title");
+        if (curr.vm.isUnderline == 0) {
+            T.css("text-decoration", "underline");
+            curr.vm.isUnderline = 1;
+        } else {
+            T.css("text-decoration", "none");
+            curr.vm.isUnderline = 0;
+        }
+    });
+
+    function getEO() {
+        Ls.ajax({
+            type: "POST",
+            url: "/ordinaryPage/getEO",
+            data: {columnId: columnId}
+        }).done(function (d) {
+            data = d;
+            curr.$id = "ordinaryPage";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            curr.vm = avalon.define(curr.init);
+            //avalon.scan(document.body, curr.vm);
+            avalon.scan($("#ordinaryPage").get(0), curr.vm);
+            $(".btn-preview").attr("href", GLOBAL_HTMLFILEPATH + "/" + d.path + "/index.html");
+            T = $("#title");
+            if (d.titleColor != null) {
+                T.css('color', d.titleColor);
+            }
+            if (d.isBold == 1) {
+                T.css("font-weight", "bold");
+            }
+            if (d.isTilt == 1) {
+                T.css("font-style", "italic");
+            }
+            if (d.isUnderline == 1) {
+                T.css("text-decoration", "underline");
+            }
+            curr.vm.id = d.id;
+            curr.vm.siteId = siteId;
+            curr.vm.columnId = columnId;
+            curr.vm.isPublish = d.isPublish;
+            if (d.imageLink != null && d.imageLink != "") {
+                if (d.imageLink.indexOf(".") != -1) {
+                    $("#imageLink").attr("src", "${fileServerNamePath}" + d.imageLink);
+                } else {
+                    $("#imageLink").attr("src", "${fileServerPath}" + d.imageLink);
+                }
+            }
+            //editor.html(d.content);
+            eweb.setHtml(d.content);
+            getModelConfig();
+        });
+    }
+
+    $('#ordinaryPage').validator({
+        fields: {
+            'title': '标题:length[0~250];',
+            'remarks': '摘要:length[0~1000];',
+            'content': '内容:required;'
+            // 'uri':'绑定域名:required;'
+            //'optionsRadios': '单选框:checked;'
+        },
+        valid: function () {
+            doSave();
+        },
+        msgClass: "n-top"
+    });
+
+    function saveEO() {
+        curr.vm.columnId = content_mgr.node.indicatorId;
+        curr.vm.siteId = GLOBAL_SITEID;
+        curr.vm.typeCode = 'ordinaryPage';
+        if (curr.vm.titleColor == "" || curr.vm.titleColor == null) {
+            curr.vm.titleColor = '#000000';
+        }
+        /*curr.vm.text = editor.text();
+        curr.vm.content = editor.html();*/
+
+        curr.vm.text = eweb.getText();
+        curr.vm.content = eweb.getHtml();
+        if (curr.vm.remarks != null && curr.vm.remarks != "" && curr.vm.remarks.length > 1000) {
+            Ls.tipsInfo("摘要字数长度应为0～1000");
+            return;
+        }
+        if (flag == 1) {
+            curr.vm.isPublish = 1;
+        } else {
+            curr.vm.isPublish = 0;
+        }
+        if (Ls.isEmpty(curr.vm.text)) {
+            Ls.tipsInfo("内容不能为空");
+            return;
+        }
+        return 1;
+    }
+
+    function doSave() {
+        if (saveEO() == 1) {
+            var value = Ls.toJSON(curr.vm.$model);
+            Ls.ajax({
+                type: "POST",
+                url: "/ordinaryPage/saveEO",
+                data: value
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+                if (curr.vm.isPublish == 1) {
+                    Ls.tipsOk("正在生成处理中");
+                } else {
+                    Ls.tipsOk("保存成功");
+                }
+                curr.vm.id = text.data.id;
+            });
+        }
+        flag = 0;
+    }
+
+    $("#saveAndPublish").click(function () {
+        curr.vm.isPublish = 1;
+        flag = 1;
+        doSave();
+    });
+
+    function picChange() {
+        if (curr.model.isEnableBeauty == 1) {
+            meiTuUpload();
+        } else {
+            normalUpload();
+        }
+    }
+
+    function normalUpload() {
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].fileName);
+            return true;
+        }, {
+            upload_url: '/content/normalUploadThumb',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "columnId": content_mgr.node.indicatorId,
+                "contentId": curr.vm.id || '',
+                "imgPath": curr.vm.imageLink || '',
+                "desc": "上传缩略图"
+            },
+            file_types: "*.jpg;*.gif;*.bmp;*.jpeg",
+        });
+    }
+
+    function meiTuUpload() {
+        art.dialog.data("imageLink", curr.vm.imageLink);
+        art.dialog.data("siteId", GLOBAL_SITEID);
+        art.dialog.data("columnId", content_mgr.node.indicatorId);
+        art.dialog.data("contentId", curr.vm.id);
+        Ls.openWin('/fileDownload/toUploadPic', {
+            width: '650px',
+            height: '410px',
+            lock: true,
+            title: '缩略图'
+        });
+    }
+
+    //缩略图路径
+    function changeImg(path) {
+        if (path.indexOf(".") != -1) {
+            $("#imageLink").attr("src", "${fileServerNamePath}" + path);
+        } else {
+            $("#imageLink").attr("src", "${fileServerPath}" + path);
+        }
+        curr.vm.imageLink = path;
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+        curr.vm.imageLink = '';
+    })
+
+    function getModelConfig() {
+        Ls.ajaxGet({
+            data: {
+                columnId: content_mgr.indicatorId
+            },
+            url: "/content/getModelConfig",
+            success: function (text) {
+                if (text.status == 1) {
+                    curr.model = text.data;
+
+                } else {
+                    Ls.tipsErr("内容模型获取错误");
+                }
+            }
+        });
+    }
+</script>

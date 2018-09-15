@@ -1,0 +1,100 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-fit">
+    <div class="mini-fit">
+        <ul class="ztree" id="treeview2"></ul>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+
+    function nodeClick(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        }
+    }
+    var setting = {
+        async: {
+            enable: false
+        },
+        isEdit: true,
+        view: {},
+        check: {
+            enable: true,
+            autoCheckTrigger: false,
+            nocheckInherit : false,
+            chkboxType: {"Y": "p", "N": "p"}
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'plateId',
+                pIdKey: 'parentId',
+            },
+            key: {
+                name: "name"
+            }
+        },
+        callback: {
+        }
+    };
+
+    $(document).ready(function () {
+        var dialog = art.dialog,
+                api = art.dialog.open.api;
+        if (!api) return;
+        SetData();
+    });
+
+    function SetData() {
+        Ls.ajax({
+            url: '/bbsPlate/getPlateByTree',
+        }).done(function (json) {
+            if (!json.status) {
+                Ls.tipsErr(json.desc);
+                return;
+            }
+            if (json.data != null) {
+                Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+            }
+            jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+            var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+
+            zTree.expandAll(true);
+        });
+        return;
+    }
+
+    function doOk() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        // var  nodes = zTree.getSelectedNodes();
+        var nodes = zTree.getCheckedNodes(true);
+        var newNodes = [];
+        var plateIds = "";
+        if (nodes != null && nodes != "") {
+            for (i = 0; i < nodes.length - 1; i++) {
+                newNodes.add(nodes[i]);
+                plateIds += nodes[i].plateId + ",";
+            }
+            plateIds += nodes[nodes.length - 1].plateId;
+        }
+        var arr = {"plateIds": plateIds};
+        return arr;
+    }
+
+    function onCancel() {
+        art.dialog.close();
+    }
+    function initSlimScroll() {
+        //添加模拟滚动条
+        var ui_tree = $('#treeview2');
+        var ui_layout = $(".mini-layout-region-body");
+        ui_tree.attr("data-height", ui_layout.height() - 10)
+        App.initSlimScroll(ui_tree);
+    }
+
+</script>
+</body>

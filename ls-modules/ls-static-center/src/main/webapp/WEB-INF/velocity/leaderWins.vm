@@ -1,0 +1,19 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($length=$Integer.parseInt($length))
+<div class="lead-show">
+#foreach($eo in $resultObj)
+  #if($eo.picUrl.indexOf("/mongo")>=0)
+    #set($filePath="")
+  #elseif($eo.picUrl.indexOf(".")>=0)
+    #set($filePath="$!{fileServerNamePath}")
+  #else
+    #set($filePath="$!{fileServerPath}")
+  #end
+  <ul class="lead_$!{eo.contentId}">
+    <li class="lead-img"><a href="$!{eo.linkUrl}" target="$!{paramObj.target}"><img src="$!{filePath}$!{eo.picUrl}" width="86" height="105" /></a></li>
+    <li class="lead-info"><span class="lead-name">$!{eo.name}</span><span class="lead-job">$!{eo.typeName}</span><span class="lead-note">#cutstr($!{eo.jobResume},$length)<span></li>
+  </ul>
+#end
+</div>

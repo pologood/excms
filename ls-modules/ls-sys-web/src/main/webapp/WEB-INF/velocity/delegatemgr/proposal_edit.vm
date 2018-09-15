@@ -1,0 +1,240 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">议案信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="proposalForm" role="form" ms-controller="proposalForm">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <div class="form-body">
+                                <div class="form-group">
+                                    <label>届次</label>
+                                    <select class="form-control" name="session" id="session" ms-duplex="session"
+                                            placeholder="请选择届次">
+                                        <option value="">请选择届次</option>
+                                        #foreach($eo in $sessionList)
+                                            <option value="$!{eo.code}">$!{eo.key}</option>
+                                        #end
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>编号</label>
+                                    <input type="number" name="num" class="form-control" ms-duplex="num"
+                                           placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>分类</label>
+                                    <input type="text" name="type" class="form-control" ms-duplex="type"
+                                           placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>标题</label>
+                                    <input type="text" name="title" class="form-control" ms-duplex="title"
+                                           placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>领衔人</label>
+                                    <input type="text" name="leader" class="form-control" ms-duplex="leader"
+                                           placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>内容</label>
+                                        <textarea class="form-control" name="content" ms-duplex="content" rows="3"
+                                                  placeholder="请输入内容"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>工作单位</label>
+                                    <input type="text" name="workUnit" class="form-control" ms-duplex="workUnit" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>职务</label>
+                                    <input type="text" name="work" class="form-control" ms-duplex="work" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>通信地址</label>
+                                    <input type="text" name="address" class="form-control" ms-duplex="address" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>邮政编码</label>
+                                    <input type="text" name="zipCode" class="form-control" ms-duplex="zipCode" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>联系方式</label>
+                                    <input type="text" name="phone" class="form-control" ms-duplex="phone" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>附议人</label>
+                                    <input type="text" name="attendant" class="form-control" ms-duplex="attendant" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>主办单位</label>
+                                    <input type="text" name="organizer" class="form-control" ms-duplex="organizer" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>协办单位</label>
+                                    <input type="text" name="coOrganizer" class="form-control" ms-duplex="coOrganizer" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>领衔办理</label>
+                                    <input type="text" name="headDeal" class="form-control" ms-duplex="headDeal" placeholder="">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>处理状态</label>
+                                    <input type="text" name="dealStatus" class="form-control" ms-duplex="dealStatus" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>交办时间</label>
+                                    <input type="datetime" name="deliveryTime" ms-duplex="deliveryTime" class="form-control readonly"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                                </div>
+                                <div class="form-group">
+                                    <label>办复时间</label>
+                                    <input type="datetime" name="replyTime" ms-duplex="replyTime" class="form-control readonly"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                                </div>
+                                <div class="form-group">
+                                    <label>办理结果</label>
+                                    <input type="text" name="result" class="form-control" ms-duplex="result" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>滚动办理</label>
+                                    <input type="text" name="rollDeal" class="form-control" ms-duplex="rollDeal" placeholder="">
+                                </div>
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset goBack" onclick="goBack()">返 回
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var curr = {
+        vm: {}
+    };
+    mini.parse();
+    var eweb;
+    $(document).ready(function () {
+        $('#proposalForm').validator({
+            rules: {
+                dNum: [/^[a-zA-Z0-9]{1,8}$/, "请填写有效的代表证号"],
+            },
+            fields: {
+                'session':'届次:required',
+                'num': '编号:required;length[1~16]',
+                'type': '分类:length[1~120]',
+                'title': '标题:required;length[1~120]',
+                'leader':'领衔人:length[0~120];',
+                'content':'内容::required;length[1~6000]',
+                'workUnit':'工作单位:length[0~120];',
+                'work':'职务:length[0~120];',
+                'address':'通讯地址:length[0~120];',
+                'zipCode':'邮编:zipcode',
+                'phone':'联系方式:mobile|tel_1|shortTel;',
+                'attendant':'附议人:length[0~120];',
+                'organizer':'主办单位:length[0~120];',
+                'coOrganizer':'协办单位:length[0~120];',
+                'leadDeal':'领衔办理:length[0~120];',
+                'dealStatus':'处理状态:length[0~120];',
+                'result':'办理结果:length[0~120];',
+                'rollDeal':'滚动办理:length[0~120];'
+            },
+            valid: function () {
+                saveEO();
+            }
+        });
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID});
+        /*editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID ,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+        getEO();
+        /*提交更新*/
+        $("button[type='submit']").on("click", function () {
+            eweb.update();
+        })
+    });
+
+    function saveEO(){
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            type: "POST",
+            url: "/proposal/saveEO",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                goBack();
+
+            }
+        })
+    }
+
+    function goBack() {
+        getContent('/proposal/getList');
+    }
+    //加载内容
+    var getContent = function (url, options) {
+        return App.getContentAjax(url, options).done(function (res) {
+            $(".page-content-body").html(res)
+        });
+    }
+
+    function getEO(){
+        var id = "$!{proposalId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/proposal/getEO",
+            data: {id: id}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(d.desc);
+                return;
+            }
+            var data = d.data;
+            curr.$id = "proposalForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            avalon.scan($("#proposalForm").get(0),curr.vm);
+            /*editor.html(data.content);*/
+            eweb.setHtml(data.content);
+        });
+    }
+
+</script>

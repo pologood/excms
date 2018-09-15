@@ -1,0 +1,141 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="formDictItem" ms-controller="formDictItem">
+                    <input type="hidden" name="itemId" ms-duplex="itemId" class="form-control" value=""></input>
+                    <input type="hidden" name="dataDicId" ms-duplex="dataDicId" class="form-control" value=""></input>
+
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>对应字典名称</label>
+                            <input type="text" class="form-control readonly"  disabled  name="dataDicName" placeholder="" readonly value="" ms-duplex="dataDicName">
+                        </div>
+
+                        <div class="form-group">
+                            <label>字典项名称</label>
+                            <input type="text" class="form-control" name="name" placeholder="" value="" ms-duplex="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>字典项编码</label>
+                            <input type="text" class="form-control" name="code" value="" readonly placeholder="" ms-duplex="code">
+                        </div>
+
+                        <div class="form-group">
+                            <label>value值</label>
+                            <input type="text" class="form-control" name="value" value="" placeholder="" ms-duplex="value">
+                        </div>
+
+                        <div class="form-group">
+                            <label>排序</label>
+                            <input type="number" class="form-control" name="sortNum" placeholder="" ms-duplex="sortNum" value="">
+                        </div>
+
+                        <div class="form-group">
+                            <label>设为默认值</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isDefault" value="1" ms-duplex-number="isDefault">
+                                    是 </label>
+                                <label class="radio-inline"><input type="radio" name="isDefault" value="0" ms-duplex-number="isDefault">
+                                    否 </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="description" rows="3" placeholder="" ms-duplex="description"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        vm: {}
+    };
+
+    var dialog = Ls.getWin.art, W = Ls.getWin.win, api = Ls.getWin.api;
+    jQuery(document).ready(function () {
+        var itemId =$!{ItemEO.itemId};
+        var dataDicId =$!{ItemEO.dataDicId};
+        var dictName = "$!{ItemEO.dataDicName}";
+        var name = "$!{ItemEO.name}";
+        var code = "$!{ItemEO.code}";
+        var value = '$!{ItemEO.value}';
+        var sortNum = "$!{ItemEO.sortNum}";
+        var isDefault = "$!{ItemEO.isDefault}";
+        var description = "$!{ItemEO.description}";
+        var data = {
+            itemId: itemId,
+            dataDicId: dataDicId,
+            dataDicName: dictName,
+            name: name,
+            code: code,
+            value: value,
+            sortNum: sortNum,
+            isDefault: isDefault,
+            description: description
+        };
+        data.$id = "formDictItem";
+
+        cur.vm = avalon.define(data);
+        avalon.scan($("#formDictItem").get(0),cur.vm);
+
+        api.button(
+            {
+                id: "save_btn",
+                name: "保 存",
+                focus: true,
+                callback: function () {
+                    $("#formDictItem").submit();
+                    return false;
+                }
+            }
+        )
+
+        //验证
+        $('#formDictItem').validator({
+            fields: {
+                'name': '字典名称:required',
+                'code': '字典编码:required',
+                'value': 'value值:required',
+                'sortNum': '排序:required;integer',
+            },
+            valid: function () {
+                saveItem();
+            }
+        });
+
+    })
+
+    var saveItem = function () {
+        var value = cur.vm.$model;
+        var data = Ls.toJSON(value);
+        Ls.ajax({
+            url: "/dictItem/updateItem",
+            data: data
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功！");
+		Ls.getWin.win.grid.reload();
+                Ls.winClose();
+            }
+        })
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+</script>

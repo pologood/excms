@@ -1,0 +1,117 @@
+<span class="hide"><script src="/content/hit/$eo.baseContentId"></script></span>
+<h1 class="newstitle">$eo.title</h1>
+<div class="newscontnet minh500">
+    <div class="lyzhuti"><span class="mesny_name"><font color="#333">[留言]</font>&nbsp;$eo.personName：</span><span class="mesny_date">#date_format(
+        "$eo.addDate","$!{paramObj.dateFormat}")</span>
+        <div class="clear"></div>
+        <div class="zhuticon">$eo.messageBoardContent</div>
+    </div>
+    #if($eo.dealStatus=="handled"||$eo.dealStatus=="replyed")
+        #set($replyEO=$resultObj.replyEO)
+        <div class="lyhuifu"> <span class="mesny_name"><font color="#333">[回复]</font>&nbsp;
+
+                #if("$replyEO.recType"=="0")
+                    #if($eo.ReplyUnitName!="")
+                        $eo.ReplyUnitName
+                    #elseif("$replyEO.receiveName"!="")
+                        $!{replyEO.receiveName}
+                    #end
+                #elseif("$replyEO.recType"=="1")
+                    #if($eo.ReplyUnitName!="")
+                        $eo.ReplyUnitName
+                    #elseif("$replyEO.receiveName"!="")
+                        $replyEO.username
+                    #else
+
+                    #end
+                #end：</span> <span class="mesny_date">#date_format("$replyEO.createDate","$!{paramObj.dateFormat}")</span>
+                <div class="clear"></div>
+                <div class="zhuticon">$replyEO.replyContent</div>
+
+        </div>
+        #if($resultObj.isAssess==1)
+            #if("$!{eo.commentName}"=="")
+                <div id="myComment">
+                    <form role="form" name="guestbook_comment" id="guestbook_comment" method="post" action="/frontGuestBook/saveComment">
+                        <div class="lymyd">
+                            <p>查询密码：</p>
+                            <p class="p4">
+                                <input name="randomCode" id="randomCode" type="text" maxlength="50">
+                            </p>
+                            <p class="p2">评价结果：
+                                #foreach($vo in $resultObj.commentList)
+                                    #if($eo.commentCode==$vo.code)
+                                        <label>
+                                            <input type="radio" name="commentCode" value="$vo.code" checked="checked">
+                                            $vo.key </label>
+                                    #else
+                                        <label>
+                                            <input type="radio" name="commentCode" value="$vo.code">
+                                            $vo.key </label>
+                                    #end
+                                #end
+                            </p>
+                            <p class="p3">
+                                <input id="btn_submit" class="btn btn-submit" type="button" accesskey="S" value="提交评价(S)">
+                                <input name="baseContentId" type="hidden" maxlength="50" value="$eo.baseContentId">
+                                <input name="docNum" type="hidden" maxlength="50" value="$eo.docNum">
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            #else
+                <div class="lymyd">
+                    <p>评价结果：<font color="#FF0000">$eo.commentName</font></p>
+                </div>
+            #end
+        #end
+    #else
+        <span style="color:#f00">暂未回复</span>
+    #end
+</div>
+<script type="text/html" id="comment_tpl">
+    <div class="lymyd">
+        <p>评价结果：<font color="#FF0000"> <?=data?></font></p>
+    </div>
+</script>
+<script>
+    $(document).ready(function () {
+
+        using("validator", function () {
+            $("#guestbook_comment").validator({
+                fields: {
+                    randomCode: "查询密码:required",
+                    commentCode: "评价结果:required"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-top',
+                timely: 1
+            });
+
+            var saveData = function () {
+                var data = $("#guestbook_comment").getFromJSON();
+                Ls.ajax({
+                    url: "/frontGuestBook/saveComment",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 0) {
+                        Ls.tipsInfo(d.desc);
+                    } else {
+                        Ls.tipsOk("评价成功!");
+                        var listHtml = template("comment_tpl", d);
+                        $("#myComment").html(listHtml);
+                    }
+                })
+            };
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#guestbook_comment").trigger("validate");
+        });
+
+    });
+
+</script>

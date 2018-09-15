@@ -1,0 +1,19 @@
+<table width="1136" border="0" cellspacing="0" cellpadding="0" class="bsgstab">
+    #set($Integer=0)
+    #set($length="$!{paramObj.length}")
+    #set($length=$Integer.parseInt($length))
+    #foreach($eo in $!{resultObj})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="")
+        #end
+        <tr class="$css">
+            <td width="185" height="48" align="left" valign="middle"><div class="nub">$!{eo.projNo}</div></td>
+            <td width="145" align="center" valign="middle">$!{eo.applyFromName}</td>
+            <td width="182" align="center" valign="middle">$!{eo.applyName}</td>
+            <td width="280" align="center" valign="middle">#cutstr($!{eo.projName},$length)</td>
+            <td width="140" align="center" valign="middle">#cut_date_format($!{eo.applyTime},"yyyyMMddHHmmss","$!{paramObj.dateFormat}")</td>
+            <td align="center" valign="middle">$!{eo.handleStateName}</td>
+        </tr>
+    #end
+</table>

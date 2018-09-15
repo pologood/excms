@@ -1,0 +1,18 @@
+    #set($Integer=0)
+    #set($length="$!{paramObj.length}")
+    #set($length=$Integer.parseInt($length))
+    <p id="ctab1" class="active">
+        受理：<span class="red" id="yesterday_app">$!{resultObj.YesterdayApplyNum}</span>件<span>·</span>
+        办结：<span class="red" id="yesterday_fin">$!{resultObj.YesterdayNum}</span>件<span>·</span>
+        在办：<span class="red" id="yesterday_doing"></span>件
+    </p>
+    <p id="ctab2">
+        受理：<span class="red"  id="lastmon_app">$!{resultObj.LastMonthApplyNum}</span>件<span>·</span>
+        办结：<span class="red"  id="lastmon_fin">$!{resultObj.LastMonthClosingNum}</span>件<span>·</span>
+        在办：<span class="red" id="lastmon_doing">$!{resultObj.LastMonthApplyNum}-$!{resultObj.LastMonthClosingNum}</span>件
+    </p>
+
+    <script>
+        $('#yesterday_doing').text($!{resultObj.YesterdayApplyNum}-$!{resultObj.YesterdayNum});
+        $('#lastmon_doing').text($!{resultObj.LastMonthApplyNum}-$!{resultObj.LastMonthClosingNum});
+    </script>

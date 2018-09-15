@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>样式按钮示例</title>
+<link rel="stylesheet" href="/assets/res/css/common.css">
+<link rel="stylesheet" href="/assets/res/css/icons.css">
+
+<style type="text/css">
+div * { vertical-align:middle}
+</style>
+</head>
+
+<body>
+<div style="margin:10px">
+<h1>图标样式示例</h1>
+<h2>1、引用css</h2>
+<pre>&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;/assets/res/css/icons.css&quot;/&gt;</pre>
+<h2>2、如何使用</h2>
+<p>可以使用span或a标记来创建，所有图标的大小均为<span class="red f14 b">20px × 20px</span>，如：</p>
+<pre>&lt;span class=&quot;icon_add&quot; title=&quot;新增&quot;&gt;&lt;/span&gt;</pre>
+<p>使用a标签的好处是当css样式加载失败时，仍然有文字代替</p>
+<pre>&lt;a href=&quot;javascript:void(0);&quot; class=&quot;icon_add&quot; title=&quot;新增&quot;&gt;新增&lt;/a&gt;</pre>
+<h2>3、统一图标样式的优势</h2>
+<ul>
+		<li>所有图标集中在一个图片文件上，易于维护和管理</li>
+		<li>减少http请求</li>
+</ul>
+<h2>4、图标样式 清单</h2>
+<p id="icon_list">&nbsp;</p>
+<h2>5、再接再励</h2>
+<p>希望团队人员能不断向我提供好的图标，以便于我补充到当前的图标库中</p>
+</div>
+
+<script src="/assets/core/jquery.min.js"></script>
+<script src="/assets/core/boot.js" debug="1" font-icon="1" miniui="1"></script>
+<script src="/app/common/js/config.js"></script>
+
+<script>
+
+$(window).load(function(){
+
+	
+	function addIcon(_name,_num){
+		if(!_num){
+			_num=20;	
+		}
+		
+		var spanStr=""
+		for(var i=0; i<_num; i++){
+			//var span = document.createElement("span");
+			
+			var span = '<span class="'; 
+			var css = _name;	
+			if(i>0){
+				css = _name+i;	
+			}
+			span += css + '" title="'+css+'" style="margin:5px"></span>';
+			spanStr += span;
+		}
+		
+		$("#icon_list").append("<div>"+_name + ":"+spanStr+"</div>");	
+	}
+	
+	addIcon("icon_add",20);
+	addIcon("icon_edit");
+	addIcon("icon_del");
+	addIcon("icon_user");
+	addIcon("icon_flag");
+	addIcon("icon_up");
+	addIcon("icon_down");
+	addIcon("icon_pic_gray");
+	addIcon("icon_pic");
+	addIcon("icon_site");
+	addIcon("icon_commit");
+	addIcon("icon_check");
+	addIcon("icon_checked");
+	addIcon("icon_checked_d");
+	addIcon("icon_count");
+	addIcon("icon_usergroup");
+	addIcon("icon_larrow");
+	addIcon("icon_rarrow");
+	addIcon("icon_mail");
+	addIcon("icon_help");
+	addIcon("icon_info");
+	addIcon("icon_arrow");
+	addIcon("icon_sound");
+	addIcon("icon_setting");
+	addIcon("icon_seach");
+	addIcon("icon_reload");
+	addIcon("icon_home");
+	addIcon("icon_user");
+	addIcon("icon_folder");
+	addIcon("icon_lock");
+	addIcon("icon_unlock");
+	addIcon("icon_ok");
+	addIcon("icon_error");
+	
+	
+
+	//Lonsun.ui.tipped.create("span[class^='icon_']");
+	//Lonsun.string.highlight.snippet("pre","html");
+	
+});
+
+</script>
+
+
+</body>
+</html>

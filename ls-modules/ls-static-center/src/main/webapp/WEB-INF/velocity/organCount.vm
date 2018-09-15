@@ -1,0 +1,72 @@
+<div id="organCount_chart_$!{paramObj.siteId}" style="width:750px;height:446px"></div>
+<script src="$!{frontStaticPath}/assets/js/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+    // 路径配置
+    require.config({
+        paths: {
+            echarts: '$!{frontStaticPath}/assets/js/echarts'
+        }
+    });
+
+    require(
+            [
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie'
+            ],
+            function (ec) {
+                var divId = document.getElementById('organCount_chart_$!{paramObj.siteId}');
+                var d = $!{resultObj.data};
+                if (!d || d.length == 0) {
+                    $(divId).html($!{paramObj.result});
+                    return;
+                }
+                var chartsData = [];
+                var chartsUnit = [];
+                if (d != null && d.length > 0) {
+                    for (var i = 0, l = d.length; i < l; i++) {
+                        chartsData[i] = d[i].count;
+                        chartsUnit[i] = d[i].organName;
+                    }
+                }
+                chartsData.reverse();
+                chartsUnit.reverse();
+
+                var option = {
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    toolbox: {
+                        show: false
+                    },
+                    grid: {
+                        x: 100,
+                        y: 50
+                    },
+                    calculable: true,
+                    xAxis: [
+                        {
+                            type: 'value',
+                            boundaryGap: [0, 0.01]
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'category',
+                            data: chartsUnit
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '发布量',
+                            type: 'bar',
+                            data: chartsData
+                        }
+                    ]
+                };
+
+                var chart = ec.init(divId);
+                chart.setOption(option);
+            });
+</script>

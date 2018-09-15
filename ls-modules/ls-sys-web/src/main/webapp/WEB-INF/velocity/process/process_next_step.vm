@@ -1,0 +1,814 @@
+#parse("_page_layout/_header.vm")
+<link rel="stylesheet" href="/assets/goa/res/css/common.css">
+<link rel="stylesheet" href="/assets/goa/res/app/common/css/common.css">
+<link rel="stylesheet" href="/assets/goa/res/css/icons.css">
+<style type="text/css">
+    body {
+        font-size: 14px !important;
+    }
+
+    .tdlabel {
+        font-weight: 700;
+        width: 80px;
+    }
+
+    .fixM {
+        vertical-align: middle;
+    }
+</style>
+<body style="background-color: inherit;">
+
+<!-- topNav -->
+<div id="mainBody">
+    <div class="form-con">
+        <form name="form1" id="form1" class="pt5" action="">
+            <table class="tform w100p">
+                <tbody>
+                <tr>
+                    <td class="tdlabel">下一步骤：</td>
+                    <td valign="top" colspan="3">
+                        <!-- ko foreach: elementId -->
+                        <input class="fixM" name="elementId" type="radio"
+                               data-bind="checked:$data.elementId,checkedValue:$data.elementId,attr{id:'radio_'+$index(),'data-name':$data.name,'participation':$data.participation}"/>
+                        <label data-bind="text:$data.name,attr{'for':'radio_'+$index()}"></label>
+                        <!-- /ko -->
+                    </td>
+                </tr>
+                <tr id="trTransactType">
+                    <td class="tdlabel">审批方式：</td>
+                    <td valign="top" colspan="3">
+            <span id="single" class="dn">
+              <input name="transactType" type="radio" value="single" data-bind="checked:transactType,checkedValue:'single'"/>
+              <label>单人审批</label>
+            </span>
+                        <span id="serial" class="dn">
+              <input name="transactType" type="radio" value="serial" data-bind="checked:transactType,checkedValue:'serial'"/>
+              <label>串联审批</label>
+            </span>
+                        <span id="parallel" class="dn">
+              <input name="transactType" type="radio" value="parallel" data-bind="checked:transactType,checkedValue:'parallel'"/>
+              <label>并联审批</label>
+            </span>
+                    </td>
+                </tr>
+                <tr id="trPersonNames">
+                    <td class="tdlabel">办理人：</td>
+                    <td valign="top">
+                        <textarea name="personNames" id="personNames" class="w98p h100 text-disabled" readonly></textarea>
+                    </td>
+                    <td>
+                        <select name="select" id="allAssignee" size="5" multiple class="h105 dn" style="min-width:80px;"></select>
+                    </td>
+                    <td class="pl5 dn" id="tdSelect">
+                        <button class="btn22_gray f14 h30 mr5" type="button" onclick="CUR.fn.select()"> 选择</button>
+                    </td>
+                </tr>
+
+                <tr id="trRemind" class="dn">
+                    <td class="tdlabel">提示：</td>
+                    <td valign="top" colspan="3">
+                        <font color="red">请双击右侧选择框中名称进行"选择"或"取消选择"办理人</font>
+                    </td>
+                </tr>
+                <tr class="dn" id="trDuedate">
+                    <td class="tdlabel">办理期限：</td>
+                    <td valign="top" colspan="3">
+                        <input type="text" name="duedate" id="duedate" class="text w100 text-disabled wdate" onfocus="WdatePicker({minDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd'})"
+                               readonly>
+                    </td>
+                </tr>
+                <!--<tr id="trAgency">
+                    <td class="tdlabel">&nbsp;&nbsp;</td>
+                    <td valign="top" colspan="3">
+                        <input id="Agency_0" type="checkbox" value="1" data-bind="checked: isAgency,checkedValue:1"/>
+                        <label for="Agency_0">代填</label>
+                    </td>
+                    <td class="pl5"></td>
+                </tr>-->
+                <!--tr id="trSmsRemind">
+                  <td class="tdlabel">短信提醒：</td>
+                  <td colspan="3">
+                    <input id="smsRemind_0" type="checkbox" value="1" data-bind="checked: smsRemind,checkedValue:1"/>
+                    <label for="smsRemind_0">是</label>
+                    <input id="smsRemind_1" type="checkbox" value="0" data-bind="checked: smsRemind,checkedValue:0"/>
+                    <label for="smsRemind_1">否</label>
+                  </td-->
+                </tr>
+                </tbody>
+            </table>
+            <button id="doSubmit" type="submit" class="dn">确定</button>
+        </form>
+
+    </div>
+</div>
+<!-- mainBody -->
+    #parse("_page_layout/_footer.vm")
+<script src="/assets/goa/res/mvc/knockout/2.3.0/jquery.tmpl.js?v=2.3.0"></script>
+<script src="/assets/goa/res/mvc/knockout/2.3.0/knockout.js?v=2.3.0"></script>
+<script src="/assets/goa/res/mvc/knockout/2.3.0/knockout.mapping.js?v=2.3.0"></script>
+<script src="/assets/goa/res/mvc/knockout/2.3.0/jquery.livequery.js?v=2.3.0"></script>
+<script src="/assets/goa/res/mvc/knockout/2.3.0/knockout.multimodels.min.js?v=2.3.0"></script>
+<script>
+    // 配置当前页面所有ajax默认的访问地址
+    Ls.ajax.url = '/';
+    var CUR = {
+        viewModel: {},
+        fn: {},
+        controller: {
+            process: Ls.ajax.url + 'process/'
+        },
+        action: {
+            getStartNextActivities: 'getStartNextActivities',
+            getNextActivities: 'getNextActivities',
+            processStart: 'processStart',
+            processRun: 'processRun',
+            processComplete: 'processComplete',
+            getTaskIsComplete: 'getTaskIsComplete'
+        },
+        el: {},
+        params: {
+            processId: '$!{processId}',
+            startFlow: '$!{startFlow}',
+            elementId: '$!{elementId}',
+            taskId: '$!{taskId}'
+        },
+        dg: Ls.getWin.api,
+        pWin: Ls.getWin.win,
+        page: {},
+        recRoles: [],
+        processStarter: []
+    };
+
+    jQuery(document).ready(function () {
+        // 获取页面加载提示对象
+        CUR.el.loading = $("#pageLoading");
+        CUR.form = $('#form1');
+        CUR.trTransactType = $("#trTransactType");//办理方式
+        CUR.trPersonNames = $("#trPersonNames");//办理人
+        CUR.trDuedate = $("#trDuedate");//办理时限
+        CUR.trAgency = $("#trAgency");//是否代填
+        CUR.trSmsRemind = $("#trSmsRemind");//提醒方式
+        CUR.allAssignee = $("#allAssignee");//备选人员
+        CUR.trRemind = $("#trRemind");//备选人员选择提示
+        CUR.single = $("#single");//单人审批方式
+        CUR.serial = $("#serial");//串联审批方式
+        CUR.parallel = $("#parallel");//并联审批方式
+        CUR.duedate = $("#duedate");//办理时限
+        CUR.personNames = $("#personNames");//办理对象名称
+        CUR.tdSelect = $("#tdSelect");//选择按钮单元格
+        var W = Ls.getWin.win, api = Ls.getWin.api;
+        api.button({
+            id: "do_submit",
+            name: "确定",
+            focus: true,
+            callback: function () {
+                CUR.fn.save();
+                return false;
+            }
+        });
+        CUR.fn.getList();
+        CUR.fn.eventBind();
+    });
+
+
+    CUR.fn.getList = function () {
+        var url = CUR.controller.process + CUR.action.getNextActivities;
+        var postData = {};
+        if (hasPWinformData()) {
+            postData = CUR.pWin.CUR_PROCESS.formData;
+        }
+        postData.elementId = CUR.params.elementId;
+        postData.taskId = CUR.params.taskId;
+        Ls.ajax({
+            type: "POST",
+            data: postData,
+            url: url,
+            success: function (json) {
+                var newData = {
+                    elementId: json,
+                    isAgency: 0,//是否代填
+                    smsRemind: 0,//短信提醒
+                    transactType: '',
+                    receivers: '',
+                    recRoles: '',
+                    recOrgans: ''
+                }
+                CUR.jsonModel = json;
+                CUR.viewModel = ko.mapping.fromJS(newData);
+                ko.applyBindings(CUR.viewModel);
+                var ipt = $("input[name='elementId']").on('change', function () {
+                    activityChange(this.value);
+                });
+                //下一步骤 默认选中第一个活动
+                ipt[0].checked = true;
+                activityChange(ipt[0].value);
+            }
+        });
+    };
+
+    //获取指定的活动对象
+    function getActivity(elementId) {
+        var data = CUR.jsonModel.data;
+        for (var i = 0; i < data.length; i++) {
+            var el = data[i];
+            if (elementId == el.elementId) {
+                return el;
+            }
+        }
+        return '';
+    }
+
+    //多个活动切换
+    function activityChange(elementId) {
+        CUR.activity = getActivity(elementId);
+        //结束活动
+        if (CUR.activity.isEndActivity == 1) {
+            CUR.trTransactType.hide();
+            CUR.trPersonNames.hide();
+            CUR.trDuedate.hide();
+            CUR.trAgency.hide();
+            CUR.trSmsRemind.hide();
+            CUR.allAssignee.hide();
+            CUR.trRemind.hide();
+            return;
+        } else {
+            CUR.trTransactType.show();
+            CUR.trPersonNames.show();
+            CUR.trAgency.show();
+            CUR.trSmsRemind.show();
+        }
+        //审批方式切换
+        CUR.viewModel.transactType('');
+        if (CUR.activity.hasTransact) {
+            var transactScope = CUR.activity.transactScope;
+            if (transactScope.indexOf('single') > -1) {
+                if (Ls.isEmpty(CUR.viewModel.transactType())) {
+                    CUR.viewModel.transactType('single');
+                }
+                CUR.single.show();
+            } else {
+                CUR.single.hide();
+            }
+            if (transactScope.indexOf('serial') > -1) {
+                if (Ls.isEmpty(CUR.viewModel.transactType())) {
+                    CUR.viewModel.transactType('serial');
+                }
+                CUR.serial.show();
+            } else {
+                CUR.serial.hide();
+            }
+            if (transactScope.indexOf('parallel') > -1) {
+                if (Ls.isEmpty(CUR.viewModel.transactType())) {
+                    CUR.viewModel.transactType('parallel');
+                }
+                CUR.parallel.show();
+            } else {
+                CUR.parallel.hide();
+            }
+            CUR.trTransactType.show();
+        } else {//如果不显示审批方式则选中单人审批
+            CUR.single.hide();
+            CUR.serial.hide();
+            CUR.parallel.hide();
+            CUR.trTransactType.hide();
+            CUR.viewModel.transactType('single');
+        }
+        //是否代填切换
+        if (CUR.activity.canAgent) {
+            CUR.trAgency.show();
+        } else {
+            CUR.trAgency.hide();
+            CUR.viewModel.isAgency(0);
+        }
+        //办理时限切换
+        if (CUR.activity.isLimit) {
+            CUR.trDuedate.show();//办理时限输入框显示
+        } else {
+            CUR.trDuedate.hide();//办理时限输入框隐藏
+            CUR.duedate.val('');//办理时限输入框清空
+        }
+        //办理人清空
+        CUR.personNames.val('');
+        CUR.viewModel.receivers('');
+        CUR.viewModel.recOrgans('');
+        CUR.viewModel.recRoles('');
+
+        //是否显示选择按钮
+        if (CUR.activity.isNeedSelect) {
+            CUR.tdSelect.show();
+        } else {
+            CUR.tdSelect.hide();
+        }
+        //参与者类型切换
+        var handlePersons = CUR.activity.handlePersons;
+        var participation = CUR.activity.participation;//参与者类型
+        CUR.fn.loadHandlePerson(handlePersons);
+//        if (participation == 'promoter' || participation == 'candidate') {//发起人/候选用户
+//            var handlePersons = CUR.activity.handlePersons;
+//            CUR.fn.loadHandlePerson(handlePersons);
+//        } else if (participation == 'dept') {//部门
+//            var handleOrgans = CUR.activity.handleOrgans;
+//            CUR.fn.loadHandleDept(handleOrgans);
+//        } else if (participation == 'role') {//角色
+//            var handleRoles = CUR.activity.handleRoles;
+//            if (!CUR.activity.isNeedSelect) {//不显示选择按钮时加载角色
+//                CUR.fn.loadHandleRole(handleRoles);
+//            } else {
+//                CUR.allAssignee.hide();
+//                CUR.trRemind.hide();
+//            }
+//        } else {
+//            CUR.allAssignee.hide();
+//            CUR.trRemind.hide();
+//        }
+    }
+
+    //加载办理人
+    CUR.fn.loadHandlePerson = function (handlePersons) {
+        if (handlePersons && handlePersons.length > 0) {
+            if (handlePersons.length == 1) {
+                CUR.personNames.val(handlePersons[0].personName);
+                CUR.viewModel.receivers(handlePersons);
+                CUR.allAssignee.hide();
+                CUR.trRemind.hide();
+            } else {
+                var html = '';
+                for (var i = 0; i < handlePersons.length; i++) {
+                    html += "<option data-id='" + handlePersons[i].userId + "' data-type='person' >" + handlePersons[i].personName + "</option>"
+                }
+                CUR.allAssignee.html(html);
+                CUR.allAssignee.show();
+                CUR.trRemind.show();
+            }
+        } else {
+            CUR.allAssignee.html('');
+            CUR.allAssignee.hide();
+            CUR.trRemind.hide();
+        }
+    }
+
+    //加载办理部门
+    CUR.fn.loadHandleDept = function (handleOrgans) {
+        if (handleOrgans && handleOrgans.length > 0) {
+            if (handleOrgans.length == 1) {
+                CUR.personNames.val(handleOrgans[0].organName + '[' + handleOrgans[0].unitName + ']');
+                CUR.viewModel.recOrgans(handleOrgans);
+                CUR.allAssignee.hide();
+                CUR.trRemind.hide();
+            } else {
+                var html = '';
+                for (var i = 0; i < handleOrgans.length; i++) {
+                    html += "<option data-id='" + handleOrgans[i].organId + "' data-type='dept' title='" + handleOrgans[i].organName + '[' + handleOrgans[i].unitName + ']' + "'>" + handleOrgans[i].organName + '[' + handleOrgans[i].unitName + ']' + "</option>"
+                }
+                CUR.allAssignee.html(html);
+                CUR.allAssignee.show();
+                CUR.trRemind.show();
+            }
+        } else {
+            CUR.allAssignee.html('');
+            CUR.allAssignee.hide();
+            CUR.trRemind.hide();
+        }
+    }
+
+    //加载办理角色
+    CUR.fn.loadHandleRole = function (handleRoles) {
+        if (handleRoles && handleRoles.length > 0) {
+            if (handleRoles.length == 1) {
+                CUR.personNames.val(handleRoles[0].roleName + '[' + handleRoles[0].unitName + ']');
+                CUR.viewModel.recRoles(handleRoles);
+                CUR.allAssignee.hide();
+                CUR.trRemind.hide();
+            } else {
+                var html = '';
+                for (var i = 0; i < handleRoles.length; i++) {
+                    html += "<option data-id='" + handleRoles[i].roleId + "&" + handleRoles[i].unitId + "' data-type='role' title='" + handleRoles[i].roleName + '[' + handleRoles[i].unitName + ']' + "'>" + handleRoles[i].roleName + '[' + handleRoles[i].unitName + ']' + "</option>"
+                }
+                CUR.allAssignee.html(html);
+                CUR.allAssignee.show();
+                CUR.trRemind.show();
+            }
+        } else {
+            CUR.allAssignee.html('');
+            CUR.allAssignee.hide();
+            CUR.trRemind.hide();
+        }
+    }
+
+    function goUrl() {
+        window.location.replace(location.href);
+    }
+
+
+    //选择
+    CUR.fn.select = function () {
+        var participation = $("input[name='elementId']:checked").attr("participation");//参与者类型(本单位用户/跨单位用户/指定角色/候选用户)
+        if (participation == 'role' || participation == 'roleUser') {//角色或者角色用户
+            CUR.fn.selectRole(participation);
+        } else if (participation == 'dept') {//指定部门
+            CUR.fn.selectOrgan();
+        } else {
+            CUR.fn.selectUser(participation);
+        }
+    }
+
+    //选择角色
+    CUR.fn.selectRole = function (participation) {
+        var elementId = $("input[name='elementId']:checked").val();
+        var activity = getActivity(elementId);
+        var roleIds = Ls.isEmpty(activity.assigneeId) ? '' : activity.assigneeId;
+        var unitIds = Ls.isEmpty(activity.assigneeOrgId) ? '' : activity.assigneeOrgId;
+        var scope = 'roleUser' == participation ? 1 : 0;
+        Ls.openSelectRolesWin2(function (arg) {
+            Ls.log.add("arg>>>");
+            Ls.log.add(arg);
+            if (arg && $.type(arg) == "object") {
+                if ('roleUser' == participation) {
+                    CUR.viewModel.receivers($.parseJSON(JSON.stringify(arg.list)));
+                    CUR.personNames.val(arg.names);
+                } else {
+                    CUR.viewModel.recRoles($.parseJSON(JSON.stringify(arg.list)));
+                    CUR.personNames.val(arg.names);
+                }
+            }
+        }, {
+            scope: scope,
+            roleIds: roleIds,
+            unitIds: unitIds,
+            returnValueType: 'json',
+            scopeType: CUR.viewModel.transactType() == 'single' ? 'single' : 'multi',
+            data: {
+                list: scope = 'roleUser' ? CUR.viewModel.receivers() : CUR.viewModel.recRoles()
+            }
+        });
+    }
+
+    //选择人员
+    CUR.fn.selectUser = function (participation) {
+        var organIds = '';
+        if (!Ls.isEmpty(participation) && participation == 'inDepUser') {
+            organIds = '$!{unitId}';
+        }
+        /*var list = [{
+            id : 2314880,
+            name : '张超',
+            userId : 2314880,
+            personId : 2314881,
+            personName : '张超',
+            organId : 15005,
+            organName : '信息中心',
+            unitId : 15002,
+            unitName : '中国合肥',
+        }];
+        CUR.viewModel.receivers($.parseJSON(JSON.stringify(list)));
+        CUR.personNames.val('张超');*/
+        Ls.selectUnitUser(function (arg, iframe) {
+            Ls.log("arg>>>");
+            if (arg && $.type(arg) == "object") {
+                CUR.viewModel.receivers($.parseJSON(JSON.stringify(arg.list)));
+                CUR.personNames.val(arg.name);
+            }
+        }, {
+            scope: 0,
+            scopeType: CUR.viewModel.transactType() == 'single' ? 'single' : 'multi',
+            organIds: organIds,
+            data: {
+                list: CUR.viewModel.receivers()
+            }
+        });
+    }
+
+    //选择部门
+    CUR.fn.selectOrgan = function () {
+        Ls.openSelectUnitUserWin2(function (arg) {
+            Ls.log("arg>>>");
+            Ls.log(arg);
+            if (arg && $.type(arg) == "object") {
+                CUR.viewModel.recOrgans($.parseJSON(JSON.stringify(arg.list)));
+                CUR.personNames.val(arg.name);
+            }
+        }, {
+            scope: 1,
+            scopeType: CUR.viewModel.transactType() == 'single' ? 'single' : 'multi',
+            data: {
+                list: CUR.viewModel.recOrgans()
+            }
+        });
+    }
+
+    //确定
+    CUR.fn.save = function () {
+        var data = ko.mapping.toJS(CUR.viewModel);
+        data.elementId = $("input[name='elementId']:checked").val();//下一个活动ID
+        var nextActivity = getActivity(data.elementId);//下一个活动
+        var url = CUR.controller.process;
+        if (nextActivity.isEndActivity) {//办结流程
+            data.taskId = CUR.params.taskId;
+            data.activityId = CUR.params.elementId;//当前活动ID
+            url += CUR.action.processComplete;
+        } else {
+            data.nextActivityName = nextActivity.name;//下一个活动的名称
+            data.participation = nextActivity.participation;//参与者类型
+            data.transactType == null && (data.transactType = 'single');//办理方式
+            data.activityId = CUR.params.elementId;//当前活动ID
+            data.canPeriodicAgent = nextActivity.canPeriodicAgent;//是否允许发起人代理
+            var duedate = $("#duedate").val();//办理时限
+            if (!Ls.isEmpty(duedate)) {
+                data.duedate = duedate;
+            }
+
+            if (data.participation == 'role') {//指定角色
+                if (data.recRoles.length == 0) {
+                    Ls.tipsErr("请选择办理角色");
+                    return;
+                }
+                if (data.transactType == 'single') {
+                    if (data.recRoles.length > 1) {
+                        Ls.tipsErr('单人办理只能选取一个角色');
+                        return;
+                    }
+                }
+                data.recRoles = JSON.stringify(data.recRoles);
+            } else if (data.participation == 'dept') {//指定部门办理
+                if (data.recOrgans.length == 0) {
+                    Ls.tipsErr("请选择办理部门");
+                    return;
+                }
+                if (data.transactType == 'single') {
+                    if (data.recOrgans.length > 1) {
+                        Ls.tipsErr('单人办理只能选取一个部门');
+                        return;
+                    }
+                }
+                data.recOrgans = JSON.stringify(data.recOrgans);
+            } else { //办理人
+                if (data.receivers.length == 0) {
+                    Ls.tipsErr("请选择办理人");
+                    return;
+                }
+                if (data.transactType == 'single') {
+                    if (data.receivers.length > 1) {
+                        Ls.tipsErr('单人办理只能选取一个办理人');
+                        return;
+                    }
+                }
+                data.receivers = JSON.stringify(data.receivers);
+            }
+            if (1 == CUR.params.startFlow) {
+                url += CUR.action.processStart;
+                data.processId = CUR.params.processId;
+            } else {
+                url += CUR.action.processRun;
+                data.taskId = CUR.params.taskId;
+            }
+        }
+        //父表单页面数据
+        var newData = data;
+        if (hasPWinformData()) {
+            var pformData = CUR.pWin.CUR_PROCESS.formData;
+            newData = $.extend(true, pformData, data);
+        }
+        Ls.log(newData);
+        Ls.ajax({
+            type: "POST",
+            data: newData,
+            url: url,
+            success: function (json) {
+                if (json.status == 0) {
+                    Ls.tipsErr(json.desc);
+                } else {
+                    Ls.tipsOk("提交成功", function () {
+                        CUR.fn.close();
+                        try {
+                            CUR.pWin.reloadData();
+                        } catch (e) {
+                        }
+                    });
+
+                }
+            }
+        });
+    };
+
+    CUR.fn.close = function () {
+        try {
+            CUR.pWin.opener.cur.grid.reload();
+        } catch (e) {
+        }
+        try {
+            if (CUR.pWin.opener.cur.fn.reload) {
+                CUR.pWin.opener.cur.fn.reload();
+            }
+        } catch (e) {
+        }
+        try {
+            if (1 != CUR.params.startFlow) {
+                CUR.pWin.close();
+            }
+        } catch (e) {
+        }
+        CUR.dg.close();
+    }
+
+    function hasPWinformData() {
+        return CUR.pWin && CUR.pWin.CUR_PROCESS && CUR.pWin.CUR_PROCESS.formData;
+    }
+
+    CUR.fn.eventBind = function () {
+        CUR.allAssignee.on('dblclick', function () {
+            var that = $(this);
+            if (that.find("option:selected").length > 0) {
+                var id = '', type = '';
+                var receivers = CUR.viewModel.receivers(), receiverArray = new Array();
+                var recOrgans = CUR.viewModel.recOrgans(), recOrganArray = new Array();
+                var recRoles = CUR.viewModel.recRoles(), recRoleArray = new Array();
+                for (var i = 0, length = receivers.length; i < length; i++) {
+                    receiverArray.push(receivers[i]);
+                }
+                for (var i = 0, length = recOrgans.length; i < length; i++) {
+                    recOrganArray.push(recOrgans[i]);
+                }
+                for (var i = 0, length = recRoles.length; i < length; i++) {
+                    recRoleArray.push(recRoles[i]);
+                }
+                that.find("option:selected").each(function (i) {
+                    var that_ = $(this);
+                    id = that_.attr("data-id");
+                    type = that_.attr("data-type");
+                    var handler;
+                    if ('person' == type) {//人
+                        if (!personIsExist(receiverArray, id)) {
+                            handler = CUR.fn.getSelectedHandlerFromCURActivity(type, id);
+                            if (CUR.viewModel.transactType() == 'single') {
+                                receiverArray = new Array();
+                            }
+                            receiverArray.push(handler);
+                        } else {
+                            removePerson(receiverArray, id);
+                        }
+                        var personNames = '';
+                        for (var i = 0; i < receiverArray.length; i++) {
+                            personNames += receiverArray[i].personName + ",";
+                        }
+                        if (personNames.length > 0) {
+                            personNames = personNames.substring(0, personNames.length - 1);
+                        }
+                        CUR.personNames.val(personNames);
+                        CUR.viewModel.receivers(receiverArray);
+
+                    } else if ('dept' == type) {//部门
+                        if (!deptIsExist(recOrganArray, id)) {
+                            handler = CUR.fn.getSelectedHandlerFromCURActivity(type, id);
+                            if (CUR.viewModel.transactType() == 'single') {
+                                recOrganArray = new Array();
+                            }
+                            recOrganArray.push(handler);
+                        } else {
+                            removeDept(recOrganArray, id);
+                        }
+                        var personNames = '';
+                        for (var i = 0; i < recOrganArray.length; i++) {
+                            personNames += recOrganArray[i].organName + '[' + recOrganArray[i].unitName + ']' + ",";
+                        }
+                        if (personNames.length > 0) {
+                            personNames = personNames.substring(0, personNames.length - 1);
+                        }
+                        CUR.personNames.val(personNames);
+                        CUR.viewModel.recOrgans(recOrganArray);
+                    } else if ('role' == type) {//角色
+                        if (!roleIsExist(recRoleArray, id)) {
+                            handler = CUR.fn.getSelectedHandlerFromCURActivity(type, id);
+                            if (CUR.viewModel.transactType() == 'single') {
+                                recRoleArray = new Array();
+                            }
+                            recRoleArray.push(handler);
+                        } else {
+                            removeRole(recRoleArray, id);
+                        }
+                        var personNames = '';
+                        for (var i = 0; i < recRoleArray.length; i++) {
+                            personNames += recRoleArray[i].roleName + '[' + recRoleArray[i].unitName + ']' + ",";
+                        }
+                        if (personNames.length > 0) {
+                            personNames = personNames.substring(0, personNames.length - 1);
+                        }
+                        CUR.personNames.val(personNames);
+                        CUR.viewModel.recRoles(recRoleArray);
+                    }
+                })
+            }
+            that = null;
+        });
+
+        //从当前活动设置中获取选中的办理对象
+        CUR.fn.getSelectedHandlerFromCURActivity = function (type, id) {
+            if (type == 'person') {
+                var handlePerson = CUR.activity.handlePersons;
+                for (var i = 0; i < handlePerson.length; i++) {
+                    if (handlePerson[i].userId == id) {
+                        return handlePerson[i];
+                    }
+                }
+            } else if (type == 'dept') {
+                var handleOrgans = CUR.activity.handleOrgans;
+                for (var i = 0; i < handleOrgans.length; i++) {
+                    if (handleOrgans[i].organId == id) {
+                        return handleOrgans[i];
+                    }
+                }
+            } else if (type == 'role') {
+                var handleRoles = CUR.activity.handleRoles;
+                var ids = id.split("&");
+                var roleId = ids[0], unitId = ids[1];
+                for (var i = 0; i < handleRoles.length; i++) {
+                    if (handleRoles[i].roleId == roleId && handleRoles[i].unitId == unitId) {
+                        return handleRoles[i];
+                    }
+                }
+            }
+        }
+
+
+        function personIsExist(receivers, userId) {
+            if (receivers) {
+                for (var i = 0; i < receivers.length; i++) {
+                    if (receivers[i].userId == userId) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function deptIsExist(recOrgans, organId) {
+            if (recOrgans) {
+                for (var i = 0; i < recOrgans.length; i++) {
+                    if (recOrgans[i].organId == organId) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function roleIsExist(recRoles, id) {
+            if (recRoles) {
+                var ids = id.split('&');
+                var roleId = ids[0], unitId = ids[1];
+                for (var i = 0; i < recRoles.length; i++) {
+                    if (recRoles[i].roleId == roleId && recRoles[i].unitId == unitId) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function removePerson(receivers, userId) {
+            if (receivers) {
+                for (var i = 0; i < receivers.length; i++) {
+                    if (receivers[i].userId == userId) {
+                        receivers.remove(i)
+                    }
+                }
+            }
+        }
+
+        function removeDept(recOrgans, organId) {
+            if (recOrgans) {
+                for (var i = 0; i < recOrgans.length; i++) {
+                    if (recOrgans[i].organId == organId) {
+                        recOrgans.remove(i)
+                    }
+                }
+            }
+        }
+
+        function removeRole(recRoles, id) {
+            if (recRoles) {
+                var ids = id.split('&');
+                var roleId = ids[0], unitId = ids[1];
+                for (var i = 0; i < recRoles.length; i++) {
+                    if (recRoles[i].roleId == roleId && recRoles[i].unitId == unitId) {
+                        recRoles.remove(i);
+                    }
+                }
+            }
+        }
+
+        Array.prototype.remove = function (dx) {
+            if (isNaN(dx) || dx > this.length) {
+                return false;
+            }
+            for (var i = 0, n = 0; i < this.length; i++) {
+                if (this[i] != this[dx]) {
+                    this[n++] = this[i]
+                }
+            }
+            this.length -= 1;
+        }
+
+    }
+</script>
+</body>
+</html>

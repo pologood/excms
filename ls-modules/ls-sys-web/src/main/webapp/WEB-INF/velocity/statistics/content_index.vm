@@ -1,0 +1,227 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+
+            #*<h3 class="page-title"> 发文统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-line-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_today">0</span>
+                            </div>
+                            <div class="desc"> 今日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_yesterday">0</span>
+                            </div>
+                            <div class="desc"> 昨日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_week">0</span>
+                            </div>
+                            <div class="desc"> 本周发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-area-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_month">0</span>
+                            </div>
+                            <div class="desc">本月发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-pie-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_history">0</span>
+                            </div>
+                            <div class="desc">历史发文</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>*#
+            <h3 class="page-title">
+                部门发文统计
+                <small></small>
+            </h3>
+            <div region="center" style="border:none; overflow: auto;">
+                <div class="portlet light">
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    #*<div class="btn-group">
+                                    <button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="exportOrganList()"> 导 出
+                                        </button>
+                                        <button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="detailExcel()"> 详情
+                                        </button>
+                                    </div>*#
+                                </div>
+                                <div class="col-md-10">
+                                    <form class="form-inline tr search-toolbar" role="form" id="searchListForOrgan_form">
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" name="startTime" id="startTime" class="form-control"
+                                                   placeholder="起始时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d %H:%m:%s\'}',readOnly:true})"
+                                                   readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" name="endTime" id="endTime" class="form-control" placeholder="结束时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startTime\')}',maxDate:'%y-%M-%d %H:%m:%s',readOnly:true})"
+                                                   readonly>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-search" onclick="searchListForOrgan(this.form)">查询</button>
+                                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClearForOrgan(this.form)">显示全部</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        #*<div id="organTj_datagrid" class="mini-treegrid"  align="center" showTreeIcon="true"
+                             url="" idField="columnId" parentField="parentId" treeColumn="columnName" onbeforeload="onBeforeTreeLoad" style="width:100%;height:1200px">*#
+                        <div id="organTj_datagrid" class="mini-treegrid"  align="center" showTreeIcon="true"
+                             url="" idField="COLUMNID" parentField="PARENTID" treeColumn="columnName" onbeforeload="onBeforeTreeLoad" style="width:100%;height:1200px">
+                        #*<div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                            ##<div field="organId" width="100" headerAlign="center" align="center">部门ID</div>
+                                <div name="CATALOGNAME" field="CATALOGNAME" width="100%" headerAlign="center" align="center">目录名称</div>
+
+                                <div field="TOTALCOUNT" width="120" headerAlign="center" allowSort="flase" align="center">合计</div>
+                            </div>*#
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        mini.parse();
+        var chartsData = [];
+        var chartsUnit = [];
+        var chartsTime = 'today';
+        var chartsData1 = [];
+        var chartsData2 = [];
+        var chartsData3 = [];
+        var chartsData4 = [];
+        var chartsData5 = [];
+
+        var cur = {
+            organTj_datagrid: null,
+            startTime: $("#startTime").val(),
+            endTime: $("#endTime").val(),
+            columnIds:'2653902,2966397,6200375,6202988,6204119'
+//            columnIds:'4133716,4133720,4133739,4133743'
+
+        }
+        $(document).ready(function () {
+            mini.parse();
+
+//        cur.organTj_datagrid = new mini.TreeGrid();
+            cur.organTj_datagrid = mini.get("organTj_datagrid");
+            console.log(cur.organTj_datagrid);
+            cur.organTj_datagrid.setUrl("/statistics/getContentStatis?columnIds="+cur.columnIds);
+
+//        cur.organTj_datagrid.load();
+
+            setGridColumn();
+
+        })
+
+        function setGridColumn() {
+            Ls.ajaxGet({
+                url: "/statistics/getCreateOrganByColumnIds",
+                data: {
+                    columnIds:cur.columnIds
+                }
+            }).done(function (d) {
+                var d = d;
+                /*var txt = '[{field:"columnName",name:"columnName",width:"120",headerAlign:"center", align:"center", header:"栏目目录"},' +
+                        '{field:"totalCount",width:"80",headerAlign:"center", align:"center", header:"合计"}';
+                for(var index = 0, count = d.length;index < count;index ++){
+                    if(d[index].organId != null){
+                        txt += ',{field:"c_'+d[index].organId + '",name:"c_'+d[index].organId+'", headerAlign:"center", align:"center", width:"100", header:"' + d[index].name + '"}';
+                    }
+                }
+                txt += "]";*/
+                var txt = '[{field:"COLUMNNAME",name:"columnName",width:"120",headerAlign:"center", align:"center", header:"栏目目录"},' +
+                        '{field:"TOTALCOUNT",width:"80",headerAlign:"center", align:"center", header:"合计"}';
+                for(var index = 0, count = d.length;index < count;index ++){
+                    if(d[index].organId != null){
+                        txt += ',{field:"C_'+d[index].organId + '",name:"C_'+d[index].organId+'", headerAlign:"center", align:"center", width:"100", header:"' + d[index].name + '"}';
+                    }
+                }
+                txt += "]";
+                console.log(mini.decode(txt));
+                cur.organTj_datagrid.set({
+                    style: "width:100%;height:500px;",
+                    columns:mini.decode(txt)
+                }).render(document.getElementById("organTj_datagrid"));
+                //cur.organTj_datagrid.load({parentId:cur.parentId,startDate:cur.startDate,endDate:cur.endDate});
+            })
+        }
+
+        function searchListForOrgan(form) {
+            var json = $(form).serializeObject();
+            cur.organTj_datagrid.load(json);
+        }
+
+        function searchClearForOrgan(form) {
+            $(form)[0].reset();
+            cur.organTj_datagrid.load();
+        }
+
+
+        function onBeforeTreeLoad(e) {
+            var tree = e.sender;    //树控件
+            var node = e.node;      //当前节点
+            var params = e.params;  //参数对象
+
+            //可以传递自定义的属性
+            /*if(node.columnId){
+                params.parentId= node.columnId;
+            }*/
+            if(node.COLUMNID){
+                params.parentId= node.COLUMNID;
+            }
+            params.startTime= $("#startTime").val();
+            params.endTime= $("#endTime").val();
+        }
+
+    </script>

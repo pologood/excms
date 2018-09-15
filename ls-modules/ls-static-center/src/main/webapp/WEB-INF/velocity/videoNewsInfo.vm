@@ -1,0 +1,12 @@
+#set($eo=$resultObj)
+<div>
+  <div>
+    <h1 >$!{eo.title}</h1>
+    <div ><span>日期：#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span><!--单位：<%= td_Author%>&nbsp;&nbsp;-->
+      <span>来源：$!{eo.resources}</span><span>阅读次数：$!{eo.hit}</span>
+    </div>
+    <div>
+        #parse("videoPlay.vm")
+    </div>
+  </div>
+</div>

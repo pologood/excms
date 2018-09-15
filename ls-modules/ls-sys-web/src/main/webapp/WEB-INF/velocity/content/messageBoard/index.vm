@@ -1,0 +1,599 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box">
+            <ul class="sidebar-nav">
+
+                <li id="noassign">
+                    <a href="javascript:void(0)" onclick="searchAll(1);">留言管理-未分配
+                        <span id="no_already_assigned" class="badge badge-info">
+                             <input type="hidden" id="no_already_assigned" value="0"/>
+                        </span>
+                    </a>
+                </li>
+
+                <li id="assign">
+                    <a href="javascript:void(0)" onclick="searchAll(0);">留言管理-已分配
+                        <span id="already_assigned" class="badge badge-info">
+                            <input type="hidden" id="already_assigned" value="0"/>
+                        </span>
+                    </a>
+                </li>
+                <li id="approval">
+                    <a href="javascript:void(0)" onclick="searchAll(5);">留言管理-待审核
+                        <span id="to_approval" class="badge badge-info"></span>
+                    </a>
+                </li>
+                <li id="backRecord">
+                    <a href="javascript:void(0)" onclick="searchAll(2);">留言管理-退回记录
+                        <span id="back" class="badge badge-info"></span>
+                    </a>
+                </li>
+                <li id="recRecord">
+                    <a href="javascript:void(0)" onclick="searchAll(3);">留言管理-收回记录
+                        <span id="recover" class="badge badge-info"></span>
+                    </a>
+                </li>
+                <li id="appRecord">
+                    <a href="javascript:void(0)" onclick="searchAll(4);">留言管理-审核记录
+                        <span id="apply" class="badge badge-info"></span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn" onclick="batchPublish()"><a href="javascript:;">批量发布</a></li>
+                                    <li class="publishBtn" onclick="batchDelete()"><a href="javascript:;">批量删除</a></li>
+                                </ul>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                        栏目筛选 <i
+                                        class="fa fa-angle-down"></i></button>
+                                    <ul class="dropdown-menu" id="statusList">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <input type="text" id="searchKey" name="searchKey" class="form-control"
+                                       placeholder="标题">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="search()"> 搜 索
+                            </button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                 collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/messageBoard/getPage"
+                 sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true">
+                <div property="columns">
+                    <div type="checkcolumn"></div>
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="40%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                    </div>
+                    <div field="" width="340" headerAlign="center" renderer="renderOpt" align="center">操作</div>
+                </div>
+            </div>
+
+            <div id="datagrid2" class="mini-datagrid" style="width:100%;height:700px;display:none"
+                 onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/messageBoard/getPage"
+                 sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true">
+                <div property="columns">
+                    <div type="checkcolumn"></div>
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="60%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                    </div>
+                    <div field="" width="115" headerAlign="center" renderer="renderOpt2" align="center">操作</div>
+                </div>
+            </div>
+            <div id="datagrid6" class="mini-datagrid" style="width:100%;height:700px;display:none"
+                 onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/messageBoard/getApplyPage"
+                 sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true">
+                <div property="columns">
+                    <div type="checkcolumn"></div>
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="60%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                    </div>
+                    <div field="" width="115" headerAlign="center" renderer="renderOpt6" align="center">操作</div>
+                </div>
+            </div>
+
+            <div id="datagrid3" class="mini-datagrid" style="width:100%;height:700px;display:none"
+                 onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                 url="/messageBoard/getOperationPage" sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true" display="none">
+                <div property="columns">
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="40%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                    </div>
+                    <div field="receiveUnitName" width="40%" headerAlign="center" align="center">退回单位</div>
+                    <div field="remarks" width="40%" headerAlign="center" align="center">退回原因</div>
+                    <div field="username" width="20%" headerAlign="center" align="center">操作人</div>
+                </div>
+            </div>
+
+            <div id="datagrid4" class="mini-datagrid" style="width:100%;height:700px;display:none"
+                 onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                 url="/messageBoard/getOperationPage" sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true" display="none">
+                <div property="columns">
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="40%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                    </div>
+                    <div field="receiveUnitName" width="40%" headerAlign="center" align="center">收回单位</div>
+                    <div field="remarks" width="40%" headerAlign="center" align="center">收回原因</div>
+                    <div field="username" width="20%" headerAlign="center" align="center">操作人</div>
+
+                </div>
+            </div>
+
+            <div id="datagrid5" class="mini-datagrid" style="width:100%;height:700px;display:none"
+                 onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                 url="/messageBoard/getApplyPage" sizeList="[10,20,30,50]" pageSize="10"
+                 idField="id" multiSelect="true" display="none">
+                <div property="columns">
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="columnName" width="20%" headerAlign="center" align="center">所属栏目</div>
+                    <div field="" width="40%" headerAlign="center" align="left" renderer="goLink">标题</div>
+                    <div field="updateDate" width="160" headerAlign="center" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">审核时间
+                    </div>
+                    <div field="" width="40%" headerAlign="center" align="center" renderer="applyStatus">审核状态</div>
+                    <div field="disposeReason" width="20%" headerAlign="center" align="center">审核原因</div>
+                    <div field="applyName" width="40%" headerAlign="center" align="center">操作人</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+
+    mini.parse();
+
+    var cur = {
+        grid: '',
+        dialog: Ls.getWin.dialog,
+        hides: ['public_content', 'ordinaryPage', 'survey', 'linksMgr', 'leaderInfo', 'fileDownload', 'interviewInfo', 'collectInfo', 'reviewInfo', 'onlinePetition', 'workGuide', 'sceneService', 'bbs', 'commonProblem']
+    };
+
+    var gridParam = {
+        dataFlag: 1,
+        pageIndex: 0,
+        pageSize: 20
+    };
+
+    function searchAll(type) {
+        if (type == 0) {
+            cur.grid = mini.get("datagrid1");
+            gridParam.isAssign = type;
+            $("#datagrid1").css("display", "block");
+            $("#datagrid2").css("display", "none");
+            $("#datagrid3").css("display", "none");
+            $("#datagrid4").css("display", "none");
+            $("#datagrid5").css("display", "none");
+            $(".btn-group").css("display", "block");
+            $("#noassign").css("background", "");
+            $("#assign").css("background", "#E3F0FC");
+            $("#backRecord").css("background", "");
+            $("#recRecord").css("background", "");
+            $("#appRecord").css("background", "");
+        } else if (type == 1) {
+            cur.grid = mini.get("datagrid2");
+            gridParam.isAssign = type;
+            $("#datagrid1").css("display", "none");
+            $("#datagrid2").css("display", "block");
+            $("#datagrid3").css("display", "none");
+            $("#datagrid4").css("display", "none");
+            $("#datagrid5").css("display", "none");
+            $(".btn-group").css("display", "block");
+            $("#noassign").css("background", "#E3F0FC");
+            $("#assign").css("background", "");
+            $("#backRecord").css("background", "");
+            $("#recRecord").css("background", "");
+            $("#appRecord").css("background", "");
+
+        } else if (type == 2) {
+            cur.grid = mini.get("datagrid3");
+            gridParam.isAssign = type;
+            $("#datagrid1").css("display", "none");
+            $("#datagrid2").css("display", "none");
+            $("#datagrid3").css("display", "block");
+            $("#datagrid4").css("display", "none");
+            $("#datagrid5").css("display", "none");
+            $(".btn-group").css("display", "none");
+            $("#noassign").css("background", "");
+            $("#assign").css("background", "");
+            $("#backRecord").css("background", "#E3F0FC");
+            $("#recRecord").css("background", "");
+            $("#appRecord").css("background", "");
+        } else if (type == 3) {
+            cur.grid = mini.get("datagrid4");
+            gridParam.isAssign = type;
+            $("#datagrid1").css("display", "none");
+            $("#datagrid2").css("display", "none");
+            $("#datagrid3").css("display", "none");
+            $("#datagrid4").css("display", "block");
+            $("#datagrid5").css("display", "none");
+            $(".btn-group").css("display", "none");
+            $("#noassign").css("background", "");
+            $("#assign").css("background", "");
+            $("#backRecord").css("background", "");
+            $("#recRecord").css("background", "#E3F0FC");
+            $("#appRecord").css("background", "");
+        } else if (type == 4) {
+            cur.grid = mini.get("datagrid5");
+            $("#datagrid1").css("display", "none");
+            $("#datagrid2").css("display", "none");
+            $("#datagrid3").css("display", "none");
+            $("#datagrid4").css("display", "none");
+            $("#datagrid5").css("display", "block");
+            $(".btn-group").css("display", "none");
+            $("#noassign").css("background", "");
+            $("#assign").css("background", "");
+            $("#backRecord").css("background", "");
+            $("#recRecord").css("background", "");
+            $("#appRecord").css("background", "#E3F0FC");
+        } else if (type == 5) {
+            cur.grid = mini.get("datagrid6");
+            gridParam.disposeStatus = 'disposeWait';
+            $("#datagrid1").css("display", "none");
+            $("#datagrid2").css("display", "none");
+            $("#datagrid3").css("display", "none");
+            $("#datagrid4").css("display", "none");
+            $("#datagrid5").css("display", "none");
+            $("#datagrid6").css("display", "block");
+            $(".btn-group").css("display", "none");
+            $("#noassign").css("background", "");
+            $("#assign").css("background", "");
+            $("#backRecord").css("background", "");
+            $("#recRecord").css("background", "");
+            $("#appRecord").css("background", "");
+            $("#approval").css("background", "#E3F0FC");
+        }
+
+        Ls.mini_datagrid_height(cur.grid);
+        cur.grid.load(gridParam);
+    }
+
+    $(document).ready(function () {
+        getCount();
+        searchAll(1);
+        getStatusList();
+    });
+
+
+    function getStatusList() {
+        Ls.ajax({
+            type: "POST",
+            url: "/acceptCenter/getColumnByContentModelCode",
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            var data = text.data;
+            var str = '';
+            if (data.length > 0) {
+                str = '<li class="divider"></li>';
+                for (var i = 0; i < data.length; i++) {
+                    str += '<li><a href="javascript:;" onclick="searchByTypeCode(\'' + data[i].indicatorId + '\')">' + data[i].name + '</a></li>';
+
+
+                }
+            }
+            $('#statusList').append(str);
+        });
+    }
+
+
+    function renderOpt(e) {
+        //操作
+        var rec = e.record;
+        var str = "";
+        str = '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchPublish(' + rec.baseContentId + ',' + rec.columnId + ')">发 布</button> '
+            + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="apply(' + rec.id + ')">审 核</button> '
+            + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="recover(' + rec.id + ',' + rec.columnId + ')">收 回</button> '
+            + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="assign(' + rec.id + ',' + rec.columnId + ',' + 0 + ')">分 配</button> '
+            + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="forward(' + rec.id + ')">分 配 记 录</button> ';
+        return str;
+    }
+
+    function renderOpt2(e) {
+        //操作
+        var rec = e.record;
+        var str = "";
+        str = '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchPublish(' + rec.baseContentId + ',' + rec.columnId + ')">发 布</button> '
+            + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="assign(' + rec.id + ',' + rec.columnId + ',' + 1 + ')">分 配</button> ';
+        return str;
+    }
+
+    function renderOpt6(e) {
+        //操作
+        var rec = e.record;
+        var str = "";
+        str = +'<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="apply(' + rec.id + ')">审 核</button> ' +
+            '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchPublish(' + rec.baseContentId + ',' + rec.columnId + ')">发 布</button> ';
+
+        return str;
+    }
+
+    //内容详情
+    function details(columnId, id) {
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/messageBoard/modify?&columnId=' + columnId + '&id=' + id + '&type=' + 1, {
+            id: 'record',
+            title: '内容详情',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+        });
+    }
+
+    //打开审核页面
+    function apply(id) {
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/acceptCenter/applyRecord?id=' + id, {
+            id: 'record',
+            title: '待审核记录',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+            close: function () {
+                getCount();
+            }
+        });
+    }
+
+
+    //打开收回页面
+    function recover(id, columnId) {
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/acceptCenter/recoverRecord?id=' + id + '&columnId=' + columnId, {
+            id: 'recover',
+            title: '收回',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+            close: function () {
+                searchAll(0);
+            }
+        });
+    }
+
+    //打开分配窗口
+    function assign(id, columnId, type) {
+        Ls.openWin('/acceptCenter/messageBoardAssign?id=' + id + '&columnId=' + columnId, '460px', '350px', {
+            id: 'message_button_forward',
+            title: "分配单位",
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+
+            },
+            close: function () {
+                if (type == 0) {
+                    searchAll(0);
+                } else {
+                    searchAll(1);
+                }
+            }
+        });
+    }
+
+    //打开转办记录窗口
+    function forward(id) {
+        //alert(id)
+        Ls.openWin('/messageBoard/queryForwardRecord?id=' + id, '700px', '400px', {
+            id: 'record',
+            title: '转办记录',
+            padding: 0
+
+        });
+    }
+
+
+    function goLink(e) {
+        var rec = e.record
+        var str = '<a href="javascript:void(0)" onclick="details(' + rec.columnId + ',' + rec.baseContentId + ')"><u>' + rec.title + '</u></a>';
+        return str;
+    }
+
+    function applyStatus(e) {
+        var rec = e.record
+        var str = '';
+        if (rec.disposeStatus == 'disposeNotPass') {
+            str = '不通过';
+        }
+        if (rec.disposeStatus == 'disposePass') {
+            str = '通过';
+        }
+        return str;
+    }
+
+    //属性筛选
+    function searchByTypeCode(columnId) {
+        getCount(columnId);
+        search(columnId);
+    }
+
+    function getCount(columnId) {
+        Ls.ajaxGet({
+            url: "/messageBoard/getCountVO",
+            data: {
+                columnId: columnId,
+                status: 'disposeWait'
+            },
+            success: function (text) {
+                var a = text.data;
+                $("#already_assigned").html(a.assignedCount);
+                $("#no_already_assigned").html(a.noAssignCount);
+                $("#back").html(a.backCount);
+                $("#recover").html(a.recoverCount);
+                $("#apply").html(a.applyCount);
+                $("#to_approval").html(a.approvalCount);
+            }
+        });
+
+    }
+
+    //标题搜索
+    function search(columnId) {
+        var title = $("#searchKey").val();
+        gridParam.title = title;
+        gridParam.columnId = columnId;
+        cur.grid.load(gridParam);
+    }
+
+    //显示全部
+    function showAll() {
+        $("#searchKey").val("");
+        gridParam.title = '';
+        gridParam.columnId = '';
+        search();
+    }
+
+    //批量发布状态
+    function batchPublish(id, columnId) {
+        var check = [];
+        var columnIds = '';
+
+        if (id != null) {
+            check.push(id);
+        }
+
+        if (columnIds != null) {
+            columnIds = columnId;
+        }
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一项操作!");
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].baseContentId);
+            columnId = rows[i].columnId;
+        }
+
+        if (confirm("确定发布?")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    columnId: columnIds,
+                    siteId: GLOBAL_SITEID,
+                    type: 1
+                },
+                url: "/messageBoard/batchPublish",
+                success: function (text) {
+                    var isSuccess = text.data;
+                    if (isSuccess) {
+                        if (id != null) {
+                            Ls.tipsOk("发布成功");
+                        } else {
+                            Ls.tipsOk("批量发布成功");
+                        }
+                    } else {
+                        if (id != null) {
+                            Ls.tipsErr("发布失败");
+                        } else {
+                            Ls.tipsErr("批量发布失败");
+                        }
+                        return;
+                    }
+                    showAll();
+                }
+            });
+        }
+    }
+
+    function batchDelete() {
+        var ids = [];
+        var rows = cur.grid.getSelecteds();
+        if (ids.length <= 0 && rows.length <= 0) {
+            Ls.tipsInfo("请至少选择一项操作");
+            return;
+        }
+        for (var i = 0, l = rows.length; i < l; i++) {
+            ids.push(rows[i].baseContentId);
+        }
+        if (confirm("确定批量删除所选项？")) {
+            Ls.ajaxGet({
+                type: "POST",
+                data: {
+                    ids: ids
+                },
+                url: "/messageBoard/batchDelete",
+                success: function (text) {
+                    Ls.tipsOk("批量删除成功");
+                    showAll();
+                }
+            });
+        }
+    }
+
+    function callBack(msg) {
+        Ls.tips(msg);
+        cur.grid.load(gridParam);
+    }
+
+</script>
+
+
+

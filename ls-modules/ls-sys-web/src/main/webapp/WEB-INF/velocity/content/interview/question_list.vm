@@ -1,0 +1,220 @@
+<style>
+    .question-pic img,.reply-pic img{
+        width: 100px;
+    }
+    .question-pic,.reply-pic{
+        margin: 5px 0;
+    }
+</style>
+<div class="portlet light">
+    <!--<div class="portlet-title">
+      <div class="caption font-grey-silver">
+        <span class="caption-subject bold uppercase">用户列表</span>
+      </div>
+      <div class="tools"></div>
+    </div>-->
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <button type="button" id="checkAll" onclick="checkAll()" class="btn btn-default btn-all-check"> 全 选</button>
+                    <button class="btn btn-default btn-add" onclick="add('')">添加访谈内容</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="issuedOpt(1)">批量发布</a></li>
+                            <li><a href="javascript:;" onclick="issuedOpt(0)">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" onclick="deleteAll()">批量删除</a></li>
+                        </ul>
+                    </div>
+					 <button class="btn btn-default btn-back" onclick="refresh()">刷新</button>
+                    <button class="btn btn-default btn-back" onclick="goback()">返 回</button>
+                    <!-- <div class="btn-group">
+                       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                         class="fa fa-angle-down"></i></button>
+                       <ul class="dropdown-menu">
+                         <li><a href="javascript:;" onclick="searchByType('is_publish',1)">已发布</a></li>
+                         <li><a href="javascript:;" onclick="searchByType('is_publish',0)">未发布</a></li>
+                         <li><a href="javascript:;" onclick="searchByType('is_response',1)">已回复</a></li>
+                         <li><a href="javascript:;" onclick="searchByType('is_response',0)">未回复</a></li>
+                       </ul>
+                     </div>-->
+                </div>
+                <div class="col-md-7">
+
+                    <!--<form class="form-inline tr" role="form">
+                      <div class="form-group">
+                        <label></label>
+                        <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                      </div>
+                      <button type="button" class="btn btn-default btn-search" onclick="searchContent()">搜索</button>
+                      <button type="button" class="btn btn-default btn-search" onclick="searchClear()">显示全部</button>
+                    </form>-->
+
+                </div>
+            </div>
+        </div>
+
+        <div id="guestbook_list_body" class="doc-manage">
+
+        </div>
+
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/interview_question.js"></script>
+<script>
+    var topPageIndex = "$!{topPageIndex}"
+    $(document).ready(function () {
+        interview_manage.init("$!{interviewId}");
+    })
+
+	function refresh(){
+        interview_manage.init("$!{interviewId}");
+	}
+	
+    //全选，取消全选
+    function checkAll() {
+        if (cur.c == 0) {
+            $("input[name='check']").prop("checked", true);
+            cur.c = 1;
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            cur.c = 0;
+            return;
+        }
+    }
+
+    //搜索
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        interview_manage.getData(0, curAll.interviewId, cur.key, '', '')
+    }
+
+    //显示全部
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        cur.condition = "";
+        cur.status = "";
+        interview_manage.getData(0, cur.columnId, cur.key, '', '')
+    }
+
+    function add(id) {
+        Ls.openWin("/interviewQuestion/edit?interviewId=" + cur.interviewId + "&questionId=" + id, "500px", "400px", {
+            type: 2,
+            title: id == '' ? '添加访谈内容' : '编辑访谈内容',
+            id: 'add',
+            maxmin: false,
+            close: function () {
+                interview_manage.getData(0, cur.interviewId, "", "", "");
+            }
+        });
+    }
+
+    function reply(id) {
+        Ls.openWin("/interviewQuestion/editReply?interviewId=$!{interviewId}&questionId=" + id, "600px", "600px", {
+            type: 2,
+            title: '回复',
+            id: 'add',
+            maxmin: false,
+            close: function () {
+                interview_manage.getData(cur.pageIndex, cur.interviewId, "", "", "");
+            }
+        });
+    }
+
+    var deleteAll = function () {
+        var ids = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            ids.push(val.value);
+        })
+        ids = ids.join(",");
+        if (confirm("您确定删除嘛")) {
+            Ls.ajaxGet({
+                url: "/interviewQuestion/delete",
+                data: {
+                    ids: ids
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    interview_manage.getData(0, cur.interviewId, "", "", "");
+                }
+            });
+        }
+    }
+
+    var del = function (id) {
+        var ids = [];
+        ids.push(id)
+        ids = ids.join(",");
+        if (confirm("您确定删除嘛")) {
+            Ls.ajaxGet({
+                url: "/interviewQuestion/delete",
+                data: {
+                    ids: ids
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    interview_manage.getData(0, cur.interviewId, "", "", "");
+                }
+            });
+        }
+    }
+
+    function issuedOpt(status) {
+        var ids = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            ids.push(val.value);
+        })
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据！")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/interviewQuestion/updateIssued",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    interview_manage.getData(0, cur.interviewId, "", "", "");
+                }
+            });
+        }
+    }
+
+    var issued = function (id, issued) {
+        var ids = [];
+        ids.push(id);
+        ids = ids.join(",");
+        var status = (issued == '0' ? '1' : '0');
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/interviewQuestion/updateIssued",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    interview_manage.getData(0, cur.interviewId, "", "", "");
+                }
+            });
+        }
+    }
+
+    var goback = function () {
+        content_mgr.getContentApp("/interviewInfo/index?pageIndex="+topPageIndex);
+    }
+
+</script>

@@ -1,0 +1,302 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">领导信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form id="formLeader" role="form" ms-controller="formLeader" autocomplete="off">
+                <table class="table table-bordered article-table">
+                    <tbody>
+                    <tr>
+                        <th>领导姓名：</th>
+                        <td>
+
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" name="name" id="title" ms-duplex="name" class="form-control" placeholder="领导姓名不能为空">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                        <td class="w300" rowspan="8">
+
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:195px;height:150px;" alt="" id="imageLink"/>
+                                </div>
+                                #if(${uploadBar} == 'hide')
+                                #else
+                                    <div class="thum-delete" id="delImg" onclick="del()"><i class="fa fa-trash"></i></div>
+                                    <div class="thum-upload" id="uploadImg" onclick="fileUpload()"><i class="fa fa-upload"></i></div>
+                                #end
+
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>排序时间：</th>
+                        <td>
+                            <input type="datetime" name="sortNum" id="sortNum" ms-duplex="sortNum" class="form-control readonly" placeholder="排序时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>职务：</th>
+                        <td>
+                            <input type="text" name="positions" ms-duplex="positions" class="form-control w250" placeholder="职位不能为空">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>领导分类：</th>
+                        <td>
+                            <select id="leaderTypeId" class="form-control" name="leaderTypeId"
+                                    ms-duplex="leaderTypeId" placeholder="请选择领导类别">
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">工作分工：</th>
+                        <td colspan="">
+              <textarea name="work" class="form-control" rows="5" placeholder=""
+                        ms-duplex="work"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">工作简历：</th>
+                        <td colspan="">
+              <textarea name="jobResume" class="form-control" rows="7" placeholder=""
+                        ms-duplex="jobResume"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="">
+                            #if(${toolbar} == 'hide')
+                            #else
+                            <div class="form-actions noborder">
+                                <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                                <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            </div>
+                        </td>
+                        #end
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    var cur = {
+        infoId: '$!{infoId}',
+        params: {
+            columnId: '$!{columnId}'==""?content_mgr.indicatorId : '$!{columnId}',
+            siteId: GLOBAL_SITEID
+        },
+        clickBtn: ''
+    }
+    $(document).ready(function () {
+
+        getLeaderType();
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/leaderInfo/getLeaderInfo",
+                data: {
+                    infoId: cur.infoId,
+                    columnId: cur.params.columnId,
+                    siteId: cur.params.siteId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formLeader"
+                data.$id = cur.$id;
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+                if (data.picUrl != null && data.picUrl != "") {
+                    if(cur.vm.picUrl.indexOf(".") != -1){
+                        $("#imageLink").attr("src", '$!{fileServerNamePath}' + data.picUrl)
+                    }else{
+                        $("#imageLink").attr("src", '$!{fileServerPath}' + data.picUrl)
+                    }
+                    $("#uploadImg").hide();
+                }
+                try{
+                    if(data.leaderInfoId == null || data.leaderInfoId == ''){
+                        data.sortNum = parseInt(new Date().getTime()/1000);
+                    }
+                    if(data.sortNum != null && data.sortNum != ""){
+                        var d = new Date();
+                        d.setTime(data.sortNum * 1000);
+                        $("#sortNum").val(d.format('yyyy-MM-dd h:m:s'));
+                    }
+                }catch (e){
+                }
+            })
+        };
+        getData();
+    })
+
+    $('#formLeader').validator({
+        fields: {
+            'title': '标题:required;length[2~50]',
+            'leaderTypeId': '领导分类:required;',
+            'sortNum': '排序:required;',
+            'positions': '职务:required;',
+            'name': '领导名称:required;',
+            'work': '工作分工:length[2~4000]',
+            'jobResume': '工作简历:length[2~4000]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+
+    function getLeaderType() {
+
+        Ls.ajaxGet({
+            url: "/leaderType/getLeaderTypes",
+            data: cur.params
+        }).done(function (text) {
+            var data = text.data;
+            var length = data.length;
+            var str = '<option value="">--选择领导分类--</option>';
+            if (length > 0) {
+                for (i = 0; i < length; i++) {
+                    str += ' <option  value=' + data[i].leaderTypeId + '>' + data[i].title + '</option> '
+                }
+            }
+            $("#leaderTypeId").append(str);
+        });
+    }
+
+    $("#saveArticle").click(function () {
+        cur.clickBtn = 0;
+        $('#formLeader').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        cur.clickBtn = 1;
+        cur.vm.issued = 1;
+        $('#formLeader').submit();
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+        }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        Ls.ajax({
+            url: "/leaderInfo/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function goBack() {
+        content_mgr.getContentApp("/leaderInfo/index?indicatorId=&pageIndex=");
+    }
+
+    function fileUpload() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+##                cur.vm.picUrl = data[0].mongoId;
+##                $("#imageLink").attr("src", '$!{fileServerPath}' + data[0].mongoId)
+                cur.vm.picUrl = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + cur.vm.picUrl)
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+            "siteId": GLOBAL_SITEID,
+            "columnId": content_mgr.node.indicatorId
+           },
+        })
+    }
+
+    function del() {
+        if (cur.vm.picUrl == null) {
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.picUrl
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.picUrl = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+
+</script>

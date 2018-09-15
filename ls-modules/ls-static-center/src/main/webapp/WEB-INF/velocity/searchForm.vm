@@ -1,0 +1,470 @@
+#set($onlineNavId="$!{paramObj.onlineNavId}")
+#set($showType=",$!{paramObj.showType},")
+#set($activeId="$!{paramObj.activeId}")
+#if($!{paramObj.url}&&$!{paramObj.url}!="")
+    #set($url = $!{paramObj.url})
+#else
+    #set($url = "/site/search/$!{global_siteId}")
+#end
+<div class="search-tab ls-tabs" id="search_tab">
+    <ul>
+        #if($showType.indexOf(",1,")!=-1)
+            <li class="#if("${activeId}"=="1")active#end"><a href="#search_tab1" data-toggle="tab">新闻中心</a></li>
+        #end
+        #if($showType.indexOf(",2,")!=-1)
+            <li class="#if("${activeId}"=="2")active#end"><a href="#search_tab2" data-toggle="tab">政民互动</a></li>
+        #end
+        #if($showType.indexOf(",3,")!=-1)
+            <li class="#if("${activeId}"=="3")active#end"><a href="#search_tab3" data-toggle="tab">网上办事</a></li>
+        #end
+        #if($showType.indexOf(",4,")!=-1)
+            <li class="#if("${activeId}"=="4")active#end"><a href="#search_tab4" data-toggle="tab">信息公开</a></li>
+        #end
+    </ul>
+</div>
+
+<div class="search-warp">
+    #if($showType.indexOf(",1,")!=-1)
+        <div class="search-form #if("${activeId}"=="1")active#end" id="search_tab1">
+            <form name="search_form1" method="get" action="/site/search/$!{global_siteId}">
+                <input type="hidden" name="searchType" value="0"/>
+                <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <th width="110" class="bt">包含关键词：</th>
+                        <td align="left">
+                            <label>
+                                <input name="keywords" type="text" class="txtinput" size="50" maxlength="30" data-rule="关键词:required;">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">检索范围：</th>
+                        <td align="lft">
+                            <input type="radio" name="typeCode" value="pictureNews,articleNews,videoNews" id="form1_typeCode_all"/>
+                            <label for="form1_typeCode_all">全部</label>
+                            <input name="typeCode" type="radio" value="articleNews" checked="checked" id="form1_typeCode_articleNews" class="typeCode-articleNews"/>
+                            <label for="form1_typeCode_articleNews" class="typeCode-articleNews">新闻信息</label>
+                            <input type="radio" name="typeCode" value="videoNews" id="form1_typeCode_videoNews" class="typeCode-videoNews"/>
+                            <label for="form1_typeCode_videoNews" class="typeCode-videoNews">视频信息</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">关键词位置：</th>
+                        <td align="left">
+                            <input name="fromCode" type="radio" value="title" checked="checked" id="form1_fromCode_title"/>
+                            <label for="form1_fromCode_title">仅在标题中</label>
+                            <input type="radio" name="fromCode" value="content" id="form1_fromCode_content"/>
+                            <label for="form1_fromCode_content">仅在正文中</label>
+                            <input type="radio" name="fromCode" value="" id="form1_fromCode_all"/>
+                            <label for="form1_fromCode_all">全部</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">时间范围：</th>
+                        <td align="left">
+                            <div class="fl seardate1">
+                                <input type="radio" name="dateType" value="1" checked="checked" data-form="form1" id="form1_datecode_u"/>
+                                <select name="datecode" id="form1_datecode" class="txt1">
+                                    <option value="">任意时间</option>
+                                    <option value="day">一天内</option>
+                                    <option value="week">一周内</option>
+                                    <option value="month">一个月内</option>
+                                    <option value="year">一年内</option>
+                                </select>
+                                <label for="form1_datecode_u">的数据中查找</label>
+                            </div>
+                            <div class="fl seardate2">
+                                <input type="radio" name="dateType" value="2" data-form="form1" id="dateType1_u"/>
+                                <label for="dateType1_u">开始时间：</label>
+                                #*<input id="form1_beginTime" name="beginDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'form1_endTime\')}'}" disabled/>*#
+                                <input type="datetime" name="beginDate" id="form1_beginTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'form1_endTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                                <label for="dateType1_u">结束时间：</label>
+                                #*<input id="form1_endTime" name="endDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'form1_beginTime\')}'}" disabled/>*#
+                                <input type="datetime" name="endDate" id="form1_endTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'form1_beginTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">排序方式：</th>
+                        <td align="left">
+                            <input name="sort" type="radio" id="form1_SearchOrder_1" value="desc" checked="checked"/>
+                            <label for="form1_SearchOrder_1">按时间降序排列</label>
+                            <input type="radio" name="sort" id="form1_SearchOrder_2" value="asc"/>
+                            <label for="form1_SearchOrder_2">按时间升序排列</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt sear_xx">每页显示：</th>
+                        <td align="left" class="sear_xx">
+                            <label>
+                                <select name="pageSize" class="txt1">
+                                    <option value="10">10条结果</option>
+                                    <option value="20" selected="selected">20条结果</option>
+                                    <option value="30">30条结果</option>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="50" colspan="2" align="center">
+                            <label>
+                                <input class="sear_button1" type="submit" name="" value="开始检索">
+                                <input class="sear_button2" type="reset" name="" value="重新填写">
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    #end
+    #if($showType.indexOf(",2,")!=-1)
+        <div class="search-form #if("${activeId}"=="2")active#end" id="search_tab2">
+            <form name="search_form2" method="get" action="$!url">
+                <input type="hidden" name="typeCode" value="guestBook"/>
+                <input type="hidden" name="searchType" value="0"/>
+                <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <th width="110" class="bt">包含关键词：</th>
+                        <td align="left">
+                            <label>
+                                <input name="keywords" type="text" class="txtinput" size="50" maxlength="30" data-rule="关键词:required;">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">检索范围：</th>
+                        <td align="left">
+                            <input name="type" type="radio" id="form2_consult" value="do_consult"/>
+                            <label for="form2_consult">我要咨询</label>
+                            <input name="type" type="radio" id="form2_complain" value="do_complain"/>
+                            <label for="form2_complain">我要投诉</label>
+                            <input name="type" type="radio" id="form2_suggest" value="do_suggest"/>
+                            <label for="form2_suggest">我要建议</label>
+                            <input name="type" type="radio" id="form2_report" value="do_report"/>
+                            <label for="form2_report">我要举报</label>
+                            <input name="type" type="radio" id="form2_others" value="others"/>
+                            <label for="form2_others">其他</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt">关键词位置：</th>
+                        <td align="left">
+                            <input name="fromCode" id="form2_fromCode_title" type="radio" value="title" checked="checked"/>
+                            <label for="form2_fromCode_title">仅在标题中</label>
+                            <input type="radio" id="form2_fromCode_content" name="fromCode" value="content"/>
+                            <label for="form2_fromCode_content">仅在正文中</label>
+                            <input type="radio" id="form2_fromCode_all" name="fromCode" value=""/>
+                            <label for="form2_fromCode_all">全部</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt">时间范围：</th>
+                        <td align="left">
+                            <div class="fl seardate1">
+                                <input type="radio" name="dateType" value="1" checked="checked" data-form="form2" id="form2_datecode_u"/>
+                                <select name="datecode" id="form2_datecode" class="txt1">
+                                    <option value="">任意时间</option>
+                                    <option value="day">一天内</option>
+                                    <option value="week">一周内</option>
+                                    <option value="month">一个月内</option>
+                                    <option value="year">一年内</option>
+                                </select>
+                                <label for="form2_datecode_u">的数据中查找</label>
+                            </div>
+                            <div class="fl seardate2">
+                                <input type="radio" name="dateType" value="2" data-form="form2" id="dateType2_u"/>
+                                <label for="dateType2_u">开始时间：</label>
+                                #*<input id="form2_beginTime" name="beginDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'form2_endTime\')}'}" disabled/>*#
+                                <input type="datetime" name="beginDate" id="form2_beginTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'form2_endTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                                <label for="dateType2_u">结束时间：</label>
+                                #*<input id="form2_endTime" name="endDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'form2_beginTime\')}'}" disabled/>*#
+                                <input type="datetime" name="endDate" id="form2_endTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'form2_beginTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">排序方式：</th>
+                        <td align="left">
+                            <input name="sort" type="radio" id="form2_SearchOrder_1" value="desc" checked="checked"/>
+                            <label for="form2_SearchOrder_1">按时间降序排列</label>
+                            <input type="radio" name="sort" id="form2_SearchOrder_2" value="asc"/>
+                            <label for="form2_SearchOrder_2">按时间升序排列</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt sear_xx">每页显示：</th>
+                        <td align="left" class="sear_xx">
+                            <label>
+                                <select name="pageSize" class="txt1">
+                                    <option value="10">10条结果</option>
+                                    <option value="20" selected="selected">20条结果</option>
+                                    <option value="30">30条结果</option>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="50" colspan="2" align="center">
+                            <label>
+                                <input class="sear_button1" type="submit" name="" value="开始检索">
+                                <input class="sear_button2" type="reset" name="" value="重新填写">
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    #end
+    #if($showType.indexOf(",3,")!=-1)
+        <div class="search-form #if("${activeId}"=="3")active#end" id="search_tab3">
+            <form name="search_form3" method="get" action="$!url">
+                <input type="hidden" name="typeCode" value="workGuide"/>
+                <input type="hidden" name="searchType" value="0"/>
+                <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <th width="110" class="bt">包含关键词：</th>
+                        <td align="left">
+                            <label>
+                                <input name="keywords" type="text" class="txtinput" size="50" maxlength="30" data-rule="关键词:required;">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">检索范围：</th>
+                        <td align="left">
+                            <select id="form3_select_one" class="txt1">
+                                <option value="">请选择主题</option>
+                            </select>
+                            <select id="form3_select_two" class="txt1">
+                                <option value=""> 请选择分类</option>
+                            </select>
+                            <input type="hidden" id="columnId" name="columnId" value=""/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">关键词位置：</th>
+                        <td align="left">
+                            <input name="fromCode" type="radio" id="form3_fromCode_title" value="title" checked="checked"/>
+                            <label for="form3_fromCode_title">仅在标题中</label>
+                            <input type="radio" name="fromCode" value="content" id="form3_fromCode_content"/>
+                            <label for="form3_fromCode_content">仅在正文中</label>
+                            <input type="radio" name="fromCode" value="" id="form3_fromCode_all"/>
+                            <label for="form3_fromCode_all">全部</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt">时间范围：</th>
+                        <td align="left">
+                            <div class="fl seardate1">
+                                <input type="radio" name="dateType" value="1" checked="checked" data-form="form3" id="form3_datecode_u"/>
+                                <select name="datecode" id="form3_datecode" class="txt1">
+                                    <option value="">任意时间</option>
+                                    <option value="day">一天内</option>
+                                    <option value="week">一周内</option>
+                                    <option value="month">一个月内</option>
+                                    <option value="year">一年内</option>
+                                </select>
+                                <label for="form3_datecode_u">的数据中查找</label>
+                            </div>
+                            <div class="fl seardate2">
+                                <input type="radio" name="dateType" value="2" data-form="form3" id="dateType3_u"/>
+                                <label for="dateType3_u">开始时间：</label>
+                                #*<input id="form3_beginTime" name="beginDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'form3_endTime\')}'}" disabled/>*#
+                                <input type="datetime" name="beginDate" id="form3_beginTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'form3_endTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                                <label for="dateType3_u">结束时间：</label>
+                                #*<input id="form3_endTime" name="endDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'form3_beginTime\')}'}" disabled/>*#
+                                <input type="datetime" name="endDate" id="form3_endTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'form3_beginTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">排序方式：</th>
+                        <td align="left">
+                            <input name="sort" type="radio" id="form3_SearchOrder_1" value="desc" checked="checked"/>
+                            <label for="form3_SearchOrder_1">按时间降序排列</label>
+                            <input type="radio" name="sort" id="form3_SearchOrder_2" value="asc"/>
+                            <label for="form3_SearchOrder_2">按时间升序排列</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt sear_xx">每页显示：</th>
+                        <td align="left" class="sear_xx">
+                            <label>
+                                <select name="pageSize" class="txt1">
+                                    <option value="10">10条结果</option>
+                                    <option value="20" selected="selected">20条结果</option>
+                                    <option value="30">30条结果</option>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="50" colspan="2" align="center">
+                            <label>
+                                <input class="sear_button1" type="submit" name="" value="开始检索">
+                                <input class="sear_button2" type="reset" name="" value="重新填写">
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    #end
+    #if($showType.indexOf(",4,")!=-1)
+        <div class="search-form #if("${activeId}"=="4")active#end" id="search_tab4">
+            <form name="search_form4" method="get" action="$!url">
+                <input type="hidden" name="typeCode" value="public_content"/>
+                <input type="hidden" name="searchType" value="0"/>
+                <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <th width="110" class="bt">包含关键词：</th>
+                        <td align="left">
+                            <label>
+                                <input name="keywords" type="text" class="txtinput" size="50" maxlength="30" data-rule="关键词:required;">
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">关键词位置：</th>
+                        <td align="left">
+                            <input name="fromCode" type="radio" value="title" checked="checked" id="form4_fromCode_title"/>
+                            <label for="form4_fromCode_title">仅在标题中</label>
+                            <input type="radio" name="fromCode" value="content" id="form4_fromCode_content"/>
+                            <label for="form4_fromCode_content">仅在正文中</label>
+                            <input type="radio" name="fromCode" value="fileNum" id="form4_fromCode_fileNum"/>
+                            <label for="form4_fromCode_fileNum">仅在发布公文号中</label>
+                            <input type="radio" name="fromCode" value="indexNum" id="form4_fromCode_indexNum"/>
+                            <label for="form4_fromCode_indexNum">仅在索引号中</label>
+                            <input type="radio" name="fromCode" value="title,content,fileNum,indexNum" id="form4_fromCode_all"/>
+                            <label for="form4_fromCode_all">全部</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">时间范围：</th>
+                        <td align="left">
+                            <div class="fl seardate1">
+                                <input type="radio" name="dateType" value="1" checked="checked" data-form="form4" id="form4_datecode_u"/>
+                                <select name="datecode" id="form4_datecode" class="txt1">
+                                    <option value="">任意时间</option>
+                                    <option value="day">一天内</option>
+                                    <option value="week">一周内</option>
+                                    <option value="month">一个月内</option>
+                                    <option value="year">一年内</option>
+                                </select>
+                                <label for="form4_datecode_u">的数据中查找</label>
+                            </div>
+                            <div class="fl seardate2">
+                                <input type="radio" name="dateType" value="2" data-form="form4" id="dateType4_u"/>
+                                <label for="dateType4_u">开始时间：</label>
+                                #*<input id="form4_beginTime" name="beginDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'form4_endTime\')}'}" disabled/>*#
+                                <input type="datetime" name="beginDate" id="form4_beginTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'form4_endTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                                <label for="dateType4_u">结束时间：</label>
+                                #*<input id="form4_endTime" name="endDate" type="text" size="15" class="txtinput datePicker" data-setting="{startDate:'%y-%M-%d',dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'form4_beginTime\')}'}" disabled/>*#
+                                <input type="datetime" name="endDate" id="form4_endTime" class="txtinput datePicker" size="15"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'form4_beginTime\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly disabled>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="bt">排序方式：</th>
+                        <td align="left">
+                            <input name="sort" type="radio" id="form4_SearchOrder_1" value="desc" checked="checked"/>
+                            <label for="form4_SearchOrder_1">按时间降序排列</label>
+                            <input type="radio" name="sort" id="form4_SearchOrder_2" value="asc"/>
+                            <label for="form4_SearchOrder_2">按时间升序排列</label></td>
+                    </tr>
+                    <tr>
+                        <th class="bt sear_xx">每页显示：</th>
+                        <td align="left" class="sear_xx">
+                            <label>
+                                <select name="pageSize" class="txt1">
+                                    <option value="10">10条结果</option>
+                                    <option value="20" selected="selected">20条结果</option>
+                                    <option value="30">30条结果</option>
+                                </select>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td height="50" colspan="2" align="center">
+                            <label>
+                                <input class="sear_button1" type="submit" name="" value="开始检索">
+                                <input class="sear_button2" type="reset" name="" value="重新填写">
+                            </label>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    #end
+</div>
+<script>
+    $(document).ready(function () {
+
+        $("input[name='dateType']").on('click', function () {
+            var $this =
+            $(this);
+            var val = $this.val();
+            var form = $this.data("form");
+
+            if (val == 1) {
+                $("#" + form + "_datecode").attr("disabled", false);
+                $("#" + form + "_beginTime").attr("disabled", true);
+                $("#" + form + "_endTime").attr("disabled", true);
+            } else {
+                $("#" + form + "_datecode").attr("disabled", true);
+                $("#" + form + "_beginTime").attr("disabled", false);
+                $("#" + form + "_endTime").attr("disabled", false);
+            }
+        });
+
+        $("#form3_select_one").on("change", function () {
+            var val = this.value;
+            if (val) {
+                getColumns(val, "two", "请选择主分类");
+                $('#columnId').val(val);
+            } else {
+                $("#form3_select_two").html('<option value=""> 请选择分类 </option>');
+            }
+        });
+
+        $("#form3_select_two").on("change", function () {
+            var val = this.value;
+            $('#columnId').val(val);
+        });
+
+        function getColumns(columnId, type, text) {
+            if (null == columnId || "" == columnId) {
+                return;
+            }
+            var settings = {
+                data: {
+                    num: 100,
+                    id: columnId,
+                    excludeColumnIds: '$!{paramObj.excludeColumnIds}',
+                    isJson: true
+                },
+                url: "/site/label/110726"
+            }
+            Ls.ajax(settings).done(function (data) {
+                var str = '';
+                if (data && data != null) {
+                    var length = data.length;
+                    if (length > 0) {
+                        for (i = 0; i < length; i++) {
+                            str += ' <option value=' + data[i].indicatorId + '>' + data[i].name + '</option> '
+                        }
+                    }
+                }
+                var option = ' <option value=""> ' + text + ' </option>' + str;
+                $('#form3_select_' + type).html(option);
+            })
+        }
+
+        #if("${onlineNavId}"!="")
+            getColumns(${onlineNavId}, "one", "请选择主题");
+        #end
+
+    });
+</script>

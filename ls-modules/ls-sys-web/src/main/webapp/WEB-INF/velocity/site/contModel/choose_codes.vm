@@ -1,0 +1,30 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-fit">
+  <div class="mini-fit">
+    <ul class="ztree" id="code_tree"></ul>
+  </div>
+</div>
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+  <a class="mini-button" id="transmit1" style="width:60px;" >确定</a>
+  <span style="display:inline-block;width:25px;"></span>
+  <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/model_guestbook.js"></script>
+<script type="text/javascript">
+  mini.parse();
+  var classCodes='${classCodes}';
+  $(document).ready(function(){
+    codesManage.init();
+  });
+
+
+  function onCancel() {
+    art.dialog.close();
+  }
+
+</script>
+</body>

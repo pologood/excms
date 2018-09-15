@@ -1,0 +1,142 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form id="export_form" role="form" ms-controller="user_form" autocomplete="off">
+            <div class="form-body">
+                <div class="form-group">
+                    <label>父节点：</label>
+                    <span id="ptitle"></span>
+                </div>
+                <div class="form-group">
+                    <label>模板下载：</label>
+                    <a style="color:blue;" onclick="downLoad()" id="down">组织导入模板</a>
+                </div>
+                <div class="form-group">
+                    <p><label>模板上传：</label><br/>
+                        <input type="file" id="file1" name="file"/>
+                </div>
+                <div class="form-group">
+                    <label style="color:red" id="unit_tips">备注：
+                        1) 单位、科室名称仅支持中文、英文数字和部分中文标点符号的组合
+                        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        2) 如出现相同名称的组织，则直接跳过
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/ajaxfileupload.min.js"></script>
+<script>
+    var cur = {
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        params: {
+            organId: Ls.url.get("organId"),
+            name: Ls.url.get("name"),
+            indicatorId: Ls.url.get("indicatorId"),
+            arg: Ls.url.get("arg")
+        }
+    };
+
+    $(document).ready(function () {
+        mini.parse();
+        cur.api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    saveData();
+                    return false;
+                }
+            },
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+        $("#ptitle").html(cur.params.name);
+
+        if (cur.params.indicatorId) {
+            $("#unit_tips").hide();
+            $("#down").text('栏目导入模板');
+        }
+    })
+
+
+    function saveData() {
+        if ($("#file1").val().length > 0) {
+            var file = $("#file1").val();
+            var suffix = file.substring(file.indexOf(".") + 1);
+            if (suffix != "xls") {
+                alert("模板格式不正确!");
+                return;
+            }
+            ajaxFileUpload();
+        } else {
+            alert("请选择excle文件");
+        }
+    }
+    ;
+
+    function ajaxFileUpload() {
+        if (!confirm("确定在[" + cur.params.name + "]组织下批量导入?")) {
+            return;
+        }
+
+        if (cur.params.indicatorId) {
+
+        }else {
+            jQuery.ajaxFileUpload({
+                url: '/poiUpload/exportUnitxls',
+                type: 'post',
+                data: {organId: cur.params.organId},
+                secureuri: false,
+                fileElementId: 'file1',
+                dataType: 'json',
+                success: function (data, status) {
+                    if (data.status == 1) {
+                        alert("上传成功");
+                        cancel();
+                    } else {
+                        alert(data.desc);
+                        window.location.reload();
+                    }
+                },
+                error: function (data, status, e) {
+                    alert(e);
+                    window.location.reload();
+                }
+            });
+        }
+
+        return false;
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+    function downLoad() {
+        if (cur.params.indicatorId) {
+
+        }else {
+            $("#download").attr("src", "$!{rc.contextPath}/organ/downUnitxls?name=" + cur.params.name);
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>APP配置</title>
+    <link href="$!{rc.contextPath}/assets/css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/css/themes/blue-min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/js/mf-pattern/mf-pattern.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/css/custom-min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/js/plugins/sui/css/sm.min.css" rel="stylesheet" type="text/css">
+    <link href="$!{rc.contextPath}/assets/css/mobile-min.css" rel="stylesheet" type="text/css"/>
+    <script src="$!{rc.contextPath}/assets/js/myfocus-min.js"></script>
+    <script src="$!{rc.contextPath}/assets/js/mf-pattern/mf-pattern.js"></script>
+</head>
+<body>
+
+<!-- page集合的容器，里面放多个平行的.page，其他.page作为内联页面由路由控制展示 -->
+<div class="page-group">
+
+    <!-- 首页 -->
+    <div class="page page-current" id="page_index">
+
+        <!-- 标题栏 -->
+        <header class="bar bar-nav m-top-bar">
+            <a class="icon icon-menu pull-left"></a>
+            <a class="icon icon-search pull-right"></a>
+            <h1 class="title">标题</h1>
+        </header>
+
+        <!-- 导航 -->
+        <div class="m-nav-bar">
+            <ul>
+                <li><a href="#" class="active">首页</a></li>
+                <li><a href="#">政府要闻</a></li>
+                <li><a href="#">热点评论</a></li>
+                <li><a href="#">部门动态</a></li>
+                <li><a href="#">区县传真</a></li>
+                <li><a href="#">公示公告</a></li>
+                <li><a href="#">国务院信息</a></li>
+                <div class="clearfix"></div>
+            </ul>
+            <div class="m-nav-pull-down">
+                <a href="#"> </a>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <nav class="bar bar-tab">
+            <a class="tab-item active" href="#page_index">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">首页</span>
+            </a>
+            <a class="tab-item" href="#page_hd">
+                <span class="icon icon-message"></span>
+                <span class="tab-label">互动</span>
+            </a>
+            <a class="tab-item" href="#page_fw">
+                <span class="icon icon-emoji"></span>
+                <span class="tab-label">服务</span>
+            </a>
+            <a class="tab-item" href="#page_xx">
+                <span class="icon icon-settings"></span>
+                <span class="tab-label">信息</span>
+            </a>
+        </nav>
+
+        <!-- 这里是页面内容区 -->
+        <div class="content m-content">
+
+            <div class="m-focus clearfix">
+                <div id="focus" class="mF_sohusports mF_sohusports_focus">
+                ## <div class="loading"><img src="/assets/images/loading.gif"  alt="请稍候..." /></div>
+                    <div class="pic">
+                        <!--图片列表-->
+                        <ul>
+                            <li><a href="demo.html#1"><img src="/assets/focus/1a.jpg" thumb="" alt="图片说明" text="详细的描述文字"/></a></li>
+                        </ul>
+                    </div>
+                    <div class="txt">
+                        <ul>
+                            <li style="display: block;"><a href="demo.html#1">图片说明</a>
+                                <p>详细的描述文字</p><b></b>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="num">
+                        <ul>
+                            <li class="current"><a>1</a><b></b></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <section class="m-info-body">
+                <div class="m-title"><strong>政府要闻</strong></div>
+                <div class="m-info-list">
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/1a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/3a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row m-info-even">
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六中全会公报</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="m-info-body">
+                <div class="m-title"><strong>政府要闻</strong></div>
+                <div class="m-info-list">
+                    <div class="m-info-row m-info-big">
+                        <div class="m-info-img">
+                            <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                        </div>
+                        <div class="m-info-ext">
+                            <h4>十二个关键词解读六中全会公报</h4>
+                            <div>2016-10-28</div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/3a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row m-info-even">
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六中全会公报</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="m-info-body">
+                <div class="m-title"><strong>政府要闻</strong></div>
+                <div class="m-info-list">
+                    <div class="m-info-row m-info-big">
+                        <div class="m-info-img">
+                            <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                        </div>
+                        <div class="m-info-ext">
+                            <h4>十二个关键词解读六中全会公报</h4>
+                            <div>2016-10-28</div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-25 m-info-img">
+                                <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                            </div>
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row">
+                            <div class="col-75 m-info-ext">
+                                <h4>十二个关键词解读六中全会公报</h4>
+                                <div>2016-10-28</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-info-row">
+                        <div class="row m-info-even">
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                            <div class="col-50 m-col-left">
+                                <div class="m-info-img">
+                                    <img src="/assets/focus/2a.jpg" thumb="" alt="图片1说明" text="图片1更详细的描述文字"/>
+                                </div>
+                                <div class="m-info-ext">
+                                    <h4>十二个关键词解读六中全会公报</h4>
+                                    <div>2016-10-28</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- 互动 -->
+    <div class="page" id="page_hd">
+
+        <!-- 标题栏 -->
+        <header class="bar bar-nav m-top-bar">
+            <a class="icon icon-menu pull-left"></a>
+            <a class="icon icon-search pull-right"></a>
+            <h1 class="title">标题</h1>
+        </header>
+
+        <!-- 导航 -->
+        <div class="m-nav-bar">
+            <ul>
+                <li><a href="#" class="active">首页</a></li>
+                <li><a href="#">政府要闻</a></li>
+                <li><a href="#">热点评论</a></li>
+                <li><a href="#">部门动态</a></li>
+                <li><a href="#">区县传真</a></li>
+                <li><a href="#">公示公告</a></li>
+                <li><a href="#">国务院信息</a></li>
+                <div class="clearfix"></div>
+            </ul>
+            <div class="m-nav-pull-down">
+                <a href="#"> </a>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <nav class="bar bar-tab">
+            <a class="tab-item" href="#page_index">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">首页</span>
+            </a>
+            <a class="tab-item active" href="#page_hd">
+                <span class="icon icon-message"></span>
+                <span class="tab-label">互动</span>
+            </a>
+            <a class="tab-item" href="#page_fw">
+                <span class="icon icon-emoji"></span>
+                <span class="tab-label">服务</span>
+            </a>
+            <a class="tab-item" href="#page_xx">
+                <span class="icon icon-settings"></span>
+                <span class="tab-label">信息</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- 服务 -->
+    <div class="page" id="page_fw"><!-- 标题栏 -->
+        <!-- 标题栏 -->
+        <header class="bar bar-nav m-top-bar">
+            <a class="icon icon-menu pull-left"></a>
+            <a class="icon icon-search pull-right"></a>
+            <h1 class="title">标题</h1>
+        </header>
+
+        <!-- 导航 -->
+        <div class="m-nav-bar">
+            <ul>
+                <li><a href="#" class="active">首页</a></li>
+                <li><a href="#">政府要闻</a></li>
+                <li><a href="#">热点评论</a></li>
+                <li><a href="#">部门动态</a></li>
+                <li><a href="#">区县传真</a></li>
+                <li><a href="#">公示公告</a></li>
+                <li><a href="#">国务院信息</a></li>
+                <div class="clearfix"></div>
+            </ul>
+            <div class="m-nav-pull-down">
+                <a href="#"> </a>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <nav class="bar bar-tab">
+            <a class="tab-item" href="#page_index">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">首页</span>
+            </a>
+            <a class="tab-item" href="#page_hd">
+                <span class="icon icon-message"></span>
+                <span class="tab-label">互动</span>
+            </a>
+            <a class="tab-item active" href="#page_fw">
+                <span class="icon icon-emoji"></span>
+                <span class="tab-label">服务</span>
+            </a>
+            <a class="tab-item" href="#page_xx">
+                <span class="icon icon-settings"></span>
+                <span class="tab-label">信息</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- 信息 -->
+    <div class="page" id="page_xx"><!-- 标题栏 -->
+        <!-- 标题栏 -->
+        <header class="bar bar-nav m-top-bar">
+            <a class="icon icon-menu pull-left"></a>
+            <a class="icon icon-search pull-right"></a>
+            <h1 class="title">标题</h1>
+        </header>
+
+        <!-- 导航 -->
+        <div class="m-nav-bar">
+            <ul>
+                <li><a href="#" class="active">首页</a></li>
+                <li><a href="#">政府要闻</a></li>
+                <li><a href="#">热点评论</a></li>
+                <li><a href="#">部门动态</a></li>
+                <li><a href="#">区县传真</a></li>
+                <li><a href="#">公示公告</a></li>
+                <li><a href="#">国务院信息</a></li>
+                <div class="clearfix"></div>
+            </ul>
+            <div class="m-nav-pull-down">
+                <a href="#"> </a>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <nav class="bar bar-tab">
+            <a class="tab-item" href="#page_index">
+                <span class="icon icon-home"></span>
+                <span class="tab-label">首页</span>
+            </a>
+            <a class="tab-item" href="#page_hd">
+                <span class="icon icon-message"></span>
+                <span class="tab-label">互动</span>
+            </a>
+            <a class="tab-item" href="#page_fw">
+                <span class="icon icon-emoji"></span>
+                <span class="tab-label">服务</span>
+            </a>
+            <a class="tab-item active" href="#page_xx">
+                <span class="icon icon-settings"></span>
+                <span class="tab-label">信息</span>
+            </a>
+        </nav>
+    </div>
+</div>
+<!-- 常规 图片+文字 -->
+<script id="img_text" type="text/html">
+    <?
+	if (data && data.length>0) {
+		for (var i=0,l=data.length;i<l;i++) {
+			var el = data[i];
+	?>
+    <div class="m-info-row">
+        <div class="row">
+            <? if(el.img){ ?>
+            <div class="col-25 m-info-img">
+                <img src="/assets/focus/1a.jpg" alt="图片1说明"/>
+            </div>
+            <div class="col-75 m-info-ext">
+                <h4><?=el.name?></h4>
+                <div><?=el.date?></div>
+            </div>
+            <? } else { ?>
+            <div class="col-100 m-info-ext">
+                <h4><?=el.name?></h4>
+                <div><?=el.date?></div>
+            </div>
+            <? } ?>
+        </div>
+    </div>
+	<?
+		}
+	}
+	?>
+</script>
+
+<!-- 单张大图 -->
+<script id="big_img" type="text/html">
+    <?
+	var nData = "";
+	if(data && data.length>0){
+        //第一个是图片的显示大图
+		if (data[0].img) {
+	?>
+    <div class="m-info-row m-info-big">
+        <div class="m-info-img">
+            <img src="<?=data[0].img?>" thumb="" alt="" text="<?=data[0].img?>"/>
+        </div>
+        <div class="m-info-ext">
+            <h4><?=data[0].name?></h4>
+            <div><?=data[0].date?></div>
+        </div>
+    </div>
+    <?
+            //去掉第一个数据，返回剩下几个
+			nData = data.splice(1,data.length);
+		} else {
+			nData = data;
+		}
+		include('img_img',{data:nData});
+	}
+	?>
+</script>
+
+<!-- 2张图片横排 -->
+<script id="img_img" type="text/html">
+    <?
+	var nData = data, flag = false;
+	//如果最后2张是图片，图片并排排列
+	if (data[data.length-1].img && data[data.length-2].img) {
+		var ldata = data[data.length-1],
+			rdata = data[data.length-2],
+			nData = data.splice(0, data.length-2);
+			flag = true;
+	} else {
+		nData = data;
+	}
+
+    //这里的数据已经去掉了最后2个数据（如果最后2张是图片的情况下）
+	include('img_text',{data:nData});
+
+	if (flag) {
+		var ldata = data[data.length-1],
+			rdata = data[data.length-2];
+	?>
+    <div class="m-info-row">
+        <div class="row m-info-even">
+            <div class="col-50 m-col-left">
+                <div class="m-info-img">
+                    <img src="<?=ldata.img?>" thumb="" alt="" text="<?=ldata.name?>"/>
+                </div>
+                <div class="m-info-ext">
+                    <h4><?=ldata.name?></h4>
+                    <div><?=ldata.date?></div>
+                </div>
+            </div>
+            <div class="col-50 m-col-left">
+                <div class="m-info-img">
+                    <img src="<?=rdata.img?>" thumb="" alt="" text="<?=rdata.name?>"/>
+                </div>
+                <div class="m-info-ext">
+                    <h4><?=rdata.name?></h4>
+                    <div><?=rdata.date?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?
+	}
+	?>
+</script>
+
+<script id="mobile_list" type="text/html">
+    <?
+    var data = articleNews;
+    if (data && data.length>0) {
+    	for (var i=0,l=data.length;i<l;i++) {
+    	var el = data[i];
+    ?>
+    <section class="m-info-body">
+        <div class="m-title"><strong><?=el.name?></strong></div>
+        <div class="m-info-list">
+            <?
+            //首页第一个是大图的不显示大图，因为顶上有轮播图
+			if (i==0) {
+            	include('img_text',el)
+            }else{
+				include('big_img',el)
+            }
+            ?>
+        </div>
+    </section>
+    <?
+        }
+    }
+    ?>
+</script>
+
+<script src='$!{sysStaticPath}/assets/js/plugins/zepto-min.js'></script>
+<script src='$!{sysStaticPath}/assets/js/plugins/sui/js/sm-min.js'></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/scrollbar-min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/arttemplate-min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/mobile_mgr.js"></script>
+<script>
+
+
+</script>
+</body>
+</html>

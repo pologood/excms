@@ -1,0 +1,146 @@
+<style>
+    .ui-state-highlight {
+        background: #F0F0EE;
+        border: dotted #00a2d4 1px;
+    }
+
+    .lsui-icon-move {
+        height: 20px;
+        width: 20px;
+        overflow: hidden;
+        display: inline-block;
+        background: url('/assets/design/static/css/imgs/move.png') center center no-repeat;
+    }
+
+    .ls-listtable {
+        margin-top: 15px;
+        /*height: 290px;*/
+        /*overflow: hidden;*/
+    }
+
+    /*.ls-listtable-inner {*/
+    /*height: 270px;*/
+    /*overflow-y: scroll;*/
+    /*}*/
+
+</style>
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10">
+
+    <fieldset>
+        <legend>组件设置</legend>
+        <sui-control-group>
+            <sui-checkbox v-model="conf.isTitle">显示标题</sui-checkbox>
+            <!--<sui-checkbox v-model="conf.isMore">显示更多</sui-checkbox>-->
+        </sui-control-group>
+
+        <sui-control-group title="标题">
+            <sui-input size="large" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.title" rules="required"
+                       placeholder="请输入标题"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="标题链接">
+            <sui-input size="xlarge" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.titleHref"
+                       placeholder="请输入标题链接"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="大小">
+            宽
+            <sui-input size="mini" v-model="conf.width" rules="required|digits|gt=49|lt=2001"
+                       errmsg="大于等于50且小于2000的整数"></sui-input>
+            - 高
+            <sui-input size="mini" v-model="conf.height" rules="required|digits|gt=49|lt=2001"
+                       errmsg="大于等于50且小于2000的整数"></sui-input>
+            <span class="sui-msg msg-info">(单位:像素)</span>
+        </sui-control-group>
+
+        <sui-control-group title="内间距">
+            <sui-input v-model="conf.panelPadding" rules="required|digits|gt=-1|lt=500" errmsg="大于等于0且小于500的整数"
+                       size="mini"></sui-input>
+            <span class="sui-msg msg-info">(单位:像素)</span>
+        </sui-control-group>
+
+        <!--<sui-control-group title="标题高度" v-if="conf.isTitle">-->
+    <!--<sui-input v-model="conf.panelHeadingHeight" rules="required|digits|gt=-1|lt=500"  errmsg="大于等于0且小于500的整数" size="mini" > </sui-input>-->
+    <!--<span class="sui-msg msg-info">(单位:像素)</span>-->
+<!--</sui-control-group>-->
+
+<sui-control-group title="">
+    <sui-checkbox v-model="conf.isCustomPBH">自定义内容高度</sui-checkbox>
+</sui-control-group>
+<sui-control-group title="内容高度" v-if="conf.isCustomPBH">
+    <sui-input v-model="conf.panelBodyHeight" rules="required|digits|gt=-1|lt=5000"  errmsg="大于等于0且小于5000的整数" size="mini" > </sui-input>
+    <span class="sui-msg msg-info">(单位:像素)</span>
+</sui-control-group>
+
+<sui-control-group title="组件样式" v-if="isStyleList">
+    <sui-dropdown v-model="conf.className" @on-target-change="onStyleListChange"
+                  :items="styleList">
+    </sui-dropdown>
+</sui-control-group>
+
+    </fieldset>
+
+
+    <fieldset>
+        <legend>调用设置</legend>
+
+        <div class="mb10">
+            <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="add">添加</a>
+            <!--<a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="associateNode">添加关联栏目</a>-->
+        </div>
+
+        <div class="ls-listtable">
+            <table class="sui-table table-bordered" style="margin-bottom: 0; width: 760px;">
+                <thead>
+                <tr>
+                    <th>排序</th>
+                    <th>名称</th>
+                    <th>链接</th>
+                    <!-- <th>启用</th> -->
+                    <th>打开方式</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="attrFormTBody">
+
+                <!--<template>-->
+
+                <tr v-for="(el,index) in conf.list" v-bind:id="'tr_'+ index">
+                    <td class="tc">
+                        <i class="lsui-icon-move movehandler" style="cursor:pointer" title="按下鼠标拖拽,可以改变行的顺序"></i>
+                    </td>
+                    <td>
+                        <input type="text" class="input-large" data-rules="required" v-model="el.name">
+                    </td>
+                    <td>
+                        <input type="text" class="input-large" data-rules="required" v-model="el.href">
+                    </td>
+                    <td width="80">
+                        <span class="sui-dropdown dropdown-bordered select">
+                            <span class="dropdown-inner">
+                                <a href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                    <input v-model="el.target" type="hidden"><i
+                                    class="caret"></i><span>{{el.target|targetTxt}}</span>
+                                </a>
+                                <ul class="sui-dropdown-menu">
+                                    <li><a tabindex="-1" href="javascript:void(0);" value="_blank">新窗口</a></li>
+                                    <li><a tabindex="-2" href="javascript:void(0);" value="_self">当前页</a></li>
+                                </ul>
+                            </span>
+                        </span>
+
+                    </td>
+                    <td style="width:60px; text-align: center; ">
+                        <a href="javascript:void(0);" class="sui-btn btn-bordered btn-small btn-danger"
+                           v-on:click="remove(index)">删除</a>
+                    </td>
+                </tr>
+                <!--</template>-->
+                </tbody>
+            </table>
+        </div>
+
+
+        <!--ls-listtable-->
+    </fieldset>
+</form>

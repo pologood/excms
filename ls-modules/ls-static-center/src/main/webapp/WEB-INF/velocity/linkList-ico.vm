@@ -1,0 +1,41 @@
+##获取当前标签参数
+var getScriptArgs = function(){
+    var scripts = document.getElementsByTagName("script");
+    var script = scripts[scripts.length-1],src = script.src, reg=/(?:\?|&)(.*?)=(.*?)(?=&|$)/g, temp, res={};
+    while((temp=reg.exec(src))!=null) res[temp[1]]=decodeURIComponent(temp[2]); return res;
+};
+##标签li数组，查询条数
+var args = getScriptArgs();
+var linkLiArr = [],num = args.num;
+if(!num || num <= 0){
+	num = "$!{paramObj.num}";
+}
+#set($isLogo=$!{paramObj.isLogo})
+#set($width=$!{paramObj.width})
+#set($height=$!{paramObj.height})
+#foreach($eo in $resultObj)
+var linkLi = '<li class="num$!{velocityCount}">
+    #if("$!{eo.redirectLink}" == "#")
+    <a href="javascript:void(0)" title="#filterHtml($!{eo.title})">
+    #else
+    <a href="$!{eo.redirectLink}" target="_blank" title="#filterHtml($!{eo.title})">
+    #end
+    <span class="ico"></span>
+    <span class="tit">$!{eo.title}</span>
+	</a>
+</li>';
+linkLiArr.push(linkLi);
+#end
+##输出内容
+var printContent = function(){
+	var length = linkLiArr.length;
+    if(num > length){
+    	num = length;
+    }
+    if(linkLiArr.length > 0){
+    	for(var i=0;i < num;i++){
+    		document.write(linkLiArr[i]);
+    	}
+    }
+};
+printContent();

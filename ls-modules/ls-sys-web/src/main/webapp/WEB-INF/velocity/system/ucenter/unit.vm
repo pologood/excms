@@ -1,0 +1,153 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light" style="display: none;">
+            <div class="portlet-title">
+                <div class="caption font-grey-silver">
+                    <span class="caption-subject bold uppercase"> 组织机构信息 </span>
+                </div>
+                <!--<div class="actions">
+                  <div class="actions">
+                    <a href="javascript:;" id="site_classify" class="btn red">
+                      <i class="fa fa-sitemap"></i> 栏目管理
+                    </a>
+                  </div>
+                </div>-->
+            </div>
+            <div class="portlet-body form col-md-8" style="padding-left: 0;">
+
+                <form id="organ_form" role="form" ms-controller="organ_form">
+                    <div class="form-body">
+
+                        <input name="organId" class="form-control" ms-duplex="organId" type="hidden"></input>
+                        <input name="pid" class="form-control" ms-duplex="pid" type="hidden"></input>
+                        <input name="parentNodeType" class="form-control" ms-duplex="parentNodeType" type="hidden"></input>
+                        <input name="isParentFictitious" class="form-control" ms-duplex="isParentFictitious" type="hidden"></input>
+                        <input name="organId" class="form-control" ms-duplex="organId" type="hidden"></input>
+                        <input name="isExternal" class="form-control" ms-duplex="isExternal" type="hidden"></input>
+                        <input name="fictitious" class="form-control" ms-duplex="fictitious" type="hidden"></input>
+
+                        <div class="form-group">
+                            <label>类型</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" name="nodeType1" value="Organ" ms-attr-disabled="disDw" ms-duplex-string="nodeType">
+                                    单位
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="nodeType1" value="OrganUnit" ms-attr-disabled="disBm" ms-duplex-string="nodeType">
+                                    处室（科室）
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input name="name" type="text" class="form-control" placeholder="" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>编码</label>
+                            <input name="code" type="text" class="form-control" placeholder="" ms-duplex="code" maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label>信息公开是否开启</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" name="isPublic" value="1" ms-duplex-string="isPublic">
+                                    是
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="isPublic" value="0" ms-duplex-string="isPublic">
+                                    否
+                                </label>
+                            </div>
+                        </div>
+                        <!--  <div class="form-group siteId hide">
+                            <label>站点</label>
+                            <select id="siteId" class="form-control" name="siteId"
+                                    ms-duplex="siteId" placeholder="请选择站点">
+                            </select>
+                          </div> -->
+
+
+                        <div class="form-group">
+                            <label>简称</label>
+                            <input name="simpleName" type="text" class="form-control" placeholder="" ms-duplex="simpleName" maxlength="40">
+                        </div>
+
+                        <div class="form-group">
+                            <label>排序号</label>
+                            <input type="number" name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                        </div>
+
+                        <div class="form-group">
+                            <label>联系电话1</label>
+                            <input name="officePhone" type="text" class="form-control" placeholder="" ms-duplex="officePhone" maxlength="80">
+                        </div>
+
+                        <div class="form-group">
+                            <label>服务电话2</label>
+                            <input name="servePhone" type="text" class="form-control" placeholder="" ms-duplex="servePhone" maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label>联系地址1</label>
+                            <input name="officeAddress" type="text" class="form-control" placeholder="" ms-duplex="officeAddress" maxlength="200">
+                        </div>
+
+                        <div class="form-group">
+                            <label>联系地址2</label>
+                            <input name="serveAddress" type="text" class="form-control" placeholder="" ms-duplex="serveAddress" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>单位网址</label>
+                            <input name="organUrl" type="text" class="form-control" placeholder="" ms-duplex="organUrl" maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>单位负责人</label>
+                            <input name="headPerson" type="text" class="form-control" placeholder="" ms-duplex="headPerson" maxlength="20">
+                        </div>
+
+                        <div class="form-group">
+                            <label>职务</label>
+                            <input name="positions" type="text" class="form-control" placeholder="" ms-duplex="positions" maxlength="64">
+                        </div>
+                        <div class="form-group">
+                            <label>简介</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="" ms-duplex="description"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="form-actions noborder">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default" ms-click="formReset">重 置</button>
+                    </div>
+                </form>
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+        <!-- END SAMPLE FORM PORTLET-->
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/unit_manage.js"></script>
+<script>
+    var isRemoveNode = '$!{isRemoveNode}';
+    $(document).ready(function () {
+        unitManage.organ();
+    })
+</script>

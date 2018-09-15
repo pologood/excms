@@ -1,0 +1,707 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+<body>
+    <table>
+        <tbody>
+##		<tr>
+##			<td valign="top" colspan="6">通道id:53f3eda79a05c23c1e1ac497-->通知公告（2656800）通道id:53f463789a05c2544be426a4-->经验交流（2657096）通道id:540917055d21fbbb3617aa64-->工作动态（2657100）</br>
+##			通道id:53f30ece9a05c27410da5295-->舆情回应（2658583）通道id:53f2ef669a05c2f902d8596a-->督查通报（2658466）通道id:53f2e5859a05c2b07f752c85-->国家级制度规定（2810774）</br>
+##			通道id:53f2e5919a05c20774c1585a-->省级制度规定（2810780）通道id:53f2e59d9a05c2b07f005266-->市级制度规定（2810787）</br></td>
+##        </tr>
+##		<tr>
+##            <td valign="top" colspan="6">
+##				通道id：<input type="text" name="channelId" id="channelId" />
+##				栏目id：<input type="text" name="columnId" id="columnId" />
+##				<button type="button" onclick="importColumn();">导入</button>（选择对应通道导入对应栏目数据）
+##            </td>
+##        </tr>
+        <tr>
+            <td valign="top" style="width:120px;">宿州单位id：</td>
+            <td valign="top" colspan="2">
+            ##                <input id="suzhou_organId"  name = "suzhou_organId" />
+
+                <div id="suzhou_menuContent_ser"
+                     style="display:none; position: absolute; left: 50; top:34px; z-index: 10000; width: 252px; height: 300px; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                    <ul id="suzhou_treeDemo_ser" class="ztree" style="margin-top:0;"></ul>
+                </div>
+                <input type="text" id="suzhou_organId_ser" style="display: none" name="suzhou_organId" disabled class="form-control readonly" ms-duplex="suzhou_organId">
+                <input type="text" id="suzhou_organName_ser" placeholder="单位" style="width:252px;" class="form-control readonly" readonly ms-duplex="suzhou_organName" onclick="suzhou_showSerTree()">
+
+
+            </td>
+            <td valign="top" style="width:120px;">--> EX8单位id：</td>
+            <td valign="top" colspan="2">
+            ##				<input id="ex8_organId" type="text" />
+
+                <div id="ex8_menuContent_ser"
+                     style="display:none; position: absolute; left: 50; top:34px; z-index: 10000; width: 252px; height: 300px; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                    <ul id="ex8_treeDemo_ser" class="ztree" style="margin-top:0;"></ul>
+                </div>
+                <input type="text" id="ex8_organId_ser" style="display: none" name="ex8_organId" disabled class="form-control readonly" ms-duplex="ex8_organId">
+                <input type="text" id="ex8_organName_ser" placeholder="单位"  style="width:252px;" class="form-control readonly" readonly ms-duplex="ex8_organName" onclick="ex8_showSerTree()">
+
+
+
+            </td>
+		<tr>
+            <td valign="top" colspan="6">
+                <button type="button" style="height: 40px; margin:5px;" onclick="importLeader();">导入单位领导</button>
+                <button type="button" style="height: 40px; margin:5px;" onclick="importWork();">导入工作动态(先导入单位领导)</button>
+                <button type="button" style="height: 40px; margin:5px;" onclick="importCatDesc();">导入分管领导和责任人</button>
+                <button type="button" style="height: 40px; margin:5px;" onclick="importPublicGuide();">导入公开指南</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importPublicAnnualReport();">导入公开年报</button>
+                <button type="button" style="height: 40px; margin:5px;" onclick="importPublicInstitution();">导入公开制度</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublic();">导入依申请公开</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublicCatalog();">导入依申请公开目录</button>
+				<span>左边所有按钮都是针对所有单位的操作。</span>
+				<span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+				<span id="clear_msg" style="color: red;display: none">数据正在清空,请耐心等待(请勿关闭浏览器)。</span>
+			</td>
+        </tr>
+        <tr style="margin-top:20px">
+            <td valign="top" style="width:400px;" colspan="2">宿州市信息公开目录：
+                <div style="border: 1px solid black;height:400px;overflow:auto;">
+                    <ul id="suzhou_public_tree" class="ztree"></ul>
+                </div>
+			</td>
+            <td valign="top" style="padding-left:30px;width:400px;" colspan="2">-> EX8信息公开目录：
+                <div style="border: 1px solid black;height:400px;overflow:auto;">
+					<ul id="ex8_public_tree" class="ztree" style="width:300px;"></ul>
+                </div>
+			</td>
+            <td valign="top" style="width:400px" colspan="2">--> 操作：
+				<button type="button" style="height:40px; " onclick="importDrivingPublic();">导入</button>
+				<button type="button" style="height:40px; " onclick="clearPublicInfo();" >清空</button><br />
+				<span style="margin-left:30px;">可选择对应单位或者目录进行数据相关操作。</span>
+			</td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+var cur = {
+	suzhou_tree : null,
+	ex8_tree : null,
+	suzhou_selectNode : null,
+	ex8_selectNode : null
+//    organId_ser: $('#organId_ser'),//查询部门选择组件
+//    organName_ser: $('#organName_ser'),//查询部门选择组件
+//    organId: $('#organId'),//添加修改部门选择组件
+//    organName: $('#organName'),//添加修改部门选择组件
+}
+
+var ztree_settings_suzhou = {
+    view: {
+        nameIsHTML: true,
+        showTitle: true,
+        selectedMulti: false,
+        dblClickExpand: false,
+        expandSpeed: "fast"
+    },
+	async: {
+        enable: true,
+		autoParam : [ "organId=id", "id=mongoId" ],
+        url: "/suzhou/xxgk/getSuzhouPublicTree"
+    },
+    data: {
+        keep: {},
+        key: {
+            title: "id",
+            name: "name"
+        },
+        simpleData: {
+            idKey: 'id',
+            pIdKey: 'parentId'
+        }
+    },
+    callback: {
+        onClick: function (event, treeId, node) {
+            if(node.isOrgan){
+                var tree = $.fn.zTree.getZTreeObj(treeId);
+                tree.expandNode(node);
+                tree.cancelSelectedNode(node);
+            }
+			cur.suzhou_selectNode = node;
+            return false;
+        }
+    }
+};
+
+var ztree_settings_ex8 = {
+    view: {
+        nameIsHTML: true,
+        showTitle: true,
+        selectedMulti: false,
+        dblClickExpand: false,
+        expandSpeed: "fast"
+    },
+	async: {
+        enable: true,
+        url: "/suzhou/xxgk/getEx8PublicTree",
+		autoParam: ["organId=id"]
+    },
+    data: {
+        keep: {},
+        key: {
+            title: "id",
+            name: "name"
+        },
+        simpleData: {
+            idKey: 'id',
+            pIdKey: 'parentId'
+        }
+    },
+    callback: {
+        onClick: function (event, treeId, node) {
+            if(node.isOrgan){
+                var tree = $.fn.zTree.getZTreeObj(treeId);
+                tree.expandNode(node);
+                tree.cancelSelectedNode(node);
+            }
+            cur.ex8_selectNode = node;
+            return false;
+        }
+    }
+};
+
+$(document).ready(function () {
+    cur.suzhou_tree = $.fn.zTree.init($("#suzhou_public_tree"), ztree_settings_suzhou);
+    cur.ex8_tree = $.fn.zTree.init($("#ex8_public_tree"), ztree_settings_ex8);
+
+    suzhou_organ_select_tree_ser.init();
+    ex8_organ_select_tree_ser.init();
+});
+
+var suzhou_organ_select_tree_ser = function () {
+    var init = function () {
+        var setting = {
+            view: {
+                nameIsHTML: true,
+                showTitle: true,
+                selectedMulti: false,
+                dblClickExpand: false,
+                expandSpeed: "fast"
+            },
+            async: {
+                enable: true,
+                url: "/suzhou/xxgk/getSuzhouOrganTree",
+                autoParam: ["id=id"]
+            },
+            callback: {
+                onClick: onClick
+            },
+            data: {
+                keep: {},
+                key: {
+                    title: "id",
+                    name: "name"
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "parentId"
+                }
+            }
+        };
+
+
+        function onClick(e, treeId, treeNode) {
+//            if (treeNode.isParent) return false;
+            var id = $("#suzhou_organId_ser");
+            var name = $("#suzhou_organName_ser");
+            id.val(treeNode.id);
+            name.val(treeNode.name);
+            suzhou_hideSerTree();
+        }
+
+
+        $.fn.zTree.init($("#suzhou_treeDemo_ser"), setting);
+    }
+
+    return {
+        init: init
+    }
+
+}();
+
+function suzhou_showSerTree() {
+    var organName = $("#suzhou_organName_ser");
+//    var organName_iconBtn = $("#icon_btn");
+    $("#suzhou_menuContent_ser").css({width: organName.outerWidth() - 1}).slideDown("fast");
+    $("body").bind("mousedown", suzhou_onSerBodyDown);
+
+}
+function suzhou_hideSerTree() {
+    $("#suzhou_menuContent_ser").hide();
+    $("body").unbind("mousedown", suzhou_onSerBodyDown);
+}
+function suzhou_onSerBodyDown(event) {
+    if (!(event.target.id == "suzhou_menuContent_ser" || $(event.target).parents("#suzhou_menuContent_ser").length > 0)) {
+        suzhou_hideSerTree();
+    }
+}
+var ex8_organ_select_tree_ser = function () {
+    var init = function () {
+        var setting = {
+            view: {
+                nameIsHTML: true,
+                showTitle: true,
+                selectedMulti: false,
+                dblClickExpand: false,
+                expandSpeed: "fast"
+            },
+            async: {
+                enable: true,
+
+                url: "/suzhou/xxgk/getEx8OrganTree",
+                autoParam: ["id=parentId", "dn=parentDn"]
+            },
+            callback: {
+                onClick: onClick
+            },
+            data: {
+                keep: {},
+                key: {
+                    title: "id",
+                    name: "name"
+                },
+                simpleData: {
+                    enable: true,
+                    idKey: "id",
+                    pIdKey: "parentId"
+                }
+            }
+        };
+
+
+        function onClick(e, treeId, treeNode) {
+//            if (treeNode.isParent) return false;
+            var id = $("#ex8_organId_ser");
+            var name = $("#ex8_organName_ser");
+            id.val(treeNode.id);
+            name.val(treeNode.name);
+            ex8_hideSerTree();
+        }
+
+
+        $.fn.zTree.init($("#ex8_treeDemo_ser"), setting);
+    }
+
+    return {
+        init: init
+    }
+
+}();
+function ex8_showSerTree() {
+    var organName = $("#ex8_organName_ser");
+//    var organName_iconBtn = $("#icon_btn");
+    $("#ex8_menuContent_ser").css({width: organName.outerWidth() - 1}).slideDown("fast");
+    $("body").bind("mousedown", ex8_onSerBodyDown);
+
+}
+function ex8_hideSerTree() {
+    $("#ex8_menuContent_ser").hide();
+    $("body").unbind("mousedown", ex8_onSerBodyDown);
+}
+function ex8_onSerBodyDown(event) {
+    if (!(event.target.id == "ex8_menuContent_ser" || $(event.target).parents("#ex8_menuContent_ser").length > 0)) {
+        ex8_hideSerTree();
+    }
+}
+function importPublicInfo(url){
+	$("#doSub_msg").show();
+	Ls.ajaxGet({
+        url: url,
+        success: function (text) {
+            if (text.status == 0) {
+                Ls.tipsErr(text.desc);
+            } else {
+                alert("导入成功");
+				$("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+
+function importLeader(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importLeader",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+
+function importWork(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    if (confirm('确定导入?')) {
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: "/suzhou/xxgk/importWork",
+            data:{
+                suzhouOrganId:suzhouOrganId,
+                ex8OrganId:ex8OrganId
+            },
+            success: function (text) {
+                if (text.status == 0) {
+                    alert("系统异常，请联系管理员");
+                    $("#doSub_msg").hide();
+                } else {
+                    alert("导入成功");
+                    $("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+}
+
+function importSuperorAndAgent(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importCatDesc",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+
+function importPublicGuide(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importPublicGuide",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function importPublicAnnualReport(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importPublicAnnualReport",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+
+function importPublicInstitution(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importPublicInstitution",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function importApplyPublic(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importApplyPublic",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function importApplyPublicCatalog(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importApplyPublicCatalog",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function importDrivingPublic(){
+	if(cur.suzhou_selectNode==null || cur.ex8_selectNode == null){
+		alert("请选择对应单位或目录");
+        return false;
+	}
+	if(cur.suzhou_selectNode.isOrgan != cur.ex8_selectNode.isOrgan){
+		alert("只能单位对单位或者目录对目录导入");
+        return false;
+	}
+	var data = {isOrgan : cur.suzhou_selectNode.isOrgan};
+	if(data.isOrgan){
+		data.suzhouOrganId = cur.suzhou_selectNode.id;
+		data.ex8OrganId = cur.ex8_selectNode.id;
+	}else{
+		data.suzhouOrganId = cur.suzhou_selectNode.organId;
+		data.suzhouCatId = cur.suzhou_selectNode.id;
+		data.ex8OrganId = cur.ex8_selectNode.organId;
+		data.ex8CatId = cur.ex8_selectNode.id;
+	}
+	$("#doSub_msg").show();
+    Ls.ajaxGet({
+        data: data,
+        url: "/suzhou/xxgk/importDrivingPublic",
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+				$("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function importCatDesc(){
+    var suzhouOrganId = $("#suzhou_organId_ser").val();
+    var ex8OrganId = $("#ex8_organId_ser").val();
+    if(suzhouOrganId==null||suzhouOrganId==""){
+        alert("请选择宿州单位！");
+        return;
+    }
+    if(ex8OrganId==null||ex8OrganId==""){
+        alert("请选择EX8单位！");
+        return;
+    }
+    $("#doSub_msg").show();
+    Ls.ajaxGet({
+        url: "/suzhou/xxgk/importCatDesc",
+        data:{
+            suzhouOrganId:suzhouOrganId,
+            ex8OrganId:ex8OrganId
+        },
+        success: function (text) {
+            if (text.status == 0) {
+                alert("系统异常，请联系管理员");
+                $("#doSub_msg").hide();
+            } else {
+                alert("导入成功");
+                $("#doSub_msg").hide();
+            }
+        }
+    });
+}
+
+function clearPublicInfo(){
+	if(cur.ex8_selectNode == null){
+		alert("请选择EX8信息公开单位或目录");
+        return false;
+	}
+	var data = {isOrgan : cur.ex8_selectNode.isOrgan};
+	if(data.isOrgan){
+		data.organId = cur.ex8_selectNode.id;
+	}else{
+		data.organId = cur.ex8_selectNode.organId;
+		data.catId = cur.ex8_selectNode.id;
+	}
+	$("#clear_msg").show();
+	Ls.ajaxGet({
+        url: "/suzhou/xxgk/clear",
+		data : data,
+        success: function (text) {
+            if (text.status == 0) {
+                Ls.tipsErr(text.desc);
+            } else {
+                alert("清空成功");
+				$("#clear_msg").hide();
+            }
+        }
+    });
+}
+
+function importColumn(){
+	var channelId = $("#channelId").val();
+    var columnId = $("#columnId").val();
+
+    if(channelId==null||channelId==""){
+        alert("请填写通道id");
+        return false;
+    }
+
+    if(columnId==null||columnId==""){
+        alert("请填写栏目id");
+        return false;
+    }
+
+    var data = {
+        channelId : channelId,
+        columnId : columnId
+    };
+
+	$("#doSub_msg").show();
+    Ls.ajaxGet({
+        data: data,
+        url: "/suzhou/xxgk/importColumn",
+        success: function (text) {
+            if (text.status == 0) {
+                Ls.tipsErr(text.desc);
+            } else {
+                alert("导入成功");
+				$("#doSub_msg").hide();
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

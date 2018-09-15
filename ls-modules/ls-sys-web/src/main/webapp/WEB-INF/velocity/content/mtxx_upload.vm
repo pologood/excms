@@ -1,0 +1,83 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>美图秀秀</title>
+</head>
+<style type="text/css">
+    body {
+        margin: 0px;
+        padding: 0px !important;
+    }
+</style>
+<body class="page-body-white">
+<div id="flashEditorOut">
+    <div id="mtxxContent">
+    </div>
+    <div id="drap" class="drap" style="display:none">
+        <input id="file" type="file" accept="image/*"/>
+    </div>
+</div>
+<input type="hidden" name="mongoId" id="mongoId" value=""/>
+<script src="http://open.web.meitu.com/sources/xiuxiu.js"></script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script type="text/javascript">
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        mType: Ls.url.get("mType"),
+        siteId: Ls.url.get("siteId"),
+        columnId: Ls.url.get("columnId")
+    }
+    $(document).ready(function () {
+
+        /*var winW = $(window).width(), winH = $(window).height();
+        $("#mtxxContent").width(winW).height(winH);*/
+
+        if (!api) {
+            document.getElementById("content").style.display = 'none';
+            alert('不可单独打开上传页面！');
+        } else {
+            var timer = setInterval(function () {
+                if (xiuxiu) {
+                    clearInterval(timer);
+                    xiuxiu.setLaunchVars("cropPresets", "4:3"); //设置裁剪的比例
+                    xiuxiu.setLaunchVars("titleVisible", 0);  //隐藏标题栏
+                    xiuxiu.setLaunchVars("maxFinalWidth", 800);  //上传图片最大宽度
+                    //xiuxiu.setLaunchVars("maxFinalHeight", ); //上传图片最大高度
+
+                    xiuxiu.embedSWF("mtxxContent", 3, "100%", "100%");
+
+                    xiuxiu.onInit = function () {
+                        xiuxiu.setUploadURL(Ls.getDomain + "/content/uploadAttachment?mType=" + cur.mType + "&siteId=" + cur.siteId + "&columnId=" + cur.columnId + "&contentId=&imgLink="
+                        );
+                        xiuxiu.setUploadType(2);
+                        xiuxiu.setUploadDataFieldName("Filedata");
+                        xiuxiu.loadPhoto("", false);
+                    }
+
+                    xiuxiu.onBeforeUpload = function (data, id) {
+                        return true;
+                    }
+
+                    xiuxiu.onUploadResponse = function (d) {
+                        $("#mongoId").val(d)
+                        api.close();
+                    }
+
+                    xiuxiu.onDebug = function (data) {
+                        alert("错误响应" + data);
+                    }
+
+                    xiuxiu.onClose = function (id) {
+                        api.close();
+                    }
+                }
+            }, 100);
+        }
+    })
+
+</script>
+</body>
+</html>

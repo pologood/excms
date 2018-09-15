@@ -1,0 +1,256 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+  <div region="west" showHeader="false" splitSize="0" width="260"
+       style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+    <div style="padding:5px; overflow: hidden;">
+      <ul id="column_tree" class="ztree"></ul>
+    </div>
+  </div>
+  <div region="center" style="border:none; overflow: auto;" >
+    <div id="center_tab_com" class="tabbable-line" style="margin:12px 20px 15px;display: none">
+      <ul class="nav nav-tabs">
+        <li class="active">
+          <a>栏目信息</a>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+          <form id="comColumnForm" role="form" ms-controller="comColumnForm">
+            <div class="form-body">
+              <div class="form-group hide">
+                <label>站点ID</label>
+                <input type="text" name="siteId" ms-duplex-number="siteId" class="form-control"
+                       placeholder="" disabled>
+              </div>
+              <div class="form-group hide">
+                <label>ID</label>
+                <input type="text" name="indicatorId" ms-duplex-number="indicatorId"
+                       class="form-control" placeholder="" disabled>
+              </div>
+              <div class="form-group hide">
+                <label>PID</label>
+                <input type="text" name="parentId" ms-duplex-number="parentId" class="form-control"
+                       placeholder="" disabled>
+              </div>
+              <div class="form-group hide">
+                <label>是否为父节点</label>
+                <input type="text" name="isParent" ms-duplex-number="isParent" class="form-control"
+                       placeholder="" disabled>
+              </div>
+              <div class="form-group hide">
+                <label>栏目配置ID</label>
+                <input type="text" name="columnConfigId" ms-duplex-number="columnConfigId"
+                       class="form-control" placeholder="" disabled>
+              </div>
+              <div class="form-group">
+                <label>栏目名称</label>
+                <input type="text" name="name" class="form-control" ms-duplex-string="name"
+                       placeholder="">
+              </div>
+
+              <div class="form-group">
+                <label>栏目序号</label>
+                <input type="number" name="sortNum" class="form-control" ms-duplex-number="sortNum"
+                       placeholder="用于站点排序，按从小到大排序">
+              </div>
+
+              <div class="form-group" id="contentModel">
+                <label>内容模型</label>
+                  <select class="form-control" name="contentModelCode" id="contentModelCode" ms-duplex="contentModelCode"
+                          placeholder="请选择内容模型" ms-change="checkColumnType">
+                  </select>
+              </div>
+              <div id="isStart" style="display: none">
+              <div class="form-group">
+                <label>启用跳转地址</label>
+
+                <div class="radio-group">
+                  <label class="radio-inline"><input type="radio" name="isStartUrl"
+                                                     ms-duplex-number="isStartUrl" value="1"
+                                                     ms-click="changeUrl()"> 是 </label>
+                  <label class="radio-inline"><input type="radio" name="isStartUrl"
+                                                     ms-duplex-number="isStartUrl" value="0"
+                                                     ms-click="changeUrl()"> 否 </label>
+                </div>
+              </div>
+              <div id="startUrl">
+                <div class="form-group">
+                  <label>跳转地址</label>
+                  <input type="text" name="transUrl" ms-duplex-string="transUrl" class="form-control"
+                         placeholder="跳转URL，需要Http://">
+                </div>
+                <div class="form-group">
+                  <label>跳转窗口</label>
+
+                  <div class="radio-group">
+                    <label class="radio-inline"><input type="radio" name="transWindow"
+                                                       ms-duplex-number="transWindow" value="0">
+                      本窗口跳转 </label>
+                    <label class="radio-inline"><input type="radio" name="transWindow"
+                                                       ms-duplex-number="transWindow" value="1">
+                      子窗口跳转 </label>
+                  </div>
+                </div>
+              </div>
+              </div>
+              <div class="form-group dn linksMgr">
+                <label>是否为logo图片</label>
+
+                <div class="radio-group">
+                  <label class="radio-inline">
+                    <input type="radio" ms-duplex-number="isLogo" value="1" ms-click="typeChange(1)"> 是 </label>
+                  <label class="radio-inline">
+                    <input type="radio" ms-duplex-number="isLogo" value="0" ms-click="typeChange(0)"> 否 </label>
+                </div>
+              </div>
+              <div class="form-group dn linksMgrY">
+                <label>图片宽度</label>
+                <input type="text" class="form-control"
+                       ms-duplex="width" placeholder="为0不限制图片宽度">
+              </div>
+              <div class="form-group dn linksMgrY">
+                <label>图片高度</label>
+                <input type="text" class="form-control"
+                       ms-duplex="height" placeholder="为0不限制图片高度">
+              </div>
+              <div class="form-group dn linksMgr">
+                <label>条数</label>
+                <input type="text" class="form-control"
+                       ms-duplex="num">
+              </div>
+
+              <div class="form-group">
+                <label>关键词</label>
+                <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3"
+                          placeholder="栏目关键字，建议100字以内有利搜索引擎抓取"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>描述</label>
+                <textarea class="form-control" name="description" ms-duplex="description" rows="3"
+                          placeholder="栏目描述，建议1000字以内有利搜索引擎抓取"></textarea>
+              </div>
+
+              <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save" id="doSave">保 存</button>
+                <button type="button" class="btn btn-default btn-reset" id="doReset"
+                        href="javascript:;">重 置
+                </button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/com_column.js"></script>
+<script>
+  var cur = {
+    vm: {},
+    contentList:{},
+    contentModelStr:'',
+    length:0
+  };
+  var siteId = GLOBAL_SITEID;
+  $(document).ready(function () {
+    getContentModel();
+  });
+
+
+  function changeUrl() {
+    var isStartUrl = cur.vm.isStartUrl;
+    if (isStartUrl == 1) {
+      $("#startUrl").show();
+      $("#contentModel").hide();
+      cur.vm.contentModelCode = '';
+
+    } else {
+      $("#startUrl").hide();
+      $("#contentModel").show();
+    }
+
+  }
+
+  function getContentModel() {
+    Ls.ajaxGet({
+      url: "/columnConfig/getContentModel",
+      data: {
+         isPublic:1
+      }
+    }).done(function (text) {
+      cur.contentModelStr = '<option value="">请选择内容模型</option>';
+      if(text!=null&&text.data!=null){
+        cur.contentList=text.data;
+        var data = text.data;
+        cur.length = data.length;
+        if (cur.length > 0) {
+          for (i = 0; i < cur.length; i++) {
+            cur.contentModelStr += ' <option  value=' + data[i].code + '>' + data[i].name + '</option> '
+          }
+        }
+      }
+      columnManage.classify();
+    });
+  }
+  function typeChange(type) {
+    if (type == 1) {
+      $(".linksMgrY").show();
+    } else {
+      $(".linksMgrY").hide();
+      cur.vm.height='';
+      cur.vm.width='';
+    }
+  }
+  function checkColumnType() {
+    contentModelCode = cur.vm.contentModelCode;
+    if (contentModelCode == '' && cur.vm.isStartUrl == 0) {
+      Ls.tipsInfo("请选择内容模型");
+      return;
+    }else{
+      Ls.ajaxGet({
+        url: "/columnConfig/checkColumnType",
+        data: {
+          contentModelCode: contentModelCode
+        }
+      }).done(function (text) {
+        if (!text.status) {
+          Ls.tips(text.desc, {icon: "info"});
+        }
+        var columnTypeCode=text.data;
+        if (columnTypeCode == "articleNews") {
+          $("#isStart").show();
+          $("#synAndGener").show();
+          $(".linksMgr").hide();
+        } else {
+          $("#synAndGener").hide();
+          if(columnTypeCode=='sceneService'||columnTypeCode=='workGuide') {
+            $("#isStart").show();
+            $(".linksMgr").hide();
+          }else{
+            $("#isStart").hide();
+            if(columnTypeCode=="linksMgr"){
+              $(".linksMgr").show();
+              if(cur.vm.isLogo==1){
+                $(".linksMgrY").show();
+              }else{
+                $(".linksMgrY").hide();
+              }
+            }else{
+              $(".linksMgr").hide();
+            }
+          }
+        }
+        if(cur.vm.isStartUrl== 1){
+          $("#startUrl").show();
+        }else{
+          $("#startUrl").hide();
+        }
+      });
+    }
+
+  }
+
+</script>
+
+

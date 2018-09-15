@@ -1,0 +1,24 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isHit="$!{paramObj.isHit}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css}">
+    #set($title=$!{eo.title})
+    <a href="$!{eo.link}" target="$!{paramObj.target}" title="${title}" class="left">
+        <font style='$style'>#cutstr($title,$length)</font>
+    </a>
+    #if($isHit == "true")
+        <span class="right hit">[$!{eo.count}]</span>
+    #end
+    #if($isDate == "true")
+        <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+    #end
+</li>
+#end

@@ -1,0 +1,32 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+<div class="guestbook-list list$!{paramObj.id}">
+    <div class="hd_telbox">
+            <p class="p1">信件编号</p>
+            <p class="p2">信件标题</p>
+            <p class="p3">受理单位</p>
+            <p class="p4">留言时间</p>
+    </div>
+    <div class="hd_xdbox">
+	<ul>
+        #foreach($eo in $resultObj)
+            #set($title="$!{eo.title}")
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <li class="$!{css}">
+                <p class="p1">$!{eo.docNum}</p>
+                <p class="p2">
+                    <a href="$!{eo.link}" target="_blank" title="$!{eo.title}">
+                        #cutstr($title,$length)
+                    </a>
+                </p>
+                <p class="p3">$!{eo.receiveUnitName}</p>
+                <p class="p4">#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</p>
+            </li>
+        #end
+		</ul>
+    </div>
+</div>

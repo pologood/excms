@@ -1,0 +1,65 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="tabs1" class="mini-tabs" activeIndex="0">
+    <div title="转办">
+        <ul class="ztree" id="unit_tree_all"></ul>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/wechartweb/choose_unit.js"></script>
+
+<script type="text/javascript">
+    var id=$!{id};
+    mini.parse();
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    $(document).ready(function () {
+        api.button({
+            id: "do_submit",
+            name: "确定",
+            focus: true,
+            callback: function () {
+                doSave();
+                return false;
+            }
+        });
+
+
+            unitManage_all.getUnit();
+
+    });
+
+
+    function doSave() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("unit_tree_all");
+        // var  nodes = zTree.getSelectedNodes();
+        var nodes = zTree.getSelectedNodes();
+        var newNodes = [];
+        var organId = "";
+        var organName = "";
+        if (nodes != null && nodes != "") {
+            organId = nodes[0].organId;
+            organName = nodes[0].name;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            url: "/weChatDeal/saveTurn",
+            data: {'id': id, 'organId': organId, 'organName': organName},
+            success: function (text) {
+                Ls.tipsOk("转办成功",{
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                        Ls.winClose();
+                    }
+                });
+            }
+        })
+    }
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+</script>
+</body>

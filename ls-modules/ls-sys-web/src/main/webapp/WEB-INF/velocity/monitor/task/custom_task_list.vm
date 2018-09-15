@@ -1,0 +1,144 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getCustomTaskPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="startDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="look">结果</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            typeCode:Ls.getWin.dialog.data("typeCode")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({typeCode:cur.params.typeCode});
+    })
+
+    function status(obj) {
+        var rec = obj.record;
+        var status = rec.taskStatus;
+        if(status == 0) {
+            return '<font style="color:red">未启动</font>';
+        } else if(status == 1) {
+            return '<span style="color: green">正在检测</span>';
+        } else {
+            return '<span style="color: blue">检测完成</span>';
+        }
+    }
+
+    function look(obj) {
+        var record = obj.record;
+        var taskId = record.id;
+        var str = '';
+        console.info();
+        if(cur.params.typeCode == 'siteDeny') {
+            str = '<a href="javascript:void(0);" onclick="siteVisitDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'siteUpdate') {
+            str = '<a href="javascript:void(0);" onclick="indexNotUpdateDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'columnUpdate') {
+            str = '<a href="javascript:void(0);" onclick="columnNotUpdateDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'error') {
+            str = '<a href="javascript:void(0);" onclick="seriousErrorDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'reply') {
+            str = '<a href="javascript:void(0);" onclick="badInteractDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'siteUse') {
+            str = '<a href="javascript:void(0);" onclick="hrefUseableDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'infoUpdate') {
+            str = '<a href="javascript:void(0);" onclick="columnBaseInfoDetail(' + taskId + ')">查看</a>'
+        } else if(cur.params.typeCode == 'replyScope') {
+            str = '<a href="javascript:void(0);" onclick="interactInfoDetail(' + taskId + ')">查看</a>'
+        }
+        return str;
+    }
+
+    function siteVisitDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/siteVisitDetail", '800px', '390px', {
+            id:cur.params.taskId + "_siteVisit",
+            title: "站点访问详情"
+        });
+    }
+
+    function seriousErrorDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/seriousErrorDetail", '800px', '390px', {
+            id:cur.params.taskId + "_seriousError",
+            title: "严重错误详情"
+        });
+    }
+
+    function hrefUseableDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/hrefUseableDetail", '850px', '390px', {
+            id:cur.params.taskId + "_hrefUseable",
+            title: "错误链接详情"
+        });
+    }
+
+    function indexNotUpdateDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/indexNotUpdateDetail", '800px', '390px', {
+            id:cur.params.taskId + "_indexNotUpdate",
+            title: "网站不更新详情"
+        });
+    }
+
+    function columnNotUpdateDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/columnNotUpdateDetail", '800px', '390px', {
+            id:cur.params.taskId + "_columnNotUpdate",
+            title: "栏目不更新详情"
+        });
+    }
+
+    function badInteractDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/badInteractDetail", '800px', '390px', {
+            id:cur.params.taskId + "_badInteract",
+            title: "互动回应差详情"
+        });
+    }
+
+    function indexColumnDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/indexColumnDetail", '800px', '390px', {
+            id:cur.params.taskId + "_indexColumn",
+            title: "首页栏目更新情况详情"
+        });
+    }
+
+    function columnBaseInfoDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/columnBaseInfoDetail", '800px', '390px', {
+            id:cur.params.taskId + "_columnBaseInfo",
+            title: "基本信息栏目更新情况详情"
+        });
+    }
+
+    function interactInfoDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/interactInfoDetail", '800px', '390px', {
+            id:cur.params.taskId + "_interactInfo",
+            title: "互动回应情况详情"
+        });
+    }
+</script>

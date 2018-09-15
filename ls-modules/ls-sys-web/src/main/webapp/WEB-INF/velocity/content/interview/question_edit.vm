@@ -1,0 +1,172 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+<body class="page-body-white">
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="formInterQues" role="form" ms-controller="formInterQues">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input name="name" type="text" class="form-control" placeholder="姓名不能为空" ms-duplex="name">
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+		   <textarea name="content" class="form-control" rows="5" placeholder=""
+                     ms-duplex="content"></textarea>
+                </div>
+                <div class="col-xs-8 col-md-8" style="padding-left: 0">
+                    <div class="form-group">
+                        <label>添加图片</label>
+                        <input type="text" name="questionPic" id="questionPic" readonly class="form-control readonly"
+                               placeholder="点击选择图片" ms-duplex="questionPic" onclick="imgUpload()"/>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-md-4">
+                    <img id="questionPicImg" src="$!{rc.contextPath}/assets/images/no.photo.jpg" alt="" style="width: 100px;border:2px solid white">
+                    <div class="thum-delete" style="top:30px" id="delImg" onclick="deleteWbPic()" title="删除"><i class="fa fa-trash"></i></div>
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        questionId: Ls.url.get("questionId"),
+        interviewId: Ls.url.get("interviewId")
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/interviewQuestion/getQuestion",
+                data: {
+                    questionId: cur.questionId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formInterQues"
+                data.$id = cur.$id;
+                data.interviewId = cur.interviewId;
+                if(Ls.isEmpty(data.questionPic)){
+                    $("#questionPicImg").attr("src",GLOBAL_CONTEXTPATH + "/assets/images/no.photo.jpg");
+                }else{
+                    if(data.questionPic.indexOf("/") != -1){
+                        $("#questionPicImg").attr("src", data.questionPic);
+                    }else if(data.questionPic.indexOf(".") != -1){
+                        $("#questionPicImg").attr("src", GLOBAL_FILESERVERNAMEPATH + data.questionPic);
+                    }else{
+                        $("#questionPicImg").attr("src", GLOBAL_FILESERVERPATH + data.questionPic);
+                    }
+                }
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+
+            })
+        };
+
+        getData();
+
+    })
+
+    $('#formInterQues').validator({
+        fields: {
+            'name': '姓名:required;length[2~40]',
+            'content': '意见:required;length[2~1000]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        Ls.ajax({
+            url: '/interviewQuestion/saveQuestion',
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.winClose();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function imgUpload() {
+        var desc = "";
+
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+//                mongoId = data[0].mongoId;
+//                cur.vm.questionPic = mongoId;
+//                $("#questionPic").val(GLOBAL_FILESERVERPATH + mongoId);
+//                $("#questionPicImg").attr("src", GLOBAL_FILESERVERPATH + mongoId);
+                cur.vm.questionPic = data[0].fileName;
+                $("#questionPic").val(GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                $("#questionPicImg").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": cur.vm.siteId,
+                "desc": desc,
+                "type": "NotDefined",
+                "code": "interviewQuestion"
+            }
+        })
+    }
+
+    /**
+     * 删除栏目缩略图
+     */
+    function deleteWbPic() {
+        var questionPic = $('#questionPic').val();
+        if (questionPic == null || "" == questionPic) {
+            Ls.tipsErr("图片不存在！");
+            return;
+        }
+        if (confirm("确定删除?")) {
+            Ls.ajaxGet({
+                url: "/fileCenter/deleteByMongoId",
+                data: {
+                    mongoId: cur.vm.questionPic
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("删除成功！", {
+                        icons: "success", callback: function () {
+                            $('#questionPic').val('');
+                            $("#questionPicImg").attr("src",GLOBAL_CONTEXTPATH + "/assets/images/no.photo.jpg");
+                            cur.vm.questionPic = "";
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>

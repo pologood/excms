@@ -1,0 +1,159 @@
+<div class="loginbox">
+    <div class="indcontainer" style="position:relative;">
+        <div class="logincont">
+            <div class="loginmbx">个人中心登录</div>
+            <div class="mem-login">
+                <div class="tit">用户登录</div>
+                <form id="loginform" method="post">
+                    <ul>
+                        <li class="inpt td_username">
+                            <input type="text" placeholder="用户名" id="memberUid" name="memberUid"/>
+                        </li>
+                        <li class="inpt td_password">
+                            <input id="memberPw" placeholder="密码" autocomplete="off" name="memberPw" type="password"/>
+                        </li>
+                        <li class="td_code">
+                            <input class="verification" placeholder="验证码" id="checkimg" name="checkCode" size="6"
+                                   maxlength="4" type="text">
+                            <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31"
+                                 title="看不清楚，换个图片" align="absmiddle">
+                            <a href="javascript:clickCode();">换一张</a></li>
+                        <li class="wjmm">
+                            <a class="fr" href="javascript:setpw()">忘记密码？</a>
+                            <input id="rmbUser" type="checkbox" class="login_rad01"/>记住密码
+                        </li>
+                        <li class="btn"><input class="sub" type="submit" value="立即登录"></li>
+                        <li class="td_text">还没有账号？赶快<a href="javascript:registerMember()">注册</a>吧！</li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+<script>
+    var cur = {
+        siteId: "$!{resultObj.siteId}",
+        validateSite: "$!{paramObj.validateSite}",
+        goId: "$!{resultObj.goId}",
+        goType: "$!{resultObj.goType}",
+        centerUrl: "/member/center/$!{resultObj.siteId}",
+        otherUrl: "/content/column/$!{resultObj.goId}?action=new&&type=$!{resultObj.goType}"
+    }
+    $("#loginform").keydown(function (e) {
+        var e = e || event,
+                keycode = e.which || e.keyCode;
+        if (keycode == 13) {
+            $("#loginform").submit();
+        }
+    });
+    function clickCode() {
+        $("#imgCode").attr("src", "/member/getCode?s=" + Math.random());
+    }
+    $(document).ready(function (e) {
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+        if (Ls.cookies("rmbUser") == "true") {
+            $("#rmbUser").attr("checked", true);
+            $("#memberUid").val(Ls.cookies("userName"));
+            $("#memberPw").val(Ls.cookies("passWord"));
+        }
+        using("validator", function () {
+            //填写基本信息表单验证
+            $("#loginform").validator({
+                fields: {
+                    memberUid: "用户账号:required;username;length[3~12];",
+                    memberPw: "密码:required;password;length[2~64];",
+                    checkCode: '验证码:required;'
+                },
+                valid: function () {
+                    Ls.ajax({
+                        url: "/member/getRSAPublicKey"
+                    }).done(function (d) {
+                        if (d.status == 1) {
+                            var data = d.data;
+                            var key = RSAUtils.getKeyPair(data.exponent, '', data.modulus);
+                            memberLogin(key);
+                        } else {
+                            Ls.tipsErr(d.desc);
+                        }
+                    });
+                },
+                msgClass: 'n-top',
+                timely: 1
+            });
+
+        });
+    });
+
+    function memberLogin(key) {
+        var memberUid = $("#memberUid").val();
+        var memberPw = $("#memberPw").val();
+        var checkCode = $("#checkimg").val();
+        if (memberUid == '') {
+            alert("登录名不能为空！");
+            return;
+        }
+        if (memberPw == '') {
+            alert("密码不能为空！");
+            return;
+        }
+        if (checkCode == '') {
+            alert("验证码不能为空！");
+            return;
+        }
+        if (cur.site) {
+            alert("站点ID不能为空！");
+            return;
+        }
+        Ls.ajax({
+            url: "/member/checkLogin",
+            data: {
+                uid: memberUid,
+                password: RSAUtils.encryptedString(key, memberPw),
+                siteId: cur.siteId,
+                checkCode: checkCode
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                if ($("#rmbUser").prop("checked")) {
+                    setCookie("0", memberUid, memberPw);
+                } else {
+                    setCookie("1", memberUid, memberPw);
+                }
+                Ls.tipsOk("登录成功!", {
+                    callback: function () {
+                        location.href = (cur.goId != "" ? cur.otherUrl : cur.centerUrl);
+                    }
+                });
+            } else {
+                Ls.tipsErr(d.desc);
+                $("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+
+    function registerMember() {
+        location.href = "/member/register/" + cur.siteId;
+    }
+
+    function setpw() {
+        location.href = "/member/setpw/" + cur.siteId;
+    }
+
+    function setCookie(isRem, userName, passWord) {
+        if (isRem == "0") {
+            Ls.cookies("rmbUser", "true", {expires: 7});
+            Ls.cookies("userName", userName, {expires: 7});
+            Ls.cookies("passWord", passWord, {expires: 7});
+        } else {
+            Ls.cookies("rmbUser", "false", {expires: -1});
+            Ls.cookies("userName", "", {expires: -1});
+            Ls.cookies("passWord", "", {expires: -1});
+        }
+    }
+</script>

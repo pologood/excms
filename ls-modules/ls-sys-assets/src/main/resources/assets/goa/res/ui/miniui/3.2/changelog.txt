@@ -1,0 +1,25 @@
+miniui代码修改日志
+
+    author: dzl  2015-03-19
+
+miniui.js  最后新增覆写mini.ajax方法,以适应上下文处理
+
+//覆写mini.ajax
+mini.ajax=function($){if(!$.dataType)$.dataType="text";if($.url && $.url.toLowerCase().indexOf('.txt')==-1 && $.url.toLowerCase().indexOf('.json')==-1 && $.url.toLowerCase().indexOf('.html')==-1&& $.url.toLowerCase().indexOf('.htm')==-1 && !("http://".length > 0 && $.url.toLowerCase().substring( 0, "http://".length ) === "http://")&&!("https://".length > 0 && $.url.toLowerCase().substring( 0, "https://".length ) === "https://")){$.url=window.WEBCONTEXT?window.WEBCONTEXT+$.url:$.url;}return window.jQuery.ajax($)};
+
+说明: 为所有的ajax增加了自动根据全局window.WEBCONTEXT变量自动附加上下文件, 静态资源文件(.txt,.json,.html,.htm)忽略上下文
+
+themes\icons.css
+
+  所有样式名称统一由.icon-add修改为.mini_icon_add这种形式,为了不和公共的字体图标重复
+
+themes\default\miniui.css
+
+  465行 注意默认按钮样式,让其显示按钮背景
+
+  body .mini-button-plain
+  {    
+      /*background:transparent;
+       border:0;
+       padding:1px;*/
+   }

@@ -1,0 +1,117 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="security_form" name="security_form">
+
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>访问规则</label>
+                            <label>
+                                <input type="radio" name="rules" value="0" #if("$!{rules}"=="" || "$!{rules}"=="0")checked="checked"#end> 允许访问
+                            </label>
+                        #*<label>
+                            <input type="radio" name="rules" value="1" #if("$!{rules}"=="1")checked="checked"#end> 禁止访问 </label>
+                        <label>*#
+                        </div>
+                        <div class="form-group">
+                            <label>IP地址</label>
+                            <input type="text" class="form-control" name="IP" id="IP" placeholder="" value="$!{ip}">
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea class="form-control" name="description" id="description" placeholder="" maxlength="200">$!{description}</textarea>
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>温馨提示：</strong> 可以作用通配符,如：255.255.255.*
+                        </div>
+                    </div>
+                    <input name="IPID" id="IPID" type="hidden" value="$!{id}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var dialog = Ls.getWin.art, W = Ls.getWin.win, api = Ls.getWin.api;
+    $(document).ready(function () {
+
+        api.button(
+            {
+                id: "save_btn",
+                name: "保 存",
+                focus: true,
+                callback: function () {
+                    $("#security_form").trigger("validate");
+                    return false;
+                }
+            }
+        )
+
+        //验证
+        $('#security_form').validator({
+            rules: {
+                ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]|\*)$/, '请检查IP格式']
+            },
+            fields: {
+                'IP': 'IP地址:required;ip'
+            },
+            valid: function () {
+                saveItem();
+            }
+        });
+
+    })
+
+    var validateIp = function (ip) {
+        var re = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5]|\*)$/;
+        if (!re.test(ip)) {
+            Ls.tipsErr("IP地址输入不正确");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    var saveItem = function () {
+        var id = Ls.trim($("#IPID").val());
+        var IP = Ls.trim($("#IP").val());
+        var description = Ls.trim($("#description").val());
+        var rules = Ls.trim($("input[name='rules']:checked").val());
+
+        if (!validateIp(IP)) {
+            return false;
+        }
+
+        Ls.ajax({
+            url: "/limitIP/" + (id ? "editIP" : "saveIP"),
+            data: {
+                id: id,
+                ip: IP,
+                rules: rules,
+                description: description
+            }
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.getWin.win.datagrid1.reload();
+                        Ls.winClose();
+                    }
+                });
+
+            }
+        })
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+</script>

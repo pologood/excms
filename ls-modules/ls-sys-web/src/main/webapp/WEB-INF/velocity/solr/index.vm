@@ -1,0 +1,67 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/solr/getSiteSolrInfo?dataFlag=1" showPager="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <div field="name" width="100%" align="center" headerAlign="center">站点</div>
+                        <div width="780" align="center" headerAlign="center" allowSort="true" renderer="opt">重建索引</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid')
+    }
+
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 0);
+        cur.grid.load();
+    })
+
+
+    function start(siteId,type) {
+        Ls.ajax({
+            type: "POST",
+            url: "/solr/start",
+            data: {
+                siteId:siteId,
+                type:type
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                Ls.tipsOk(resp.desc);
+                cur.grid.load();
+            }
+        });
+    }
+
+    function status(obj) {
+        var rec = obj.record;
+        return rec.status == 1?'<span style="color: green">已启动</span>':'<span style="color: red">未启动</span>';
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var result = '<button type="button" class="btn btn-default btn-sm btn-add" onclick="start('+record.indicatorId+',-1)">重建所有</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',1)">新闻</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',2)">信息公开</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',3)">网上办事</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',4)">留言</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',5)">调查管理</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',6)">网上调查</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',7)">在线访谈</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',8)">民意征集</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',9)">领导之窗</button> ';
+        result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="start('+record.indicatorId+',10)">问答知识库</button> ';
+        return  result;
+    }
+</script>

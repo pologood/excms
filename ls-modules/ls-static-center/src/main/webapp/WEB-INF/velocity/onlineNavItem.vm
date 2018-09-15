@@ -1,0 +1,63 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{target}")
+#set($length=$Integer.parseInt($length))
+#if($resultObj.data.size()>0)
+    #foreach($eo in $resultObj.data)
+    <ul>
+        <li class="title">
+            #if("$!{eo.linkUrl}" != "")
+                <a href="$!{eo.linkUrl}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+            #else
+                <a href="/content/article/$!{eo.contentId}?guideId=$!{eo.id}&tableColumnId=$!{tableColumnId}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+            #end
+        </li>
+        <li class="attr">
+            <a href="/content/article/$!{eo.contentId}?guideId=$!{eo.id}&tableColumnId=$!{tableColumnId}" target="$target"
+               class="l1 #if("$!{eo.zxLink}" != "" || "$!{eo.tsLink}" != "" || "$!{eo.sbLink}" != "")#else l1-1 #end">办事指南</a>
+            #if("$!{eo.zxLink}" != "")
+                <a href="$!{eo.zxLink}" target="$target" class="l2 #if("$!{eo.tsLink}" != "" || "$!{eo.sbLink}" != "")#else l1-2 #end">在线咨询</a>
+            #else
+                <span>在线咨询</span>
+            #end
+            #if("$!{eo.tableIds}" != "")
+                <a href="/content/column/$!{tableColumnId}?guideId=$!{eo.id}" target="$target" class="l3 #if("$!{eo.tableIds}" != "")#else l1-3 #end">相关表格</a>
+            #else
+                <span>相关表格</span>
+            #end
+            #if("$!{eo.sbLink}" != "")
+                <a href="$!{eo.sbLink}" target="$target" class="l4 l1-4">在线申报</a>
+            #else
+                <span>在线申报</span>
+            #end
+            #if("$!{eo.minLocalTime}" != "")
+                <a href="javascript:void(0)" class="l5 l1-5"> 至少去现场次数: $!{eo.minLocalTime} 次</a>
+            #end
+        </li>
+    </ul>
+    <div class="clear"></div>
+    #end
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{columnId}" class="pagination"></div>
+    <script>
+        Ls.pagination("#page_$!{columnId}", function (pageIndex) {
+            location.href = "$!{linkPrefix}?pageIndex=" + pageIndex + "&SearchWords=$!{SearchWords}&organShow=$!{organShow}&organId=$!{organId}";
+        }, {
+            pageCount:$!{resultObj.pageCount},
+            currPage:$!{resultObj.pageIndex} +1
+        })
+    </script>
+    #end
+#else
+<div class="warm-prompt">
+    #if("$!{SearchWords}" == "")
+        暂无相关结果
+    #else
+        抱歉，没有找到<font color="red">$!{SearchWords}</font>
+        相关结果。建议： <br>
+        1.请您检查输入是否错误<br>
+        2.请您尝试简化输入词<br>
+        3.请您尝试用相似词或常见词<br>
+    #end
+</div>
+#end

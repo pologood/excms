@@ -1,0 +1,608 @@
+#if(${toolbar} == 'hide')
+#else
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+    </ul>
+
+<div class="tab-content">
+<div class="tab-pane active" id="tab_1_1">
+#end
+    <form role="form" id="videoForm" ms-controller="videoForm">
+        <table class="table table-bordered video-table">
+            <tbody>
+            <tr>
+                <th>标题：</th>
+                <td>
+                    <table class="w100p">
+                        <tbody>
+                        <tr>
+                            <td><input type="text" name="title" id="title" ms-duplex="title" maxlength="250" class="form-control"></td>
+                            <td class="w150 text-center">
+                                <button type="button" id="colorpicker" class="btn btn-default btn-font" title="字体颜色"><i class="fa fa-font"></i>
+                                </button>
+                                <input type="hidden" id="mycolor" class="colorPicker evo-cp0" />
+                                <button type="button" id="bold" class="btn btn-default btn-bold" title="加粗"><i class="fa fa-bold"></i></button>
+                                <button type="button" id="italic" class="btn btn-default btn-italic" title="倾斜"><i class="fa fa-italic"></i>
+                                </button>
+                                <button type="button" id="underline" class="btn btn-default btn-underline" title="下划线"><i
+                                    class="fa fa-underline"></i></button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td class="w300" rowspan="5">
+                    <div class="thumb_layout">
+                        <div class="thumb">
+                            <img src="$!{sysStaticPath}/assets/images/video_bg.jpg" alt="" id="imageLink"/>
+                        </div>
+                        #if(${uploadBar} == 'hide')
+                        #else
+                            <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                            <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="fileChange()"></i></div>
+                        #end
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>视频：</th>
+                <td>
+                    <div class="form-group">
+                        <div class="input-group mb0">
+                            <input type="text" id="videoName" name="videoName" ms-duplex="videoName"
+                                   class="form-control">
+
+                            <div class="input-group-btn">
+                                #if(${uploadBar} == 'hide')
+                                #else
+                                    <button type="button" class="btn btn-default btn-default-upload"
+                                            onclick="uploadVideo()"><i class=" fa fa-upload">上传</i>
+                                    </button>
+                                #end
+                                <button type="button" class="btn btn-default btn-default-upload"
+                                        onclick="videoPlayer()"><i class=" fa fa-play-circle-o">播放</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>发布日期：</th>
+                <td>
+                    <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control readonly"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly>
+                <td>
+            </tr>
+            <tr>
+                <th>作者：</th>
+                <td>
+                    <input type="text" id="author" ms-duplex="author" class="form-control" placeholder="">
+                <td>
+            </tr>
+            <tr>
+                <th>属性：</th>
+                <td>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" disabled class="publishBtn" id="isTop" value=""> 置顶
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" disabled class="publishBtn" id="isNew" value=""> 加新
+                    </label>
+                #* <label id="isComment" class="checkbox-inline hide">
+                   <input type="checkbox" id="isAllowComments" class="publishBtn" disabled value="1"> 允许评论
+                 </label>*#
+                #* <label class="checkbox-inline">
+                     <input type="checkbox" id="isJob" class="publishBtn" disabled value="1"> 定时发布
+                 </label>*#
+                    <label class="checkbox-inline">
+                        <button id="btn_extend_video" type="button" class="btn btn-default btn-xs btn-video-extend"> 扩展信息
+                            <i class="fa fa-angle-double-down"></i>
+                        </button>
+                    </label>
+                </td>
+            </tr>
+            <tr id="JobDate" class="hide">
+                <th>定时发布：</th>
+                <td>
+                    <input type="datetime" id="jobIssueDate" placeholder="定时发布时间，空值代表无需定时发布" ms-duplex="jobIssueDate" class="form-control readonly publishBtn"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate:'${nowDate}'})" readonly/>
+                </td>
+            </tr>
+            <tr class="video_attr_ext hide">
+                <th>摘要：</th>
+                <td>
+                    <textarea class="form-control" id="remarks" rows="3" placeholder=""></textarea>
+                </td>
+            </tr>
+            <tr class="video_attr_ext hide">
+                <th>来源：</th>
+                <td>
+                    <div class="input-group" id="resMark">
+                        <div id="res" class=""
+                             style="position: absolute;z-index: 10;display:none; overflow:auto; border:1px solid gray;top:34px;left:0; background-color:#F7F7FB;height:220px;">
+                            <table style="margin-left:10px;" id="ns_list">
+                            </table>
+                        </div>
+                        <input type="text" id="resources" ms-duplex="resources" class="form-control" placeholder=""/>
+
+                        <div class="input-group-btn">
+                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showRes()">
+                                <i class="fa fa-caret-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th style="vertical-align: top;">备注：</th>
+                <td colspan="2">
+              <textarea id="video_content" name="article" ms-duplex="article" class="form-control"
+                        style="width: 100%; visibility: visible;"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th></th>
+                <td colspan="2">
+                    #if(${toolbar} == 'hide')
+                    #else
+                        <button disabled class="publishBtn btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                        <button class="btn btn-default btn-save" type="submit"> 保 存</button>
+                        <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                    #end
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+#if(${toolbar} == 'hide')
+#else
+</div>
+</div>
+
+</div>
+#end
+<script src="$!{rc.contextPath}/assets/js/pages/selectEditBox/selectEditBox.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/video_edit.js"></script>
+
+<script>
+    var curr = {
+        vm: "",
+        pageIndex: '$!{pageIndex}',
+        opt: [],
+        recordStatus: "$!{recordStatus}",
+        columnId: content_mgr.indicatorId
+    };
+    var expand = 0;
+    var editor;
+    var flag = 0;
+    var eweb;
+    $(document).ready(function () {
+
+        /*取色器*/
+        $("#mycolor").colorpicker({
+            color: "#000",
+            hideButton: true,
+            strings: " , , 无颜色 , , , , "
+        }).on('change.color', function(evt, color){
+            $('#title').css('color', color);
+            curr.vm.titleColor = color;
+        });
+        $("#colorpicker").on("click", function (evt) {
+            evt.stopImmediatePropagation();
+            $("#mycolor").colorpicker("showPalette");
+        });
+
+        //加载来源
+        if(content_mgr.node.opt!=null){
+            curr.opt = content_mgr.node.opt.split("\|");
+        }
+        //权限控制
+        for (var i = 0; i < curr.opt.length; i++) {
+            if (curr.opt[i] == "publish" || curr.opt[i] == "super") {
+                $(".publishBtn").attr("disabled", false);
+                $(".publishBtn").removeClass("disabled");
+            }
+        }
+        eweb = Ls.editor("article", {cusdir: "/" + GLOBAL_SITEID + "/" + curr.columnId});
+        console.info('columnId', curr.columnId)
+        /*editor = KindEditor.create('textarea[name="article"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&&columnId=" + curr.columnId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: curr.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });
+
+        //取色器
+        var K = KindEditor;
+        var colorpicker;
+        K('#colorpicker').bind('click', function (e) {
+            e.stopPropagation();
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+                return;
+            }
+            var colorpickerPos = K('#colorpicker').pos();
+            colorpicker = K.colorpicker({
+                x: colorpickerPos.x,
+                y: colorpickerPos.y + K('#colorpicker').height(),
+                z: 19811214,
+                selectedColor: 'default',
+                noColor: '无颜色',
+                click: function (color) {
+                    K('#title').css('color', color);
+                    colorpicker.remove();
+                    curr.vm.titleColor = color;
+                    colorpicker = null;
+                }
+            });
+        });
+        K(document).click(function () {
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+            }
+        });*/
+
+        getVideoNewsEO();
+        getSource();
+        getModelConfig();
+    });
+
+
+    $("#bold").click(function () {
+        var T = $("#title");
+        if (curr.vm.isBold == 0) {
+            T.css("font-weight", "bold");
+            curr.vm.isBold = 1;
+        } else {
+            T.css("font-weight", "normal");
+            curr.vm.isBold = 0;
+        }
+    });
+
+    $("#italic").click(function () {
+        var T = $("#title");
+        if (curr.vm.isTilt == 0) {
+            T.css("font-style", "italic");
+            curr.vm.isTilt = 1;
+        } else {
+            T.css("font-style", "normal");
+            curr.vm.isTilt = 0;
+        }
+    })
+
+    $("#underline").click(function () {
+        var T = $("#title");
+        if (curr.vm.isUnderline == 0) {
+            T.css("text-decoration", "underline");
+            curr.vm.isUnderline = 1;
+        } else {
+            T.css("text-decoration", "none");
+            curr.vm.isUnderline = 0;
+        }
+    });
+
+    function fileChange() {
+        if (curr.model.isEnableBeauty == 1) {
+            meiTuUpload();
+        } else {
+            normalUpload();
+        }
+    }
+
+    function normalUpload() {
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].fileName);
+            return true;
+        }, {
+            upload_url: '/content/normalUploadThumb',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "columnId": content_mgr.node.indicatorId,
+                "contentId": curr.vm.id || '',
+                "imgPath": curr.vm.imageLink || '',
+                "desc": "上传缩略图"
+            },
+            file_types: "*.jpg;*.gif;*.bmp;*.jpeg;*.png",
+        });
+    }
+    function meiTuUpload() {
+        art.dialog.data("imageLink", curr.vm.imageLink);
+        art.dialog.data("siteId", GLOBAL_SITEID);
+        art.dialog.data("columnId", content_mgr.node.indicatorId);
+        art.dialog.data("contentId", curr.vm.id);
+        art.dialog.open('/videoNews/uploadPic', {
+            width: '650px',
+            height: '410px',
+            lock: true,
+            title: '缩略图'
+        });
+    }
+    //上传视频
+    function uploadVideo() {
+        var videoPathPre = curr.vm.videoPath;
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                curr.vm.videoPath = filePath[0].mongoId;
+                curr.vm.videoName = filePath[0].fileName;
+                curr.vm.fileType = curr.vm.videoName.substring(curr.vm.videoName.lastIndexOf("."));//获取后缀名
+                curr.vm.status = 0;
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传视频',
+            upload_url: "/videoNews/uploadVideo",
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "columnId": content_mgr.node.indicatorId,
+                "contentId": curr.vm.contentId
+            },
+            file_size_limit: "1024 MB",
+            file_types: "*.asx;*.asf;*.mpg;*.wmv;*.3gp;*.mov;*.avi;*.flv;*.mp4",
+            file_types_description: "Video Files",
+            file_upload_limit: 1,  //配置上传个数
+        })
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/video_bg.jpg');
+        curr.vm.imageLink = '';
+    })
+
+    function getVideoNewsEO() {
+        var baseId = "${baseId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/videoNews/getVideoEO",
+            data: {id: baseId, status: curr.recordStatus}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(d.desc);
+                return;
+            }
+            data = d.data;
+            curr.$id = "videoForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            curr.vm = avalon.define(curr.init);
+            curr.vm.author=GLOBAL_PERSON.name;
+            //avalon.scan(document.body, curr.vm);
+            avalon.scan($("#videoForm").get(0), curr.vm);
+            T = $("#title");
+            if (data.titleColor != null) {
+                T.css('color', data.titleColor);
+            }
+            if (data.isBold == 1) {
+                T.css("font-weight", "bold");
+            }
+            if (data.isTilt == 1) {
+                T.css("font-style", "italic");
+            }
+            if (data.isUnderline == 1) {
+                T.css("text-decoration", "underline");
+            }
+            if(data.workFlowStatus == 1){
+                $("#saveAndPublish").attr("style","display:none;")
+            }
+            curr.vm.id = data.id;
+            curr.vm.videoId = data.videoId;
+            curr.vm.isPublish = data.isPublish;
+            if (data.remarks != null) {
+                $("#remarks").val(data.remarks);
+            }
+            if (data.isTop == 1) {
+                $("#isTop").prop("checked", true);
+            }
+            if (data.isNew == 1) {
+                $("#isNew").prop("checked", true);
+            }
+            if (data.isJob == 1) {
+                $("#isJob").prop("checked", true);
+                if (data.jobIssueDate != null)
+                    $("#jobIssueDate").val(Ls.dateFormat(data.jobIssueDate, "yyyy-MM-dd hh:mm"));
+                $("#JobDate").removeClass("hide");
+            }
+            eweb.setHtml(data.article);
+            /*editor.html(data.article);*/
+            if (data.imageLink != null && data.imageLink != "") {
+                if (data.imageLink.indexOf("/") != -1) {
+                    $("#imageLink").attr('src', data.imageLink);
+                } else if (data.imageLink.indexOf(".") != -1) {
+                    $("#imageLink").attr('src', GLOBAL_FILESERVERNAMEPATH + data.imageLink);
+                } else {
+                    $("#imageLink").attr('src', GLOBAL_FILESERVERPATH + data.imageLink);
+                }
+            }
+            /*var synColumnIds = content_mgr.node.synColumnIds;
+            if (synColumnIds != null) {
+              curr.vm.synColumnIds = synColumnIds.split(",");
+            }*/
+        });
+    }
+    $('#videoForm').validator({
+        fields: {
+            'title': '标题:required;length[1~250];',
+            'videoName': '视频新闻路径:required;length[2~250];',
+        },
+        valid: function () {
+            doSave();
+        },
+        msgClass: "n-top"
+    });
+
+
+    function saveVideoNews() {
+        if (curr.vm.titleColor == "" || curr.vm.titleColor == null) {
+            curr.vm.titleColor = '#000000';
+        }
+        if ($("#isTop").is(':checked')) {
+            curr.vm.isTop = 1;
+        } else {
+            curr.vm.isTop = 0;
+        }
+        if ($("#isNew").is(':checked')) {
+            curr.vm.isNew = 1;
+        } else {
+            curr.vm.isNew = 0;
+        }
+
+        if (curr.vm.fileType == '' || curr.vm.fileType == null) {
+            curr.vm.videoPath = curr.vm.videoName;
+        }
+        if (flag == 1) {
+            curr.vm.isPublish = 1;
+            flag = 0;
+        } else {
+            curr.vm.isPublish = 0;
+        }
+        /*curr.vm.videoText = editor.text();
+        curr.vm.article = editor.html();*/
+        curr.vm.videoText = eweb.getText();
+        curr.vm.article = eweb.getHtml();
+        curr.vm.columnId = content_mgr.node.indicatorId;
+        curr.vm.siteId = GLOBAL_SITEID;
+        curr.vm.remarks = $("#remarks").val();
+        curr.vm.typeCode = 'videoNews';
+        if ($("#isJob").is(':checked')) {
+            curr.vm.isJob = 1;
+            curr.vm.jobIssueDate = $("#jobIssueDate").val();
+        } else {
+            curr.vm.isJob = 0;
+            curr.vm.jobIssueDate = null;
+        }
+        return 1;
+    }
+
+    function doSave() {
+        if (saveVideoNews() == 1) {
+            var value = curr.vm.$model;
+            value = Ls.toJSON(value);
+            Ls.ajax({
+                type: "POST",
+                url: "/videoNews/saveVideoNews",
+                data: value
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                } else {
+                    if (curr.vm.isPublish == 0) {
+                        Ls.tipsOk("保存成功");
+                    } else {
+                        Ls.tipsOk("正在生成处理中");
+                    }
+                    goBack();
+                    return;
+                }
+            });
+        }
+    }
+
+    $("#btn_extend_video").click(function () {
+        var AE = $(".video_attr_ext");
+        if (expand == 0) {
+            AE.removeClass("hide");
+            expand = 1;
+        } else {
+            AE.addClass("hide");
+            expand = 0;
+        }
+    });
+
+
+    $("#saveAndPublish").click(function () {
+        flag = 1;
+        if($('#videoForm').isValid()){
+            doSave();
+        }
+    });
+
+    function goBack() {
+        content_mgr.getContentApp('/videoNews/index?indicatorId=' + curr.vm.columnId + "&pageIndex=" + curr.pageIndex);
+    }
+
+    function videoPlayer() {
+        var videoPath = curr.vm.videoPath;
+        var videoName = curr.vm.videoName;
+        var status = curr.vm.status;
+        if (videoName == null || videoName == '') {
+            Ls.tipsInfo("请先上传视频");
+            return;
+        } else {
+            if(Ls.isEmpty(videoPath)){
+              videoPath = videoName;
+              Ls.openWin('/videoNews/playAfterTrans?videoPath=' + videoPath + "&&videoName=" + videoName+"&&editor="+curr.vm.editor, '600px', '400px', {
+                id: 'video_player',
+                title: videoName,
+                padding: 0
+              });
+            }else if (curr.vm.status != 100) {
+                  if (curr.vm.status == -1) {
+                    Ls.tipsInfo("视频转换失败，请重新上传");
+                    return;
+                  }else if (curr.vm.id == null) {
+                    Ls.tipsInfo("视频尚未转换格式，请先点击保存");
+                  } else {
+                    Ls.tipsInfo("视频正在转换，请稍等");
+                  }
+                return;
+            } else if(curr.vm.status==100){
+                //直接输入
+                if (videoPath == null || videoPath == '') {
+                    videoPath = videoName;
+                }
+                Ls.openWin('/videoNews/playAfterTrans?videoPath=' + videoPath + "&&videoName=" + videoName+"&&editor="+curr.vm.editor, '600px', '400px', {
+                    id: 'video_player',
+                    title: videoName,
+                    padding: 0
+                });
+            }
+        }
+    }
+    //缩略图路径
+    function changeImg(path) {
+        console.log(path);
+        if (path.indexOf("/") != -1) {
+            $("#imageLink").attr('src', path);
+        } else if (path.indexOf(".") != -1) {
+            $("#imageLink").attr('src', GLOBAL_FILESERVERNAMEPATH + path);
+        } else {
+            $("#imageLink").attr('src', GLOBAL_FILESERVERPATH + path);
+        }
+        curr.vm.imageLink = path;
+    }
+
+    $("#isJob").click(function () {
+        if ($("#isJob").is(':checked')) {
+            $("#JobDate").removeClass("hide");
+        } else {
+            $("#JobDate").addClass("hide");
+        }
+
+    })
+
+</script>

@@ -1,0 +1,178 @@
+<div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+    <div id="form1">
+        <table class="wh100p">
+            <tr>
+                <td class="nowrap">
+                    <a class="mini-button mr5 pl5 pr5" iconCls="" plain="true" onClick="startUser()">启用</a>
+                    <a class="mini-button pl5 pr5" iconCls="" plain="true" onClick="disableUser()">禁用</a>
+                    <a class="mini-button pl5 pr5" iconCls="" plain="true" onClick="delUser()">删除</a>
+                    <!-- <a class="mini-button pl5 pr5" iconCls="" plain="true" onClick="exportUser()">导出</a>-->
+                </td>
+                <td>
+                    <div id="form1">
+              <span class="right">
+                  <input id="searchText" name="searchText" class="mini-Textbox w180" emptyText="请输入姓名、账号或部门名称"
+                         emptyText="请输入查询内容"/>
+                  <input class="mini-hidden" type="hidden" id="roleIds" name="roleIds"/>
+                  <a class="mini-button mr5" iconCls="icon-search" plain="true" onClick="searchUser()">搜索</a>
+                  <a class="mini-button" onclick="searchClear()">显示全部</a>
+              </span>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div> <!-- form1 -->
+</div>
+
+<div class="mini-fit">
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:100%;"
+         idField="personId" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" multiSelect="true"
+         url="/person/getPersonsPage">
+        <div property="columns">
+            <div field="uid" width="100" headerAlign="center" align="center" renderer="renderUid" allowSort="true">用户名</div>
+            <div field="name" width="90" headerAlign="center" align="center" renderer="renderName">姓名</div>
+            <div field="fullOranName" width="100%" headerAlign="center" align="center">所属部门</div>
+            <div field="loginTimes" width="68" headerAlign="center" align="center" allowSort="true">登录次数</div>
+            <div field="lastLoginDate" width="140" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss"
+                 allowSort="true">最后登录
+            </div>
+            <div width="115" headerAlign="center" align="center" renderer="renderOpt">操作</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    var grid = mini.get("datagrid1");
+    grid.load({dataFlag: 1, organId: '$!{organId}'});
+
+    //标题列
+    function renderUid(e) {
+        var rec = e.record, strTitle = "", isPluralistic = "", status = "";
+        if (rec.status == "Unable") {
+            status = " <font class='red'>[禁]</font>";
+        }
+        if (rec.status == "Unable") {
+            strTitle = "<span class='gray-2' style='text-decoration:line-through;'>" + rec.uid + "</span>" + status;
+        } else {
+            strTitle = rec.uid + status;
+        }
+        return strTitle;
+    }
+
+    //姓名
+    function renderName(e) {
+        var rec = e.record, strTitle = "", isPluralistic = "";
+        if (rec.isPluralistic == true) {
+            isPluralistic = " <font class='red'>[兼]</font>";
+        }
+        strTitle = rec.name + isPluralistic;
+        return strTitle;
+    }
+
+    // 操作列
+    function renderOpt(e) {
+        var rec = e.record;
+        var editStr = '<button type="button" class="btn18_gray mr5" onclick="cur.fn.edit(' + rec.personId + ',' + rec.isPluralistic + ')">修 改</button>';
+        var moveStr = '<button type="button" class="btn18_gray mr5" onclick="cur.fn.move(' + rec.personId + ',\'' + rec.name + '\')">移 动</button>';
+        /* var updateIsPluralistic = '';
+        var isPluralistic = rec.isPluralistic;
+        //如果是兼职用户，那么提供切换为主单位用户的按钮
+        if(isPluralistic){
+            updateIsPluralistic = '<button class="btn18_gray mr5" onclick="cur.fn.updatePluralistic('+rec.personId+',\''+rec.srcPersonId+'\')">设置为宿主</button>';
+        } */
+        return editStr + moveStr;
+    }
+
+
+    //启用
+    var startUser = function () {
+        var userIds = getUserIds();
+        if (userIds == null || userIds.length <= 0) {
+            Ls.tip.info("请选择用户", 2);
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/updateStatus?status=Enabled&userIds=" + userIds,
+            success: function (text) {
+                grid.reload();
+            }
+        });
+    }
+
+    var disableUser = function () {
+        var userIds = getUserIds();
+        if (userIds == null || userIds.length <= 0) {
+            Ls.tip.info("请选择用户", 2);
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/updateStatus?status=Unable&userIds=" + userIds,
+            success: function (text) {
+                grid.reload();
+            }
+        });
+    }
+
+    //删除
+    var delUser = function () {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tip.info("请选择用户!", 2);
+            return;
+        }
+        if (ids.split(",").length > 1) {
+            Ls.tip.info("只能选择一项进行删除!", 2);
+            return;
+        }
+        if (confirm("确认删除吗？")) {
+            Ls.ajaxGet({
+                url: "/person/deletePersonsList?personIds=" + ids,
+                success: function (text) {
+                    grid.reload();
+                }
+            });
+        }
+    }
+
+    //导出
+    var exportUser = function () {
+        var roleIds = mini.get("#roleIds").getValue() || "";
+        var searchText = mini.get("#searchText").getValue() || "";
+        var par = "organId=$!{organId}&searchText=" + searchText + "&roleIds=" + roleIds;
+        downloadPersonInfos.location.href = "/person/downloadPersonInfos?" + par;
+    }
+
+    //用户搜索
+    var searchUser = function () {
+        var searchText = mini.get("#searchText").getValue();
+        grid.load({organId: "$!{organId}", searchText: searchText, dataFlag: 1});
+    }
+
+    //清除条件
+    var searchClear = function () {
+        mini.get("#searchText").setValue("");
+        grid.load({organId: "$!{organId}", dataFlag: 1});
+    }
+
+    function getUserIds() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].userId);
+        }
+        ids = ids.join(",");
+        return ids;
+    }
+
+    //循环选中的行
+    function getIDS() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].personId);
+        }
+        ids = ids.join(",");
+        return ids;
+    }
+</script>

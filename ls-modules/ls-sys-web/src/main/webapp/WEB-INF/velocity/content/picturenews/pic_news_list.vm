@@ -1,0 +1,513 @@
+#set($hasEdit=$shiro.hasColumnButton("edit"))
+#set($hasPublish=$shiro.hasColumnButton("publish"))
+<div id="doc_main" style="width: 100%; height: 100%;">
+
+    <div class="portlet light">
+        <!--<div class="portlet-title">
+          <div class="caption font-grey-silver">
+            <span class="caption-subject bold uppercase">用户列表</span>
+          </div>
+          <div class="tools"></div>
+        </div>-->
+        <div class="portlet-body">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6">
+
+                        #if($hasEdit)
+                            <div class="btn-group">
+                                <button id="article_news_add" type="button" class="editBtn btn btn-default btn-add"> 添 加</button>
+                            </div>
+                        #end
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                #if($hasPublish)
+                                    <li id="publishs"><a href="javascript:;">批量发布</a></li>
+                                    <li id="unpublishs"><a href="javascript:;">批量取消发布</a></li>
+                                    <li class="divider"></li>
+                                    <li id="batchMove_news"><a href="javascript:;">批量移动到</a></li>
+                                #end
+                                #if($hasEdit)
+                                    <li class="divider"></li>
+                                    <li id="deletes"><a href="javascript:;">批量删除</a></li>
+                                #end
+                            </ul>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                    class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="searchByType('isPublish',1)">已发布</a></li>
+                                <li><a href="javascript:;" onclick="searchByType('isPublish',0)">未发布</a></li>
+                                <li class="divider"></li>
+                                <li><a href="javascript:;" onclick="searchByType('isNew',1)">已标新</a></li>
+                                <li><a href="javascript:;" onclick="searchByType('isTop',1)">已置顶</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-all-check" id="checkAll" onclick="checkAll(this)"> 全 选</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <!-- <label>搜索：</label>-->
+                                <input type="text" id="searchKey" name="searchKey" class="form-control w160" placeholder="标题" maxlength="100">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="searchContent()"> 搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="picture-news pb15">
+
+                <table class="table table-hover picture-list">
+                    <thead>
+                    <tr>
+                        <th class="w55">排 序</th>
+                        <th class="w190"></th>
+                        <th></th>
+                        <th class="w35 text-center">
+                        #*<input type="checkbox" id="checkAll" onclick="checkAll()">*#
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="picture_list">
+                    </tbody>
+                </table>
+                <div id="pagination" class="pagination pull-right"></div>
+                <div class="clearfix"></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<script id="picture_list_template" type="text/html">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <?
+    var el = data[i],imgPath = "",titleStyle = "";
+    if(el.imageLink!=null){
+        if(el.imageLink.indexOf("/")==-1){
+            if(el.imageLink.indexOf(".")==-1){
+                imgPath = GLOBAL_FILESERVERPATH + el.imageLink;
+            }else if(el.imageLink.indexOf("/mongo")==-1){
+                imgPath = GLOBAL_FILESERVERNAMEPATH + el.imageLink;
+            }else{
+                imgPath = el.imageLink;
+            }
+        }else{
+            imgPath = el.imageLink;
+        }
+    }else{
+        imgPath = GLOBAL_CONTEXTPATH + "assets/images/no.photo.jpg";
+    }
+
+    titleStyle = "color:" + el.titleColor + ";";
+    if(el.isBold==1) {
+        titleStyle += "font-weight:bold;"
+    }
+    if(el.isTilt==1) {
+        titleStyle += "font-style:italic;"
+    }
+    if(el.isUnderline==1) {
+        titleStyle += "text-decoration:underline;"
+    }
+
+    var redirectLink = "";
+    if(el.redirectLink!=null && el.redirectLink != ''){
+        redirectLink = el.redirectLink
+    }else{
+        redirectLink = GLOBAL_HTMLFILEPATH + "/content/article/" + el.id
+    }
+    var disabledStr = Ls.publishStatus(el.isPublish);
+    moveStr = "arrow_move"
+    if(disabledStr){
+    moveStr = "";
+    }
+    ?>
+    <tr>
+        <td>
+            <div class="rows text-center">
+                <a href="javascript:;" onclick="contentSort(<?=el.id?>,<?=el.num?>,'up')"><i class="fa fa-long-arrow-up"></i></a>
+                <a href="javascript:;" onclick="contentSort(<?=el.id?>,<?=el.num?>,'down')"><i class="fa fa-long-arrow-down"></i></a>
+            </div>
+        </td>
+        <td>
+            <div class="thumb">
+                <img src="<?=imgPath?>"/>
+            </div>
+        </td>
+        <td>
+
+            <div class="title">
+                <a href="<?=redirectLink?>" target="_blank" style="<?=titleStyle?>"><?=el.title?></a>
+                <? if(disabledStr!="") {?><span class="publish-status publish-<?= el.id ?>">[生成中...]</span><? } ?>&nbsp;&nbsp;&nbsp;<?==imga?>
+            </div>
+
+            <div class="attr">
+                <span class="w230"><?if(el.isPublish==1){?>发布日期：<?=el.publishDate?><?}else{?>创建日期：<?=el.createDate?><?}?></span>
+                <span class="w140">作者：<?=el.author?></span>
+                <span>点击量：<?=el.hit?></span>
+            </div>
+
+            <div class="info">
+                <?=Ls.cutstr(el.remarks,80)?>
+            </div>
+
+            <div class="tools-bar">
+
+                <div class="l">
+                    <?if(el.workFlowStatus!=1){?>
+                    #if($hasPublish)
+                        <button <?=disabledStr?> type="button" class="publishBtn_ btn btn-default btn-xs <? if(el.isPublish==1){?> green-meadow<?}?>" id="p_<?=el.id?>"
+                        onclick="changePublish(<?=el.id?>,<?=el.isPublish?>)">发
+                        </button>
+
+                        <button <?=disabledStr?> type="button" class="publishBtn_ btn btn-default btn-xs <? if(el.isTop==1){ ?> blue <? } ?>" id="top_<?=el.id?>"
+                        onclick="changeTop(<?=el.id?>)">顶
+                        </button>
+                        <button <?=disabledStr?> type="button" class="publishBtn_ btn btn-default btn-xs <? if(el.isTitle==1){ ?> blue <? } ?>" id="title_<?=el.id?>"
+                        onclick="changeTitle(<?=el.id?>)">标
+                        </button>
+                        <button <?=disabledStr?> type="button" class="publishBtn_ btn btn-default btn-xs <? if(el.isNew==1){ ?> blue <? } ?>" id="new_<?=el.id?>"
+                        onclick="changeNew(<?=el.id?>)">新
+                        </button>
+                    #end
+                    <?}?>
+                </div>
+
+                <div class="r input-group">
+                    <div class="btn-group">
+                        <?if(el.workFlowStatus!=1){?>
+                        #if($hasEdit)
+                            <button <?=disabledStr?>  type="button" onclick="editPicNews(<?=el.id?>)" class="editBtn_ btn btn-default btn-xs">修 改</button>
+                            <button <?=disabledStr?>  type="button" class="editBtn_ btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only"> 修 改 </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="javascript:;" onclick="copyNews(<?=el.id?>)"> 复 制 </a></li>
+                                <li class="editBtn disabled"><a href="javascript:;" onclick="moveById(<?=el.id?>)"> 移 动 </a></li>
+                            #*<li role="separator" class="divider"></li>
+                            <li class="editBtn disabled"><a href="javascript:;" onclick="report(<?=el.id?>)"> 报 审 </a></li>*#
+
+                                <?if(el.isPublish==1){?>
+                                <li class="editBtn disabled"><a href="javascript:;" onclick="referPage(<?=el.id?>)"> 引 用 </a></li>
+                                <?}?>
+                                <?if(el.isPublish==1){?>
+                                <li class="editBtn disabled"><a href="javascript:;" onclick="sharePage(<?=el.id?>)"> 推 送 </a></li>
+                                <?}?>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="javascript:;" onclick="deleteById(<?=el.id?>)"> 删 除 </a></li>
+                            </ul>
+                        #end
+                        <?}?>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </td>
+        <td class="text-center">
+            <?if(el.workFlowStatus!=1){?>
+            <input type="checkbox" name="picture_checkbox" value="<?=el.id?>">
+        ##            <?}else{?>
+        ##            <input type="checkbox" name="picture_checkbox" disabled="disabled" value="<?=el.id?>">
+            <?}?>
+        </td>
+    </tr>
+    <? } ?>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/picNews/pic_news_list.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script>
+    cur.pageIndex = '$!{pageIndex}'
+
+    $(document).ready(function () {
+        doc_manage.init();
+
+        $("#article_news_add").on('click', function () {
+            content_mgr.getContentApp("/pictureNews/picNewsEdit?pageIndex=" + cur.pageIndex)
+        })
+
+    })
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        doc_manage.getData(cur.pageIndex, content_mgr.indicatorId, "", '', '');
+    }
+
+    //修改
+    function editPicNews(id) {
+        content_mgr.getContentApp("/pictureNews/picNewsEdit?id=" + id + "&pageIndex=" + cur.pageIndex)
+    }
+
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        doc_manage.getData(0, cur.columnId, cur.key, cur.condition, cur.status)
+    }
+
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        cur.condition = "";
+        cur.status = "";
+        doc_manage.getData(0, cur.columnId, cur.key, '', '')
+    }
+
+    function searchByType(type, status) {
+        cur.condition = type;
+        cur.status = status;
+        doc_manage.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+    }
+
+    function checkAll(el) {
+        var el = $(el);
+        if (el.data("checked")) {
+            $("input[name='picture_checkbox']").prop("checked", false);
+            el.data("checked", false);
+        } else {
+            $("input[name='picture_checkbox']").prop("checked", true);
+            el.data("checked", true);
+        }
+    }
+
+    //批量发布状态
+    function publishs(type) {
+        var check = [];
+        $("input[name='picture_checkbox']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                type: type
+            },
+            url: "/articleNews/publishs",
+            success: function (text) {
+                if(type!=0){
+                    Ls.tipsOk("批量发布完成，正在生成处理中");
+                }else{
+                    Ls.tipsOk("批量取消发布完成，正在生成处理中");
+                }
+                doc_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+            }
+        });
+    }
+
+    function batchMove_news() {// 批量移动
+        var check = [];
+        $("input[name='picture_checkbox']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        moveById(check);
+    }
+
+    function moveById(id) {
+        var i = "移动";
+        var r = "/content/toMove?contentId=" + id + "&source=1&type=1";
+        Ls.openWin(r, "400px", "400px", {
+            id: "copy_refer_page",
+            title: i + "到",
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.ok();
+                data.contentId = id.toString();
+                data.type = 1;
+                Ls.ajax({
+                    url: "/content/move",
+                    data: data
+                }).done(function (e) {
+                    if (e.status) {
+                        Ls.tipsOk(i + "完成，正在生成处理中")
+                        doc_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                    } else {
+                        Ls.tipsErr(e.desc);
+                    }
+                })
+            }
+        })
+
+    }
+
+    //单删除
+    function deleteById(id) {
+        var check = [];
+        check.push(id);
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/articleNews/delete",
+                success: function (text) {
+                    if (text.status == 1) {
+                        doc_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                        Ls.tipsOk("删除完成，正在生成处理中");
+                    } else {
+                        Ls.tipsErr(text.desc);
+                    }
+                }
+            });
+        }
+    }
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish:isPublish
+            },
+            url: "/articleNews/changePublish",
+            success: function (text) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    doc_manage.getData(cur.pageIndex,  cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    doc_manage.getData(cur.pageIndex,  cur.columnId, cur.key, cur.condition, cur.status);
+                }
+
+            }
+        });
+    }
+
+    //改变置顶状态
+    function changeTop(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeTop",
+            success: function (text) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#top_" + id).removeClass("blue");
+                    Ls.tipsOk("取消置顶完成，正在生成处理中");
+                    doc_manage.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#top_" + id).addClass("blue");
+                    Ls.tipsOk("置顶完成，正在生成处理中");
+                    doc_manage.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            }
+        });
+    }
+
+    //改变标题新闻状态
+    function changeTitle(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeTitle",
+            success: function (text) {
+                var isTitle = text.data;
+                if (isTitle == 1) {
+                    $("#title_" + id).removeClass("blue");
+                    Ls.tipsOk("取消加标完成，正在生成处理中");
+                } else {
+                    $("#title_" + id).addClass("blue");
+                    Ls.tipsOk("加标完成，正在生成处理中");
+                }
+            }
+        });
+    }
+
+    //改变加新状态
+    function changeNew(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeNew",
+            success: function (text) {
+                var isNew = text.data;
+                if (isNew == 1) {
+                    $("#new_" + id).removeClass("blue");
+                    Ls.tipsOk("取消加新完成，正在生成处理中");
+                } else {
+                    $("#new_" + id).addClass("blue");
+                    Ls.tipsOk("加新完成，正在生成处理中");
+                }
+            }
+        });
+    }
+
+    function contentSort(id, num, opr) {
+        var data = {
+            opr: opr,
+            oprId: id,
+            oprSort: num,
+            columnId: cur.columnId,
+            title: cur.key,
+            condition: cur.condition,
+            status: cur.status
+        };
+        Ls.ajaxGet({
+            data: data,
+            url: "/content/contentSort",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    doc_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                    Ls.tipsOk("排序完成，正在生成处理中");
+                }
+            }
+        });
+    }
+
+    function copyNews(id) {
+        art.dialog.open("/content/copyNews?id=" + id, {
+            width: '430px',
+            height: '460px',
+            lock: true,
+            title: '复制'
+        });
+    }
+
+    function referPage(id) {
+        art.dialog.open("/content/referPage?id=" + id, {
+            width: '430px',
+            height: '460px',
+            lock: true,
+            title: '引用'
+        });
+    }
+
+    function sharePage(id) {
+        art.dialog.open("/content/sharePage?id=" + id, {
+            width: '555px',
+            height: '365px',
+            lock: true,
+            title: '推送'
+        });
+    }
+    function report(dataId) {
+        startProcess("EX", cur.columnId, "PictureNews", dataId);
+    }
+</script>

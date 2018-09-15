@@ -1,0 +1,32 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0, maximum-scale=2.0" />
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="copyright" content="Copyright ? 2013 Lonsun.cn." />
+    <meta name="description" content="" />
+    <link rel="stylesheet" type="text/css" href="/css/longsun.css">
+</head>
+    #parse("/lottery/lottrty_footer.vm")
+
+<body class="hdbodybg" >
+<!--第六步开始-->
+<div class="hdnum6" id="hd05" >
+    <div class="hdtitle">很遗憾！</div>
+    <!--主体内容-->
+    <div class="hd_nrbg" >
+        <div class="hdtit1">$!{error}</div>
+        <div class="faceimg"><img src="/images/faceimg.jpg" width="202" height="171"></div>
+
+    </div>
+    <!--主体内容--->
+    <div class="hdbotbg">
+        <div class="zdbtn1"><a href="/lotteryDraw/drawNotice"><img src="/images/zdbtn.jpg" ></a></div>
+    </div>
+</div>
+<!--第六步结束-->
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<form method="post" name="correction_form" id="correction_form">
+    <input type="hidden" name="siteId" value="$!{resultObj}"/>
+    <table width="100%" class="correction-table">
+        <tbody>
+        <tr>
+            <th>错误类型：</th>
+            <td>
+                <select name="type" class="form-control" id="type">
+                    <option value="editError">字词、标点、语法错误</option>
+                    <option value="typeSettingError">段落、版面编排错误</option>
+                    <option value="pictureError">图片使用、注释错误</option>
+                    <option value="contentImproper">链接、相关新闻不当</option>
+                    <option value="timePlaceError">时间地点不明或错误</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>错误链接：</th>
+            <td><input type="text" name="link" id="link" class="form-control" placeholder="" maxlength="200"></td>
+        </tr>
+        <tr>
+            <th>姓名：</th>
+            <td><input type="text" name="createName" id="createName" class="form-control" placeholder="" maxlength="20"></td>
+        </tr>
+        <tr>
+            <th>联系方式：</th>
+            <td><input type="text" name="contactWay" id="contactWay" class="form-control" placeholder="" maxlength="13"></td>
+        </tr>
+        <tr>
+            <th>详细描述：</th>
+            <td>
+                <textarea id="descs" name="descs" rows="5"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th><span>*</span>验证码：</th>
+            <td>
+                <input class="verification" name="checkCode" id="checkCode" size="6" maxlength="4" type="text">
+                <img id="correction_code" class="imgcode" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片"
+                     align="absmiddle">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" class="btn-group">
+                <input id="btn_correction_submit" class="btn btn-submit" type="button" value="确定(S)">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+<script>
+    $(document).ready(function () {
+
+        var autoLink = Ls.url.get("autoLink");
+
+        if (!autoLink) {
+            try {
+                var link = parent.window.location.href;
+                $("#link").val(link);
+            } catch (e) {
+            }
+        }
+
+        using("validator", function () {
+
+            $("#correction_form").validator({
+                fields: {
+                    link: "错误链接:required;",
+                    createName: "姓名:required;",
+                    contactWay: "联系方式:required;mobile|tel|shortTel;",
+                    descs: "详细描述:required;length[5~500];",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-top',
+                timely: 1
+            });
+
+            function saveData() {
+                var data = {};
+                data.siteId = "$!{resultObj}";
+                data.type = $("#type").val();
+                data.link = $("#link").val();
+                data.createName = $("#createName").val();
+                data.contactWay = $("#contactWay").val();
+                data.descs = $("#descs").val();
+                data.checkCode = $("#checkCode").val();
+                data.ip = returnCitySN["cip"];
+                return Ls.ajax({
+                    data: data,
+                    url: "/correction/saveData",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            Ls.tipsOk("提交成功", {
+                                callback: function () {
+                                    try {
+                                        parent.Ls.dialog.get("correction").close();
+                                    } catch (e) {
+                                    }
+                                }
+                            });
+                            $('#correction_form')[0].reset();
+                        } else {
+                            Ls.tipsErr(text.desc);
+                        }
+
+                    }
+                }).always(function () {
+                    $("#correction_code").click();
+                });
+            }
+
+        });
+
+        $("#correction_code").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        $("#btn_correction_submit").on('click', function () {
+            $("#correction_form").trigger("validate");
+        });
+
+        if ("KindEditor" in window) {
+            editor1 = KindEditor.create('textarea[name="descs"]', {
+                uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&columnId=",//上传文件
+                fileManagerJson: '/fileCenter/getPage',//文件空间
+                allowImageUpload: true,
+                allowFileManager: false,
+                allowFlashUpload: false,
+                allowMediaUpload: false,
+                filterMode: false,
+                items: [
+                    'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+                afterCreate: function () {
+                    this.sync();
+                },
+                afterBlur: function () {
+                    this.sync();
+                },
+                resizeType: 1
+            });
+        }
+    })
+
+</script>

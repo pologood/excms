@@ -1,0 +1,30 @@
+##三公经费
+<div class="sgjf">
+	#set($organList=$resultObj.get("organList"))
+	#set($organCatMap=$resultObj.get("organCatMap"))
+	#if($organList.size()>0)
+    	<ul>
+			#foreach($organ in $organList)
+				#if($foreach.count%2==0)
+					<li class="ever">
+						<a href="/public/column/$!{organ.organId}?type=4&action=list" class="tit" title="$!{organ.name}">$!{organ.name}</a>
+						#foreach($cat in $organCatMap.get($organ.organId).entrySet())
+                            <a href="/public/column/$!{organ.organId}?type=4&action=list&catId=$!{cat.key}" target="_blank">$!{cat.value}</a><br>
+						#end
+					</li>
+				#else
+					<li>
+                        <a href="/public/column/$!{organ.organId}?type=4&action=list" class="tit" title="$!{organ.name}">$!{organ.name}</a>
+						#foreach($cat in $organCatMap.get($organ.organId).entrySet())
+                            <a href="/public/column/$!{organ.organId}?type=4&action=list&catId=$!{cat.key}" target="_blank">$!{cat.value}</a><br>
+						#end
+					</li>
+				#end
+			#end
+        </ul>
+	#else
+        暂无数据
+	#end
+    <div class="clear"></div>
+</div>
+

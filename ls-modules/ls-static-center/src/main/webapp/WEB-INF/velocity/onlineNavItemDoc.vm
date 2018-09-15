@@ -1,0 +1,108 @@
+#set($i=0)
+#set($eo = $!{resultObj})
+<table class="online-service">
+    #set($css="even")
+    #if($i%2 == 1)
+        #set($css="odd")
+    #end
+    #if("$!{eo.setAccord}"!="")
+        <tr class="$css">
+            <th>设定依据：</th>
+            <td>
+                $!{eo.setAccord}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.applyCondition}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>申请条件：</th>
+            <td>
+                $!{eo.applyCondition}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.handleData}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>办理材料：</th>
+            <td>
+                $!{eo.handleData}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.handleProcess}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>办理流程：</th>
+            <td>
+                $!{eo.handleProcess}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.handleAddress}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>办理地点：</th>
+            <td>
+                $!{eo.handleAddress}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.handleDate}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>办理时间：</th>
+            <td>
+                $!{eo.handleDate}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.phone}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>联系电话：</th>
+            <td>
+                $!{eo.phone}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+    #if("$!{eo.content}"!="")
+        #set($css="even")
+        #if($i%2 == 1)
+            #set($css="odd")
+        #end
+        <tr class="$css">
+            <th>其他：</th>
+            <td>
+                $!{eo.content}
+            </td>
+        </tr>
+        #set($i=$i+1)
+    #end
+</table>

@@ -1,0 +1,159 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">编辑器样式配置</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="table-toolbar" style="margin-bottom: 10px">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="pdr10">
+                                    <button class="btn btn-default btn-add" onclick="edit()"> 新增</button>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+
+                                <form class="form-inline tr search-toolbar" role="form">
+                                    <div class="form-group">
+                                        <input type="text" id="searchKey" name="searchKey" class="form-control"
+                                               placeholder="名称">
+                                    </div>
+                                    <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                        搜索
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                        显示全部
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="false"
+                         url="/pageStyle/getPage?DataFlag=1" sizeList="[5,10,20,50]" pageSize="10"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;">
+                        <div property="columns">
+                            <div type="indexcolumn"></div>
+                            <div field="name" width="50%" align="center" headerAlign="center">名称</div>
+                            <div field="isBase" width="150" align="center" headerAlign="center" renderer="cur.formatter.isBase">是否为基础样式</div>
+                            <div field="useAble" width="100" align="center" align="center" headerAlign="center" renderer="cur.formatter.useAble">是否启用</div>
+                            <div field="createDate" width="150" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                            <div width="115" align="center" headerAlign="center" allowSort="true" renderer="cur.formatter.option">操作</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        gridPageStyle:mini.get("datagrid"),
+        dialog: Ls.getWin.dialog,
+        formatter:{
+            useAble:function(obj){
+                var record = obj.record;
+                if(record.useAble == 1){
+                    return "启用";
+                }
+                return "禁用";
+            },
+            isBase:function(obj){
+                var record = obj.record;
+                if(record.isBase == 1){
+                    return "是";
+                }
+                return "否";
+            },
+            option:function(obj){
+                var record = obj.record;
+                var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="edit('+record.id+',\''+ record.name +'\')">修 改</button> ' +
+                        '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="del('+ record.id+',\''+ record.name +'\')">删 除</button>';
+                return diyDom;
+            }
+        }
+    };
+    $(document).ready(function () {
+        cur.gridPageStyle.load();
+
+        /*
+        * grid高度渲染
+        * */
+        Ls.mini_datagrid_height(cur.gridPageStyle, 70);
+
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.gridPageStyle.load();
+            }
+        });
+    })
+
+    function edit(id, name) {
+        var url = '/pageStyle/edit?id=';
+        var title = "添加界面样式";
+        if (id == null || id == undefined || id == '') {
+        } else {
+            url += id;
+            title = "修改样式【" + name + "】";
+        }
+        /*var height = document.body.offsetHeight;
+        if(height > 800){
+            height = height - 160;
+        }else{
+            height = height - 100;
+        }
+        var width = document.body.offsetWidth;
+        if(width > 1600){
+            width = width - 450;
+        }else{
+            width = width - 300;
+        }*/
+        Ls.openWin(url, '900px', '560px', {
+            title: title,
+            esc:false
+        });
+    }
+
+    function del(id, name) {
+        if(confirm('确定删除样式【'+ name +'】?')) {
+            Ls.ajaxGet({
+                url: "/pageStyle/remove",
+                data: {
+                    id: id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.gridPageStyle.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function search() {
+        var searchKey = $("#searchKey").val();
+        cur.gridPageStyle.load({searchKey: searchKey});
+    }
+
+    function showAll() {
+        $("#searchKey").val('');
+        search();
+    }
+
+    function success_save_callback(msg) {
+        search();
+        Ls.tipsOk('配置修改生效，请刷新页面！', {times: 3.5});
+    }
+</script>

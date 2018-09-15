@@ -1,0 +1,123 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+  <div class="portlet-body form">
+
+    <form role="form" id="declaForm" ms-controller="declaForm">
+      <table class="table table-bordered petition-table">
+        <tbody>
+        <tr>
+          <th>申请人：</th>
+          <td colspan="2" ms-text="personName">
+          </td>
+        </tr>
+        <tr>
+          <th>单位：</th>
+          <td colspan="2" ms-text="unitName">
+          </td>
+        </tr>
+        <tr>
+          <th>事项名称：</th>
+          <td colspan="2" ms-text="title">
+          </td>
+        </tr>
+        #if($recType==0)
+        <tr>
+          <th>受理单位：</th>
+          <td colspan="2" ms-text="recUnitName">
+          </td>
+        </tr>
+        #end
+        <tr>
+          <th>申请表下载：</th>
+          <td colspan="2" ms-text="downUrl">
+          </td>
+        </tr>
+        <tr>
+          <th>联系地址：</th>
+          <td colspan="2" ms-text="address">
+          </td>
+        </tr>
+        <tr>
+          <th>联系电话：</th>
+          <td colspan="2" ms-text="phoneNum">
+          </td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top;">事实和理由：</th>
+          <td colspan="2" ms-text="factReason">
+          </td>
+        </tr>
+        <tr>
+          <th>附件：</th>
+          <td colspan="2" ms-text="attach|html">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </form>
+
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+  var curr = {
+    vm: "",
+    pageIndex: '$!{pageIndex}'
+  };
+  var setUnit = false;
+  var recType='$!{recType}';
+  $(document).ready(function () {
+    getVO();
+  });
+
+  function getVO() {
+    var baseContentId = "${baseContentId}";
+    Ls.ajax({
+      type: "POST",
+      url: "/onlineDeclaration/getVO",
+      data: {id: baseContentId}
+    }).done(function (d) {
+      if (!d.status) {
+        Ls.tipsErr(d.desc);
+        return;
+      }
+      data = d.data;
+      if(recType!=null&&recType!=''){
+        data.recUnitId = Ls.isEmpty(data.recUnitId) ? "" : data.recUnitId;
+      }
+      data.$id = "declaForm";
+      data.attach = ""
+      if (data.attachId) {
+        var url='/onlinePetition/downloadFile?attachId=' + data.attachId + '&&s=' + Math.random();
+        data.attach = '<a href='+url +'target="_blank">' + data.attachName + '</a>'
+      }
+
+      curr.vm = avalon.define(data);
+      avalon.scan($("#declaForm").get(0), curr.vm);
+
+    });
+  }
+
+  function getRecUnit() {
+    Ls.ajax({
+      type: "POST",
+      url: "/onlinePetition/getRecUnitOrPerson",
+      data: {columnId: curr.vm.columnId}
+    }).done(function (text) {
+      setUnit = true;
+      if (text.status) {
+        var data = text.data;
+        var length = data.length;
+        for (i = 0; i < length; i++) {
+          if (jQuery.trim(data[i].recUnitId) == curr.vm.recUnitId) {
+            curr.vm.recUnitId = data[i].recUnitName;
+            break;
+          }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

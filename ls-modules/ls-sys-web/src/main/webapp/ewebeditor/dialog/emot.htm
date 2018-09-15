@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sCaption = lang["DlgEmot"];
+        document.write("<title>" + sCaption + "</title>");
+
+        function emotclick(e) {
+            if (!e) {
+                e = window.event;
+            }
+            var o_Target = e.srcElement || e.target;
+
+            if ("IMG" == o_Target.tagName.toUpperCase()) {
+
+                var s_Url = GetAttribute(o_Target, "src");
+                s_Url = s_Url.substr(3);
+                s_Url = relativePath2setPath(s_Url, true);
+
+                EWIN.insertHTML('<img src="' + s_Url + '">');
+
+                parent.Ok();
+            }
+        }
+
+
+        function InitDocument() {
+            EWEBTools.AddEventListener($('emot_table'), 'click', emotclick);
+            parent.InnerDialogLoaded(sCaption);
+        }
+    </script>
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+
+            <table id="emot_table" cellSpacing=5 border=0 align=center bgcolor=#FFFFFF>
+                <tbody>
+                <tr>
+                    <td><img src="../../assets/images/ewebeditor/emot/01.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/02.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/03.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/04.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/05.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/06.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/07.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/08.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/09.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/10.gif"></td>
+                </tr>
+                <tr>
+                    <td><img src="../../assets/images/ewebeditor/emot/11.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/12.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/13.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/14.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/15.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/16.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/17.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/18.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/19.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/20.gif"></td>
+                </tr>
+                <tr>
+                    <td><img src="../../assets/images/ewebeditor/emot/21.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/22.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/23.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/24.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/25.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/26.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/27.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/28.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/29.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/30.gif"></td>
+                </tr>
+                <tr>
+                    <td><img src="../../assets/images/ewebeditor/emot/31.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/32.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/33.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/34.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/35.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/36.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/37.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/38.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/39.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/40.gif"></td>
+                </tr>
+                <tr>
+                    <td><img src="../../assets/images/ewebeditor/emot/41.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/42.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/43.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/44.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/45.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/46.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/47.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/48.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/49.gif"></td>
+                    <td><img src="../../assets/images/ewebeditor/emot/50.gif"></td>
+                </tr>
+                </tbody>
+            </table>
+
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

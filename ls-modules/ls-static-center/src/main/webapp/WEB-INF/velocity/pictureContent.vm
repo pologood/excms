@@ -1,0 +1,34 @@
+#if($PicList && $PicList.size() > 0)
+<div class="contentpic">
+    <div id="myFocus01" class="myFocus myLoading" data-setting="{id:'myFocus01',pattern:'mF_tbhuabao',width:800,height:600}">
+                        <div class="pic">
+                          <ul>
+                           
+						   #foreach($eo in $PicList)   
+								#if($eo.path.indexOf("/") !=-1)
+									#set($filePath="")
+								#elseif($eo.path.indexOf(".") !=-1)
+									#set($filePath="$!{fileServerNamePath}")
+								#else
+									#set($filePath="$!{fileServerPath}")
+								#end
+								#set($css="even")
+								#if($velocityCount%2 == 1)
+									#set($css="odd")
+								#end
+							<li class="$!{css}">
+								<a href="javascript:void(0);"  title="$!{eo.picTitle}">
+									<img src="${filePath}$!{eo.path}"  alt="$!{eo.picTitle}"/>
+								</a>
+							</li>
+							#end
+                          </ul>
+                        </div>
+                      </div>
+						<div  class="clear"></div>
+			</div>
+
+
+#else
+&nbsp;
+#end

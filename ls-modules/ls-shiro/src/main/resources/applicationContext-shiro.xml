@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+	<!-- 单点登录 -->
+	<bean id="casSubjectFactory" class="org.apache.shiro.cas.CasSubjectFactory" />
+	<!-- redisShiroSessionDAO -->
+	<bean id="redisShiroSessionDAO" class="cn.lonsun.shiro.session.redis.RedisSessionDAO">
+		<property name="expire" value="2000"></property>
+	</bean>
+	<bean id="ehcacheShiroSessionDAO" class="cn.lonsun.shiro.session.ehcache.EhcacheSessionDAO" />
+	<bean id="onlineSessionFactory" class="cn.lonsun.shiro.session.OnlineSessionFactory" />
+	<!-- sessionIdCookie的实现,用于重写覆盖容器默认的JSESSIONID -->
+	<bean id="sessionIdCookie" class="cn.lonsun.shiro.ShiroSimpleCookie">
+		<!-- cookie的name,对应的默认是 JSESSIONID -->
+		<constructor-arg name="name" value="SHIROJSESSIONID" />
+	</bean>
+
+	<!-- sessionManager -->
+	<bean id="sessionManager" class="cn.lonsun.shiro.ShiroWebSessionManager">
+		<!-- 设置全局会话超时时间，默认30分钟(1800000) -->
+		<property name="globalSessionTimeout" value="1800000" />
+		<!-- 是否在会话过期后会调用SessionDAO的delete方法删除会话 默认true -->
+		<property name="deleteInvalidSessions" value="true" />
+		<!-- 会话验证器调度时间 -->
+		<property name="sessionValidationInterval" value="1800000" />
+		<!-- session存储的实现 -->
+		<property name="sessionDAO" ref="ehcacheShiroSessionDAO" />
+		<!-- 定时检查失效的session -->
+		<property name="sessionValidationSchedulerEnabled" value="true" />
+		<property name="sessionFactory" ref="onlineSessionFactory" />
+		<property name="sessionIdCookie" ref="sessionIdCookie" />
+		<property name="sessionListeners">
+			<list>
+				<bean class="cn.lonsun.shiro.ShiroSessionListener" />
+			</list>
+		</property>
+	</bean>
+
+	<!--<bean id="shiroEhcacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">-->
+		<!--<property name="cacheManagerConfigFile" value="classpath:${ehcache.file_resource_path}" />-->
+	<!--</bean>-->
+
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!--单个realm使用realm,如果有多个realm，使用realms属性代替 -->
+		<property name="realm" ref="shiroRealm" />
+		<property name="sessionMode" value="http" />
+		<property name="subjectFactory" ref="casSubjectFactory" />
+		<property name="sessionManager" ref="sessionManager" />
+		<!--<property name="cacheManager" ref="shiroEhcacheManager" />-->
+	</bean>
+	<!-- 异常处理 -->
+	<bean id="exceptionHandler" class="cn.lonsun.shiro.HandlerExceptionResolver" />
+	<!-- 重写 -->
+	<bean id="anonFilter" class="cn.lonsun.shiro.filter.AnonymousFilter" />
+
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"></bean>
+
+    <bean id="springAnnotationResolver" class="org.apache.shiro.spring.aop.SpringAnnotationResolver"></bean>
+
+</beans>

@@ -1,0 +1,16 @@
+#set($Integer=0)
+#set($url="$!{paramObj.url}")
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($target="$!{paramObj.target}")
+<ul>
+    #foreach($eo in $resultObj)
+        #set($uri="$!{eo.uri}")
+        #if($url!="")
+            #set($uri=$url)
+        #end
+        <li class="num${velocityCount}">
+            <a href="${uri}" target="$!{target}" title="$!{eo.name}" tabindex="-1">#cutstr($!{eo.name},$length)</a>
+        </li>
+    #end
+</ul>

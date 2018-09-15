@@ -1,0 +1,81 @@
+#set($_title="缩略图")
+<style type="text/css">
+    body {
+        margin: 0px;
+        padding: 0px !important;
+    }
+</style>
+</head>
+<body class="page-body-white">
+
+<div id="flashEditorOut">
+    <div id="altContent2">
+    </div>
+    <div id="drap" class="drap" style="display:none">
+        <input id="file" type="file" accept="image/*"/>
+    </div>
+</div>
+
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script src="http://open.web.meitu.com/sources/xiuxiu.js"></script>
+<script type="text/javascript">
+    var W = art.dialog.opener,				// 父页面window对象
+            api = art.dialog.open.api;
+    var imageLink = art.dialog.data("imageLink");
+    var siteId = art.dialog.data("siteId");
+    var contentId = art.dialog.data("contentId");
+    var columnId = art.dialog.data("columnId");
+    xiuxiu.setLaunchVars("titleVisible", 0);
+    xiuxiu.setLaunchVars("maxFinalWidth", 198);
+    xiuxiu.setLaunchVars("maxFinalHeight", 148);
+    xiuxiu.embedSWF("altContent2", 1, "100%", "100%", "lite");
+
+    xiuxiu.onInit = function (id) {
+        if (contentId == null) {
+            contentId = "";
+        }
+        if (imageLink == null) {
+            imageLink = "";
+        }
+        xiuxiu.setUploadURL(Ls.getDomain + "$!{rc.contextPath}/videoNews/uploadAttachment?siteId=" + siteId + "&columnId=" + columnId + "&contentId=" + contentId + "&imageLink=" + imageLink);
+        xiuxiu.setUploadType(2);
+        xiuxiu.setUploadDataFieldName("Filedata");
+        if (imgLink != null && imgLink != "") {
+            if(imgLink.indexOf(".") != -1){
+                imgPath = '$!{fileServerNamePath}' + imgLink;
+            }else{
+                imgPath = '$!{fileServerPath}' + imgLink;
+            }
+            xiuxiu.loadPhoto(imgPath, false);
+        }
+    }
+
+    xiuxiu.onBeforeUpload = function (data, id) {
+        return true;
+    }
+
+    xiuxiu.onUploadResponse = function (d) {
+        if (d != null) {
+            var arr = d.split(",");
+            W.changeImg(arr[0]);
+            api.close();
+        }
+    }
+
+    xiuxiu.onDebug = function (data) {
+        alert("错误响应" + data);
+    }
+
+    xiuxiu.onClose = function (id) {
+        api.close();
+    }
+
+
+    $(document).ready(function () {
+    })
+
+</script>
+</html>

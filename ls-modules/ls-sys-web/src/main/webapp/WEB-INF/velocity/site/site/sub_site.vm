@@ -1,0 +1,169 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">站点信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="sub_formId" role="form" ms-controller="sub_formId">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <div class="form-body">
+                                <div class="form-group hide">
+                                    <label>ID</label>
+                                    <input type="text" name="indicatorId" ms-duplex="indicatorId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>PID</label>
+                                    <input type="text" name="parentId" ms-duplex="parentId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>父节点</label>
+                                    <input type="text" name="isParent" ms-duplex="isParent" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>站点配置ID</label>
+                                    <input type="text" name="siteConfigId" ms-duplex="siteConfigId" class="form-control" placeholder=""
+                                           disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点简称</label>
+                                    <input type="text" name="name" class="form-control" ms-duplex="name" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点全称</label>
+                                    <input type="text" name="siteTitle" class="form-control" ms-duplex="siteTitle" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点序号</label>
+                                    <input type="number" min="0" max="9999" name="sortNum" class="form-control" ms-duplex="sortNum"
+                                           placeholder="用于站点排序，按从小到大排序">
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定单位（用于站点栏目选择单位的范围）</label>
+                                    <div class="input-group">
+                                        <div id="menuContent"
+                                             style="display:none;position: absolute; top: 34px;height:300px; left: 0px;z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: auto;background-color: InactiveBorder">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                        <input type="text" name="unitIds" class="form-control hide" ms-duplex="unitIds">
+                                        <input type="text" id="unitNames" placeholder="请选择单位" ms-duplex="unitNames" class="form-control readonly" onclick="showUnitTree()">
+                                        <span class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                                    onclick="showUnitTree()">
+                                            <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定公共栏目</label>
+                                    <select class="form-control" name="comColumnId" id="comColumnId" ms-duplex="comColumnId"
+                                            placeholder="请选择公共栏目">
+                                    ##                                      <option value="">请选择公共栏目</option>
+##                                        #foreach($s in $comList)
+##                                          <option value="$!{s.indicatorId}">$!{s.name}</option>
+##                                        #end
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点模板</label>
+                                    <select class="form-control" name="siteTempId" id="siteTempId" ms-duplex="siteTempId"
+                                            placeholder="请选择站点模板">
+                                        <option value="">请选择站点模板</option>
+                                        #foreach($s in $tplObj)
+                                            <option value="$!{s.id}">$!{s.name}</option>
+                                        #end
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>关键词</label>
+                                    <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3" placeholder="站点关键字，建议100字以内有利搜索引擎抓取"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea class="form-control" name="description" ms-duplex="description" rows="3" placeholder="站点描述，建议1000字以内有利搜索引擎抓取"></textarea>
+                                </div>
+
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save" id="doSave">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/subSite_unit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/sub_site.js"></script>
+<script>
+    mini.parse();
+
+    $(document).ready(function () {
+        getComColumn();
+        unit_select_tree_ser.init();
+    });
+
+    function getComColumn() {
+        Ls.ajaxGet({
+            url: "/comColumn/getLevComColumn",
+            data: {siteId: GLOBAL_SITEID}
+        }).done(function (text) {
+            var str1 = '<option value=""> 请选择公共栏目 </option> ';
+            var str = "";
+            if (text.data != null) {
+                var data = text.data;
+                curr.comColumnList = data;
+                curr.length = data.length;
+                if (curr.length > 0) {
+                    for (i = 0; i < curr.length; i++) {
+                        str += ' <option value=' + data[i].indicatorId + '>' + data[i].name + '</option> ';
+                    }
+                }
+            }
+            curr.comColumnStr = str1 + str;
+            siteManage.site();
+            //  $("#comColumnId").append(str1 + str);
+
+        });
+    }
+
+
+    function getTemplate() {
+        Ls.ajaxGet({
+            url: "/subSite/getComTemplate",
+            data: {}
+        }).done(function (text) {
+            var str1 = '<option value=""> 请选择站点模板 </option> ';
+            var str = "";
+            if (text != null) {
+                var data = text;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> ';
+                    }
+                }
+            }
+            $("#siteTempId").append(str1 + str);
+
+        });
+    }
+
+</script>

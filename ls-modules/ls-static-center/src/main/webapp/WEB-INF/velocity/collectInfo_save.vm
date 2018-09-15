@@ -1,0 +1,102 @@
+<form method="post" name="collect_form" id="collect_form">
+    <div class="poll_collect">
+        <h3>发表意见</h3>
+        <ul>
+            <li>
+                <p class="poll_txt"><span class="red">*</span>您的姓名：</p>
+                <p class="poll_input"><input id="c_title" name="c_title" type="text" maxlength="5"></p>
+            </li>
+            <li>
+                <p class="poll_txt"><span class="red">*</span>联系方式：</p>
+                <p class="poll_input"><input id="c_tel" name="c_tel" type="text" maxlength="13"></p>
+            </li>
+            <li class="poll_area">
+                <p class="poll_con"><span class="red">*</span>您的意见：</p>
+                <p class="poll_conts"><textarea id="c_contents" name="c_contents" rows="5" maxlength="1000" placeholder="最多允许输入1000汉字，多余汉字将被截去"></textarea></p>
+            </li>
+            <li>
+                <p class="poll_txt"><span class="red">*</span>验证码：</p>
+                <p class="poll_yzm">
+                    <input class="verification" name="checkCode" id="checkimg" size="6" maxlength="4" type="text">
+                    <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                </p>
+            </li>
+            <li class="btn-group"><input id="btn_submit" name="submit" class="btn btn-submit" type="button" accesskey="S" value="提交"></li>
+        </ul>
+    </div>
+</form>
+<script>
+    $(document).ready(function (e) {
+        //获取会员信息
+        getLoginMember();
+
+        using("validator", function () {
+
+            $("#collect_form").validator({
+                fields: {
+                    c_title: "姓名:required;",
+                    c_tel: "联系方式:required;mobile|tel|shortTel;",
+                    c_contents: "您的意见:required;length[5~1000];",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-top',
+                timely: 1
+            });
+
+            function saveData() {
+                return Ls.ajax({
+                    url: "/content/saveCollectWeb",
+                    data: {
+                        collectInfoId:$!{resultObj.collectInfoId},
+                        name: $("#c_title").val(),
+                        phone: $("#c_tel").val(),
+                        content: $("#c_contents").val(),
+                        checkCode: $("#checkimg").val()
+                    }
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tipsOk("提交成功", function () {
+                            location.href = location.href;
+                        });
+                        $('#collect_form')[0].reset();
+
+                    } else {
+                        Ls.tipsErr(d.desc);
+                    }
+                }).always(function () {
+                    $("#imgCode").click();
+                });
+            }
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#collect_form").trigger("validate");
+        })
+
+    });
+
+    function getLoginMember() {
+        Ls.ajax({url: "/member/isLogin", data: {}}).done(function (d) {
+            var data = d.data;
+            if (data.isLogin == 1) {
+                $("#c_title").val(data.userName);
+                $("#c_tel").val(data.phone);
+            }
+        }).fail(function (d) {
+            Ls.tips("服务器未能响应请求，请重试！", {icons: "error"});
+        });
+    }
+
+</script>

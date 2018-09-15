@@ -1,0 +1,141 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" ms-controller="sensitive_form">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light" style="padding-bottom:0px;">
+            <div class="portlet-body form">
+                <form id="sensitive_form" role="form">
+                    <div class="form-body">
+                        <div class="well" style="padding-top: 5px;padding-bottom: 5px;">
+                            <h5 style="margin-bottom: 5px">导入说明</h5>
+                            <hr style="margin-top:10px;margin-bottom: 5px;">
+                            <div class="form-group" align="left">
+                                导入仅支持xls,xlsx格式文件，请严格按照提供的
+                                <a href="/monitor/wordsSensitive/getImportTemplate" style="color:-webkit-link;">[模 板]</a>
+                                格式上传，否则可能会导入失败或导致词库错乱 <br>
+                            </div>
+                        </div>
+                        <div class="form-group input-group" align="left" style="padding:5px 0px;">
+                            <input class="form-control" type="text" id="file" readonly style="cursor: pointer;background-color: #fefefe;" onclick="$('#absFile').click();" />
+                            <input id="absFile" type="file" style="display: none;" name="file"
+                                   onchange="$('#file').val(this.value);" accept=".xls,.xlsx" >
+                            <span class="input-group-addon">
+                               <a href="javascript:void(0);" style="text-decoration: none;" onclick="$('#absFile').click();">选择文件</a>
+                            </span>
+                        </div>
+                        <div class="form-group" align="left">
+                            <label class="checkbox inline">
+                                <input id="ck" type="checkbox" checked  style="position: relative;margin: 0px 0px 5px 0px;" > 覆盖现在词库
+                            </label>
+                            #if($!{superAdmin})
+                                <label class="checkbox inline" style="margin-left:20px;" >
+                                    <input id="qj" type="checkbox" style="position: relative;margin: 0px 0px 5px 0px;" /> 全局导入(<font style="color: red">不选中仅对当前站点有效</font>)
+                                </label>
+                            #end
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/plugins/ajaxfileupload.min.js"></script>
+<script>
+    var cur = {
+        $id: 'sensitive_form',
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        qj: $('#qj'),
+        superAdmin: $!{superAdmin}
+    }
+
+    $(document).ready(function () {
+        mini.parse();
+        cur.api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    saveData();
+                    return false;
+                }
+            },
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+        cur.node = Ls.initFORM(cur.$id, {
+            openType: "0"
+        });
+        getData(cur.node);
+    })
+
+    //拉取数据
+    function getData(data) {
+        //所有数据格式遵循EOA的标准,或看data1.txt
+        data = data;
+        //定义唯一ID，和页面上的 ms-controller 相同
+        data.$id = cur.$id;
+
+        //绑定模型
+        cur.vm = avalon.define(data);
+
+        //扫描模型
+        avalon.scan();
+
+    }
+
+    function saveData() {
+        var tips = Ls.tips("上传中", {icons: 'loading', autoClose: false});
+        var rowFirst = 2;//默认
+        var cellFirst = 1;//默认
+//        var rowFirst = mini.get('sp_row').getValue();//默认
+//        var cellFirst = mini.get('sp_cell').getValue();//默认
+        var rpl = $('#ck').is(':checked');
+        var qj = false;
+        if (cur.superAdmin) {
+            qj = $('#qj').is(':checked');
+        }
+        jQuery.ajaxFileUpload({
+            url: '$!{rc.contextPath}/monitor/wordsSensitive/upload?rowFirst=' + rowFirst + "&cellFirst=" + cellFirst + "&rpl=" + rpl + "&qj=" + qj,//服务器端程序
+            secureuri: false,
+            fileElementId: 'absFile',//input框的ID
+            dataType: 'json',//返回数据类型
+            beforeSend: function () {//上传前需要处理的工作，如显示Loading...
+            },
+            success: function (data, status) {
+                tips.hide();
+                if (data.status == '1') {
+                    cur.win.cur.excelgrid.load();
+                    cur.win.upload_success();
+                    Ls.winClose();
+                } else {
+                    cur.win.upload_error(data.desc);
+                }
+            },
+            error: function (data, status, e) {
+                cur.win.upload_error(data.desc);
+            }
+        });
+
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

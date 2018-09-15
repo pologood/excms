@@ -1,0 +1,65 @@
+ <style>
+	.tc{
+		text-align:center;
+	}
+ </style>
+ <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+	<div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+	<div id="" style="margin:10px 30px">
+		
+	<div class="row">
+       <div class="col-md-12 col-sm-12">
+            <div class="portlet light bordered mb25">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-bar-chart font-blue"></i>
+                        <span class="caption-subject font-blue bold">访问明细</span> &nbsp;
+                        <span class="caption-helper"></span>
+                    </div>
+					<div style="float:right;">
+						 <div class="form-group form-inline search-toolbar">
+                            <!--  <label>搜索：</label>-->
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="访问IP" ms-duplex="key">
+                            <input type="text" name="st" id="st" class="form-control w160"
+                                   placeholder="开始时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                            <input type="text" name="ed" id="ed" class="form-control w160"
+                                   placeholder="结束时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+							<button type="button" class="btn btn-default btn-search" onclick="search()">查询</button>
+                            <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                         </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <div id="doc_list_body">
+                    </div>
+                    <div id="pagination" class="pagination text-right mr22"></div>
+                </div>
+            </div>
+        </div>
+    </div>	
+		
+    </div>
+    </div>
+ </div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/sitechart/v_detail.js"></script>
+<script >
+    $(document).ready(function () {
+        v_detail.init();
+    })
+
+	function search(){
+
+		cur.st=$("#st").val();
+		cur.ed=$("#ed").val();
+		cur.ip=$("#searchKey").val();
+		cur.pageIndex=0;
+		v_detail.getData();
+	}
+	
+	function searchClear(){
+		$("#st").val("");
+		$("#ed").val("");
+		$("#searchKey").val("");
+		search();
+	}
+</script>

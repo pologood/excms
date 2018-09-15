@@ -1,0 +1,71 @@
+#set($Integer=0)
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($showType="$!{paramObj.showType}")
+#set($length=$Integer.parseInt("$!{paramObj.length}"))
+#set($noteLength=$Integer.parseInt("$!{paramObj.noteLength}"))
+#if($resultObj.data.size()>0)
+<ul class="videoNews-img-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        #set($shortTitle="$!{eo.title}")
+
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+
+        <li class="$!{css} num${velocityCount}">
+            <a href="$!{eo.link}" target="$!{target}" title="$!{eo.title}">
+                #set($imageLink="")
+                #if("$!{eo.imageLink}"!= "")
+                    #if($eo.imageLink.indexOf("/")==-1)
+                        #if($eo.imageLink.indexOf(".") !=-1)
+                            #set($imageLink="$!{fileServerNamePath}$!{eo.imageLink}")
+                        #else
+                            #set($imageLink="$!{fileServerPath}$!{eo.imageLink}")
+                        #end
+                    #else
+                        #set($imageLink="$!{eo.imageLink}")
+                    #end
+                #else
+                    #set($imageLink="/images/video_null.jpg")
+                #end
+
+                <img class="video-thumb" onclick="$!{eo.link}" border="0" src="$!{imageLink}" width="200" height="150" title="$!{eo.title}"/>
+
+                #set($style="")
+                #if("$!{eo.isBold}" == "1")
+                    #set($style="font-weight:bold;")
+                #end
+                #if("$!{eo.isTilt}" == "1")
+                    #set($style=$style+"font-style:italic;")
+                #end
+                #if("$!{eo.isUnderline}" == "1")
+                    #set($style=$style+"text-decoration:underline;")
+                #end
+                #if("$!{eo.isNew}" == "1")
+                    #set($length=$length - 2)
+                #end
+                #if("$!{eo.titleColor}" != "#0000000")
+                    #set($style=$style+"color:$!{eo.titleColor};")
+                #end
+                <span class="title">
+                    <a href="$!{eo.link}" title="$!{eo.title}">#cutstr($shortTitle,$length)</a>
+                </span>
+                <p></p>
+            </a>
+        </li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount}
+        });
+    </script>
+    #end
+#end

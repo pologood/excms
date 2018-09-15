@@ -1,0 +1,41 @@
+#set($_title="留言详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="content_body fuwucon mesgcon">
+        <h3>信件详细信息</h3>
+        <div class="fu_con">
+            <ul class="mesg_con">
+                <li><span class="tit">信件编号：</span><span class="con">$!{eo.docNum}</span></li>
+                <li><span class="tit">信件类型：</span><span class="con">$!{eo.className}</span></li>
+                <li><span class="tit">来信标题：</span><span class="con">$!{eo.title}</span></li>
+                <li><span class="tit">来信时间：</span><span class="con">#date_format("$!{eo.addDate}","yyyy-MM-dd HH:mm:ss")</span></li>
+                <li><span class="tit">来信内容：</span><span class="con">$!{eo.guestBookContent}</span></li>
+            </ul>
+        </div>
+        <h3>来信件人详细信息</h3>
+        <div class="fu_con">
+            <ul class="mesg_con">
+                <li><span class="tit">姓名：</span><span class="con">$!{eo.personName}</span></li>
+##                <li><span class="tit">联系电话：</span><span class="con">$!{eo.personPhone}</span></li>
+            </ul>
+        </div>
+        <h3>回复内容</h3>
+        <div class="fu_con">
+            <ul class="mesg_con">
+                <li><span class="tit">回复单位：</span><span class="con">$!{eo.receiveName}</span></li>
+                <li><span class="tit">办理时间：</span><span class="con">#date_format("$!{eo.replyDate}","yyyy-MM-dd HH:mm:ss")</span></li>
+                <li><span class="tit">回复内容：</span><span class="con"> $!{eo.responseContent}</span></li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+<!-- 正文 -->
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+</body>
+</html>

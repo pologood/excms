@@ -1,0 +1,243 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="container-fluid">
+    <!-- BEGIN SAMPLE FORM PORTLET-->
+    <div class="portlet light">
+        <div class="portlet-body form">
+            <form role="form" ms-controller="specialThemeForm" id="specialThemeForm" name="specialThemeForm">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="">主题名称</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="主题名称" ms-duplex="name">
+                    </div>
+                    <div class="form-group">
+                        <label>上传主题</label>
+                        <div class="input-group">
+                            <input type="text" id="path" name="path" class="form-control readonly" placeholder="文件名称，不用带路径" ms-duplex="path" readonly>
+                            <span class="input-group-btn">
+                                <button id="upload_theme" class="btn btn-success" type="button">
+                                    <i class="fa fa-upload"></i> 浏览上传
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+
+                #*<div class="form-group">
+                    <label for="">可选颜色</label>
+                    <input type="text" id="selectColor" name="selectColor" class="form-control"
+                           placeholder="可选颜色" ms-duplex="selectColor">
+                </div>*#
+                    <div class="form-group">
+                        <label for="">缩略图</label>
+                        <div class="thumb">
+                            <img width="198" height="148" src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                        </div>
+                    #*<div class="mt10 mb20">
+                        <button type="button" class="btn btn-default btn-add" id="uploadImg">上传</button>
+                        <button type="button" class="btn btn-default btn-delete" id="delImg">删除</button>
+                    </div>*#
+                        <input type="hidden" id="imgPath" name="imgPath" class="form-control" placeholder="图片路径" ms-duplex="imgPath">
+                    </div>
+
+                    <div class="thumb_layout">
+
+                    </div>
+                </div>
+                <input type="submit" style="display: none;" id="doSubmit">
+
+            </form>
+        </div>
+    </div>
+</div>
+
+    #parse("_page_layout/_footer.vm")
+
+<script>
+
+    var cur = {
+        formId: 'specialThemeForm',
+        params: {
+            id: '$!{id}',
+            mongoId: ''
+        },
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        vm: {},
+        btnFlag: false
+    }
+
+    $(document).ready(function () {
+        cur.api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    if (!cur.btnFlag) {
+                        $("#doSubmit").click();
+                    }
+                    return false;
+                }
+            }
+        );
+
+        $("#upload_theme").on('click', function (e) {
+            Ls.uploadFile(function (filePath) {
+                if (filePath && Ls.isArray(filePath)) {
+                    cur.vm.path = filePath[0].fileName;
+                    getThumb(filePath[0].fileName);
+                }
+                return true;
+            }, {
+                /*post_params: {
+                    mongoId: cur.params.mongoId
+                },
+                upload_url: cur.params.id ? '/fileCenter/updateFile' : '',*/
+                file_upload_limit: 1,
+                file_size_limit: "30 MB",
+                file_types: "*.zip",
+                file_types_description: "Zip Files",
+            });
+        })
+
+        getData();
+        validate();
+    })
+
+    //获取缩略图
+    function getThumb(path) {
+        Ls.ajaxGet({
+            url: "/specialTheme/getSpecialThumb",
+            data: {
+                path: path
+            }
+        }).done(function (d) {
+            if (d.status) {
+                var data = d.data;
+                cur.vm.imgPath = JSON.stringify(data);
+                for (var i = 0, l = data.length; i < l; i++) {
+                    var el = data[i];
+                    if (el.defaults) {
+                        var path = "";
+                        if(el.path.indexOf(".") == -1){
+                            path = GLOBAL_FILESERVERPATH + el.path;
+                        }else{
+                            path = GLOBAL_FILESERVERNAMEPATH + el.path;
+                        }
+                        $("#imageLink").attr("src", path);
+                        break;
+                    }
+                }
+            } else {
+                Ls.tipsErr(d.desc);
+            }
+        }).always(function () {
+            btnFlag = false;
+        });
+
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function validate() {
+        $('#' + cur.formId).validator({
+            fields: {
+                'name': '主题名称:required;',
+                'path': '主题路径:required;'
+            },
+            valid: function () {
+                saveData();
+            }
+        });
+    }
+
+    function getData() {
+        return Ls.ajaxGet({
+            url: "/specialTheme/getSpecialTheme",
+            data: {id: cur.params.id}
+        }).done(function (json) {
+            var data = json.data;
+            if (data) {
+                //附加 mongoID 修改附件时使用
+                cur.params.mongoId = data.path;
+                if (data.imgPath) {
+                    var imgPath = JSON.parse(data.imgPath);
+                    for (var i = 0, l = imgPath.length; i < l; i++) {
+                        var el = imgPath[i];
+                        var path = "";
+                        if (el.defaults) {
+                            if (el.path.indexOf('/') > -1) {
+                                path = el.path;
+
+                            }else if(el.path.indexOf(".") == -1){
+                                path = GLOBAL_FILESERVERPATH + el.path;
+                            }else{
+                                path = GLOBAL_FILESERVERNAMEPATH + el.path;
+                            }
+
+                            $("#imageLink").attr("src", path);
+                            break;
+                        }
+                    }
+                }
+
+                //初始化表单字段
+                cur.initData = Ls.initFORM(cur.formId, data);
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.define(cur.initData);
+                avalon.scan($("#" + cur.formId).get(0), cur.vm);
+            } else {
+                Ls.tipsErr('信息不存在或已被删除！');
+            }
+        });
+    }
+
+    function saveData() {
+        cur.btnFlag = true;
+        var data = Ls.toJSON(cur.vm.$model);
+        Ls.ajax({
+            type: "POST",
+            data: {
+                id: data.id,
+                name: data.name,
+                path: data.path,
+                imgPath: data.imgPath
+            },
+            url: "/specialTheme/saveSpecialTheme",
+            success: function (d) {
+                if (d.status == 1) {
+                    Ls.tipsOk("操作成功", function () {
+                        cur.win.search();
+                        Ls.winClose();
+                    })
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+                cur.btnFlag = false;
+            }
+        });
+    }
+
+    $("#uploadImg").click(function () {
+        Ls.uploadFile(function (filePath) {
+            var path = filePath[0].fileName;
+            cur.vm.imgPath = path;
+            $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + path);
+            return true;
+        }, {
+            file_upload_limit: 1,
+            post_params: {}
+        });
+    });
+
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", GLOBAL_CONTEXTPATH + '/assets/images/no.photo.jpg');
+        cur.vm.imgPath = '';
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+#set($_title="EX8 系统管理")
+#set($_version="072418")
+#parse("_page_layout/_header.vm")
+<body>
+<h3 style="color: #FFFFFF">这是演示页面 $!name</h3>
+<button type="button" class="btn btn-default">
+    搜索
+</button>
+<div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+     url="/demo/pageList" sizeList="[5,10,20,50]" pageSize="10"
+     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+>
+    <div property="columns">
+        <div type="checkcolumn" width="50"></div>
+        <div field="id" width="20%" align="center" headerAlign="center">id</div>
+        <div field="code" width="30%" align="center" headerAlign="center" >编码</div>
+        <div field="name" width="50%" align="left" headerAlign="center" >名称</div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/dwr/util.js"></script>
+<script src="$!{rc.contextPath}/dwr/engine.js"></script>
+<script>
+    var cur_flag = window.location.href.indexOf("index");
+    if(cur_flag > 0){
+        Ls.ajax({
+            type: "POST",
+            url: "/demo/ajax",
+            data: {
+                code:"this is a param value"
+            }
+        }).done(function (resp) {
+            console.log(resp);
+        });
+    }
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid')
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+        $("button").click(function(){
+            open();
+        });
+    });
+
+    function open(){
+        // Ls.openWin('/personalInfo/editPersonalInfo', {
+        //     width: '600px',
+        //     height: '300px',
+        //     lock: true,
+        //     title: '修改个人信息'
+        // });
+        Ls.openWin("http://www.baidu.com",{
+            width: '500px',
+            height: '300px',
+            lock: true,
+            title: '弹窗'
+        });
+    }
+</script>
+</body>
+</html>

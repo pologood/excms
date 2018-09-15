@@ -1,0 +1,99 @@
+#parse("_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;padding-top:20px;">
+    <form id="api_audit_form" role="form" autocomplete="off">
+        <table class="table table-bordered survey-table" style="margin-top:20px;">
+            <tbody>
+                <tr>
+                    <th style="width:100px;">标题：</th>
+                    <td><a href="$!{data.link}" target="_blank">$!{data.title}</a></td>
+                </tr>
+                <tr>
+                    <th>栏目：</th>
+                    <td>$!{data.columnName}</td>
+                </tr>
+                <tr>
+                    <th>创建时间：</th>
+                    <td>$!{data.createDate}</td>
+                </tr>
+                <tr>
+                    <th>内容：</th>
+                    <td >$!{apiInfo.content}</td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+#parse("_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    mini.parse();
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+        },
+        fn:{
+            isNull:function(value){
+                if(value == undefined || value == null || value == ""){
+                    return true;
+                }
+                return false;
+
+            },
+            save:function(){
+                var data = {id:$!{data.id},status:'$!{data.status}',auditInfo:'$!{data.auditInfo}'};
+                $('input[name="status"]').each(function(){
+                    if(this.checked){
+                        data.status = this.dataset.value;
+                        return false;
+                    }
+                });
+                data.auditInfo = $("#auditInfo").val();
+                if(data.status == 'fail' && cursave.fn.isNull(data.auditInfo)){
+                    Ls.tipsErr("请输入审核不通过的原因！");
+                    return false;
+                }
+                Ls.ajax({
+                    url: "/dataopen/apiApply/audit",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips("保存成功！", {
+                            icons: "success", callback: function () {
+                                Ls.winClose();
+                            }
+                        })
+                    } else {
+                        Ls.tipsErr(d.desc)
+                    }
+                });
+            }
+        }
+    };
+    $(document).ready(function () {
+        api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    cursave.fn.save();
+                    return false;
+                }
+            },
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    Ls.winClose();
+                    return false;
+                }
+            }
+        );
+    })
+
+</script>

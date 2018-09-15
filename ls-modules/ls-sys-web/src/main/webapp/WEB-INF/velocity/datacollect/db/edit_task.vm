@@ -1,0 +1,297 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div title="center" region="center" style="border:none; overflow: auto;">
+            <form id="task_db_form" role="form" ms-controller="task_db_form">
+                <div class="form-body" style="margin-right: 20px">
+                    <table class="table table-bordered article-table" style="margin-top:18px;margin-bottom: 0px;">
+                        <tr>
+                            <th>任务名称:</th>
+                            <td>
+                                <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                                <input type="text" id="taskName" name="taskName" class="form-control" data-rule="任务名称:required;" data-tip="任务名称" placeholder="" ms-duplex="taskName">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>所属栏目:</th>
+                            <td>
+                                <input type="text" id="columnId" name="columnId" style="display: none" ms-duplex="columnId">
+                                <input type="text" id="cSiteId" name="cSiteId" style="display: none" ms-duplex="cSiteId">
+                                <input type="text" id="columnName" name="columnName" class="form-control readonly" readonly data-rule="所属栏目:required;" placeholder="" ms-duplex="columnName" onclick="columnSelect()">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>选择类型:</th>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="dbType" value="oracle" ms-duplex-string="dbType" checked> Oracle </label> &nbsp;&nbsp;
+                                    <label class="radio-inline"><input type="radio" name="dbType" value="mysql" ms-duplex-string="dbType"> Mysql </label> &nbsp;&nbsp;
+                                    <label class="radio-inline"><input type="radio" name="dbType" value="mssql" ms-duplex-string="dbType"> Mssql </label> &nbsp;&nbsp;
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>IP地址:</th>
+                            <td>
+                                <input type="text" id="ip" name="ip" class="form-control"
+                                       data-rule="required; ip"
+                                       data-rule-ip="[/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/, '请填写正确IP地址']"
+                                       data-msg-required="请填写正确IP地址"
+                                       data-tip="必填项" placeholder="" ms-duplex="ip">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>端口:</th>
+                            <td>
+                                <input type="text" id="port" name="port" class="form-control" data-rule="端口:required;" data-tip="必填项" placeholder="" ms-duplex="port">
+                            </td>
+                            <th>数据库:</th>
+                            <td>
+                                <input type="text" id="dataBase" name="dataBase" class="form-control" data-rule="数据库:required;" data-tip="必填项" placeholder="" ms-duplex="dataBase">
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>用户名:</th>
+                            <td>
+                                <input type="text" id="username" name="username" class="form-control" data-rule="" data-tip="" placeholder="" ms-duplex="username">
+                            </td>
+                            <th>密码:</th>
+                            <td>
+                                <input type="password" id="password" name="password" class="form-control" data-rule="" data-tip="" placeholder="" ms-duplex="password">
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>采集表名:</th>
+                            <td>
+                                 <select type="text" id="collectTable" name="collectTable" class="form-control" data-rule="" placeholder="" onclick="getFromTables()" "></select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>采集条数:</th>
+                            <td>
+                                <input type="number" id="collectCount" name="collectCount" placeholder="" class="form-control" value="0" name="sortNum" max="" min="0" aria-required="true" ms-duplex="collectCount">
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <td valign="top" align="right">过滤条件:</td>
+                            <td>
+                                <textarea id="collectCondition" name="collectCondition" class="form-control" style="width: 100%;height: 80px;" data-rule="" placeholder="不加where的SQL条件" ms-duplex="collectCondition"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "task_db_form",
+        form: $('#task_db_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type"),
+        collectTable:$("#collectTable"),
+        flag:false
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'test',className:'btn-connect',focus:true,name:'测试连接',callback:function(){testConnect();return false;}},
+            {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+            });
+            setData(cur.model);
+        } else {
+            cur.model = cur.dialog.data("record");
+            setData(cur.model);
+            getFromTables();
+        }
+
+    })
+
+    function testConnect() {
+        Ls.ajax({
+            url: "/db/collect/testConnect",
+            data: {
+                ip: cur.vm.ip,
+                port:cur.vm.port,
+                dbType:cur.vm.dbType,
+                dataBase:cur.vm.dataBase,
+                username:cur.vm.username,
+                password:cur.vm.password
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc);
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error'});
+                }
+            }
+        });
+    }
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function columnSelect() {
+        cur.dialog.data("columnId",cur.vm.columnId);
+        cur.dialog.data("cSiteId",cur.vm.cSiteId);
+        Ls.openWin("/data/collect/columnSelect", '300px', '300px', {
+            id:"column_select",
+            title: "开始字符"
+        });
+    }
+
+    function column_callback(columnId,cSiteId,name) {
+        cur.vm.columnId = columnId;
+        cur.vm.cSiteId = cSiteId;
+        cur.vm.columnName = name;
+    }
+
+    function saveData() {
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/db/collect/saveTask"
+        } else {
+            url = "/db/collect/updateTask"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                taskName: cur.vm.taskName,
+                columnId:cur.vm.columnId,
+                cSiteId:cur.vm.cSiteId,
+                dbType:cur.vm.dbType,
+                ip:cur.vm.ip,
+                port:cur.vm.port,
+                dataBase:cur.vm.dataBase,
+                username:cur.vm.username,
+                password:cur.vm.password,
+                collectTable:cur.collectTable.val(),
+                collectCondition:cur.vm.collectCondition,
+                collectCount:cur.vm.collectCount
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getFromTables() {
+        if(cur.flag) {
+            return;
+        }
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        cur.flag = true;
+        Ls.ajax({
+            url: "/db/collect/testConnect",
+            data: {
+                ip: cur.vm.ip,
+                port:cur.vm.port,
+                dbType:cur.vm.dbType,
+                dataBase:cur.vm.dataBase,
+                username:cur.vm.username,
+                password:cur.vm.password
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.ajaxGet({
+                        url: "/db/collect/getTables",
+                        data:{
+                            id: cur.vm.id,
+                            columnId:cur.vm.columnId,
+                            cSiteId:cur.vm.cSiteId,
+                            dbType:cur.vm.dbType,
+                            ip:cur.vm.ip,
+                            port:cur.vm.port,
+                            dataBase:cur.vm.dataBase,
+                            username:cur.vm.username,
+                            password:cur.vm.password
+                        }
+                    }).done(function (response) {
+                        var str = '<option value=""> 选择采集表 </option> ';
+                        if (response != null) {
+                            var data = response.data;
+                            var length = data.length;
+                            if (length > 0) {
+                                for (i = 0; i < length; i++) {
+                                    str += ' <option value=' + data[i].tableName + '>【' + data[i].tableName + '】</option> '
+                                }
+                            }
+                            cur.collectTable.append(str);
+                            cur.collectTable.val(cur.vm.collectTable);
+                            cur.flag = true;
+                        } else {
+                            cur.flag = false;
+                        }
+                    });
+                } else {
+                    cur.flag = false;
+                    Ls.tips(resp.desc, {icons: 'error'});
+                    return;
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>

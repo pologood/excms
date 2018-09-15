@@ -1,0 +1,111 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="web_form" role="form" ms-controller="web_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>栏目类别名称</label>
+                            <input type="text" class="form-control" name="typeName" ms-duplex="typeName">
+                        </div>
+                        <div class="form-group">
+                            <label>栏目类别描述</label>
+                            <textarea class="form-control" name="description" rows="3"
+                                      ms-duplex="description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>栏目类别关键词</label>
+                            <input type="text" class="form-control" name="keyWords" ms-duplex="keyWords">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "web_form",
+        W: art.dialog.opener//父对象
+    }
+    var parent = Ls.getWin.win;
+    $(document).ready(function () {
+        //获取数据
+        Ls.ajax({
+            url: "/columnType/getColumnType",
+            data: {
+                id: '$!{typeid}'
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                data.$id = cur.id;
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels[data.$id];
+                if (!cur.vm) {
+                    //绑定模型
+                    cur.vm = avalon.define(data);
+                }
+                avalon.scan($("#" + cur.id).get(0), cur.vm);
+            } else {
+                Ls.tipsErr("加载数据失败!");
+            }
+        });
+
+        //验证
+        $('#' + cur.id).validator({
+            fields: {
+                'typeName': '栏目类别名称:required;',
+                'keyWords': '栏目类别关键词:required;',
+                'description': '栏目类别描述:required;'
+            },
+            valid: function () {
+                var me = this;
+                // 提交表单之前，hold住表单，防止重复提交
+                me.holdSubmit();
+                var data = Ls.toJSON(cur.vm.$model);
+                var url = "/columnType/update";
+                if ("$!{typeid}" == "") {
+                    url = "/columnType/save";
+                }
+                data.siteId = parent.GLOBAL_SITEID;
+                // 提交
+                Ls.ajax({
+                    url: url,
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        if (d.data == "1") {
+                            Ls.tips('保存成功!', {
+                                icons: "success",
+                                callback: function () {
+//                                Ls.getWin.api.close();
+                                    art.dialog.close();
+//                                Ls.getWin.win.cur.grid.reload();
+                                    cur.W.cur.grid.reload();
+                                    // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                    me.holdSubmit(false);
+                                }
+                            });
+                        } else {
+                            Ls.tipsErr("类别名称重复!");
+                            me.holdSubmit(false);
+                        }
+                    } else {
+                        Ls.tips(d.desc, {
+                            icons: "error",
+                            callback: function () {
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                me.holdSubmit(false);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>

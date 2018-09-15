@@ -1,0 +1,7 @@
+<div id="loading_mask" class="loading_mask" style="display:;"></div>
+<div id="loading_bd" class="loading_bd" style="display:;">
+    <div class="loading_indicator">
+        <img src="$!{sysStaticPath}/assets/images/page_loading.gif" style="margin-right:8px;float:left;vertical-align:top;"/>系统正在初始化...<br/>
+        <span id="loading_msg">Loading system...</span>
+    </div>
+</div>

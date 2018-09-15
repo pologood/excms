@@ -1,0 +1,175 @@
+<style>
+    #tab_1_2 {
+        /*position: relative;*/
+    }
+
+    #tab_1_2 .title {
+        margin-bottom: 20px;
+    }
+
+    #tab_1_2 .toggleWrap {
+        position: absolute;
+        right: 6px;
+        z-index: 10;
+    }
+
+    #tab_1_2 .toggleWrap span {
+        display: inline-block;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        background-size: cover !important;
+    }
+
+    #tab_1_2 .toggleWrap span:first-child {
+        background: url('$!{rc.contextPath}/assets/images/tab2_2_1.png') 0 0 no-repeat;
+    }
+
+    #tab_1_2 .toggleWrap span:last-child {
+        background: url('$!{rc.contextPath}/assets/images/tab2_1_1.png') 0 0 no-repeat;
+    }
+
+    #tab_1_2 .toggleWrap span.on1 {
+        background: url('$!{rc.contextPath}/assets/images/tab2_2.png') 0 0 no-repeat;
+    }
+
+    #tab_1_2 .toggleWrap span.on2 {
+        background: url('$!{rc.contextPath}/assets/images/tab2_1.png') 0 0 no-repeat;
+    }
+
+    .ztree {
+        overflow: hidden;
+    }
+
+    .ztree li span.emptyNode {
+        color: red;
+        vertical-align: middle;
+        margin-left: 5px;
+    }
+
+    .tabbable-line {
+        display: none;
+    }
+
+    .hideWrap {
+        float: left;
+        /*display: none;
+        margin-bottom: 20px;*/
+    }
+	
+	.tabbable-line>.nav-tabs>li>a {
+	    font-weight: bold;
+		font-size: 16px;
+	}
+	
+	.tab_tips {
+		color: #3da1e5;
+		font-weight: normal;
+		font-size: 13px;
+	}
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="240"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="organ_tree" class="ztree"></ul>
+        </div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">目录管理<span class="tab_tips">（点击维护单位目录）</span></a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">空白目录<span class="tab_tips">（点击查询空白目录）</span></a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div id="ztreeScrollbar">
+                        <ul id="catalog_tree" class="ztree"></ul>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                    <div class="title clearfix">
+                        <div class="hideWrap">
+                            <button class="btn btn-default btn-add" onclick="catalogManage.hideAllColumn()" style="margin-right: 8px;">一键隐藏目录
+                            </button>
+                            <span>搜索结果：已为您查到 <span id="record"></span> 个空白目录，支持后台隐藏，前台不显示</span>
+                        </div>
+
+                        <div class="toggleWrap">
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <div id="emptyWrap">
+                        <ul id="catalog_tree_withEmpty" class="ztree"></ul>
+                    </div>
+                    <div id="datagrid1" class="mini-datagrid no-auto-height" allowCellSelect="false"
+                         allowResize="true"
+                         url="/public/catalog/getCatalogsByOrganId" sizeList="[5,10,20,50]" pageSize="15"
+                         idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                         showPager="true">
+                        <div property="columns">
+                            <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                            <div field="catPath" width="50%" headerAlign="center" align="left">空白目录</div>
+                            <div field="" width="80" headerAlign="center" align="center"
+                                 renderer="catalogManage.hideColumn">是否隐藏
+                            </div>
+                            <div field="" width="60" headerAlign="center" align="center"
+                                 renderer="catalogManage.renderOpt" align="center">操作
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        id: "catalog_form",
+        organ_url: "/public/catalog/getOrgansBySiteId",//单位查询url
+        catalogs_url: "/public/catalog/getCatalogsByOrganId",//目录查询url
+        config_url: "/public/catalog/config",//配置单位目录url
+        save_url: "/public/catalog/saveOrUpdate",//保存url
+        edit_url: "/public/catalog/edit?type=1",//编辑
+        organ_tree_id: "organ_tree",//单位树id
+        catalog_tree_id: "catalog_tree",//目录树对象
+        catalog_tree_withEmpty_id: "catalog_tree_withEmpty",
+        organ_tree: null,//单位树对象
+        catalog_tree: null,//目录树对象
+        type: null,//类型，新增(1)、修改(2)、删除(3)
+        data: null,//单位配置数据
+        organId: null,//部门id
+        grid: null
+    };
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/catalog_manage.js"></script>
+<script>
+
+    $(document).ready(function () {
+        var timer = null;
+        catalogManage.rel();
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_2') {
+                catalogManage.emptyRel();
+                $('.toggleWrap>span:first').click();
+                clearTimeout(timer);
+            } else {
+                var node = catalogManage.leftZtree.getSelectedNodes()[0];
+                catalogManage.rel();
+                timer = setTimeout(function () {
+                    catalogManage.leftZtree.selectNode(node);
+                }, 100)
+
+            }
+        });
+    });
+</script>

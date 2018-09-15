@@ -1,0 +1,52 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width: 100%;height: 100%;">
+    <div region="center" style="border:none; overflow: auto;padding: 5px">
+        <textarea id="content" style="width: 100%;height: 100%;" readonly class="form-control readonly"></textarea>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        tempId:${tempId},
+        win: Ls.getWin.win,
+        api:Ls.getWin.api,
+        dialog: Ls.getWin.dialog
+    };
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'恢复',callback:function(){recovery();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        cur.rec = cur.dialog.data('rec');
+        $('#content').val(cur.rec.tempContent);
+    })
+
+    function recovery() {
+        if(confirm('确定恢复，恢复版本将覆盖当前使用版本?')) {
+            Ls.ajax({
+                url: '/tpl/tplRecovery',
+                data: {
+                    tempId: cur.tempId,
+                    content: cur.rec.tempContent
+                },
+                success: function (resp) {
+                    if (resp.status == '1') {
+                        cur.win.callback_tplDetail();
+                        Ls.winClose();
+                    } else {
+                        Ls.tips(resp.desc);
+                    }
+                }
+            });
+        };
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

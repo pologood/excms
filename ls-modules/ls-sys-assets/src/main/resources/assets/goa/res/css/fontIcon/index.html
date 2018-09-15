@@ -1,0 +1,3174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<link rel="stylesheet" href="/assets/res/css/common.css">
+	
+	<style type="text/css">
+*{margin: 0;padding: 0;list-style: none;}
+/*
+CSS Reset
+理念：1. reset 的目的不是清除浏览器的默认样式，这仅是部分工作。清除和重置是紧密不可分的。
+      2. reset 的目的不是让默认样式在所有浏览器下一致，而是减少默认样式有可能带来的问题。
+      3. reset 期望提供一套普适通用的基础样式。但没有银弹，推荐根据具体需求，裁剪和修改后再使用。
+	  
+特色：1. 适应中文；2. 基于最新主流浏览器。
+ */
+
+/** 清除内外边距 **/
+body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, /* structural elements 结构元素 */
+dl, dt, dd, ul, ol, li, /* list elements 列表元素 */
+pre, /* text formatting elements 文本格式元素 */
+form, fieldset, legend, button, input, textarea, /* form elements 表单元素 */
+th, td /* table elements 表格元素 */ {
+  margin: 0;
+  padding: 0;
+}
+
+/** 设置默认字体 **/
+body,
+button, input, select, textarea /* for ie */ {
+  font: 12px/1.5 tahoma, arial, \5b8b\4f53, sans-serif;
+}
+h1, h2, h3, h4, h5, h6 { font-size: 100%; }
+address, cite, dfn, em, var { font-style: normal; } /* 将斜体扶正 */
+code, kbd, pre, samp { font-family: courier new, courier, monospace; } /* 统一等宽字体 */
+small { font-size: 12px;  } /* 小于 12px 的中文很难阅读，让 small 正常化 */
+/** 重置列表元素 **/
+ul, ol { list-style: none; }
+
+/** 重置文本格式元素 **/
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+
+/** 重置表单元素 **/
+legend { color: #000; } /* for ie6 */
+fieldset, img { border: 0; } /* img 搭车：让链接里的 img 无边框 */
+button, input, select, textarea { font-size: 100%; } /* 使得表单元素在 ie 下能继承字体大小 */
+/* 注：optgroup 无法扶正 */
+
+/** 重置表格元素 **/
+table { border-collapse: collapse; border-spacing: 0; }
+
+/* 清除浮动 */
+.ks-clear:after, .clear:after {
+  content: '\20';
+  display: block;
+  height: 0;
+  clear: both;
+}
+.ks-clear, .clear {
+  *zoom: 1;
+}
+
+.main {padding: 30px 100px;}
+.main h1{font-size:36px; color:#333; text-align:left;margin-bottom:30px; border-bottom: 1px solid #eee;}
+.main h1 small{font-size: 16px; color:#999 }
+
+.helps{margin-top:40px;}
+.helps pre{
+  padding:20px;
+  margin:10px 0;
+  border:solid 1px #e7e1cd;
+  background-color: #fffdef;
+  overflow: auto;
+}
+
+.icon_lists li{
+  float:left;
+  width: 100px;
+  height:150px;
+  text-align: center;
+}
+.icon_lists .icon{
+  font-size: 42px;
+  line-height: 100px;
+  margin: 10px 0;
+  cursor:default;
+  color:#333;
+  -webkit-transition: font-size 0.25s ease-out 0s;
+  -moz-transition: font-size 0.25s ease-out 0s;
+  transition: font-size 0.25s ease-out 0s;
+
+}
+.icon_lists .icon:hover{
+  font-size: 100px;
+  color:#F60!important;
+}
+
+
+
+</style>
+	<link rel="stylesheet" href="fontello.css">
+    
+    <script>
+      function toggleCodes(on) {
+        var obj = document.getElementById('icons');
+        
+        if (on) {
+          obj.className += ' codesOn';
+        } else {
+          obj.className = obj.className.replace(' codesOn', '');
+        }
+      }
+      
+    </script>
+  </head>
+  <body>
+   <div class="main">
+        <h1>fontello 图标  <small>兼容IE6/7/8/9/10/11、firefox、chrome、safari、opera等各类浏览器</small></h1>
+         <ul id="iconList" class="icon_lists clear">
+       <li> <i class="icon fontello red-4">&#xebee;</i>
+             <div class="code">&amp;#xebee;</div>
+           </li>
+       <li> <i class="icon fontello red-3">&#xe827;</i>
+             <div class="code">&amp;#xe827;</div>
+           </li>
+       <li><i class="icon fontello red-2">&#xe827;</i>
+             <div class="code">&amp;#xe827;</div>
+           </li>
+       <li><i class="icon fontello red-1">&#xe988;</i>
+             <div class="code">&amp;#xe988;</div>
+           </li>
+       <li><i class="icon fontello red">&#xe98b;</i>
+             <div class="code">&amp;#xe98b;</div>
+           </li>
+       <li><i class="icon fontello red1">&#xe82b;</i>
+             <div class="code">&amp;#xe82b;</div>
+           </li>
+       <li><i class="icon fontello red2">&#xeb3c;</i>
+             <div class="code">&amp;#xeb3c;</div>
+           </li>
+       <li><i class="icon fontello red3">&#xe990;</i>
+             <div class="code">&amp;#xe990;</div>
+           </li>
+       <li><i class="icon fontello red4">&#xebbd;</i>
+             <div class="code">&amp;#xebbd;</div>
+           </li>
+       <li><i class="icon fontello blue-4">&#xebe3;</i>
+             <div class="code">&amp;#xebe3;</div>
+           </li>
+       <li><i class="icon fontello blue-3">&#xe9fe;</i>
+             <div class="code">&amp;#xe9fe;</div>
+           </li>
+       <li><i class="icon fontello blue-2">&#xe8af;</i>
+             <div class="code">&amp;#xe8af;</div>
+           </li>
+       <li><i class="icon fontello blue-1">&#xe8b1;</i>
+             <div class="code">&amp;#xe8b1;</div>
+           </li>
+       <li><i class="icon fontello blue">&#xea00;</i>
+             <div class="code">&amp;#xea00;</div>
+           </li>
+       <li><i class="icon fontello blue1">&#xebe4;</i>
+             <div class="code">&amp;#xebe4;</div>
+           </li>
+       <li><i class="icon fontello blue2">&#xe9ff;</i>
+             <div class="code">&amp;#xe9ff;</div>
+           </li>
+       <li><i class="icon fontello blue3">&#xebe5;</i>
+             <div class="code">&amp;#xebe5;</div>
+           </li>
+       <li><i class="icon fontello blue4">&#xe8b0;</i>
+             <div class="code">&amp;#xe8b0;</div>
+           </li>
+       <li><i class="icon fontello green-4">&#xe8ae;</i>
+             <div class="code">&amp;#xe8ae;</div>
+           </li>
+       <li><i class="icon fontello green-3">&#xebe2;</i>
+             <div class="code">&amp;#xebe2;</div>
+           </li>
+       <li><i class="icon fontello green-2">&#xe9fd;</i>
+             <div class="code">&amp;#xe9fd;</div>
+           </li>
+       <li><i class="icon fontello green-1">&#xea05;</i>
+             <div class="code">&amp;#xea05;</div>
+           </li>
+       <li><i class="icon fontello green">&#xea04;</i>
+             <div class="code">&amp;#xea04;</div>
+           </li>
+       <li><i class="icon fontello green1">&#xea08;</i>
+             <div class="code">&amp;#xea08;</div>
+           </li>
+       <li><i class="icon fontello green2">&#xeba1;</i>
+             <div class="code">&amp;#xeba1;</div>
+           </li>
+       <li><i class="icon fontello green3">&#xea34;</i>
+             <div class="code">&amp;#xea34;</div>
+           </li>
+       <li><i class="icon fontello green4">&#xe98a;</i>
+             <div class="code">&amp;#xe98a;</div>
+           </li>
+       <li><i class="icon fontello gray-4">&#xe98d;</i>
+             <div class="code">&amp;#xe98d;</div>
+           </li>
+       <li><i class="icon fontello gray-3">&#xe833;</i>
+             <div class="code">&amp;#xe833;</div>
+           </li>
+       <li><i class="icon fontello gray-2">&#xe993;</i>
+             <div class="code">&amp;#xe993;</div>
+           </li>
+       <li><i class="icon fontello gray-1">&#xe9ac;</i>
+             <div class="code">&amp;#xe9ac;</div>
+           </li>
+       <li><i class="icon fontello gray">&#xea35;</i>
+             <div class="code">&amp;#xea35;</div>
+           </li>
+       <li><i class="icon fontello gray1">&#xea0b;</i>
+             <div class="code">&amp;#xea0b;</div>
+           </li>
+       <li><i class="icon fontello gray2">&#xe8c8;</i>
+             <div class="code">&amp;#xe8c8;</div>
+           </li>
+       <li><i class="icon fontello gray3">&#xe8cd;</i>
+             <div class="code">&amp;#xe8cd;</div>
+           </li>
+       <li><i class="icon fontello gray4">&#xea0f;</i>
+             <div class="code">&amp;#xea0f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ce;</i>
+             <div class="code">&amp;#xe8ce;</div>
+           </li>
+       <li><i class="icon fontello">&#xea10;</i>
+             <div class="code">&amp;#xea10;</div>
+           </li>
+       <li><i class="icon fontello">&#xea0d;</i>
+             <div class="code">&amp;#xea0d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c9;</i>
+             <div class="code">&amp;#xe8c9;</div>
+           </li>
+       <li><i class="icon fontello">&#xea0e;</i>
+             <div class="code">&amp;#xea0e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8cb;</i>
+             <div class="code">&amp;#xe8cb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d5;</i>
+             <div class="code">&amp;#xe9d5;</div>
+           </li>
+       <li><i class="icon fontello">&#xea0a;</i>
+             <div class="code">&amp;#xea0a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c7;</i>
+             <div class="code">&amp;#xe8c7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f8;</i>
+             <div class="code">&amp;#xe9f8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe897;</i>
+             <div class="code">&amp;#xe897;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c4;</i>
+             <div class="code">&amp;#xe8c4;</div>
+           </li>
+       <li><i class="icon fontello">&#xea09;</i>
+             <div class="code">&amp;#xea09;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f7;</i>
+             <div class="code">&amp;#xe9f7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe899;</i>
+             <div class="code">&amp;#xe899;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f5;</i>
+             <div class="code">&amp;#xe9f5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe896;</i>
+             <div class="code">&amp;#xe896;</div>
+           </li>
+       <li><i class="icon fontello">&#xe898;</i>
+             <div class="code">&amp;#xe898;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f6;</i>
+             <div class="code">&amp;#xe9f6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d9;</i>
+             <div class="code">&amp;#xe9d9;</div>
+           </li>
+       <li><i class="icon fontello">&#xea24;</i>
+             <div class="code">&amp;#xea24;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8da;</i>
+             <div class="code">&amp;#xe8da;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8dd;</i>
+             <div class="code">&amp;#xe8dd;</div>
+           </li>
+       <li><i class="icon fontello">&#xebcb;</i>
+             <div class="code">&amp;#xebcb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97a;</i>
+             <div class="code">&amp;#xe97a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe811;</i>
+             <div class="code">&amp;#xe811;</div>
+           </li>
+       <li><i class="icon fontello">&#xebbb;</i>
+             <div class="code">&amp;#xebbb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe812;</i>
+             <div class="code">&amp;#xe812;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97b;</i>
+             <div class="code">&amp;#xe97b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe904;</i>
+             <div class="code">&amp;#xe904;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b8;</i>
+             <div class="code">&amp;#xe9b8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b3;</i>
+             <div class="code">&amp;#xe8b3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b4;</i>
+             <div class="code">&amp;#xe8b4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b2;</i>
+             <div class="code">&amp;#xe8b2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b5;</i>
+             <div class="code">&amp;#xe8b5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81f;</i>
+             <div class="code">&amp;#xe81f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe983;</i>
+             <div class="code">&amp;#xe983;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb64;</i>
+             <div class="code">&amp;#xeb64;</div>
+           </li>
+       <li><i class="icon fontello">&#xea27;</i>
+             <div class="code">&amp;#xea27;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7f;</i>
+             <div class="code">&amp;#xea7f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea80;</i>
+             <div class="code">&amp;#xea80;</div>
+           </li>
+       <li><i class="icon fontello">&#xe810;</i>
+             <div class="code">&amp;#xe810;</div>
+           </li>
+       <li><i class="icon fontello">&#xe979;</i>
+             <div class="code">&amp;#xe979;</div>
+           </li>
+       <li><i class="icon fontello">&#xebba;</i>
+             <div class="code">&amp;#xebba;</div>
+           </li>
+       <li><i class="icon fontello">&#xe978;</i>
+             <div class="code">&amp;#xe978;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb9;</i>
+             <div class="code">&amp;#xebb9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80f;</i>
+             <div class="code">&amp;#xe80f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe972;</i>
+             <div class="code">&amp;#xe972;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80b;</i>
+             <div class="code">&amp;#xe80b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe973;</i>
+             <div class="code">&amp;#xe973;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc8;</i>
+             <div class="code">&amp;#xebc8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81e;</i>
+             <div class="code">&amp;#xe81e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe982;</i>
+             <div class="code">&amp;#xe982;</div>
+           </li>
+       <li><i class="icon fontello">&#xe843;</i>
+             <div class="code">&amp;#xe843;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99c;</i>
+             <div class="code">&amp;#xe99c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c8;</i>
+             <div class="code">&amp;#xe9c8;</div>
+           </li>
+       <li><i class="icon fontello">&#xebce;</i>
+             <div class="code">&amp;#xebce;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87c;</i>
+             <div class="code">&amp;#xe87c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c7;</i>
+             <div class="code">&amp;#xe9c7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb09;</i>
+             <div class="code">&amp;#xeb09;</div>
+           </li>
+       <li><i class="icon fontello">&#xe862;</i>
+             <div class="code">&amp;#xe862;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b0;</i>
+             <div class="code">&amp;#xe9b0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaeb;</i>
+             <div class="code">&amp;#xeaeb;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd0;</i>
+             <div class="code">&amp;#xebd0;</div>
+           </li>
+       <li><i class="icon fontello">&#xea26;</i>
+             <div class="code">&amp;#xea26;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb68;</i>
+             <div class="code">&amp;#xeb68;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8db;</i>
+             <div class="code">&amp;#xe8db;</div>
+           </li>
+       <li><i class="icon fontello">&#xea0c;</i>
+             <div class="code">&amp;#xea0c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea25;</i>
+             <div class="code">&amp;#xea25;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87d;</i>
+             <div class="code">&amp;#xe87d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f6;</i>
+             <div class="code">&amp;#xe8f6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb95;</i>
+             <div class="code">&amp;#xeb95;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3a;</i>
+             <div class="code">&amp;#xea3a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8de;</i>
+             <div class="code">&amp;#xe8de;</div>
+           </li>
+       <li><i class="icon fontello">&#xea28;</i>
+             <div class="code">&amp;#xea28;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80d;</i>
+             <div class="code">&amp;#xe80d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe977;</i>
+             <div class="code">&amp;#xe977;</div>
+           </li>
+       <li><i class="icon fontello">&#xebcd;</i>
+             <div class="code">&amp;#xebcd;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb8;</i>
+             <div class="code">&amp;#xebb8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86d;</i>
+             <div class="code">&amp;#xe86d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe855;</i>
+             <div class="code">&amp;#xe855;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae1;</i>
+             <div class="code">&amp;#xeae1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a8;</i>
+             <div class="code">&amp;#xe9a8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a9;</i>
+             <div class="code">&amp;#xe9a9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe984;</i>
+             <div class="code">&amp;#xe984;</div>
+           </li>
+       <li><i class="icon fontello">&#xebea;</i>
+             <div class="code">&amp;#xebea;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc5;</i>
+             <div class="code">&amp;#xebc5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe820;</i>
+             <div class="code">&amp;#xe820;</div>
+           </li>
+       <li><i class="icon fontello">&#xe821;</i>
+             <div class="code">&amp;#xe821;</div>
+           </li>
+       <li><i class="icon fontello">&#xe824;</i>
+             <div class="code">&amp;#xe824;</div>
+           </li>
+       <li><i class="icon fontello">&#xe985;</i>
+             <div class="code">&amp;#xe985;</div>
+           </li>
+       <li><i class="icon fontello">&#xe825;</i>
+             <div class="code">&amp;#xe825;</div>
+           </li>
+       <li><i class="icon fontello">&#xe986;</i>
+             <div class="code">&amp;#xe986;</div>
+           </li>
+       <li><i class="icon fontello">&#xe908;</i>
+             <div class="code">&amp;#xe908;</div>
+           </li>
+       <li><i class="icon fontello">&#xebeb;</i>
+             <div class="code">&amp;#xebeb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe987;</i>
+             <div class="code">&amp;#xe987;</div>
+           </li>
+       <li><i class="icon fontello">&#xe98e;</i>
+             <div class="code">&amp;#xe98e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe863;</i>
+             <div class="code">&amp;#xe863;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a5;</i>
+             <div class="code">&amp;#xe9a5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe989;</i>
+             <div class="code">&amp;#xe989;</div>
+           </li>
+       <li><i class="icon fontello">&#xe828;</i>
+             <div class="code">&amp;#xe828;</div>
+           </li>
+       <li><i class="icon fontello">&#xe98c;</i>
+             <div class="code">&amp;#xe98c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe82c;</i>
+             <div class="code">&amp;#xe82c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f3;</i>
+             <div class="code">&amp;#xe9f3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b6;</i>
+             <div class="code">&amp;#xe9b6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a4;</i>
+             <div class="code">&amp;#xe9a4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84f;</i>
+             <div class="code">&amp;#xe84f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8bb;</i>
+             <div class="code">&amp;#xe8bb;</div>
+           </li>
+       <li><i class="icon fontello">&#xea01;</i>
+             <div class="code">&amp;#xea01;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb39;</i>
+             <div class="code">&amp;#xeb39;</div>
+           </li>
+       <li><i class="icon fontello">&#xea02;</i>
+             <div class="code">&amp;#xea02;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ba;</i>
+             <div class="code">&amp;#xe8ba;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f2;</i>
+             <div class="code">&amp;#xe9f2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f4;</i>
+             <div class="code">&amp;#xe9f4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f1;</i>
+             <div class="code">&amp;#xe9f1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88f;</i>
+             <div class="code">&amp;#xe88f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe890;</i>
+             <div class="code">&amp;#xe890;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8cf;</i>
+             <div class="code">&amp;#xe8cf;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb65;</i>
+             <div class="code">&amp;#xeb65;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5f;</i>
+             <div class="code">&amp;#xeb5f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9a;</i>
+             <div class="code">&amp;#xeb9a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea18;</i>
+             <div class="code">&amp;#xea18;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9b;</i>
+             <div class="code">&amp;#xeb9b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb00;</i>
+             <div class="code">&amp;#xeb00;</div>
+           </li>
+       <li><i class="icon fontello">&#xea17;</i>
+             <div class="code">&amp;#xea17;</div>
+           </li>
+       <li><i class="icon fontello">&#xead9;</i>
+             <div class="code">&amp;#xead9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeada;</i>
+             <div class="code">&amp;#xeada;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb30;</i>
+             <div class="code">&amp;#xeb30;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2c;</i>
+             <div class="code">&amp;#xeb2c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb34;</i>
+             <div class="code">&amp;#xeb34;</div>
+           </li>
+       <li><i class="icon fontello">&#xeadb;</i>
+             <div class="code">&amp;#xeadb;</div>
+           </li>
+       <li><i class="icon fontello">&#xeadc;</i>
+             <div class="code">&amp;#xeadc;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb31;</i>
+             <div class="code">&amp;#xeb31;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2d;</i>
+             <div class="code">&amp;#xeb2d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb35;</i>
+             <div class="code">&amp;#xeb35;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe1;</i>
+             <div class="code">&amp;#xebe1;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb3f;</i>
+             <div class="code">&amp;#xeb3f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1c;</i>
+             <div class="code">&amp;#xeb1c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1d;</i>
+             <div class="code">&amp;#xeb1d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1e;</i>
+             <div class="code">&amp;#xeb1e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1f;</i>
+             <div class="code">&amp;#xeb1f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb20;</i>
+             <div class="code">&amp;#xeb20;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb21;</i>
+             <div class="code">&amp;#xeb21;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb32;</i>
+             <div class="code">&amp;#xeb32;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2e;</i>
+             <div class="code">&amp;#xeb2e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb36;</i>
+             <div class="code">&amp;#xeb36;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb3b;</i>
+             <div class="code">&amp;#xeb3b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb33;</i>
+             <div class="code">&amp;#xeb33;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2f;</i>
+             <div class="code">&amp;#xeb2f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb37;</i>
+             <div class="code">&amp;#xeb37;</div>
+           </li>
+       <li><i class="icon fontello">&#xebde;</i>
+             <div class="code">&amp;#xebde;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba4;</i>
+             <div class="code">&amp;#xeba4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac2;</i>
+             <div class="code">&amp;#xeac2;</div>
+           </li>
+       <li><i class="icon fontello">&#xebdd;</i>
+             <div class="code">&amp;#xebdd;</div>
+           </li>
+       <li><i class="icon fontello">&#xebdc;</i>
+             <div class="code">&amp;#xebdc;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac3;</i>
+             <div class="code">&amp;#xeac3;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab0;</i>
+             <div class="code">&amp;#xeab0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab1;</i>
+             <div class="code">&amp;#xeab1;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb55;</i>
+             <div class="code">&amp;#xeb55;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb54;</i>
+             <div class="code">&amp;#xeb54;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb53;</i>
+             <div class="code">&amp;#xeb53;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb51;</i>
+             <div class="code">&amp;#xeb51;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb52;</i>
+             <div class="code">&amp;#xeb52;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb96;</i>
+             <div class="code">&amp;#xeb96;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb99;</i>
+             <div class="code">&amp;#xeb99;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae9;</i>
+             <div class="code">&amp;#xeae9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb27;</i>
+             <div class="code">&amp;#xeb27;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb77;</i>
+             <div class="code">&amp;#xeb77;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb78;</i>
+             <div class="code">&amp;#xeb78;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaef;</i>
+             <div class="code">&amp;#xeaef;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9f;</i>
+             <div class="code">&amp;#xeb9f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0d;</i>
+             <div class="code">&amp;#xeb0d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0e;</i>
+             <div class="code">&amp;#xeb0e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa4;</i>
+             <div class="code">&amp;#xeaa4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa5;</i>
+             <div class="code">&amp;#xeaa5;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1a;</i>
+             <div class="code">&amp;#xeb1a;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd8;</i>
+             <div class="code">&amp;#xebd8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb82;</i>
+             <div class="code">&amp;#xeb82;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb83;</i>
+             <div class="code">&amp;#xeb83;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb84;</i>
+             <div class="code">&amp;#xeb84;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb80;</i>
+             <div class="code">&amp;#xeb80;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb86;</i>
+             <div class="code">&amp;#xeb86;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb87;</i>
+             <div class="code">&amp;#xeb87;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb28;</i>
+             <div class="code">&amp;#xeb28;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb29;</i>
+             <div class="code">&amp;#xeb29;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2a;</i>
+             <div class="code">&amp;#xeb2a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb2b;</i>
+             <div class="code">&amp;#xeb2b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8a;</i>
+             <div class="code">&amp;#xeb8a;</div>
+           </li>
+       <li><i class="icon fontello">&#xead8;</i>
+             <div class="code">&amp;#xead8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeadd;</i>
+             <div class="code">&amp;#xeadd;</div>
+           </li>
+       <li><i class="icon fontello">&#xeade;</i>
+             <div class="code">&amp;#xeade;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb98;</i>
+             <div class="code">&amp;#xeb98;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb08;</i>
+             <div class="code">&amp;#xeb08;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf6;</i>
+             <div class="code">&amp;#xeaf6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaee;</i>
+             <div class="code">&amp;#xeaee;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb89;</i>
+             <div class="code">&amp;#xeb89;</div>
+           </li>
+       <li><i class="icon fontello">&#xead7;</i>
+             <div class="code">&amp;#xead7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8b;</i>
+             <div class="code">&amp;#xeb8b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab2;</i>
+             <div class="code">&amp;#xeab2;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab3;</i>
+             <div class="code">&amp;#xeab3;</div>
+           </li>
+       <li><i class="icon fontello">&#xebdb;</i>
+             <div class="code">&amp;#xebdb;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5b;</i>
+             <div class="code">&amp;#xeb5b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5c;</i>
+             <div class="code">&amp;#xeb5c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5d;</i>
+             <div class="code">&amp;#xeb5d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf0;</i>
+             <div class="code">&amp;#xeaf0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab8;</i>
+             <div class="code">&amp;#xeab8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab9;</i>
+             <div class="code">&amp;#xeab9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeafa;</i>
+             <div class="code">&amp;#xeafa;</div>
+           </li>
+       <li><i class="icon fontello">&#xeafb;</i>
+             <div class="code">&amp;#xeafb;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf9;</i>
+             <div class="code">&amp;#xeaf9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf8;</i>
+             <div class="code">&amp;#xeaf8;</div>
+           </li>
+       <li><i class="icon fontello">&#xead3;</i>
+             <div class="code">&amp;#xead3;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe0;</i>
+             <div class="code">&amp;#xebe0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae4;</i>
+             <div class="code">&amp;#xeae4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4d;</i>
+             <div class="code">&amp;#xeb4d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4e;</i>
+             <div class="code">&amp;#xeb4e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaba;</i>
+             <div class="code">&amp;#xeaba;</div>
+           </li>
+       <li><i class="icon fontello">&#xeabb;</i>
+             <div class="code">&amp;#xeabb;</div>
+           </li>
+       <li><i class="icon fontello">&#xeadf;</i>
+             <div class="code">&amp;#xeadf;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae0;</i>
+             <div class="code">&amp;#xeae0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaca;</i>
+             <div class="code">&amp;#xeaca;</div>
+           </li>
+       <li><i class="icon fontello">&#xeacb;</i>
+             <div class="code">&amp;#xeacb;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae3;</i>
+             <div class="code">&amp;#xeae3;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9f;</i>
+             <div class="code">&amp;#xea9f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeacf;</i>
+             <div class="code">&amp;#xeacf;</div>
+           </li>
+       <li><i class="icon fontello">&#xead0;</i>
+             <div class="code">&amp;#xead0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb67;</i>
+             <div class="code">&amp;#xeb67;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8e;</i>
+             <div class="code">&amp;#xeb8e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8f;</i>
+             <div class="code">&amp;#xeb8f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb90;</i>
+             <div class="code">&amp;#xeb90;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb91;</i>
+             <div class="code">&amp;#xeb91;</div>
+           </li>
+       <li><i class="icon fontello">&#xeafe;</i>
+             <div class="code">&amp;#xeafe;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaff;</i>
+             <div class="code">&amp;#xeaff;</div>
+           </li>
+       <li><i class="icon fontello">&#xeafd;</i>
+             <div class="code">&amp;#xeafd;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7e;</i>
+             <div class="code">&amp;#xeb7e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb62;</i>
+             <div class="code">&amp;#xeb62;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd6;</i>
+             <div class="code">&amp;#xebd6;</div>
+           </li>
+       <li><i class="icon fontello">&#xea99;</i>
+             <div class="code">&amp;#xea99;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9a;</i>
+             <div class="code">&amp;#xea9a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb15;</i>
+             <div class="code">&amp;#xeb15;</div>
+           </li>
+       <li><i class="icon fontello">&#xea93;</i>
+             <div class="code">&amp;#xea93;</div>
+           </li>
+       <li><i class="icon fontello">&#xea94;</i>
+             <div class="code">&amp;#xea94;</div>
+           </li>
+       <li><i class="icon fontello">&#xeabe;</i>
+             <div class="code">&amp;#xeabe;</div>
+           </li>
+       <li><i class="icon fontello">&#xeabf;</i>
+             <div class="code">&amp;#xeabf;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa2;</i>
+             <div class="code">&amp;#xeaa2;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa3;</i>
+             <div class="code">&amp;#xeaa3;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba0;</i>
+             <div class="code">&amp;#xeba0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeabc;</i>
+             <div class="code">&amp;#xeabc;</div>
+           </li>
+       <li><i class="icon fontello">&#xeabd;</i>
+             <div class="code">&amp;#xeabd;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaea;</i>
+             <div class="code">&amp;#xeaea;</div>
+           </li>
+       <li><i class="icon fontello">&#xebda;</i>
+             <div class="code">&amp;#xebda;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7c;</i>
+             <div class="code">&amp;#xeb7c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7d;</i>
+             <div class="code">&amp;#xeb7d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8c;</i>
+             <div class="code">&amp;#xeb8c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb75;</i>
+             <div class="code">&amp;#xeb75;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb19;</i>
+             <div class="code">&amp;#xeb19;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac0;</i>
+             <div class="code">&amp;#xeac0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac1;</i>
+             <div class="code">&amp;#xeac1;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf4;</i>
+             <div class="code">&amp;#xeaf4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf5;</i>
+             <div class="code">&amp;#xeaf5;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf1;</i>
+             <div class="code">&amp;#xeaf1;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf2;</i>
+             <div class="code">&amp;#xeaf2;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac4;</i>
+             <div class="code">&amp;#xeac4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac5;</i>
+             <div class="code">&amp;#xeac5;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd7;</i>
+             <div class="code">&amp;#xebd7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac6;</i>
+             <div class="code">&amp;#xeac6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac7;</i>
+             <div class="code">&amp;#xeac7;</div>
+           </li>
+       <li><i class="icon fontello">&#xea92;</i>
+             <div class="code">&amp;#xea92;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf3;</i>
+             <div class="code">&amp;#xeaf3;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4f;</i>
+             <div class="code">&amp;#xeb4f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb50;</i>
+             <div class="code">&amp;#xeb50;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb47;</i>
+             <div class="code">&amp;#xeb47;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb48;</i>
+             <div class="code">&amp;#xeb48;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb45;</i>
+             <div class="code">&amp;#xeb45;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb46;</i>
+             <div class="code">&amp;#xeb46;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb41;</i>
+             <div class="code">&amp;#xeb41;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb42;</i>
+             <div class="code">&amp;#xeb42;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4b;</i>
+             <div class="code">&amp;#xeb4b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4c;</i>
+             <div class="code">&amp;#xeb4c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb49;</i>
+             <div class="code">&amp;#xeb49;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb4a;</i>
+             <div class="code">&amp;#xeb4a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb43;</i>
+             <div class="code">&amp;#xeb43;</div>
+           </li>
+       <li><i class="icon fontello">&#xebdf;</i>
+             <div class="code">&amp;#xebdf;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb44;</i>
+             <div class="code">&amp;#xeb44;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae7;</i>
+             <div class="code">&amp;#xeae7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae6;</i>
+             <div class="code">&amp;#xeae6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae8;</i>
+             <div class="code">&amp;#xeae8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0f;</i>
+             <div class="code">&amp;#xeb0f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab6;</i>
+             <div class="code">&amp;#xeab6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab7;</i>
+             <div class="code">&amp;#xeab7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeafc;</i>
+             <div class="code">&amp;#xeafc;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8e;</i>
+             <div class="code">&amp;#xea8e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8f;</i>
+             <div class="code">&amp;#xea8f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae2;</i>
+             <div class="code">&amp;#xeae2;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb04;</i>
+             <div class="code">&amp;#xeb04;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac8;</i>
+             <div class="code">&amp;#xeac8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeac9;</i>
+             <div class="code">&amp;#xeac9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb79;</i>
+             <div class="code">&amp;#xeb79;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb73;</i>
+             <div class="code">&amp;#xeb73;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb74;</i>
+             <div class="code">&amp;#xeb74;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb56;</i>
+             <div class="code">&amp;#xeb56;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab4;</i>
+             <div class="code">&amp;#xeab4;</div>
+           </li>
+       <li><i class="icon fontello">&#xeab5;</i>
+             <div class="code">&amp;#xeab5;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba6;</i>
+             <div class="code">&amp;#xeba6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba7;</i>
+             <div class="code">&amp;#xeba7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7a;</i>
+             <div class="code">&amp;#xeb7a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7b;</i>
+             <div class="code">&amp;#xeb7b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeae5;</i>
+             <div class="code">&amp;#xeae5;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9c;</i>
+             <div class="code">&amp;#xeb9c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9d;</i>
+             <div class="code">&amp;#xeb9d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb57;</i>
+             <div class="code">&amp;#xeb57;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb38;</i>
+             <div class="code">&amp;#xeb38;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb02;</i>
+             <div class="code">&amp;#xeb02;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb03;</i>
+             <div class="code">&amp;#xeb03;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb01;</i>
+             <div class="code">&amp;#xeb01;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0c;</i>
+             <div class="code">&amp;#xeb0c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba5;</i>
+             <div class="code">&amp;#xeba5;</div>
+           </li>
+       <li><i class="icon fontello">&#xebac;</i>
+             <div class="code">&amp;#xebac;</div>
+           </li>
+       <li><i class="icon fontello">&#xebad;</i>
+             <div class="code">&amp;#xebad;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb0;</i>
+             <div class="code">&amp;#xebb0;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb1;</i>
+             <div class="code">&amp;#xebb1;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb4;</i>
+             <div class="code">&amp;#xebb4;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb5;</i>
+             <div class="code">&amp;#xebb5;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb6;</i>
+             <div class="code">&amp;#xebb6;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb7;</i>
+             <div class="code">&amp;#xebb7;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd9;</i>
+             <div class="code">&amp;#xebd9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba8;</i>
+             <div class="code">&amp;#xeba8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeba9;</i>
+             <div class="code">&amp;#xeba9;</div>
+           </li>
+       <li><i class="icon fontello">&#xebaa;</i>
+             <div class="code">&amp;#xebaa;</div>
+           </li>
+       <li><i class="icon fontello">&#xebab;</i>
+             <div class="code">&amp;#xebab;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0a;</i>
+             <div class="code">&amp;#xeb0a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea95;</i>
+             <div class="code">&amp;#xea95;</div>
+           </li>
+       <li><i class="icon fontello">&#xea96;</i>
+             <div class="code">&amp;#xea96;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb92;</i>
+             <div class="code">&amp;#xeb92;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb93;</i>
+             <div class="code">&amp;#xeb93;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb18;</i>
+             <div class="code">&amp;#xeb18;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb76;</i>
+             <div class="code">&amp;#xeb76;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb22;</i>
+             <div class="code">&amp;#xeb22;</div>
+           </li>
+       <li><i class="icon fontello">&#xeacc;</i>
+             <div class="code">&amp;#xeacc;</div>
+           </li>
+       <li><i class="icon fontello">&#xeacd;</i>
+             <div class="code">&amp;#xeacd;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa8;</i>
+             <div class="code">&amp;#xeaa8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa9;</i>
+             <div class="code">&amp;#xeaa9;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaaa;</i>
+             <div class="code">&amp;#xeaaa;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaab;</i>
+             <div class="code">&amp;#xeaab;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb06;</i>
+             <div class="code">&amp;#xeb06;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb07;</i>
+             <div class="code">&amp;#xeb07;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa6;</i>
+             <div class="code">&amp;#xeaa6;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa7;</i>
+             <div class="code">&amp;#xeaa7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb7f;</i>
+             <div class="code">&amp;#xeb7f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaac;</i>
+             <div class="code">&amp;#xeaac;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaad;</i>
+             <div class="code">&amp;#xeaad;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb88;</i>
+             <div class="code">&amp;#xeb88;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaae;</i>
+             <div class="code">&amp;#xeaae;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaaf;</i>
+             <div class="code">&amp;#xeaaf;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaf7;</i>
+             <div class="code">&amp;#xeaf7;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb9e;</i>
+             <div class="code">&amp;#xeb9e;</div>
+           </li>
+       <li><i class="icon fontello">&#xead5;</i>
+             <div class="code">&amp;#xead5;</div>
+           </li>
+       <li><i class="icon fontello">&#xead6;</i>
+             <div class="code">&amp;#xead6;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9b;</i>
+             <div class="code">&amp;#xea9b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9c;</i>
+             <div class="code">&amp;#xea9c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9d;</i>
+             <div class="code">&amp;#xea9d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea9e;</i>
+             <div class="code">&amp;#xea9e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea97;</i>
+             <div class="code">&amp;#xea97;</div>
+           </li>
+       <li><i class="icon fontello">&#xea98;</i>
+             <div class="code">&amp;#xea98;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa0;</i>
+             <div class="code">&amp;#xeaa0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaa1;</i>
+             <div class="code">&amp;#xeaa1;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb13;</i>
+             <div class="code">&amp;#xeb13;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb11;</i>
+             <div class="code">&amp;#xeb11;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb14;</i>
+             <div class="code">&amp;#xeb14;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb12;</i>
+             <div class="code">&amp;#xeb12;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaec;</i>
+             <div class="code">&amp;#xeaec;</div>
+           </li>
+       <li><i class="icon fontello">&#xeaed;</i>
+             <div class="code">&amp;#xeaed;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb17;</i>
+             <div class="code">&amp;#xeb17;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6a;</i>
+             <div class="code">&amp;#xeb6a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6b;</i>
+             <div class="code">&amp;#xeb6b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb66;</i>
+             <div class="code">&amp;#xeb66;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6c;</i>
+             <div class="code">&amp;#xeb6c;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb69;</i>
+             <div class="code">&amp;#xeb69;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6d;</i>
+             <div class="code">&amp;#xeb6d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6e;</i>
+             <div class="code">&amp;#xeb6e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb6f;</i>
+             <div class="code">&amp;#xeb6f;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb70;</i>
+             <div class="code">&amp;#xeb70;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb71;</i>
+             <div class="code">&amp;#xeb71;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb72;</i>
+             <div class="code">&amp;#xeb72;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb59;</i>
+             <div class="code">&amp;#xeb59;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5a;</i>
+             <div class="code">&amp;#xeb5a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb97;</i>
+             <div class="code">&amp;#xeb97;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb60;</i>
+             <div class="code">&amp;#xeb60;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb23;</i>
+             <div class="code">&amp;#xeb23;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb24;</i>
+             <div class="code">&amp;#xeb24;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb25;</i>
+             <div class="code">&amp;#xeb25;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb26;</i>
+             <div class="code">&amp;#xeb26;</div>
+           </li>
+       <li><i class="icon fontello">&#xea90;</i>
+             <div class="code">&amp;#xea90;</div>
+           </li>
+       <li><i class="icon fontello">&#xea91;</i>
+             <div class="code">&amp;#xea91;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9fa;</i>
+             <div class="code">&amp;#xe9fa;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9fb;</i>
+             <div class="code">&amp;#xe9fb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9fc;</i>
+             <div class="code">&amp;#xe9fc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f9;</i>
+             <div class="code">&amp;#xe9f9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97e;</i>
+             <div class="code">&amp;#xe97e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe813;</i>
+             <div class="code">&amp;#xe813;</div>
+           </li>
+       <li><i class="icon fontello">&#xe822;</i>
+             <div class="code">&amp;#xe822;</div>
+           </li>
+       <li><i class="icon fontello">&#xe826;</i>
+             <div class="code">&amp;#xe826;</div>
+           </li>
+       <li><i class="icon fontello">&#xe98f;</i>
+             <div class="code">&amp;#xe98f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86b;</i>
+             <div class="code">&amp;#xe86b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe831;</i>
+             <div class="code">&amp;#xe831;</div>
+           </li>
+       <li><i class="icon fontello">&#xe991;</i>
+             <div class="code">&amp;#xe991;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc7;</i>
+             <div class="code">&amp;#xebc7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86a;</i>
+             <div class="code">&amp;#xe86a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83d;</i>
+             <div class="code">&amp;#xe83d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe998;</i>
+             <div class="code">&amp;#xe998;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83e;</i>
+             <div class="code">&amp;#xe83e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe999;</i>
+             <div class="code">&amp;#xe999;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83f;</i>
+             <div class="code">&amp;#xe83f;</div>
+           </li>
+       <li><i class="icon fontello">&#xebbf;</i>
+             <div class="code">&amp;#xebbf;</div>
+           </li>
+       <li><i class="icon fontello">&#xe840;</i>
+             <div class="code">&amp;#xe840;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc0;</i>
+             <div class="code">&amp;#xebc0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81d;</i>
+             <div class="code">&amp;#xe81d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a1;</i>
+             <div class="code">&amp;#xe9a1;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc4;</i>
+             <div class="code">&amp;#xebc4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a2;</i>
+             <div class="code">&amp;#xe9a2;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd5;</i>
+             <div class="code">&amp;#xebd5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a3;</i>
+             <div class="code">&amp;#xe9a3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a6;</i>
+             <div class="code">&amp;#xe9a6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a7;</i>
+             <div class="code">&amp;#xe9a7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe853;</i>
+             <div class="code">&amp;#xe853;</div>
+           </li>
+       <li><i class="icon fontello">&#xe857;</i>
+             <div class="code">&amp;#xe857;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9aa;</i>
+             <div class="code">&amp;#xe9aa;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd3;</i>
+             <div class="code">&amp;#xebd3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe858;</i>
+             <div class="code">&amp;#xe858;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ab;</i>
+             <div class="code">&amp;#xe9ab;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85b;</i>
+             <div class="code">&amp;#xe85b;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd2;</i>
+             <div class="code">&amp;#xebd2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ad;</i>
+             <div class="code">&amp;#xe9ad;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd1;</i>
+             <div class="code">&amp;#xebd1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85c;</i>
+             <div class="code">&amp;#xe85c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ae;</i>
+             <div class="code">&amp;#xe9ae;</div>
+           </li>
+       <li><i class="icon fontello">&#xebcf;</i>
+             <div class="code">&amp;#xebcf;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b2;</i>
+             <div class="code">&amp;#xe9b2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b3;</i>
+             <div class="code">&amp;#xe9b3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe864;</i>
+             <div class="code">&amp;#xe864;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b4;</i>
+             <div class="code">&amp;#xe9b4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b5;</i>
+             <div class="code">&amp;#xe9b5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b7;</i>
+             <div class="code">&amp;#xe9b7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe867;</i>
+             <div class="code">&amp;#xe867;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b9;</i>
+             <div class="code">&amp;#xe9b9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ba;</i>
+             <div class="code">&amp;#xe9ba;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9be;</i>
+             <div class="code">&amp;#xe9be;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9bb;</i>
+             <div class="code">&amp;#xe9bb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9bc;</i>
+             <div class="code">&amp;#xe9bc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c3;</i>
+             <div class="code">&amp;#xe9c3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c5;</i>
+             <div class="code">&amp;#xe9c5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c9;</i>
+             <div class="code">&amp;#xe9c9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9cb;</i>
+             <div class="code">&amp;#xe9cb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87f;</i>
+             <div class="code">&amp;#xe87f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ca;</i>
+             <div class="code">&amp;#xe9ca;</div>
+           </li>
+       <li><i class="icon fontello">&#xe882;</i>
+             <div class="code">&amp;#xe882;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ce;</i>
+             <div class="code">&amp;#xe9ce;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86f;</i>
+             <div class="code">&amp;#xe86f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9cf;</i>
+             <div class="code">&amp;#xe9cf;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d3;</i>
+             <div class="code">&amp;#xe9d3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9db;</i>
+             <div class="code">&amp;#xe9db;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88c;</i>
+             <div class="code">&amp;#xe88c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9dc;</i>
+             <div class="code">&amp;#xe9dc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88e;</i>
+             <div class="code">&amp;#xe88e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9dd;</i>
+             <div class="code">&amp;#xe9dd;</div>
+           </li>
+       <li><i class="icon fontello">&#xebd4;</i>
+             <div class="code">&amp;#xebd4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9de;</i>
+             <div class="code">&amp;#xe9de;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9df;</i>
+             <div class="code">&amp;#xe9df;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e0;</i>
+             <div class="code">&amp;#xe9e0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe892;</i>
+             <div class="code">&amp;#xe892;</div>
+           </li>
+       <li><i class="icon fontello">&#xea36;</i>
+             <div class="code">&amp;#xea36;</div>
+           </li>
+       <li><i class="icon fontello">&#xe893;</i>
+             <div class="code">&amp;#xe893;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3c;</i>
+             <div class="code">&amp;#xea3c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea40;</i>
+             <div class="code">&amp;#xea40;</div>
+           </li>
+       <li><i class="icon fontello">&#xea45;</i>
+             <div class="code">&amp;#xea45;</div>
+           </li>
+       <li><i class="icon fontello">&#xea46;</i>
+             <div class="code">&amp;#xea46;</div>
+           </li>
+       <li><i class="icon fontello">&#xea47;</i>
+             <div class="code">&amp;#xea47;</div>
+           </li>
+       <li><i class="icon fontello">&#xea48;</i>
+             <div class="code">&amp;#xea48;</div>
+           </li>
+       <li><i class="icon fontello">&#xe894;</i>
+             <div class="code">&amp;#xe894;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e1;</i>
+             <div class="code">&amp;#xe9e1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e2;</i>
+             <div class="code">&amp;#xe9e2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e3;</i>
+             <div class="code">&amp;#xe9e3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e4;</i>
+             <div class="code">&amp;#xe9e4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe895;</i>
+             <div class="code">&amp;#xe895;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e5;</i>
+             <div class="code">&amp;#xe9e5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89a;</i>
+             <div class="code">&amp;#xe89a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e6;</i>
+             <div class="code">&amp;#xe9e6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89b;</i>
+             <div class="code">&amp;#xe89b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e7;</i>
+             <div class="code">&amp;#xe9e7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89c;</i>
+             <div class="code">&amp;#xe89c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89d;</i>
+             <div class="code">&amp;#xe89d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e8;</i>
+             <div class="code">&amp;#xe9e8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9e9;</i>
+             <div class="code">&amp;#xe9e9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8bc;</i>
+             <div class="code">&amp;#xe8bc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ea;</i>
+             <div class="code">&amp;#xe9ea;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c6;</i>
+             <div class="code">&amp;#xe8c6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9eb;</i>
+             <div class="code">&amp;#xe9eb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ca;</i>
+             <div class="code">&amp;#xe8ca;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ec;</i>
+             <div class="code">&amp;#xe9ec;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8cc;</i>
+             <div class="code">&amp;#xe8cc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ed;</i>
+             <div class="code">&amp;#xe9ed;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ee;</i>
+             <div class="code">&amp;#xe9ee;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9ef;</i>
+             <div class="code">&amp;#xe9ef;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9f0;</i>
+             <div class="code">&amp;#xe9f0;</div>
+           </li>
+       <li><i class="icon fontello">&#xea11;</i>
+             <div class="code">&amp;#xea11;</div>
+           </li>
+       <li><i class="icon fontello">&#xea12;</i>
+             <div class="code">&amp;#xea12;</div>
+           </li>
+       <li><i class="icon fontello">&#xea13;</i>
+             <div class="code">&amp;#xea13;</div>
+           </li>
+       <li><i class="icon fontello">&#xea14;</i>
+             <div class="code">&amp;#xea14;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1c;</i>
+             <div class="code">&amp;#xea1c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1f;</i>
+             <div class="code">&amp;#xea1f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea21;</i>
+             <div class="code">&amp;#xea21;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d7;</i>
+             <div class="code">&amp;#xe8d7;</div>
+           </li>
+       <li><i class="icon fontello">&#xea22;</i>
+             <div class="code">&amp;#xea22;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e1;</i>
+             <div class="code">&amp;#xe8e1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e2;</i>
+             <div class="code">&amp;#xe8e2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e3;</i>
+             <div class="code">&amp;#xe8e3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e4;</i>
+             <div class="code">&amp;#xe8e4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e5;</i>
+             <div class="code">&amp;#xe8e5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e6;</i>
+             <div class="code">&amp;#xe8e6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e7;</i>
+             <div class="code">&amp;#xe8e7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e8;</i>
+             <div class="code">&amp;#xe8e8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e9;</i>
+             <div class="code">&amp;#xe8e9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ea;</i>
+             <div class="code">&amp;#xe8ea;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8eb;</i>
+             <div class="code">&amp;#xe8eb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ec;</i>
+             <div class="code">&amp;#xe8ec;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2b;</i>
+             <div class="code">&amp;#xea2b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2c;</i>
+             <div class="code">&amp;#xea2c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2f;</i>
+             <div class="code">&amp;#xea2f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea30;</i>
+             <div class="code">&amp;#xea30;</div>
+           </li>
+       <li><i class="icon fontello">&#xea31;</i>
+             <div class="code">&amp;#xea31;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2e;</i>
+             <div class="code">&amp;#xea2e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8fc;</i>
+             <div class="code">&amp;#xe8fc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8fd;</i>
+             <div class="code">&amp;#xe8fd;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4a;</i>
+             <div class="code">&amp;#xea4a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8fe;</i>
+             <div class="code">&amp;#xe8fe;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4b;</i>
+             <div class="code">&amp;#xea4b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ff;</i>
+             <div class="code">&amp;#xe8ff;</div>
+           </li>
+       <li><i class="icon fontello">&#xe900;</i>
+             <div class="code">&amp;#xe900;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4c;</i>
+             <div class="code">&amp;#xea4c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe902;</i>
+             <div class="code">&amp;#xe902;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4d;</i>
+             <div class="code">&amp;#xea4d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe903;</i>
+             <div class="code">&amp;#xe903;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4e;</i>
+             <div class="code">&amp;#xea4e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea32;</i>
+             <div class="code">&amp;#xea32;</div>
+           </li>
+       <li><i class="icon fontello">&#xea29;</i>
+             <div class="code">&amp;#xea29;</div>
+           </li>
+       <li><i class="icon fontello">&#xea33;</i>
+             <div class="code">&amp;#xea33;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90b;</i>
+             <div class="code">&amp;#xe90b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea50;</i>
+             <div class="code">&amp;#xea50;</div>
+           </li>
+       <li><i class="icon fontello">&#xea51;</i>
+             <div class="code">&amp;#xea51;</div>
+           </li>
+       <li><i class="icon fontello">&#xea52;</i>
+             <div class="code">&amp;#xea52;</div>
+           </li>
+       <li><i class="icon fontello">&#xea53;</i>
+             <div class="code">&amp;#xea53;</div>
+           </li>
+       <li><i class="icon fontello">&#xea54;</i>
+             <div class="code">&amp;#xea54;</div>
+           </li>
+       <li><i class="icon fontello">&#xea55;</i>
+             <div class="code">&amp;#xea55;</div>
+           </li>
+       <li><i class="icon fontello">&#xea56;</i>
+             <div class="code">&amp;#xea56;</div>
+           </li>
+       <li><i class="icon fontello">&#xea57;</i>
+             <div class="code">&amp;#xea57;</div>
+           </li>
+       <li><i class="icon fontello">&#xea58;</i>
+             <div class="code">&amp;#xea58;</div>
+           </li>
+       <li><i class="icon fontello">&#xea59;</i>
+             <div class="code">&amp;#xea59;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5a;</i>
+             <div class="code">&amp;#xea5a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5b;</i>
+             <div class="code">&amp;#xea5b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5c;</i>
+             <div class="code">&amp;#xea5c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe800;</i>
+             <div class="code">&amp;#xe800;</div>
+           </li>
+       <li><i class="icon fontello">&#xe801;</i>
+             <div class="code">&amp;#xe801;</div>
+           </li>
+       <li><i class="icon fontello">&#xe802;</i>
+             <div class="code">&amp;#xe802;</div>
+           </li>
+       <li><i class="icon fontello">&#xe803;</i>
+             <div class="code">&amp;#xe803;</div>
+           </li>
+       <li><i class="icon fontello">&#xe804;</i>
+             <div class="code">&amp;#xe804;</div>
+           </li>
+       <li><i class="icon fontello">&#xe805;</i>
+             <div class="code">&amp;#xe805;</div>
+           </li>
+       <li><i class="icon fontello">&#xe806;</i>
+             <div class="code">&amp;#xe806;</div>
+           </li>
+       <li><i class="icon fontello">&#xe807;</i>
+             <div class="code">&amp;#xe807;</div>
+           </li>
+       <li><i class="icon fontello">&#xe808;</i>
+             <div class="code">&amp;#xe808;</div>
+           </li>
+       <li><i class="icon fontello">&#xe809;</i>
+             <div class="code">&amp;#xe809;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe9;</i>
+             <div class="code">&amp;#xebe9;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe6;</i>
+             <div class="code">&amp;#xebe6;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe7;</i>
+             <div class="code">&amp;#xebe7;</div>
+           </li>
+       <li><i class="icon fontello">&#xebe8;</i>
+             <div class="code">&amp;#xebe8;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb3a;</i>
+             <div class="code">&amp;#xeb3a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe891;</i>
+             <div class="code">&amp;#xe891;</div>
+           </li>
+       <li><i class="icon fontello">&#xebed;</i>
+             <div class="code">&amp;#xebed;</div>
+           </li>
+       <li><i class="icon fontello">&#xebec;</i>
+             <div class="code">&amp;#xebec;</div>
+           </li>
+       <li><i class="icon fontello">&#xe836;</i>
+             <div class="code">&amp;#xe836;</div>
+           </li>
+       <li><i class="icon fontello">&#xe905;</i>
+             <div class="code">&amp;#xe905;</div>
+           </li>
+       <li><i class="icon fontello">&#xe842;</i>
+             <div class="code">&amp;#xe842;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87a;</i>
+             <div class="code">&amp;#xe87a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe967;</i>
+             <div class="code">&amp;#xe967;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94e;</i>
+             <div class="code">&amp;#xe94e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe954;</i>
+             <div class="code">&amp;#xe954;</div>
+           </li>
+       <li><i class="icon fontello">&#xe877;</i>
+             <div class="code">&amp;#xe877;</div>
+           </li>
+       <li><i class="icon fontello">&#xe911;</i>
+             <div class="code">&amp;#xe911;</div>
+           </li>
+       <li><i class="icon fontello">&#xe916;</i>
+             <div class="code">&amp;#xe916;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b6;</i>
+             <div class="code">&amp;#xe8b6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b7;</i>
+             <div class="code">&amp;#xe8b7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b8;</i>
+             <div class="code">&amp;#xe8b8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8b9;</i>
+             <div class="code">&amp;#xe8b9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe917;</i>
+             <div class="code">&amp;#xe917;</div>
+           </li>
+       <li><i class="icon fontello">&#xe918;</i>
+             <div class="code">&amp;#xe918;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88d;</i>
+             <div class="code">&amp;#xe88d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe919;</i>
+             <div class="code">&amp;#xe919;</div>
+           </li>
+       <li><i class="icon fontello">&#xe869;</i>
+             <div class="code">&amp;#xe869;</div>
+           </li>
+       <li><i class="icon fontello">&#xe970;</i>
+             <div class="code">&amp;#xe970;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87b;</i>
+             <div class="code">&amp;#xe87b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ed;</i>
+             <div class="code">&amp;#xe8ed;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ee;</i>
+             <div class="code">&amp;#xe8ee;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ef;</i>
+             <div class="code">&amp;#xe8ef;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f0;</i>
+             <div class="code">&amp;#xe8f0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f3;</i>
+             <div class="code">&amp;#xe8f3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91a;</i>
+             <div class="code">&amp;#xe91a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95e;</i>
+             <div class="code">&amp;#xe95e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95f;</i>
+             <div class="code">&amp;#xe95f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe956;</i>
+             <div class="code">&amp;#xe956;</div>
+           </li>
+       <li><i class="icon fontello">&#xe957;</i>
+             <div class="code">&amp;#xe957;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91c;</i>
+             <div class="code">&amp;#xe91c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f4;</i>
+             <div class="code">&amp;#xe8f4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe925;</i>
+             <div class="code">&amp;#xe925;</div>
+           </li>
+       <li><i class="icon fontello">&#xe926;</i>
+             <div class="code">&amp;#xe926;</div>
+           </li>
+       <li><i class="icon fontello">&#xe927;</i>
+             <div class="code">&amp;#xe927;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80e;</i>
+             <div class="code">&amp;#xe80e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95c;</i>
+             <div class="code">&amp;#xe95c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92f;</i>
+             <div class="code">&amp;#xe92f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85d;</i>
+             <div class="code">&amp;#xe85d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85e;</i>
+             <div class="code">&amp;#xe85e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe930;</i>
+             <div class="code">&amp;#xe930;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f7;</i>
+             <div class="code">&amp;#xe8f7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88a;</i>
+             <div class="code">&amp;#xe88a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c0;</i>
+             <div class="code">&amp;#xe8c0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84b;</i>
+             <div class="code">&amp;#xe84b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84c;</i>
+             <div class="code">&amp;#xe84c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe935;</i>
+             <div class="code">&amp;#xe935;</div>
+           </li>
+       <li><i class="icon fontello">&#xe936;</i>
+             <div class="code">&amp;#xe936;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f9;</i>
+             <div class="code">&amp;#xe8f9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe860;</i>
+             <div class="code">&amp;#xe860;</div>
+           </li>
+       <li><i class="icon fontello">&#xe932;</i>
+             <div class="code">&amp;#xe932;</div>
+           </li>
+       <li><i class="icon fontello">&#xe933;</i>
+             <div class="code">&amp;#xe933;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86e;</i>
+             <div class="code">&amp;#xe86e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93b;</i>
+             <div class="code">&amp;#xe93b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93a;</i>
+             <div class="code">&amp;#xe93a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe937;</i>
+             <div class="code">&amp;#xe937;</div>
+           </li>
+       <li><i class="icon fontello">&#xe938;</i>
+             <div class="code">&amp;#xe938;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8df;</i>
+             <div class="code">&amp;#xe8df;</div>
+           </li>
+       <li><i class="icon fontello">&#xe934;</i>
+             <div class="code">&amp;#xe934;</div>
+           </li>
+       <li><i class="icon fontello">&#xe939;</i>
+             <div class="code">&amp;#xe939;</div>
+           </li>
+       <li><i class="icon fontello">&#xe829;</i>
+             <div class="code">&amp;#xe829;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a6;</i>
+             <div class="code">&amp;#xe8a6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a7;</i>
+             <div class="code">&amp;#xe8a7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a8;</i>
+             <div class="code">&amp;#xe8a8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a9;</i>
+             <div class="code">&amp;#xe8a9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89e;</i>
+             <div class="code">&amp;#xe89e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe89f;</i>
+             <div class="code">&amp;#xe89f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a0;</i>
+             <div class="code">&amp;#xe8a0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a1;</i>
+             <div class="code">&amp;#xe8a1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d3;</i>
+             <div class="code">&amp;#xe8d3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d4;</i>
+             <div class="code">&amp;#xe8d4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d5;</i>
+             <div class="code">&amp;#xe8d5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d6;</i>
+             <div class="code">&amp;#xe8d6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe907;</i>
+             <div class="code">&amp;#xe907;</div>
+           </li>
+       <li><i class="icon fontello">&#xe850;</i>
+             <div class="code">&amp;#xe850;</div>
+           </li>
+       <li><i class="icon fontello">&#xe851;</i>
+             <div class="code">&amp;#xe851;</div>
+           </li>
+       <li><i class="icon fontello">&#xe931;</i>
+             <div class="code">&amp;#xe931;</div>
+           </li>
+       <li><i class="icon fontello">&#xe906;</i>
+             <div class="code">&amp;#xe906;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84d;</i>
+             <div class="code">&amp;#xe84d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe952;</i>
+             <div class="code">&amp;#xe952;</div>
+           </li>
+       <li><i class="icon fontello">&#xe874;</i>
+             <div class="code">&amp;#xe874;</div>
+           </li>
+       <li><i class="icon fontello">&#xe875;</i>
+             <div class="code">&amp;#xe875;</div>
+           </li>
+       <li><i class="icon fontello">&#xe82a;</i>
+             <div class="code">&amp;#xe82a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe82f;</i>
+             <div class="code">&amp;#xe82f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93c;</i>
+             <div class="code">&amp;#xe93c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93d;</i>
+             <div class="code">&amp;#xe93d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93e;</i>
+             <div class="code">&amp;#xe93e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85a;</i>
+             <div class="code">&amp;#xe85a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe859;</i>
+             <div class="code">&amp;#xe859;</div>
+           </li>
+       <li><i class="icon fontello">&#xe86c;</i>
+             <div class="code">&amp;#xe86c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe844;</i>
+             <div class="code">&amp;#xe844;</div>
+           </li>
+       <li><i class="icon fontello">&#xe940;</i>
+             <div class="code">&amp;#xe940;</div>
+           </li>
+       <li><i class="icon fontello">&#xe852;</i>
+             <div class="code">&amp;#xe852;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84e;</i>
+             <div class="code">&amp;#xe84e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe814;</i>
+             <div class="code">&amp;#xe814;</div>
+           </li>
+       <li><i class="icon fontello">&#xe865;</i>
+             <div class="code">&amp;#xe865;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f5;</i>
+             <div class="code">&amp;#xe8f5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe913;</i>
+             <div class="code">&amp;#xe913;</div>
+           </li>
+       <li><i class="icon fontello">&#xe835;</i>
+             <div class="code">&amp;#xe835;</div>
+           </li>
+       <li><i class="icon fontello">&#xe830;</i>
+             <div class="code">&amp;#xe830;</div>
+           </li>
+       <li><i class="icon fontello">&#xe832;</i>
+             <div class="code">&amp;#xe832;</div>
+           </li>
+       <li><i class="icon fontello">&#xe861;</i>
+             <div class="code">&amp;#xe861;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f1;</i>
+             <div class="code">&amp;#xe8f1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f2;</i>
+             <div class="code">&amp;#xe8f2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe941;</i>
+             <div class="code">&amp;#xe941;</div>
+           </li>
+       <li><i class="icon fontello">&#xe942;</i>
+             <div class="code">&amp;#xe942;</div>
+           </li>
+       <li><i class="icon fontello">&#xe883;</i>
+             <div class="code">&amp;#xe883;</div>
+           </li>
+       <li><i class="icon fontello">&#xe884;</i>
+             <div class="code">&amp;#xe884;</div>
+           </li>
+       <li><i class="icon fontello">&#xe943;</i>
+             <div class="code">&amp;#xe943;</div>
+           </li>
+       <li><i class="icon fontello">&#xe881;</i>
+             <div class="code">&amp;#xe881;</div>
+           </li>
+       <li><i class="icon fontello">&#xe944;</i>
+             <div class="code">&amp;#xe944;</div>
+           </li>
+       <li><i class="icon fontello">&#xe914;</i>
+             <div class="code">&amp;#xe914;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95d;</i>
+             <div class="code">&amp;#xe95d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a2;</i>
+             <div class="code">&amp;#xe8a2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a3;</i>
+             <div class="code">&amp;#xe8a3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a4;</i>
+             <div class="code">&amp;#xe8a4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8a5;</i>
+             <div class="code">&amp;#xe8a5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe958;</i>
+             <div class="code">&amp;#xe958;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94b;</i>
+             <div class="code">&amp;#xe94b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe93f;</i>
+             <div class="code">&amp;#xe93f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83b;</i>
+             <div class="code">&amp;#xe83b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe945;</i>
+             <div class="code">&amp;#xe945;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8fa;</i>
+             <div class="code">&amp;#xe8fa;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8fb;</i>
+             <div class="code">&amp;#xe8fb;</div>
+           </li>
+       <li><i class="icon fontello">&#xe878;</i>
+             <div class="code">&amp;#xe878;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c5;</i>
+             <div class="code">&amp;#xe8c5;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90d;</i>
+             <div class="code">&amp;#xe90d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe82d;</i>
+             <div class="code">&amp;#xe82d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe82e;</i>
+             <div class="code">&amp;#xe82e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8bd;</i>
+             <div class="code">&amp;#xe8bd;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8be;</i>
+             <div class="code">&amp;#xe8be;</div>
+           </li>
+       <li><i class="icon fontello">&#xe823;</i>
+             <div class="code">&amp;#xe823;</div>
+           </li>
+       <li><i class="icon fontello">&#xe856;</i>
+             <div class="code">&amp;#xe856;</div>
+           </li>
+       <li><i class="icon fontello">&#xe837;</i>
+             <div class="code">&amp;#xe837;</div>
+           </li>
+       <li><i class="icon fontello">&#xe854;</i>
+             <div class="code">&amp;#xe854;</div>
+           </li>
+       <li><i class="icon fontello">&#xe866;</i>
+             <div class="code">&amp;#xe866;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c1;</i>
+             <div class="code">&amp;#xe8c1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c2;</i>
+             <div class="code">&amp;#xe8c2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8c3;</i>
+             <div class="code">&amp;#xe8c3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91d;</i>
+             <div class="code">&amp;#xe91d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91e;</i>
+             <div class="code">&amp;#xe91e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91f;</i>
+             <div class="code">&amp;#xe91f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe920;</i>
+             <div class="code">&amp;#xe920;</div>
+           </li>
+       <li><i class="icon fontello">&#xe921;</i>
+             <div class="code">&amp;#xe921;</div>
+           </li>
+       <li><i class="icon fontello">&#xe922;</i>
+             <div class="code">&amp;#xe922;</div>
+           </li>
+       <li><i class="icon fontello">&#xe923;</i>
+             <div class="code">&amp;#xe923;</div>
+           </li>
+       <li><i class="icon fontello">&#xe924;</i>
+             <div class="code">&amp;#xe924;</div>
+           </li>
+       <li><i class="icon fontello">&#xe870;</i>
+             <div class="code">&amp;#xe870;</div>
+           </li>
+       <li><i class="icon fontello">&#xe871;</i>
+             <div class="code">&amp;#xe871;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92a;</i>
+             <div class="code">&amp;#xe92a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92b;</i>
+             <div class="code">&amp;#xe92b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe928;</i>
+             <div class="code">&amp;#xe928;</div>
+           </li>
+       <li><i class="icon fontello">&#xe929;</i>
+             <div class="code">&amp;#xe929;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92c;</i>
+             <div class="code">&amp;#xe92c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92d;</i>
+             <div class="code">&amp;#xe92d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe847;</i>
+             <div class="code">&amp;#xe847;</div>
+           </li>
+       <li><i class="icon fontello">&#xe848;</i>
+             <div class="code">&amp;#xe848;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96e;</i>
+             <div class="code">&amp;#xe96e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96d;</i>
+             <div class="code">&amp;#xe96d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96b;</i>
+             <div class="code">&amp;#xe96b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96c;</i>
+             <div class="code">&amp;#xe96c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96f;</i>
+             <div class="code">&amp;#xe96f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94d;</i>
+             <div class="code">&amp;#xe94d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe962;</i>
+             <div class="code">&amp;#xe962;</div>
+           </li>
+       <li><i class="icon fontello">&#xe959;</i>
+             <div class="code">&amp;#xe959;</div>
+           </li>
+       <li><i class="icon fontello">&#xe950;</i>
+             <div class="code">&amp;#xe950;</div>
+           </li>
+       <li><i class="icon fontello">&#xe946;</i>
+             <div class="code">&amp;#xe946;</div>
+           </li>
+       <li><i class="icon fontello">&#xe949;</i>
+             <div class="code">&amp;#xe949;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94a;</i>
+             <div class="code">&amp;#xe94a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe964;</i>
+             <div class="code">&amp;#xe964;</div>
+           </li>
+       <li><i class="icon fontello">&#xe965;</i>
+             <div class="code">&amp;#xe965;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8aa;</i>
+             <div class="code">&amp;#xe8aa;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ad;</i>
+             <div class="code">&amp;#xe8ad;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ac;</i>
+             <div class="code">&amp;#xe8ac;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8ab;</i>
+             <div class="code">&amp;#xe8ab;</div>
+           </li>
+       <li><i class="icon fontello">&#xe948;</i>
+             <div class="code">&amp;#xe948;</div>
+           </li>
+       <li><i class="icon fontello">&#xe96a;</i>
+             <div class="code">&amp;#xe96a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe947;</i>
+             <div class="code">&amp;#xe947;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95b;</i>
+             <div class="code">&amp;#xe95b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94c;</i>
+             <div class="code">&amp;#xe94c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe961;</i>
+             <div class="code">&amp;#xe961;</div>
+           </li>
+       <li><i class="icon fontello">&#xe951;</i>
+             <div class="code">&amp;#xe951;</div>
+           </li>
+       <li><i class="icon fontello">&#xe963;</i>
+             <div class="code">&amp;#xe963;</div>
+           </li>
+       <li><i class="icon fontello">&#xe818;</i>
+             <div class="code">&amp;#xe818;</div>
+           </li>
+       <li><i class="icon fontello">&#xe817;</i>
+             <div class="code">&amp;#xe817;</div>
+           </li>
+       <li><i class="icon fontello">&#xe955;</i>
+             <div class="code">&amp;#xe955;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d9;</i>
+             <div class="code">&amp;#xe8d9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8dc;</i>
+             <div class="code">&amp;#xe8dc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe876;</i>
+             <div class="code">&amp;#xe876;</div>
+           </li>
+       <li><i class="icon fontello">&#xe915;</i>
+             <div class="code">&amp;#xe915;</div>
+           </li>
+       <li><i class="icon fontello">&#xe968;</i>
+             <div class="code">&amp;#xe968;</div>
+           </li>
+       <li><i class="icon fontello">&#xe969;</i>
+             <div class="code">&amp;#xe969;</div>
+           </li>
+       <li><i class="icon fontello">&#xe960;</i>
+             <div class="code">&amp;#xe960;</div>
+           </li>
+       <li><i class="icon fontello">&#xe953;</i>
+             <div class="code">&amp;#xe953;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5d;</i>
+             <div class="code">&amp;#xea5d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5e;</i>
+             <div class="code">&amp;#xea5e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea5f;</i>
+             <div class="code">&amp;#xea5f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea60;</i>
+             <div class="code">&amp;#xea60;</div>
+           </li>
+       <li><i class="icon fontello">&#xe966;</i>
+             <div class="code">&amp;#xe966;</div>
+           </li>
+       <li><i class="icon fontello">&#xea61;</i>
+             <div class="code">&amp;#xea61;</div>
+           </li>
+       <li><i class="icon fontello">&#xea62;</i>
+             <div class="code">&amp;#xea62;</div>
+           </li>
+       <li><i class="icon fontello">&#xe94f;</i>
+             <div class="code">&amp;#xe94f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea63;</i>
+             <div class="code">&amp;#xea63;</div>
+           </li>
+       <li><i class="icon fontello">&#xea64;</i>
+             <div class="code">&amp;#xea64;</div>
+           </li>
+       <li><i class="icon fontello">&#xea65;</i>
+             <div class="code">&amp;#xea65;</div>
+           </li>
+       <li><i class="icon fontello">&#xe95a;</i>
+             <div class="code">&amp;#xe95a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea66;</i>
+             <div class="code">&amp;#xea66;</div>
+           </li>
+       <li><i class="icon fontello">&#xea67;</i>
+             <div class="code">&amp;#xea67;</div>
+           </li>
+       <li><i class="icon fontello">&#xea68;</i>
+             <div class="code">&amp;#xea68;</div>
+           </li>
+       <li><i class="icon fontello">&#xea69;</i>
+             <div class="code">&amp;#xea69;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6a;</i>
+             <div class="code">&amp;#xea6a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6b;</i>
+             <div class="code">&amp;#xea6b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6c;</i>
+             <div class="code">&amp;#xea6c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6d;</i>
+             <div class="code">&amp;#xea6d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6e;</i>
+             <div class="code">&amp;#xea6e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea6f;</i>
+             <div class="code">&amp;#xea6f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea70;</i>
+             <div class="code">&amp;#xea70;</div>
+           </li>
+       <li><i class="icon fontello">&#xea71;</i>
+             <div class="code">&amp;#xea71;</div>
+           </li>
+       <li><i class="icon fontello">&#xea72;</i>
+             <div class="code">&amp;#xea72;</div>
+           </li>
+       <li><i class="icon fontello">&#xea73;</i>
+             <div class="code">&amp;#xea73;</div>
+           </li>
+       <li><i class="icon fontello">&#xea74;</i>
+             <div class="code">&amp;#xea74;</div>
+           </li>
+       <li><i class="icon fontello">&#xea75;</i>
+             <div class="code">&amp;#xea75;</div>
+           </li>
+       <li><i class="icon fontello">&#xea76;</i>
+             <div class="code">&amp;#xea76;</div>
+           </li>
+       <li><i class="icon fontello">&#xea77;</i>
+             <div class="code">&amp;#xea77;</div>
+           </li>
+       <li><i class="icon fontello">&#xea78;</i>
+             <div class="code">&amp;#xea78;</div>
+           </li>
+       <li><i class="icon fontello">&#xea79;</i>
+             <div class="code">&amp;#xea79;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7a;</i>
+             <div class="code">&amp;#xea7a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7b;</i>
+             <div class="code">&amp;#xea7b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7c;</i>
+             <div class="code">&amp;#xea7c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7d;</i>
+             <div class="code">&amp;#xea7d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea7e;</i>
+             <div class="code">&amp;#xea7e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea81;</i>
+             <div class="code">&amp;#xea81;</div>
+           </li>
+       <li><i class="icon fontello">&#xea82;</i>
+             <div class="code">&amp;#xea82;</div>
+           </li>
+       <li><i class="icon fontello">&#xea83;</i>
+             <div class="code">&amp;#xea83;</div>
+           </li>
+       <li><i class="icon fontello">&#xea84;</i>
+             <div class="code">&amp;#xea84;</div>
+           </li>
+       <li><i class="icon fontello">&#xea85;</i>
+             <div class="code">&amp;#xea85;</div>
+           </li>
+       <li><i class="icon fontello">&#xea86;</i>
+             <div class="code">&amp;#xea86;</div>
+           </li>
+       <li><i class="icon fontello">&#xea87;</i>
+             <div class="code">&amp;#xea87;</div>
+           </li>
+       <li><i class="icon fontello">&#xea88;</i>
+             <div class="code">&amp;#xea88;</div>
+           </li>
+       <li><i class="icon fontello">&#xea89;</i>
+             <div class="code">&amp;#xea89;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8a;</i>
+             <div class="code">&amp;#xea8a;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8c;</i>
+             <div class="code">&amp;#xea8c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8b;</i>
+             <div class="code">&amp;#xea8b;</div>
+           </li>
+       <li><i class="icon fontello">&#xea8d;</i>
+             <div class="code">&amp;#xea8d;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb61;</i>
+             <div class="code">&amp;#xeb61;</div>
+           </li>
+       <li><i class="icon fontello">&#xebbc;</i>
+             <div class="code">&amp;#xebbc;</div>
+           </li>
+       <li><i class="icon fontello">&#xe980;</i>
+             <div class="code">&amp;#xe980;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc6;</i>
+             <div class="code">&amp;#xebc6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81b;</i>
+             <div class="code">&amp;#xe81b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d8;</i>
+             <div class="code">&amp;#xe8d8;</div>
+           </li>
+       <li><i class="icon fontello">&#xea23;</i>
+             <div class="code">&amp;#xea23;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb63;</i>
+             <div class="code">&amp;#xeb63;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2a;</i>
+             <div class="code">&amp;#xea2a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8e0;</i>
+             <div class="code">&amp;#xe8e0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe971;</i>
+             <div class="code">&amp;#xe971;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80a;</i>
+             <div class="code">&amp;#xe80a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe909;</i>
+             <div class="code">&amp;#xe909;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3b;</i>
+             <div class="code">&amp;#xea3b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d0;</i>
+             <div class="code">&amp;#xe9d0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb10;</i>
+             <div class="code">&amp;#xeb10;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81a;</i>
+             <div class="code">&amp;#xe81a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe888;</i>
+             <div class="code">&amp;#xe888;</div>
+           </li>
+       <li><i class="icon fontello">&#xea16;</i>
+             <div class="code">&amp;#xea16;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3d;</i>
+             <div class="code">&amp;#xea3d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97f;</i>
+             <div class="code">&amp;#xe97f;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc9;</i>
+             <div class="code">&amp;#xebc9;</div>
+           </li>
+       <li><i class="icon fontello">&#xe819;</i>
+             <div class="code">&amp;#xe819;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb58;</i>
+             <div class="code">&amp;#xeb58;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d0;</i>
+             <div class="code">&amp;#xe8d0;</div>
+           </li>
+       <li><i class="icon fontello">&#xea15;</i>
+             <div class="code">&amp;#xea15;</div>
+           </li>
+       <li><i class="icon fontello">&#xe974;</i>
+             <div class="code">&amp;#xe974;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1a;</i>
+             <div class="code">&amp;#xea1a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d2;</i>
+             <div class="code">&amp;#xe8d2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe845;</i>
+             <div class="code">&amp;#xe845;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99d;</i>
+             <div class="code">&amp;#xe99d;</div>
+           </li>
+       <li><i class="icon fontello">&#xead1;</i>
+             <div class="code">&amp;#xead1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99e;</i>
+             <div class="code">&amp;#xe99e;</div>
+           </li>
+       <li><i class="icon fontello">&#xe846;</i>
+             <div class="code">&amp;#xe846;</div>
+           </li>
+       <li><i class="icon fontello">&#xead2;</i>
+             <div class="code">&amp;#xead2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9cc;</i>
+             <div class="code">&amp;#xe9cc;</div>
+           </li>
+       <li><i class="icon fontello">&#xebca;</i>
+             <div class="code">&amp;#xebca;</div>
+           </li>
+       <li><i class="icon fontello">&#xe815;</i>
+             <div class="code">&amp;#xe815;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97c;</i>
+             <div class="code">&amp;#xe97c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe97d;</i>
+             <div class="code">&amp;#xe97d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe816;</i>
+             <div class="code">&amp;#xe816;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d6;</i>
+             <div class="code">&amp;#xe9d6;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9b1;</i>
+             <div class="code">&amp;#xe9b1;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3e;</i>
+             <div class="code">&amp;#xea3e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea3f;</i>
+             <div class="code">&amp;#xea3f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea41;</i>
+             <div class="code">&amp;#xea41;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90e;</i>
+             <div class="code">&amp;#xe90e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1d;</i>
+             <div class="code">&amp;#xea1d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea2d;</i>
+             <div class="code">&amp;#xea2d;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8f8;</i>
+             <div class="code">&amp;#xe8f8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90f;</i>
+             <div class="code">&amp;#xe90f;</div>
+           </li>
+       <li><i class="icon fontello">&#xea42;</i>
+             <div class="code">&amp;#xea42;</div>
+           </li>
+       <li><i class="icon fontello">&#xea20;</i>
+             <div class="code">&amp;#xea20;</div>
+           </li>
+       <li><i class="icon fontello">&#xe872;</i>
+             <div class="code">&amp;#xe872;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c2;</i>
+             <div class="code">&amp;#xe9c2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe873;</i>
+             <div class="code">&amp;#xe873;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9bd;</i>
+             <div class="code">&amp;#xe9bd;</div>
+           </li>
+       <li><i class="icon fontello">&#xe868;</i>
+             <div class="code">&amp;#xe868;</div>
+           </li>
+       <li><i class="icon fontello">&#xe880;</i>
+             <div class="code">&amp;#xe880;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9cd;</i>
+             <div class="code">&amp;#xe9cd;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb81;</i>
+             <div class="code">&amp;#xeb81;</div>
+           </li>
+       <li><i class="icon fontello">&#xea37;</i>
+             <div class="code">&amp;#xea37;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb85;</i>
+             <div class="code">&amp;#xeb85;</div>
+           </li>
+       <li><i class="icon fontello">&#xea38;</i>
+             <div class="code">&amp;#xea38;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90c;</i>
+             <div class="code">&amp;#xe90c;</div>
+           </li>
+       <li><i class="icon fontello">&#xea43;</i>
+             <div class="code">&amp;#xea43;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83c;</i>
+             <div class="code">&amp;#xe83c;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc1;</i>
+             <div class="code">&amp;#xebc1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe995;</i>
+             <div class="code">&amp;#xe995;</div>
+           </li>
+       <li><i class="icon fontello">&#xe838;</i>
+             <div class="code">&amp;#xe838;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99b;</i>
+             <div class="code">&amp;#xe99b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe901;</i>
+             <div class="code">&amp;#xe901;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c1;</i>
+             <div class="code">&amp;#xe9c1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c0;</i>
+             <div class="code">&amp;#xe9c0;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb05;</i>
+             <div class="code">&amp;#xeb05;</div>
+           </li>
+       <li><i class="icon fontello">&#xe879;</i>
+             <div class="code">&amp;#xe879;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c6;</i>
+             <div class="code">&amp;#xe9c6;</div>
+           </li>
+       <li><i class="icon fontello">&#xea44;</i>
+             <div class="code">&amp;#xea44;</div>
+           </li>
+       <li><i class="icon fontello">&#xe910;</i>
+             <div class="code">&amp;#xe910;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9a0;</i>
+             <div class="code">&amp;#xe9a0;</div>
+           </li>
+       <li><i class="icon fontello">&#xe84a;</i>
+             <div class="code">&amp;#xe84a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe849;</i>
+             <div class="code">&amp;#xe849;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99f;</i>
+             <div class="code">&amp;#xe99f;</div>
+           </li>
+       <li><i class="icon fontello">&#xead4;</i>
+             <div class="code">&amp;#xead4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9c4;</i>
+             <div class="code">&amp;#xe9c4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9bf;</i>
+             <div class="code">&amp;#xe9bf;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1e;</i>
+             <div class="code">&amp;#xea1e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb5e;</i>
+             <div class="code">&amp;#xeb5e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea19;</i>
+             <div class="code">&amp;#xea19;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8d1;</i>
+             <div class="code">&amp;#xe8d1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe81c;</i>
+             <div class="code">&amp;#xe81c;</div>
+           </li>
+       <li><i class="icon fontello">&#xe981;</i>
+             <div class="code">&amp;#xe981;</div>
+           </li>
+       <li><i class="icon fontello">&#xe8bf;</i>
+             <div class="code">&amp;#xe8bf;</div>
+           </li>
+       <li><i class="icon fontello">&#xea06;</i>
+             <div class="code">&amp;#xea06;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb40;</i>
+             <div class="code">&amp;#xeb40;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb3d;</i>
+             <div class="code">&amp;#xeb3d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea07;</i>
+             <div class="code">&amp;#xea07;</div>
+           </li>
+       <li><i class="icon fontello">&#xea03;</i>
+             <div class="code">&amp;#xea03;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d7;</i>
+             <div class="code">&amp;#xe9d7;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d8;</i>
+             <div class="code">&amp;#xe9d8;</div>
+           </li>
+       <li><i class="icon fontello">&#xe885;</i>
+             <div class="code">&amp;#xe885;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d1;</i>
+             <div class="code">&amp;#xe9d1;</div>
+           </li>
+       <li><i class="icon fontello">&#xe886;</i>
+             <div class="code">&amp;#xe886;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d2;</i>
+             <div class="code">&amp;#xe9d2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe887;</i>
+             <div class="code">&amp;#xe887;</div>
+           </li>
+       <li><i class="icon fontello">&#xea1b;</i>
+             <div class="code">&amp;#xea1b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe975;</i>
+             <div class="code">&amp;#xe975;</div>
+           </li>
+       <li><i class="icon fontello">&#xe80c;</i>
+             <div class="code">&amp;#xe80c;</div>
+           </li>
+       <li><i class="icon fontello">&#xebcc;</i>
+             <div class="code">&amp;#xebcc;</div>
+           </li>
+       <li><i class="icon fontello">&#xebb3;</i>
+             <div class="code">&amp;#xebb3;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb8d;</i>
+             <div class="code">&amp;#xeb8d;</div>
+           </li>
+       <li><i class="icon fontello">&#xea49;</i>
+             <div class="code">&amp;#xea49;</div>
+           </li>
+       <li><i class="icon fontello">&#xe912;</i>
+             <div class="code">&amp;#xe912;</div>
+           </li>
+       <li><i class="icon fontello">&#xe996;</i>
+             <div class="code">&amp;#xe996;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc2;</i>
+             <div class="code">&amp;#xebc2;</div>
+           </li>
+       <li><i class="icon fontello">&#xe839;</i>
+             <div class="code">&amp;#xe839;</div>
+           </li>
+       <li><i class="icon fontello">&#xebc3;</i>
+             <div class="code">&amp;#xebc3;</div>
+           </li>
+       <li><i class="icon fontello">&#xe997;</i>
+             <div class="code">&amp;#xe997;</div>
+           </li>
+       <li><i class="icon fontello">&#xe83a;</i>
+             <div class="code">&amp;#xe83a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9af;</i>
+             <div class="code">&amp;#xe9af;</div>
+           </li>
+       <li><i class="icon fontello">&#xe85f;</i>
+             <div class="code">&amp;#xe85f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe99a;</i>
+             <div class="code">&amp;#xe99a;</div>
+           </li>
+       <li><i class="icon fontello">&#xeace;</i>
+             <div class="code">&amp;#xeace;</div>
+           </li>
+       <li><i class="icon fontello">&#xe841;</i>
+             <div class="code">&amp;#xe841;</div>
+           </li>
+       <li><i class="icon fontello">&#xe834;</i>
+             <div class="code">&amp;#xe834;</div>
+           </li>
+       <li><i class="icon fontello">&#xebbe;</i>
+             <div class="code">&amp;#xebbe;</div>
+           </li>
+       <li><i class="icon fontello">&#xe994;</i>
+             <div class="code">&amp;#xe994;</div>
+           </li>
+       <li><i class="icon fontello">&#xe992;</i>
+             <div class="code">&amp;#xe992;</div>
+           </li>
+       <li><i class="icon fontello">&#xe90a;</i>
+             <div class="code">&amp;#xe90a;</div>
+           </li>
+       <li><i class="icon fontello">&#xe976;</i>
+             <div class="code">&amp;#xe976;</div>
+           </li>
+       <li><i class="icon fontello">&#xe87e;</i>
+             <div class="code">&amp;#xe87e;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb0b;</i>
+             <div class="code">&amp;#xeb0b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe92e;</i>
+             <div class="code">&amp;#xe92e;</div>
+           </li>
+       <li><i class="icon fontello">&#xea39;</i>
+             <div class="code">&amp;#xea39;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9d4;</i>
+             <div class="code">&amp;#xe9d4;</div>
+           </li>
+       <li><i class="icon fontello">&#xe889;</i>
+             <div class="code">&amp;#xe889;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb16;</i>
+             <div class="code">&amp;#xeb16;</div>
+           </li>
+       <li><i class="icon fontello">&#xea4f;</i>
+             <div class="code">&amp;#xea4f;</div>
+           </li>
+       <li><i class="icon fontello">&#xe91b;</i>
+             <div class="code">&amp;#xe91b;</div>
+           </li>
+       <li><i class="icon fontello">&#xe9da;</i>
+             <div class="code">&amp;#xe9da;</div>
+           </li>
+       <li><i class="icon fontello">&#xe88b;</i>
+             <div class="code">&amp;#xe88b;</div>
+           </li>
+       <li><i class="icon fontello">&#xeb1b;</i>
+             <div class="code">&amp;#xeb1b;</div>
+           </li>
+     </ul>
+        
+        
+  
+  <div class="helps">
+            第一步：使font-icon自定义属性
+    <pre>
+&lt;script src=&quot;/assets/core/boot.js&quot; font-icon=&quot;1&quot;&gt;&lt;/script&gt;
+</pre>
+
+第二步：挑选相应图标并获取字体编码，应用于页面
+<pre>
+<i class="ficon fontello">&#xeb3c;</i> &lt;i class="ficon fontello"&gt;&amp;#xeb3c;&lt;/i&gt;
+</pre>
+第三步：可以通CSS的font-size来控制图标大小 ， 可以通过CSS的color来控制图标的颜色 
+<pre>
+<i class="ficon fontello f18 red">&#xeb3c;</i> &lt;i class="ficon fontello f18 red"&gt;&amp;#xeb3c;&lt;/i&gt;
+</pre>
+       </div>
+  
+    </div>
+
+
+
+<script src="/assets/core/jquery.min.js"></script>
+<script src="/assets/core/boot.js" debug="1" ></script>
+<script>
+	
+jQuery(document).ready(function(){
+	/*var ul = $("#iconList");
+	var str1 = "";
+	$('.i-code').each(function(index, element) {
+        var me = $(this),str = '<li>';
+		var icode1 = me.text();
+		var icode2 = '&amp;#'+icode1.substring(2);
+		//Ls.log.add('icode1 = ' + icode1 + ', icode2=' + icode2);
+		str += '<i class="icon fontello">' +icode1+'</i>' ;
+		str += '<div class="code">' + icode2 +'</div>' ;
+		str += '</li>';
+		ul.append(str);
+		str1 += str;
+    });
+	Ls.log.add(str1);*/
+});
+
+</script>
+
+  
+  </body>
+</html>

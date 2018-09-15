@@ -1,0 +1,125 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<style>
+    .device-wrap {
+        display: none;
+        font-size: 0.85rem;
+        line-height: 1.05rem;
+    }
+
+    .device-wrap {
+        margin: 0 auto;
+        position: relative;
+        display: block;
+        width: 395px;
+        height: 813px;
+        font-family: "Helvetica Neue", sans-serif;
+        background-image: url("/assets/images/device-sprite.png");
+        background-size: 300%;
+        background-repeat: no-repeat;
+        background-position: -395px 0;
+        -webkit-transition: background-image 0.1s linear;
+        transition: background-image 0.1s linear;
+    }
+
+    .device-wrap.device-fixed {
+        position: fixed;
+        right: auto;
+    }
+
+    .device-wrap .device-content {
+        position: absolute;
+        top: 117px;
+        left: 37px;
+        width: 321px;
+        height: 569px;
+        overflow: hidden;
+        font-size: 0.85rem;
+        line-height: 1.05rem;
+        background: #eeeeee;
+    }
+
+    .device-wrap .content,
+    .device-wrap .bar,
+    .device-wrap .modal {
+        position: absolute;
+    }
+
+    .device-wrap iframe {
+        border: 0;
+    }
+</style>
+<div class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="pd10">
+            <div class="device-wrap">
+                <div class="device-content">
+                    <div id="iwindow">
+                        <iframe id="deviceCfg" src="$!{rc.contextPath}/mobilecfg/deviceCfg" width="321" height="569" frameBorder="0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        pageIndex: 0,
+        pageSize: 10
+    };
+
+    $(document).ready(function () {
+
+        /*$('#iwindow').on('mousedown', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var obj = $(this),
+                el = obj[0];
+
+            if (1 == e.which) {
+                var x, cx, dx;
+                dx = cx = obj.offset().left;
+                x = e.clientX - dx;
+
+                //绑定鼠标移动事件
+                $(document).on('mousemove', function (e) {
+                    cx = e.clientX <= 0 ? 0 : e.clientX >= $(window).width() ? $(window).width() : e.clientX;
+
+                    console.info(cx)
+
+                    obj.css({
+                        marginLeft: cx - x
+                    });
+
+                }).on('mouseup', function () {
+
+                    $(document).off('mousemove').off('mouseup');
+
+                });
+
+            }
+        });*/
+
+    });
+
+    function configOpt(e) {
+        var record = e.record;
+        var btn = '<button type="button" class="btn btn-default btn-sm btn-config" onclick="funConfig(\'' + record.itemType + '\',\'' + record.itemName + '\')">配置</button>';
+        return btn;
+    }
+
+    function funConfig(type, itemName) {
+        Ls.openWin('/mobilecfg/configEdit?configType=' + type + '&configName=' + itemName, '400px', '400px', {
+            id: 'config',
+            title: '配置',
+            padding: 0
+        });
+    }
+
+</script>
+</body>
+</html>

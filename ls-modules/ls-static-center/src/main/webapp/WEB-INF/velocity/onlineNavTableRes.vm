@@ -1,0 +1,34 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+<script>
+    function downLoad(mongdbid) {
+        document.getElementById("downLoad").src = "$!{rc.contextPath}/download/" + mongdbid;
+    }
+</script>
+#if($page.data.size()>0)
+#foreach($eo in $!{page.data})
+    <li><a class="left" href="#" onclick="downLoad('$!{eo.uploadUrl}')" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        ##<span class="unit">$!{eo.organName}</span>
+        <span class="right date">#date_format("$!{eo.joinDate}.0","$!{paramObj.dateFormat}")</span>
+    </li>
+#end
+#else
+    #if("$!{paramObj.result}" != "")
+        $!{paramObj.result}
+    #else
+        暂无相关数据
+    #end
+#end
+#if($!{page.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_table_res" class="pagination"></div>
+    <script>
+        Ls.pagination("#page_table_res", function (pageIndex) {
+            location.href = "/content/column/$!{columnId}?guideId=$!{guideId}&pageIndex=" + pageIndex;
+        }, {
+            pageCount:$!{page.pageCount},
+            currPage:$!{page.pageIndex} + 1
+        })
+    </script>
+#end
+<iframe style="display: none;" id="downLoad"></iframe>

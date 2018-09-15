@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>${title}</title>
+    <link href="$!{sysStaticPath}/assets/css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/weui.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <style>
+        body {
+            background-color: #fbf9fe
+        }
+
+        .page.cell .page_title {
+            color: #225fba;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page slideIn cell" id="form">
+    <div class="hd">
+        <h1 class="page_title">${title}</h1>
+    </div>
+    <div class="bd">
+        <div class="weui_cells_title">受理单位</div>
+        <div class="weui_cells">
+            <div class="weui_cell weui_cell_select">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <select class="weui_select" name="select1" id="recOrg">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_cells_title">留言类型</div>
+        <div class="weui_cells">
+            <div class="weui_cell weui_cell_select">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <select class="weui_select" name="select1" id="type">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_cells_title">标题</div>
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell" ms-class="weui_cell_warn:title_warn">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <input class="weui_input" type="text" value="" placeholder="标题不能为空" ms-duplex="title" id="title">
+                </div>
+                <div class="weui_cell_ft" ms-if="title_warn">
+                    <i class="weui_icon_warn"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_cells_title">内容</div>
+        <div class="weui_cells weui_cells_form">
+            <div class="weui_cell">
+                <div class="weui_cell_bd weui_cell_primary">
+                    <textarea class="weui_textarea" placeholder="请输入内容" rows="3" id="content"></textarea>
+                    <!-- <div class="weui_textarea_counter"><span>0</span>/200</div>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="weui_btn_area">
+            <a class="weui_btn weui_btn_primary" href="javascript:" id="showTooltips" ms-click="doSub">确定</a>
+            <!-- <a href="javascript:window.history.back(-1);" class="weui_btn weui_btn_default" id="">返回</a>-->
+        </div>
+
+
+    </div>
+</div>
+
+<div class="page slideIn msg" id="msg" hidden>
+    <div class="weui_msg">
+        <div class="weui_icon_area"><i class="weui_icon_success weui_icon_msg"></i></div>
+        <div class="weui_text_area">
+            <h2 class="weui_msg_title">操作成功</h2>
+            <p class="weui_msg_desc"></p>
+        </div>
+        <div class="weui_opr_area">
+            <p class="weui_btn_area">
+                <a class="weui_btn weui_btn_primary" href="/webAuth/$!{siteId}/$!{columnId}/login/?state=interactlist">确定</a>
+                <!-- <a class="weui_btn weui_btn_default" href="javascript:;">取消</a>-->
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/avalon.mobile-min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/pages/wechartweb/wx_mgr.js"></script>
+<script>
+
+    var cmm = {
+        siteId: '$!{siteId}',
+        columnId: '$!{columnId}',
+        openId: '$!{openId}',
+        personName: '$!{nickname}'
+    }
+
+    $(document).ready(function () {
+        wx_mgr.postForm();
+        getRecOrgList();
+        getType();
+    });
+
+    getRecOrgList = function () {
+        jQuery.ajax({
+            url: "/webAuth/getRecOrgList",
+            dataType: "json",
+            data: {
+                columnId: '$!{columnId}'
+            }
+        }).done(function (d) {
+            var data = d.data;
+            var html = "";
+            for (var i = 0; i < data.length; i++) {
+                html += "<option value='" + data[i].recUnitId + "'>" + data[i].recUnitName + "</option>";
+            }
+            $("#recOrg").html(html);
+        }).done(function () {
+
+        })
+    }
+    getType = function () {
+        jQuery.ajax({
+            url: "/webAuth/getType",
+            dataType: "json",
+            data: {
+                columnId: '$!{columnId}'
+            }
+        }).done(function (d) {
+            var data = d.data;
+            var html = "";
+            for (var i = 0; i < data.length; i++) {
+                if ('$!{type}' == data[i].classCode) {
+                    html += "<option value='" + data[i].classCode + "' selected>" + data[i].className + "</option>";
+                } else {
+                    html += "<option value='" + data[i].classCode + "'>" + data[i].className + "</option>";
+                }
+            }
+            $("#type").html(html);
+        }).done(function () {
+
+        })
+    }
+</script>
+</html>

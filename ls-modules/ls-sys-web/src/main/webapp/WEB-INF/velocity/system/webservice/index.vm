@@ -1,0 +1,131 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-5">
+                    <button id="adduser_btn" class="btn btn-default btn-add" onclick="addPage()"> 新 增</button>
+                    <button id="adduser_btn" class="btn btn-default btn-delete" onclick="del()"> 删 除</button>
+                </div>
+                <div class="col-md-7">
+                    <form class="form-inline tr search-toolbar" role="form" id="serviceForm">
+                        <div class="form-group">
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="关键词">
+                        </div>
+                        <button type="button" class="btn btn-default" onclick="searchService()">查询</button>
+                        <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" allowCellSelect="false" onlyCheckSelection="true"
+             idField="accessPolicyId" sizeList="[20,30,50]" pageSize="20" allowCellSelect="true" multiSelect="true"
+             url="/cmswebservice/getPage">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+				##<div field="systemName" width="80" headerAlign="center" align="center" allowSort="true">所属系统</div>
+                <div field="code" width="180" headerAlign="center" align="center" allowSort="true">编码</div>
+                <div field="uri" width="100%" headerAlign="center" align="left" allowSort="true">服务</div>
+                <div field="nameSpace" width="300" headerAlign="center" align="left" allowSort="true">命名空间</div>
+                <div field="createDate" width="130" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss"
+                     allowSort="true">创建时间
+                </div>
+                <div width="60" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+var cur = {
+	grid : null
+}
+$(document).ready(function(){
+    mini.parse();
+	cur.grid = mini.get("datagrid1");
+	cur.grid.load({dataFlag: 1});
+	//重置 datagrid 高度
+	Ls.mini_datagrid_height(cur.grid);
+});
+//描述
+function renderopt(e) {
+    var str = "";
+    var rec = e.record;
+    var editStr = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="editPage(' + rec.webServiceId + ')">修 改</button>';
+    return editStr;
+}
+var searchService = function () {
+    var searchText = $("#searchKey").val();
+    var systemCode = "";
+    var data = {
+        dataFlag: 1,
+        systemCode: systemCode,
+        systemName: searchText,
+        code: searchText,
+        uri: searchText,
+        nameSpace: searchText,
+        description: searchText
+    };
+    cur.grid.load(data);
+}
+var searchClear = function () {
+    $("#searchKey").val("");
+    var data = {dataFlag: 1};
+    cur.grid.load(data);
+}
+// 删除
+var del = function () {
+    var webServiceIds = [];
+    var selected = cur.grid.getSelecteds();
+    var length = selected.length;
+    if (length <= 0) {
+        Ls.tipsInfo("至少选择一项");
+        return;
+    }
+    for (var i = 0; i < length; i++) {
+        webServiceIds.push(selected[i].webServiceId);
+    }
+    if (confirm("您确定要删除选中的记录吗?")) {
+		Ls.ajaxGet({
+            url: "/cmswebservice/delete",
+            data: {
+                webServiceIds: webServiceIds
+            }
+        }).done(function (d) {
+            Ls.tips('删除成功!', {
+                icons: "success"
+            });
+            cur.grid.reload();
+        });
+    }
+}
+
+//新增服务
+var addPage = function () {
+	Ls.openWin('/cmswebservice/edit', '460px', '400px', {
+		id : 'webservice_button_edit',
+		title : "新增服务接口",
+		ok : function() {
+			var iframe = this.iframe.contentWindow;
+			if (!iframe.document.body) {
+				return false;
+			}
+			iframe.$("#" + iframe.cur.id).submit();
+			return false;
+		}
+	});
+};
+//修改
+var editPage = function (webServiceId) {
+	Ls.openWin('/cmswebservice/edit?webServiceId=' + webServiceId, '460px', '400px', {
+		id : 'webservice_button_edit',
+		title : "修改服务接口",
+		ok : function() {
+			var iframe = this.iframe.contentWindow;
+			if (!iframe.document.body) {
+				return false;
+			}
+			iframe.$("#" + iframe.cur.id).submit();
+			return false;
+		}
+	});
+};
+</script>

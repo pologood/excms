@@ -1,0 +1,105 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getHrefUseableDynamicPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div renderer="visitUrl" width="150" align="center" headerAlign="center" >链接</div>
+                        <div renderer="parentUrl" width="150" align="center" headerAlign="center" >父链接</div>
+                        <div field="monitorDate" width="120" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="respCode" width="60" align="center" headerAlign="center" >返回编码</div>
+                        <div field="" width="140" align="center" headerAlign="center" renderer="errDesc">结果</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="isIndex">是否首页</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="optDiy">定位</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            taskId:Ls.getWin.dialog.data("taskId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.params.taskId});
+    })
+
+    function visitUrl(obj) {
+        var record = obj.record;
+        return '<a href="' + record.visitUrl + '" target="_blank"><u>' + record.visitUrl + '</u></a>'
+    }
+
+    function parentUrl(obj) {
+        var record = obj.record;
+        return '<a href="' + record.parentUrl + '" target="_blank"><u>' + record.parentUrl + '</u></a>'
+    }
+
+    function errDesc(obj) {
+        var record = obj.record;
+        var errCode = record.respCode;
+        var desc = "错误链接";
+        if (errCode == '400') {
+            desc = "错误请求";
+        } else if (errCode == '403') {
+            desc = "服务器拒绝请求";
+        } else if (errCode == '404') {
+            desc = "服务器找不到请求的网页";
+        } else if (errCode == '405') {
+            desc = "禁用请求中指定的方法";
+        } else if (errCode == '406') {
+            desc = "无法使用请求的内容特性响应请求的网页";
+        } else if (errCode == '407') {
+            desc = "指定请求者应当授权使用代理";
+        } else if (errCode == '408') {
+            desc = "服务器等候请求时发生超时";
+        } else if (errCode == '409') {
+            desc = "服务器在完成请求时发生冲突";
+        } else if (errCode == '410') {
+            desc = "资源已删除";
+        } else if (errCode == '500') {
+            desc = "服务器遇到错误，无法完成请求";
+        } else if (errCode == '501') {
+            desc = "服务器不具备完成请求的功能";
+        } else if (errCode == '502') {
+            desc = "错误网关";
+        } else if (errCode == '503') {
+            desc = "服务不可用";
+        } else if (errCode == '504') {
+            desc = "网关超时";
+        } else if (errCode == '505') {
+            desc = "HTTP 版本不受支持";
+        }
+        return desc;
+    }
+
+    function isIndex(obj) {
+        var rec = obj.record;
+        var isIndex = rec.isIndex;
+        if(isIndex == 0) {
+            return '<font style="color:green">否</font>';
+        } else {
+            return '<span style="color: red">是</span>';
+        }
+    }
+
+    function optDiy(obj) {
+        var record = obj.record;
+        var location = '<a href="/href/useable/errLocation?resultId=' + record.id + '" target="_blank"><img src="$!{rc.contextPath}/assets/images/location.png" border="0" title="页面定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var code = '<a href="/href/useable/htmlLocation?resultId=' + record.id + '" target="_blank"><img src="$!{rc.contextPath}/assets/images/code.png" border="0" title="源码定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        return location + code;
+    }
+</script>

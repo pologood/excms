@@ -1,0 +1,759 @@
+<style>
+    .sp_result_area {
+        width: auto;
+        min-width: 350px;
+        padding: 10px 0;
+    }
+
+    .w350 {
+        width: 350px !important;
+    }
+
+</style>
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box">
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn"
+                                        onclick="cur.typeCode == 'messageBoard' ? batchCancelPublish_messageBoard() : batchCancelPublish()">
+                                        <a href="javascript:;">批量取消发布</a></li>
+
+                                    <li class="publishBtn" id="batchMove_news" style="display: none"
+                                        onclick="batchMove_news()"><a href="javascript:;">批量移动</a></li>
+
+                                    <li class="publishBtn"
+                                        onclick="cur.typeCode == 'messageBoard' ? batchDelete_messageBoard() : batchDelete()">
+                                        <a href="javascript:;">批量删除</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                ##                                    <select type="text" id="columnCode" name="columnCode" class="form-control"
+                                ##                                            data-rule="必填项:required;columnCode" placeholder="必填项"></select>
+                                    <div id="selectWrap">
+                                        <input type="text" name="columnCode" id="columnCode" class="form-control w350" data-rule="必填项:required;columnCode"
+                                               placeholder="请输入栏目名检索或选择栏目">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control"
+                                           placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()"> 搜 索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                #if("$!{showType}"=="publicInfo")
+                    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;"
+                         onPageChanged="onPageChanged"
+                         collapseGroupOnLoad="false"
+                         allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                         url="/public/content/getUnAuditContents" sizeList="[10,20,30,50]" pageSize="10"
+                         idField="id" multiSelect="true">
+                        <div property="columns">
+                            <div type="checkcolumn"></div>
+                            <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                            <div field="organName" width="200" headerAlign="center" align="center">部门</div>
+                            <div field="organName" width="200" headerAlign="center" align="center">所属目录</div>
+                            <div field="" width="100%" headerAlign="center" renderer="goLink">标题</div>
+                            <div field="createDate" width="140" headerAlign="center" align="center"
+                                 dateFormat="yyyy-MM-dd HH:mm:ss">发文日期
+                            </div>
+                            <div field="" width="135" headerAlign="center" renderer="renderOpt" align="center">操作</div>
+                        </div>
+                    </div>
+                #else
+                    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;"
+                         onPageChanged="onPageChanged"
+                         collapseGroupOnLoad="false"
+                         allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                         url="/content/getUnAuditContents" sizeList="[10,20,30,50]" pageSize="10"
+                         idField="id" multiSelect="true">
+                        <div property="columns">
+                            <div type="checkcolumn"></div>
+                            <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                            <div field="columnName" width="200" headerAlign="center" align="center">所属栏目</div>
+                            <div field="" width="100%" headerAlign="center" renderer="goLink">标题</div>
+                            <div field="createDate" width="140" headerAlign="center" align="center"
+                                 dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                            </div>
+                            <div name="rspGuest" width="55" headerAlign="center" renderer="rspGuest" align="center">回复
+                            </div>
+                            <div field="" width="135" headerAlign="center" renderer="renderOpt" align="center">操作</div>
+                        </div>
+                    </div>
+                #end
+            </div>
+        </div>
+    </div>
+</div>
+<script type="template" id="todo_nav">
+    <ul class="sidebar-nav">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <li>
+            <a href="javascript:;" data-code="<?==el.typeCode?>"> <?==el.typeName?>
+                <span id="badge_<?==el.typeCode?>" class="badge badge-info"><?==el.count?></span>
+            </a>
+        </li>
+        <?}?>
+    </ul>
+
+</script>
+
+<script src="$!{sysStaticPath}/assets/js/plugins/selectPage/selectpage.min.js"></script>
+
+<script>
+    mini.parse();
+
+    var isSuper = '$!{isSuper}';
+
+    var cur = {
+        //columnCode: $("#columnCode"),
+        grid: mini.get("datagrid1"),
+        dialog: Ls.getWin.dialog,
+        // hides: ['public_content', 'ordinaryPage', 'survey', 'linksMgr', 'leaderInfo', 'fileDownload', 'interviewInfo', 'collectInfo', 'reviewInfo', 'onlinePetition', 'workGuide', 'sceneService', 'bbs','commonProblem'],
+        #if("$!{showType}"=="info")
+            shows: ['articleNews', 'pictureNews', 'videoNews'],
+        #elseif("$!{showType}"=="guestbook" || "$!{showType}"=="guestBook")
+            shows: ['guestBook'],
+        #elseif("$!{showType}"=="todayPublish")
+            shows: ['todayPublish'],
+        #elseif("$!{showType}"=="publicInfo")
+            shows: ['DRIVING_PUBLIC', 'PUBLIC_APPLY'],
+        #else
+            shows: ['articleNews', 'pictureNews', 'videoNews', 'guestBook', 'messageBoard'],
+        #end
+        typeCode: '$!{typeCode}',
+        showType: '$!{showType}',
+        isDividePublic: '$!{isDividePublic}',
+        publicColumnId: '$!{publicColumnId}',
+    }
+
+    var gridParam = {
+        dataFlag: 1,
+        pageIndex: 0,
+        pageSize: 20
+    };
+
+    $(document).ready(function () {
+        //cur.grid.load(gridParam);
+        //重置 datagrid 高度
+
+        Ls.mini_datagrid_height(cur.grid);
+
+        loadTodoNum().done(function () {
+            var todoMenu;
+            todoMenu = $('.sidebar-nav').on('click', 'a', function () {
+                $("#searchKey").val("");
+                gridParam.title = '';
+                var $this =
+                $(this), code = $this.data("code");
+                    $this.parent('li').addClass('active').siblings().removeClass('active');
+                searchByTypeCode(code);
+                cur.typeCode = code;
+                if (cur.typeCode == "articleNews" || cur.typeCode == "pictureNews") {
+                    $("#batchMove_news").removeAttr("style");
+                } else {
+                    $("#batchMove_news").attr("style", "display:none;");
+                }
+                #if("$!{showType}"=="publicInfo")
+                    getUnAuditOrgans();
+                #else
+                    getUnAuditColumns();
+                #end
+                if (cur.typeCode != "guestBook" && cur.typeCode != "messageBoard") {
+                    cur.grid.hideColumn("rspGuest");
+                } else {
+                    cur.grid.showColumn("rspGuest");
+                }
+            })
+
+            if (cur.typeCode) {
+                todoMenu.find('a[data-code="' + cur.typeCode + '"]').trigger('click');
+            } else {
+                todoMenu.find('a:first').trigger('click');
+            }
+
+        });
+
+        $("#columnCode").selectPage({
+            showField: 'name',
+            keyField: 'id',
+            pagination: false, //关闭分页后，将会在列表中显示所有数据，上限为200个项目
+            listSize: 15, //关闭分页的状态下，列表显示的项目个数，其它的项目以滚动条滚动方式展现
+            data: []
+        });
+
+    });
+
+    function rspGuest(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.typeCode != null && rec.typeCode == "messageBoard") {
+            return str += '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="reply_messageBoard(' + rec.baseContentId + ',' + rec.columnId + ',' + rec.id + ',' + rec.isSuper + ')">回 复</button> ';
+        } else {
+            return str += '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="reply(' + rec.id + ',' + rec.columnId + ')">回 复</button> ';
+        }
+    }
+
+    //操作
+    function renderOpt(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.typeCode != null && rec.typeCode == 'messageBoard') {
+            str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="details_messageBoard(' + rec.baseContentId + ',' + rec.columnId + ')">详 情</button> ';
+            if (cur.typeCode == 'todayPublish') {
+                str += '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchCancelPublish_messageBoard(' + rec.baseContentId + ',' + rec.columnId + ')">取消发布</button> ';
+            } else {
+                str += '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchPublish_messageBoard(' + rec.baseContentId + ',' + rec.columnId + ')">发 布</button> ';
+            }
+        } else {
+            str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="details(' + rec.id + ',\'' + rec.typeCode + '\',' + rec.columnId + ')">详 情</button> ';
+            if (cur.typeCode == 'todayPublish') {
+                str += '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchCancelPublish(' + rec.id + ',' + rec.columnId + ')">取消发布</button> ';
+            } else {
+                str += '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchPublish(' + rec.id + ',' + rec.columnId + ')">发 布</button> ';
+            }
+        }
+
+        return str;
+    }
+
+    function goLink(e) {
+        var rec = e.record
+        var str = "";
+        if (rec.redirectLink != null && rec.redirectLink != "") {
+            str = '<a target="_blank" href="' + rec.redirectLink + '"><u>' + rec.title + '</u></a>';
+        } else {
+            if (rec.typeCode == "messageBoard") {
+                //str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.baseContentId + '"><u>' + rec.title + '</u></a>';
+                str = rec.title;
+            } else {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.id + '"><u>' + rec.title + '</u></a>';
+            }
+        }
+        return str;
+    }
+
+    //后台打开回复弹窗
+    function reply(id, columnId) {
+        Ls.openWin('/guestBook/guestBookReply?id=' + id + '&&columnId=' + columnId, '600px', '380px', {
+            id: 'reply',
+            title: '回复留言',
+            padding: 0,
+            close: function (text) {
+                cur.grid.load(gridParam);
+                refreshTodoNum();
+            }
+        });
+
+    }
+
+    //后台打开回复弹窗--messageBoard
+    function reply_messageBoard(baseContentId, columnId, id, isSuper) {
+        Ls.openWin('/messageBoard/messageBoardReply?id=' + baseContentId + '&columnId=' + columnId + '&messageBoardId=' + id + '&isSuper=' + isSuper, '600px', '400px', {
+            id: 'reply',
+            title: '回复留言',
+            padding: 0,
+            close: function () {
+                cur.grid.load(gridParam);
+                refreshTodoNum();
+            }
+        });
+    }
+
+    function loadTodoNum() {
+        return Ls.ajaxGet({
+            url: "/todolist/loadTodoList",
+            data: {
+                shows: cur.shows.join(","),
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            },
+            success: function (resp) {
+                if (resp == null) {
+                    Ls.tipsErr("加载失败!");
+                } else {
+                    $('#todo_box').html(Ls.template("todo_nav", resp));
+                }
+            }
+        });
+    }
+
+    function refreshTodoNum() {
+        return Ls.ajaxGet({
+            url: "/todolist/loadTodoNum",
+            data: {
+                typeCode: cur.typeCode,
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            },
+
+            success: function (resp) {
+                if (resp.status == 0) {
+                    Ls.tipsErr("加载失败!");
+                } else {
+                    $('#badge_' + cur.typeCode).html(resp.data);
+                }
+            }
+        });
+    }
+
+    //属性筛选
+    function searchByTypeCode(typeCode) {
+        cur.typeCode = typeCode;
+        gridParam.typeCode = typeCode;
+        gridParam.columnId = null;
+        gridParam.isDividePublic = cur.isDividePublic;
+        gridParam.publicColumnId = cur.publicColumnId;
+        cur.grid.load(gridParam);
+    }
+
+    //标题搜索
+    function search() {
+        var title = $("#searchKey").val();
+        var columnId = $("#columnCode").val();
+        gridParam.typeCode = cur.typeCode;
+        gridParam.title = title;
+        gridParam.columnId = columnId;
+        gridParam.pageIndex = cur.grid.pageIndex;
+        gridParam.pageSize = cur.grid.pageSize;
+        cur.grid.load(gridParam);
+    }
+
+    //显示全部
+    function showAll() {
+        $("#searchKey").val("");
+//        $("#columnCode").val("");
+        $('#columnCode').selectPageClear();
+        gridParam.title = '';
+        search();
+    }
+
+    //批量发布状态
+    function batchPublish(id, columnId) {
+        var check = [];
+        var columnIds = [];
+
+        if (id != null) {
+            check.push(id);
+        }
+
+        if (columnId != null) {
+            columnIds.push(columnId);
+        }
+
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一项操作!");
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].id);
+            columnIds.push(rows[i].columnId);
+        }
+
+        if (confirm("确定发布,发布后将不在待办事项中显示?")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    columnIds: columnIds,
+                    siteId: GLOBAL_SITEID
+                },
+                url: "/todolist/batchPublish",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips("正在生成处理中");
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    function batchMove_news() {// 批量移动
+        var check = [];
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一条记录!");
+            return;
+        }
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].id);
+        }
+        moveById(check);
+    }
+
+
+    function moveById(id) {
+        console.log(id)
+        var i = "移动";
+        var r = "/content/toMove?contentId=" + id + "&source=1&type=1";
+        Ls.openWin(r, "400px", "400px", {
+            id: "copy_refer_page",
+            title: i + "到",
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.ok();
+                data.contentId = id.toString();
+                data.type = 1;
+                Ls.ajax({
+                    url: "/content/move",
+                    data: data
+                }).done(function (e) {
+                    if (e.status) {
+                        Ls.tipsOk(i + "成功!")
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tipsErr(e.desc);
+                    }
+                })
+            }
+        })
+
+    }
+
+    //批量发布状态--messageBoard
+    function batchPublish_messageBoard(baseContentId, columnId) {
+        var check = [];
+        var columnIds = [];
+
+        if (baseContentId != null) {
+            check.push(baseContentId);
+        }
+
+        if (columnId != null) {
+            columnIds.push(columnId);
+        }
+
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一项操作!");
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].baseContentId);
+            columnIds.push(rows[i].columnId);
+        }
+
+        if (confirm("确定发布?")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    columnIds: columnIds,
+                    siteId: GLOBAL_SITEID
+                },
+                url: "/todolist/batchPublish",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips(text.desc);
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    //批量取消发布状态
+    function batchCancelPublish(id, columnId) {
+        var check = [];
+        var columnIds = [];
+
+        if (id != null) {
+            check.push(id);
+        }
+
+        if (columnId != null) {
+            columnIds.push(columnId);
+        }
+
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一项操作!");
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].id);
+            columnIds.push(rows[i].columnId);
+        }
+
+        if (confirm("确定取消发布?")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    columnIds: columnIds,
+                    siteId: GLOBAL_SITEID
+                },
+                url: "/todolist/batchCancelPublish",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips("正在生成处理中");
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    //批量取消发布状态--messageBoard
+    function batchCancelPublish_messageBoard(baseContentId, columnId) {
+        var check = [];
+        var columnIds = [];
+
+        if (baseContentId != null) {
+            check.push(baseContentId);
+        }
+
+        if (columnId != null) {
+            columnIds.push(columnId);
+        }
+
+        var rows = cur.grid.getSelecteds();
+        if (check.length <= 0 && rows.length <= 0) {
+            Ls.tips("至少选择一项操作!");
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            check.push(rows[i].baseContentId);
+            columnIds.push(rows[i].columnId);
+        }
+
+        if (confirm("确定取消发布?")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    columnIds: columnIds,
+                    siteId: GLOBAL_SITEID
+                },
+                url: "/todolist/batchCancelPublish",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips(text.desc);
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    function batchDelete(id) {
+        var ids = [];
+        if (id != null) {
+            ids.push(id);
+        }
+        var rows = cur.grid.getSelecteds();
+        if (ids.length <= 0 && rows.length <= 0) {
+            Ls.tipsInfo("请至少选择一项操作");
+            return;
+        }
+        for (var i = 0, l = rows.length; i < l; i++) {
+            ids.push(rows[i].id);
+        }
+        if (confirm("确定批量删除所选项？")) {
+            Ls.ajaxGet({
+                type: "POST",
+                data: {
+                    ids: ids
+                },
+                url: "/todolist/batchDelete",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips("删除完成，正在生成处理中");
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    function batchDelete_messageBoard(baseContentId) {
+        var ids = [];
+        if (baseContentId != null) {
+            ids.push(baseContentId);
+        }
+        var rows = cur.grid.getSelecteds();
+        if (ids.length <= 0 && rows.length <= 0) {
+            Ls.tipsInfo("请至少选择一项操作");
+            return;
+        }
+        for (var i = 0, l = rows.length; i < l; i++) {
+            ids.push(rows[i].baseContentId);
+        }
+        if (confirm("确定批量删除所选项？")) {
+            Ls.ajaxGet({
+                type: "POST",
+                data: {
+                    ids: ids
+                },
+                url: "/todolist/batchDelete",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips("删除完成，正在生成处理中");
+                        cur.grid.load(gridParam);
+                        refreshTodoNum();
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    //打开详情窗口
+    function details(id, typeCode, columnId) {
+        cur.typeCode = typeCode;
+        cur.dialog.data('siteId', GLOBAL_SITEID);
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/todolist/showDetail?typeCode=' + typeCode + '&columnId=' + columnId + '&id=' + id, {
+            id: 'record',
+            title: '内容详情',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+        });
+    }
+
+    //打开详情窗口--messageBoard
+    function details_messageBoard(baseContentId, columnId) {
+        cur.dialog.data('siteId', GLOBAL_SITEID);
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/messageBoard/modify?id=' + baseContentId + '&&columnId=' + columnId + '&&type=2', '650px', '540px', {
+            id: 'record',
+            title: '内容详情',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+        });
+    }
+
+    function callBack(msg) {
+        Ls.tips(msg);
+        cur.grid.load(gridParam);
+    }
+
+    function getUnAuditOrgans() {
+        //cur.columnCode.empty();
+        $('#columnCode').selectPageClear();
+
+        Ls.ajaxGet({
+            url: "/content/getUnAuditColumns",
+        }).done(function (response) {
+
+//            var str = '<option value=""> 请选择栏目 </option> ';
+//            if (response != null && response.data != null) {
+//                var data = response.data;
+//                var length = data.length;
+//                if (length > 0) {
+//                    for (i = 0; i < length; i++) {
+//                        str += ' <option value=' + data[i].columnId + '>' + data[i].columnName + '</option> '
+//                    }
+//                }
+//            }
+//            cur.columnCode.append(str);
+
+            var data = [];
+            if (response.status == 1) {
+                var responseData = response.data;
+                for (var i = 0, l = responseData.length; i < l; i++) {
+                    var d = responseData[i];
+                    data.push({id: d.columnId, name: d.columnName, desc: d.columnName});
+                }
+            } else {
+                Ls.tipsErr(response.desc);
+            }
+
+            $("#columnCode").selectPageData(data);
+
+        });
+    }
+
+    function getUnAuditColumns() {
+        var codeType = cur.typeCode;
+        if (isSuper == 1 && cur.typeCode == 'guestBook') {
+            codeType = 'messageBoard';
+        }
+        //cur.columnCode.empty();
+        $('#columnCode').selectPageClear();
+
+        Ls.ajaxGet({
+            url: "/content/getUnAuditColumns",
+            data: {
+                typeCode: codeType,
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            }
+        }).done(function (response) {
+
+//            var str = '<option value=""> 请选择栏目 </option> ';
+//            if (response != null && response.data != null) {
+//                var data = response.data;
+//                var length = data.length;
+//                if (length > 0) {
+//                    for (i = 0; i < length; i++) {
+//                        str += ' <option value=' + data[i].columnId + '>' + data[i].columnName + '</option> '
+//                    }
+//                }
+//            }
+//            cur.columnCode.append(str);
+
+            var data = [];
+            if (response.status == 1) {
+                var responseData = response.data;
+                for (var i = 0, l = responseData.length; i < l; i++) {
+                    var d = responseData[i];
+                    data.push({id: d.columnId, name: d.columnName, desc: d.columnName});
+                }
+            } else {
+                Ls.tipsErr(response.desc);
+            }
+
+            $("#columnCode").selectPageData(data);
+        });
+    }
+</script>

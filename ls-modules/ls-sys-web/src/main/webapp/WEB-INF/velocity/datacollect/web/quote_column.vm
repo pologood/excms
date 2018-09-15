@@ -1,0 +1,81 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" style="background-color: #fdfdfd">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="quote_data" role="form" ms-controller="quote_data">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>引用到</label>
+                            <input type="text" id="columnId" name="columnId" style="display: none" value="$!{columnId}" ms-duplex="columnId">
+                            <input type="text" id="cSiteId" name="cSiteId" style="display: none" value="$!{cSiteId}" ms-duplex="cSiteId">
+                            <input type="text" id="columnName" name="columnName" class="form-control readonly" readonly value="$!{columnName}" ms-duplex="columnName">
+
+                            <div class="mt10">
+                                <ul id="ui_tree" class="ztree"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/datacollect/quote_column_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "quote_data",
+        win:Ls.getWin.win,
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'all',className:'btn-back',focus:true,name:'确定',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'关闭',callback:function(){Ls.winClose();return false;}}
+        );
+        cur.model = Ls.initFORM(cur.vm_id, {});
+        setData(cur.model);
+        column_tree.init();
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function saveData() {
+        var columnId = cur.vm.columnId;
+        var cSiteId = cur.vm.cSiteId;
+        if(null == columnId || "" == columnId) {
+            Ls.tips("请选择栏目!",{icons:"info"});
+            return;
+        }
+        cur.win.quoteBack(columnId,cSiteId);
+        Ls.winClose();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>
+</body>
+</html>

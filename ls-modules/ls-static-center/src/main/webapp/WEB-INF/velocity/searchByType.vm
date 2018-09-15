@@ -1,0 +1,32 @@
+#if($!{show})
+    #if($!{paramObj.url}&&$!{paramObj.url}!="")
+        #set($url = $!{paramObj.url})
+    #else
+        #set($url = "/site/search/$!{siteId}")
+    #end
+<div class="searchType-title">搜索范围</div>
+<div class="searchType-column">
+    <ul>
+        <li class="class-title"><a
+            href="$!url?columnId=&columnIds=&typeCode=$!{typeCode}&beginDate=$!{beginDate}&endDate=$!{endDate}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=&datecode=$!{datecode}&sort=$!{sort}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}"
+            #if(("" == "$!{columnId}") && ("$!{excColumns}" == "")) class="active" #end
+        >全部</a>
+        </li>
+        #foreach($eo in $resultObj)
+            <li>
+                <a id="$!{eo.indicatorId}"
+                   href="$!url?columnId=$!{eo.indicatorId}&typeCode=$!{typeCode}&beginDate=$!{beginDate}&endDate=$!{endDate}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=$!{eo.excColumns}&datecode=$!{datecode}&sort=$!{sort}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}"
+                   target="_self"
+                    #if(("$!{eo.excColumns}" == "" && "$!{eo.indicatorId}" != "" && "$!{eo.indicatorId}" == "$!{columnId}") || ("" == "$!{eo.indicatorId}" && "$!{excColumns}" != ""))
+                   class="active" #end
+                >
+                    $!{eo.name}($!{eo.total})
+                </a>
+            </li>
+        #end
+    </ul>
+</div>
+#else
+<!--不加这段代码显示正在更新中 -->
+<div style="display: none"></div>
+#end

@@ -1,0 +1,18 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css}">
+    #set($title=$!{eo.title})
+    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="${title}" class="left">
+        #cutstr($title,$length)
+    </a>
+    <span class="right date">$!{eo.time}</span>
+</li>
+#end

@@ -1,0 +1,137 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="user_form" role="form" ms-controller="user_form">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>问题：</label>
+                    <input name="title" type="text" class="form-control" placeholder="问题不能为空" ms-duplex="title">
+                </div>
+
+                <div class="form-group">
+                    <label>类型：</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline">
+                            <input type="radio" name="options" value="1" ms-duplex-string="options" ms-attr-disabled="isUpdate" onclick="selectOption('1')">单选</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="options" value="2" ms-duplex-string="options" ms-attr-disabled="isUpdate" onclick="selectOption('2')">多选</label>
+                        <label class="radio-inline">
+                            <input type="radio" name="options" value="3" ms-duplex-string="options" ms-attr-disabled="isUpdate" onclick="selectOption('3')">文本</label>
+                    </div>
+                </div>
+
+                <div class="optionsCount form-group hide">
+                    <label>最多投票项数：</label>
+                    <input name="optionsCount" class="form-control w90" placeholder="" ms-duplex="optionsCount">
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        questionId: '$!{questionId}',
+        themeId: '$!{themeId}'
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/survey/question/getSurveyQuestion",
+                data: {
+                    id: cur.questionId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "user_form"
+                data.$id = cur.$id;
+                data.resetForm = function () {
+                    $("#user_form")[0].reset();
+                }
+                if (data.options == '2') {
+                    $(".optionsCount").removeClass("hide")
+                }
+                if (cur.questionId != '') {
+                    data.isUpdate = true
+                } else {
+                    data.isUpdate = false
+                }
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+
+            })
+        };
+
+        getData();
+
+    })
+
+    $('#user_form').validator({
+        rules: {
+            myRule: function (el, param, field) {
+                var isTrue = ( cur.vm.options == '2' ? true : false);
+                return isTrue;
+            }
+        },
+        fields: {
+            'title': '排序号:required;length[1~200]',
+            'optionsCount': '投项数:required(myRule);integer;range[2~99999];'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        data.themeId = cur.themeId;
+        data.optionsList = []
+        data.replys = []
+        var url = "/survey/question/save";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.winClose();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function selectOption(t) {
+        if (t == '2') {
+            $(".optionsCount").removeClass("hide")
+        } else {
+            $(".optionsCount").addClass("hide")
+        }
+    }
+</script>
+</body>
+</html>

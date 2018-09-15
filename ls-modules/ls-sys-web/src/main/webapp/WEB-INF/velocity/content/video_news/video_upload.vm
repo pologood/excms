@@ -1,0 +1,338 @@
+#parse("_page_layout/_header.vm")
+<style>
+    #content {
+        margin: 20px;
+    }
+
+    div.fieldset {
+        border: 1px solid #afe14c;
+        margin: 0px 0;
+        padding: 5px 0px 0px 0px;
+    }
+
+    div.fieldset span.legend {
+        position: relative;
+        background-color: #FFF;
+        padding: 3px;
+        left: 10px;
+        top: -14px;
+        font: 700 14px Arial, Helvetica, sans-serif;
+        color: #73b304;
+    }
+
+    div.flash {
+        margin: 15px 0px;
+        border-color: #D9E4FF;
+        -moz-border-radius-topleft: 5px;
+        -webkit-border-top-left-radius: 5px;
+        -moz-border-radius-topright: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-bottomleft: 5px;
+        -webkit-border-bottom-left-radius: 5px;
+        -moz-border-radius-bottomright: 5px;
+        -webkit-border-bottom-right-radius: 5px;
+    }
+
+    .progressWrapper {
+        overflow: hidden;
+    }
+
+    .progressContainer {
+        margin: 5px;
+        padding: 4px;
+        border: solid 1px #E8E8E8;
+        background-color: #F7F7F7;
+        overflow: hidden;
+    }
+
+    /* Message */
+    .message {
+        margin: 1em 0;
+        padding: 10px 20px;
+        border: solid 1px #FFDD99;
+        background-color: #FFFFCC;
+        overflow: hidden;
+    }
+
+    /* Error */
+    .red {
+        border: solid 1px #B50000;
+        background-color: #FFEBEB;
+    }
+
+    /* Current */
+    .green {
+        border: solid 1px #DDF0DD;
+        background-color: #EBFFEB;
+    }
+
+    /* Complete */
+    .blue {
+        border: solid 1px #CEE2F2;
+        background-color: #F0F5FF;
+    }
+
+    .progressName {
+        font-weight: 700;
+        color: #555;
+        width: 430px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .progressBarInProgress,
+    .progressBarComplete,
+    .progressBarError {
+        font-size: 0;
+        width: 0%;
+        height: 2px;
+        background-color: blue;
+        margin-top: 2px;
+    }
+
+    .progressBarComplete {
+        width: 100%;
+        background-color: green;
+        visibility: hidden;
+    }
+
+    .progressBarError {
+        width: 100%;
+        background-color: red;
+        visibility: hidden;
+    }
+
+    .progressBarStatus {
+        margin-top: 2px;
+        width: 430px;
+        /*font-size: 7pt;*/
+        font-family: Arial;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    a.progressCancel {
+        font-size: 0;
+        display: block;
+        height: 14px;
+        width: 14px;
+        background-image: url($!{sysStaticPath}/assets/images/cancelbutton.gif);
+        background-repeat: no-repeat;
+        background-position: -14px 0px;
+        float: right;
+    }
+
+    a.progressCancel:hover {
+        background-position: 0px 0px;
+    }
+
+    /* -- SWFUpload Object Styles ------------------------------- */
+    .swfupload {
+        vertical-align: top;
+    }
+
+    /* 页面加载的loading */
+    /*遮罩层*/
+    .ls-loading {
+        z-index: 65530;
+        display: block;
+        cursor: default;
+        background: #FFF;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0
+    }
+
+    .ls-loading-img {
+        position: absolute;
+        z-index: 65531;
+        top: 43%;
+        left: 50%;
+        background: url('$!{sysStaticPath}assets/images/bigloading.gif') no-repeat 0px 0px;
+        width: 48px;
+        height: 48px;
+        display: block;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="content">
+    <form id="form1" action="" method="post" enctype="multipart/form-data">
+        <div>
+            <span id="spanButtonPlaceHolder"></span>
+        #*<input id="btnCancel" type="button" value="取消上传" onclick="swfu.cancelQueue();" disabled="disabled" style="margin-left: 2px; font-size: 8pt; height: 30px;"/>*#
+            <button type="button" id="startUploadBtn" class="btn btn-default btn-uploadfile" onclick="swfu.startUpload();">
+                <i class="fa fa-upload"></i> 上 传
+            </button>
+        </div>
+        <br/>
+
+    #*   <div style=" border:1px dotted #0000CC;text-align:center;margin:auto;">
+         *##*<p>点击“浏览”按钮，选择您要上传的文档文件后，系统将自动上传并在完成后提示您。</p>*##*
+         <p>(提醒：文件大小不能超过500M。)</p>
+       </div>*#
+        <div class="fieldset flash" id="fsUploadProgress" style="height: 160px;">
+            <span class="legend">上传信息(提醒：文件大小不能超过500M。)</span>
+
+            <div id="loading2">
+
+            </div>
+        </div>
+        <div id="divStatus1" align="center" style="color:green"></div>
+    </form>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/swfupload/swfupload.min.js"></script>
+</html>
+<script>
+    var api;
+    var dialog;
+    var localPath = '';
+    var videoName = '';
+    var videoPath = '';
+    var columnId = ${columnId};
+    var videoPathPre = '${videoPathPre}';
+
+    //视频上传后返回值
+    function uploadVideoSuccess(file, serverData) {
+        try {
+            var progress = new FileProgress(file, this.customSettings.progressTarget);
+            progress.setVideoComplete();
+            progress.setStatus("上传成功");
+            if (serverData != '') {
+                var arr = serverData.split(",");
+                localPath = arr[0];
+                videoName = arr[1];
+                var type = videoName.substring(videoName.lastIndexOf("."));
+                if (type != ".flv") {
+                    transVideo(localPath);
+                }
+
+            }
+        } catch (ex) {
+            this.debug(ex);
+        }
+    }
+
+    function transVideo(localPath) {
+        document.getElementById("divStatus1").innerHTML = "开始转换视频，请稍后...";
+        Ls.ajaxGet({
+            data: {
+                localPath: localPath,
+                siteId: GLOBAL_SITEID,
+                columnId: columnId,
+                videoPathPre: videoPathPre
+            },
+            url: "/videoNews/transVideo",
+            timeout: 999999,
+            success: function (text) {
+                $("#loading2").removeClass("ls-loading-img");
+                Ls.tipsOk("视频转换成功");
+                videoPath = text.data.mongoId;
+                document.getElementById("divStatus1").innerHTML = "文件已上传并转换成功！";
+            }
+
+            /* }).done(function (text) {*/
+
+        });
+    }
+
+    $(document).ready(function () {
+        var parent = art.dialog.parent,				// 父页面window对象
+            api = art.dialog.open.api;
+        dialog = art.dialog;
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'saveBtn',
+                callback: function () {
+                    if (videoName == '' || videoPath == '') {
+                        return false;
+                    }
+                    parent.curr.vm.videoName = videoName;
+                    parent.curr.vm.videoPath = videoPath;
+                },
+                focus: true
+            }
+        );
+    });
+    var swfu;
+    window.onload = function () {
+    ##    var contentId=dialog.data('contentId');//$!{contentId};
+    ##    var siteId=dialog.data('siteId');//$!{siteId};
+    ##    var columnId=dialog.data('columnId');//$!{columnId};
+        //console.log(contentId+"--"+siteId+"--"+columnId);
+        var settings = {
+            flash_url: "$!{sysStaticPath}/assets/js/plugins/swfupload/swfupload.swf",
+            upload_url: "/videoNews/uploadVideo",
+            post_params: {"ASPSESSID": "<%=Session.SessionID %>"},
+            file_size_limit: "500 MB",
+            file_types: "*.asx;*.asf;*.mpg;*.wmv;*.3gp;*.mp4;*.mov;*.avi;*.flv;*.wmv9;*.rm;*.rmvb;",
+            file_types_description: "Video Files",
+            file_upload_limit: 1,  //配置上传个数
+            file_queue_limit: 0,
+            //file_post_name:'file',
+            custom_settings: {
+                progressTarget: "fsUploadProgress",
+                cancelButtonId: "btnCancel"
+            },
+            debug: false,
+            // Button settings
+            button_image_url: "$!{sysStaticPath}/assets/images/btn_65x24.png",
+            button_width: "74",
+            button_height: "34",
+            button_placeholder_id: "spanButtonPlaceHolder",
+            button_text: '',
+            button_text_style: ".theFont { font-size: 16; }",
+            button_text_left_padding: 12,
+            button_text_top_padding: 3,
+
+            file_queued_handler: fileQueued,
+            file_queue_error_handler: fileQueueError,
+            //file_dialog_complete_handler : fileDialogComplete,
+            upload_start_handler: uploadStart,
+            upload_progress_handler: uploadProgress,
+            upload_error_handler: uploadError,
+            upload_success_handler: uploadVideoSuccess,
+            upload_complete_handler: uploadComplete,
+            queue_complete_handler: queueVideoComplete
+        };
+
+        swfu = new SWFUpload(settings);
+    };
+
+    function queueVideoComplete(numFilesUploaded) {
+        //total += numFilesUploaded;
+        //status.innerHTML = "1 个文件已上传,开始转换视频，请稍后...";
+    }
+
+    function uploadStart(file) {
+        try {
+            var progress = new FileProgress(file, this.customSettings.progressTarget);
+            progress.setStatus("正在上传...");
+            progress.toggleCancel(true, this);
+            document.getElementById("startUploadBtn").disabled = true;
+            document.getElementById("loading2").setAttribute("class", "ls-loading-img");
+        }
+        catch (ex) {
+        }
+        return true;
+    }
+
+    FileProgress.prototype.setVideoComplete = function () {
+        this.fileProgressElement.className = "progressContainer blue";
+        this.fileProgressElement.childNodes[3].className = "progressBarComplete";
+        this.fileProgressElement.childNodes[3].style.width = "";
+
+        /*var oSelf = this;
+        setTimeout(function () {
+          oSelf.disappear();
+        }, 10000);*/
+    };
+</script>

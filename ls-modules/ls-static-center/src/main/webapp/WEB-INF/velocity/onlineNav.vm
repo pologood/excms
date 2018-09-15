@@ -1,0 +1,23 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#if(!$!{organShow})
+    #foreach($eo in $eos)
+        #if($!{eo.isShow} == 1)
+            <li>
+                #if($!{eo.isStartUrl} == 0)
+                    <a href="/content/column/$!{eo.indicatorId}" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+                #else
+                    <a href="$!{eo.transUrl}" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+                #end
+            </li>
+        #end
+    #end
+#elseif($!{organShow})
+    #foreach($eo in $eos)
+        <li>
+            <a href="/content/column/$!{gotoId}?organId=$!{eo.organId}&organShow=true" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        </li>
+    #end
+#end

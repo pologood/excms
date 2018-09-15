@@ -1,0 +1,194 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="tabbable-line" style="padding:12px 20px 15px;">
+    <ul class="nav nav-tabs" id="copy_refer_tab">
+        #set($hasColumn="false")
+        #MenuButton(12652,true)
+        #if($_button_code_list_.contains("12652"))
+            #set($hasColumn="true")
+            <li>
+                <a href="#tab_1_1" data-toggle="tab">内容管理</a>
+            </li>
+        #end
+        #set($hasPublic="false")
+        #MenuButton(121710,true)
+        #if($_button_code_list_.contains("121710") )
+            #set($hasPublic="true")
+            <li>
+                <a href="#tab_1_2" data-toggle="tab">信息公开</a>
+            </li>
+        #end
+        #set($hasMsg="false")
+        #MenuButton(13701,true)
+        #if($_button_code_list_.contains("13701") && "$!{type}" == "1")
+            #set($hasMsg="true")
+            <li>
+                <a href="#tab_1_3" data-toggle="tab">信息报送</a>
+            </li>
+        #end
+        #set($hasWeixin="false")
+        #MenuButton(12593,true)
+        #if($_button_code_list_.contains("12593") && "$!{type}" == "1")
+            #set($hasWeixin="true")
+            <li>
+                <a href="#tab_1_4" data-toggle="tab">两微一端</a>
+            </li>
+        #end
+    </ul>
+
+    <div class="tab-content pt10">
+        #if("$!{hasColumn}" == "true")
+            <div class="tab-pane" id="tab_1_1">
+                <ul class="ztree" id="column_tree">
+                </ul>
+            </div>
+        #end
+        #if("$!{hasPublic}" == "true" )
+            <div class="tab-pane" id="tab_1_2">
+                <ul class="ztree" id="public_tree">
+                </ul>
+            </div>
+        #end
+        #if("$!{hasMsg}" == "true")
+            <div class="tab-pane" id="tab_1_3">
+                <ul class="ztree" id="msg_tree">
+                </ul>
+            </div>
+        #end
+        #if("$!{hasWeixin}" == "true")
+            <div class="tab-pane" id="tab_1_4">
+                <ul class="ztree" id="weixin_tree">
+                </ul>
+            </div>
+        #end
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/content/copyReferNews.js"></script>
+<script>
+    var initZtree = {};
+    var cur = {
+        W: Ls.getWin.win,
+        column_tree: null,
+        public_tree: null,
+        msg_tree: null,
+        contentModeCode: null,//当前内容模型
+        columnId: null,//当前栏目id
+        type: null,//当前信息公开类型
+        id: null,//当前信息公开目录id
+        synColumnIds: "$!{synColumnIds}",
+        synColumnIsPublishs: "$!{synColumnIsPublishs}",
+        synOrganCatIds: "$!{synOrganCatIds}",
+        synOrganIsPublishs: "$!{synOrganIsPublishs}",
+        synMsgCatIds: "$!{synMsgCatIds}",
+        synWeixin: "$!{synWeixin}"
+    };
+
+    $(document).ready(function () {
+        #if("$!{source}" == "1" && "$!{hasColumn}" == "true")//内容管理
+            cur.contentModeCode = cur.W.content_mgr.node.columnTypeCode;
+            cur.columnId = cur.W.content_mgr.node.indicatorId;
+            cur.type = "DRIVING_PUBLIC";//内容管理只同步到主动公开
+        #elseif("$!{source}" == "2" && "$!{hasPublic}" == "true")//信息公开
+            cur.contentModeCode = cur.W.cur.contentModel.code;
+            cur.type = cur.W.cur.node.type;
+            cur.id = cur.W.cur.node.id;
+        #end
+
+        //绑定标签事件
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            if (!initZtree[activeTab]) {
+                initZtree[activeTab] = true;
+                if (activeTab == "#tab_1_1") {
+                    #if("$!{source}" == "1")//内容管理
+                        cur.column_tree = copyRefer_mgr.columnInit("column_tree", cur.contentModeCode, cur.W.GLOBAL_SITEID, cur.columnId, "$!{eo.id}", "$!{type}");
+                    #elseif("$!{source}" == "2")//信息公开，只会复制到文章新闻
+                        cur.column_tree = copyRefer_mgr.columnInit("column_tree", "articleNews", cur.W.GLOBAL_SITEID, cur.columnId, "$!{eo.id}", "$!{type}");
+                    #end
+                } else if (activeTab == "#tab_1_2") {//信息公开要带上单位ID
+                    #if("$!{source}" == "1")//内容管理
+                        cur.public_tree = copyRefer_mgr.publicInit("public_tree", cur.type, cur.id);
+                    #elseif("$!{source}" == "2")//信息公开
+                        cur.public_tree = copyRefer_mgr.publicInit("public_tree", cur.type, cur.id, cur.W.cur.node.organId);
+                    #end
+                } else if (activeTab == "#tab_1_3") {
+                    cur.msg_tree = copyRefer_mgr.msgInit("msg_tree");
+                } else if (activeTab == "#tab_1_4") {
+                    cur.weixin_tree = copyRefer_mgr.weixinInit("weixin_tree");
+                }
+            }
+        });
+        $('#copy_refer_tab a:first').tab('show');//显示第一个标签
+
+        $(".ztree").height("315").css("overflow", "auto");
+    });
+
+    // 获取数据，内容管理选中、信息公开选中、信息报送选中
+    function ok() {
+        var data = {source: "$!{source}", publicSiteId: "2653861", hasPublish: false};//信息公开主站站点id，根据不同项目需要改动
+        if (cur.column_tree) {
+            var checks = cur.column_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建内容管理选中节点
+                var ids = [], publishs = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    ids.push(checks[i].columnStrId);
+                    if (checks[i].isPublish && checks[i].isPublish == true) {
+                        publishs.push("1");
+                        data.hasPublish = true;
+                        names.push(checks[i].name + "(发布)");
+                    } else {
+                        publishs.push("0");
+                        names.push(checks[i].name);
+                    }
+                }
+                data.synColumnIds = ids.join(",");
+                data.synColumnNames = names.join(",");
+                data.synColumnIsPublishs = publishs.join(",");
+            }
+        }
+    ##        #if("$!{type}" == "1")
+        if (cur.public_tree) {
+            checks = cur.public_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建信息公开选中节点
+                var ids = [], publishs = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    ids.push(checks[i].organId + "_" + checks[i].id);
+                    if (checks[i].isPublish && checks[i].isPublish == true) {
+                        publishs.push("1");
+                        data.hasPublish = true;
+                        names.push(checks[i].name + "(发布)");
+                    } else {
+                        publishs.push("0");
+                        names.push(checks[i].name);
+                    }
+                }
+                data.synOrganCatIds = ids.join(",");
+                data.synOrganCatNames = names.join(",");
+                data.synOrganIsPublishs = publishs.join(",");
+            }
+        }
+        if (cur.msg_tree) {
+            checks = cur.msg_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建信息报送选中节点
+                var ids = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    ids.push(checks[i].id);
+                    names.push(checks[i].name);
+                }
+                data.synMsgCatIds = ids.join(",");
+                data.synMsgCatNames = names.join(",");
+            }
+        }
+        if (cur.weixin_tree) {
+            data.synWeixin = false;
+            checks = cur.weixin_tree.getCheckedNodes(true);
+            if (checks.length > 0) {
+                data.synWeixin = true;
+            }
+        }
+    ##        #end
+        return data;
+    }
+</script>

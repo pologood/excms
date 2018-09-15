@@ -1,0 +1,82 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+
+
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/dataimportSiteDataSource/getSitePage" sizeList="[20,30,50]" pageSize="20"
+                     idField="dataSourceId" multiSelect="true">
+                    <div property="columns">
+                        <div type="indexcolumn" width="50" headerAlign="center" align="center"></div>
+                        <div field="name" width="180" headerAlign="center" allowSort="flase"  align="center">
+                            站点
+                        </div>
+                        <div width="115" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    var grid;
+
+    $(document).ready(function () {
+        mini.parse();
+
+        grid = mini.get("datagrid1");
+        grid.load({dataFlag: 1});
+
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid);
+
+    })
+
+    function search() {
+        var manufacturerid = $("#manufacturerid option:selected").val()
+        grid.load({manufacturerid: manufacturerid, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var cstr = "";
+        var rec = e.record;
+        tgBtn = '<button class="btn btn-default btn-sm btn-edit"   onclick="edit(' + rec.indicatorId + ')">站点数据源配置</button> '
+        str += tgBtn
+        return str;
+    }
+
+    function edit(id) {
+        Ls.openWin("/dataimportSiteDataSource/columnTypePage?siteId=" + id, '1050px', '400px', {
+                    id: 'site',
+                    title: ' 配置'
+                }
+        )
+    }
+</script>

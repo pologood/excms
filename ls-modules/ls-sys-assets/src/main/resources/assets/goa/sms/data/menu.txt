@@ -1,0 +1,14 @@
+{
+  "status":1,"desc":"","data":[
+    {"id":1,"name":"我的短信","textIcon":"&#xe80d;","items":[
+	   	{"id":3,"name":"短信记录","uri":"/sms/log/view","textIcon":"&#xeaf9;"}
+	]},
+    {"id":4,"name":"短信管理","textIcon":"&#xe87d;","items":[
+		{"id":5,"name":"用量统计","uri":"/sms/smsTj","textIcon":"&#xe90c;"},
+	    {"id":6,"name":"短信日志","uri":"/sms/log/viewUnitLog","textIcon":"&#xe8ed;"},
+	    {"id":6,"name":"限额配置","uri":"/sms/setting/index","textIcon":"&#xe8ed;"},
+	    {"id":6,"name":"短信队列","uri":"/sms/log/smsSendMonintor","textIcon":"&#xe8ed;"}
+	]}
+    
+  ]
+}

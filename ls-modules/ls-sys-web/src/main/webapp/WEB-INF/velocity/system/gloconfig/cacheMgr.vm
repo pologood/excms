@@ -1,0 +1,115 @@
+#parse("_page_layout/_header.vm")
+<body>
+<div style="width:100%">
+    <div class="mini-toolbar" style="border-bottom:0;padding:0px;">
+        <table style="width:100%;">
+            <tr>
+                <td style="width:100%;"><a class="mini-button" iconCls="icon-reload" onclick="reload()">刷新</a> <a
+                    class="mini-button" iconCls="icon-reload" onclick="reloadAll()">全部刷新</a></td>
+            </tr>
+        </table>
+    </div>
+</div>
+<div id="datagrid1" class="mini-datagrid" style="width:100%;height:100%;" allowCellSelect="false"
+     onlyCheckSelection="true" allowResize="true"
+     url="/globConfig/getCachePage" sizeList="[20,30,50]" pageSize="20" showPager="false"
+     idField="id" multiSelect="true">
+    <div property="columns">
+        <!--<div type="indexcolumn"></div>        -->
+        <div type="checkcolumn" width="40"></div>
+        <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+        <div field="cacheKey" width="100%" headerAlign="center" allowSort="flase" renderer="itemLink" align="center">
+            缓存CacheKey
+        </div>
+        <div width="60" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    $(document).ready(function () {
+        mini.parse();
+        var grid = mini.get("datagrid1");
+        grid.load({dataFlag: 1});
+    })
+
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        tgBtn = '<button type="button"  class="icon-reload btn18_gray mr5 " onclick="reloadByKey(+\"'
+        rec.cacheKey
+        '\"+)">刷 新</button>'
+        str = tgBtn;
+        return str;
+    }
+    ;
+
+    function reloadAll() {
+        if (confirm("确定要刷新所有缓存？")) {
+            Ls.ajaxGet({
+                url: "/globConfig/reloadAllCache",
+            }).done(function (d) {
+                if (d.status == 0) {
+                    Ls.tipsErr("刷新失败：" + d.desc);
+                } else {
+                    Ls.tipsOk("刷新成功");
+                }
+            })
+        }
+    }
+
+    function reloadByKey(key) {
+        if (confirm("确定刷新记录？")) {
+            var cacheKey = [];
+            cacheKey.push(key);
+            Ls.ajaxGet({
+                data: {
+                    cacheKey: cacheKey
+                },
+                url: "/globConfig/reloadCache",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("刷新失败：" + d.desc);
+                    } else {
+                        Ls.tipsOk("刷新成功");
+                    }
+                    grid.reload();
+                }
+            });
+        }
+
+    }
+
+
+    function reload() {
+        var grid = mini.get("datagrid1");
+        grid.load({dataFlag: 1});
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            if (confirm("确定刷新选中记录？")) {
+                var cacheKey = [];
+                for (var i = 0, l = rows.length; i < l; i++) {
+                    cacheKey[i] = rows[i].cacheKey;
+                }
+                grid.loading("操作中，请稍后......");
+                Ls.ajaxGet({
+                    data: {
+                        cacheKey: cacheKey
+                    },
+                    url: "/globConfig/reloadCache",
+                    success: function (text) {
+                        if (text.status == 0) {
+                            Ls.tipsErr("刷新失败：" + d.desc);
+                        } else {
+                            Ls.tipsOk("刷新成功");
+                        }
+                        grid.reload();
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请选中一条记录");
+        }
+    }
+</script>

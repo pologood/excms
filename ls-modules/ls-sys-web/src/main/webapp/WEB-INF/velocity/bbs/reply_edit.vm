@@ -1,0 +1,270 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">回复信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="reply_form" role="form" ms-controller="reply_form" autocomplete="off">
+                        <table class="table table-bordered survey-table">
+                            <tbody>
+                            <tr style="background-color:#f8f8f8">
+                                <th>主题回顾</th>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>标 题：</th>
+                                <td colspan="3">
+                                    $!{post.title}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发 帖 人：</th>
+                                <td>
+                                    $!{post.memberName}
+                                </td>
+                                <th>发帖时间：</th>
+                                <td>
+                                    $!date.format('yyyy-MM-dd HH:mm:ss',$!{post.createDate})
+                                    #if("$!{post.isAccept}" !=  "") (督办单位：$!{post.acceptUnitName}) #end
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>帖子正文：</th>
+                                <td colspan="3">
+                                    $!{post.content}
+                                </td>
+                            </tr>
+                            <tr style="background-color:#f8f8f8">
+                                <th>回复信息</th>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>回 复 人：</th>
+                                <td>
+                                    <input type="text" name="memberName" id="memberName" value="$!{reply.memberName}" class="form-control readonly" placeholder="">
+                                </td>
+                                <th>回复时间：</th>
+                                <td>
+                                    <input type="datetime" name="" disabled value="$!date.format('yyyy-MM-dd HH:mm:ss',$!{reply.createDate})" class="form-control readonly w180">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>审 核：</th>
+                                <td colspan="3">
+                                    <select id="isPublish" class="form-control w100" name="isPublish" placeholder="请选择状态">
+                                        <option value="0" #if("$!{reply.isPublish}" == "0") selected #end >待审核</option>
+                                        <option value="1" #if("$!{reply.isPublish}" == "1") selected #end>已审核</option>
+                                        <option value="2" #if("$!{reply.isPublish}" == "2") selected #end>屏蔽</option>
+                                    </select>
+                                ##                                    <label class="checkbox-inline"><input type="checkbox" id="isColse" #if("$!{reply.isColse}" == "1") checked #end name="isColse"  value="1">封此信息</label>
+                                </td>
+                            </tr>
+                            ##                            <tr>
+                            ##                                <th>封此注释：</th>
+                            ##                                <td colspan="3">
+                            ##                                    <input type="text" name="colseDesc" id="colseDesc" value="$!{reply.colseDesc}" class="form-control" placeholder="">
+                            ##                                </td>
+                            ##                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">内 容：</th>
+                                <td colspan="3">
+                                    <textarea name="content" style="width: 100%;height:300px; visibility: visible;">$!{reply.content}</textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>附件信息：</th>
+                                <td colspan="3" >
+                                    <div>
+                                        <ul style="list-style-type:none" id="files">
+                                            #set($Imgsuffixs="*.png;*.jpg;*.jpeg;*.gif")
+                                            #foreach($file in $!{files})
+                                                <li id="$!{file.id}_li">
+                                                    #set($mongoId="$!{file.mongoId}")
+                                                    #if($mongoId.indexOf("/") == -1)
+                                                        #if($mongoId.indexOf(".")==-1)
+                                                            #set($filePath="$!{fileServerNamePath}")
+                                                        #else
+                                                            #set($filePath="$!{fileServerPath}")
+                                                        #end
+                                                    #else
+                                                        #set($filePath="")
+                                                    #end
+                                                    #if($Imgsuffixs.indexOf($!{file.suffix})>-1)
+                                                        <img src="$!{filePath}$!{mongoId}" style="width: 150px;height: 150px" title="$!{file.fileName}">
+                                                        <br/>
+                                                    #end
+                                                    <a style="text-decoration: underline;color: blue;cursor:pointer;" onclick="downLoad('$!{mongoId}',$!{file.id})">$!{file.fileName}</a>
+                                                    [$!{file.fileSizeKb} KB]
+                                                    <span style="text-decoration: underline;color: blue;cursor:pointer;" onclick="delFile($!{file.id})">[删除]</span>
+                                                </li>
+                                            #end
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <button class="btn btn-default btn-save" type="submit" id="saveArticle"> 保 存</button>
+                                    <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+<script>
+    mini.parse();
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+            replyId:"$!{reply.replyId}",
+            fileIds:[]
+        },
+        columnId:0,
+        imgsuffixs:"*.png;*.jpg;*.jpeg;*.gif"
+    };
+    var eweb;
+
+    $(document).ready(function () {
+        //创建编辑器
+        createKindEditor();
+
+    })
+
+    $('#reply_form').validator({
+        rules: {},
+        fields: {
+            'memberName': '回复人:required;length[2~20]',
+            'content': "内容:required;"
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+    function addPost () {
+        var data = {};
+        data.replyId = cursave.params.replyId;
+        data.isPublish = $("#isPublish").val();
+        data.memberName = $("#memberName").val();
+        data.colseDesc = $("#colseDesc").val();
+        if($("#isColse").is(":checked")){data.isColse = 1;}else{data.isColse = 0}
+        /*data.content = cursave.editor.html();*/
+        data.content = eweb.getHtml();
+        var url = "/bbsReply/updateReply";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function createKindEditor(){
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cursave.columnId});
+        /*cursave.editor = KindEditor.create('textarea[name="content"]', {
+            items:["source","|","undo","redo","|","plainpaste","wordpaste","emoticons","baidumap","mtxx","|","justifyleft","justifycenter","justifyright","indent","outdent","removeformat","clearhtml","quickformat","image","multiimage","insertfile","formatblock","fontsize","|","forecolor","hilitecolor","bold","italic","underline","strikethrough","|","table","link","unlink","fullscreen"],
+            uploadJson: GLOBAL_CONTEXTPATH + '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: GLOBAL_CONTEXTPATH + '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: cursave.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+    }
+
+    function goBack(){
+        var url = "/bbsReply/list";
+        if(cur.nextpage.t == '1'){
+            url = "/bbsReply/list";
+        }else if(cur.nextpage.t == '2'){
+            url = "/bbsReply/auditList";
+        }
+        App.getContentHtml(url+"?pageIndex="+cur.nextpage.pageIndex+"&isPublish="+cur.params.isPublish,"");
+    }
+
+    function addfile(files) {
+        var htmls = "";
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            cursave.params.fileIds.push(file.id)
+            htmls +="<li id='"+file.id+"_li'>"
+            if(cursave.imgsuffixs.indexOf(file.suffix) > -1){
+                htmls +="<img src='$!{fileServerNamePath}"+file.fileName+"' style='width: 150px;height: 150px' title='"+file.fileName+"'>";
+                htmls +="<br/>";
+            }
+            htmls +="<a onclick=\"downLoad('"+file.fileName+"')\" style='text-decoration: underline;color: blue;cursor:pointer;'>"+file.fileName+"</a>";
+            htmls +=" ["+file.fileSizeKb+" KB] <span style='text-decoration: underline;color: blue;cursor:pointer;' onclick='delFile("+file.fileName+")'>[删除]</span></li>";
+        }
+        $("#files").append(htmls);
+    }
+
+    function delFile(fileId){
+        var ids = [];
+        ids.push(fileId);
+        ids = ids.join(",");
+        if (confirm("确认删除吗？")) {
+            Ls.ajaxGet({
+                url: "/bbsFile/deleteFiles?isDel=1&ids=" + ids,
+                success: function (text) {
+                    Ls.tipsOk("删除成功！");
+                    $("#"+fileId+"_li").remove();
+                }
+            });
+        }
+    }
+
+    //下载
+    function downLoad(mongoId,id){
+        if (!Ls.isEmpty(mongoId)) {
+            var filePath = '$!{fileServerPath}';
+            if (mongoId.indexOf("/") == -1) {
+                if (mongoId.indexOf(".") != -1) {
+                    filePath = "$!{fileServerNamePath}"
+                }
+            } else {
+                filePath = "";
+            }
+            if (!Ls.isEmpty(filePath)) {
+                $("#download").attr("src", "/bbsFile/download/" + mongoId);
+            }else{
+                $("#download").attr("src", "/govbbs/static/file/download?id=" + id);
+            }
+        }
+    }
+</script>

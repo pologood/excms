@@ -1,0 +1,9 @@
+<ul>
+	#foreach($organ in $resultObj)
+		#if("$!{organ.simpleName}"=="")
+            <li><a id="$!{organ.organId}" title="$!{organ.name}" onclick="changeUnit($!{organ.organId})" name="units"><span>$!{organ.name}</span></a></li>
+		#else
+            <li><a id="$!{organ.organId}" title="$!{organ.simpleName}" onclick="changeUnit($!{organ.organId})" name="units"><span>$!{organ.simpleName}</span></a></li>
+		#end
+	#end
+</ul>

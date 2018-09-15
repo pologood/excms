@@ -1,0 +1,146 @@
+#parse("_page_layout/_header.vm")
+<style>
+    @media (max-width: 1366px) {
+        .page-content-white {
+            overflow-y: auto !important;
+        }
+    }
+
+</style>
+<body class="page-body-white page-content-white">
+<div style="padding: 10px;">
+    <ul class="ztree" id="treeview2"></ul>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+
+    var columnId = '${columnId}';
+    var indicatorId = ${indicatorId};
+    var parentId = '${parentId}';
+    var siteName = '${siteName}';
+    var dialog = art.dialog, W = dialog.opener, api = dialog.open.api;
+
+    function nodeClick(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        }
+    }
+
+    var setting = {
+        async: {
+            enable: true,
+            type: "GET",
+            dataType: "JSON",
+            url: "/siteMain/getMoveTree",
+            dataFilter: dataFilter,
+            autoParam: ["indicatorId=indicatorId"],
+            otherParam: {columnId: columnId}
+        },
+        isEdit: true,
+        view: {},
+        check: {
+            enable: true,
+            autoCheckTrigger: false,
+            nocheckInherit: false,
+            chkStyle: "radio",
+            radioType: "all"
+        },
+        data: {
+            key: {
+                title: "indicatorId"
+            },
+            data: {
+                simpleData: {
+                    enable: true,
+                    idKey: "indicatorId",
+                    pIdKey: "parentId"
+                }
+            }
+        },
+        callback: {
+            // onCheck: onCheck,
+            onAsyncSuccess: onAsyncSuccess
+        }
+    };
+
+    $(document).ready(function () {
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'saveBtn',
+                focus: true,
+                callback: function () {
+                    doOk();
+                    return false;
+                }
+            }
+        );
+
+        treeObj = jQuery.fn.zTree.init($("#treeview2"), setting);
+    });
+
+    function doOk() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        // var  nodes = zTree.getSelectedNodes();
+        var nodes = zTree.getCheckedNodes(true);
+        var id = "";
+        if (nodes != null && nodes != "") {
+            id = nodes[0].indicatorId;
+            Ls.ajax({
+                url: "/columnConfig/saveMove",
+                data: {
+                    id: id,
+                    columnId: columnId
+                },
+            }).done(function (json) {
+                if (!json.status) {
+                    Ls.tipsErr(json.desc);
+                    return;
+                }
+                var desNode = W.columnManage.zTree.getNodeByParam("indicatorId", indicatorId, null);
+                W.columnManage.zTree.reAsyncChildNodes(desNode, "refresh");
+                art.dialog.close();
+            });
+        }
+
+    }
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+    var isPush = false;
+    function dataFilter(treeId, parentNode, responseData) {
+        var responseData = responseData.data;
+        var responseData = Ls.treeDataFilter(responseData, Ls.treeDataType.SITE);
+        if (!isPush) {
+            //添加根节点
+            responseData.push({
+                "indicatorId": indicatorId,
+                "parentId": 1,
+                "name": siteName,
+                "isParent": true,
+                "title": siteName,
+                "icon": GLOBAL_CONTEXTPATH + "/assets/images/site.png",
+            });
+            isPush = true;
+        }
+        return responseData;
+    }
+
+    function onAsyncSuccess(treeId, parentNode, responseData) {
+        if (parentId != "") {
+            var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+            var node = zTree.getNodeByParam("indicatorId", parentId, null);
+            if (node != null && !node.nocheck) {
+                //zTree.setChkDisabled(node, true);
+                node.nocheck = true;
+            }
+        }
+    }
+
+</script>
+</body>

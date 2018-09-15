@@ -1,0 +1,204 @@
+<style type="text/css">
+    .table-bordered {
+        border: 1px solid #e7ecf1;
+    }
+
+    .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th {
+        border: 1px solid #e7ecf1 !important;
+    }
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">主题信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="reply_form" role="form" ms-controller="reply_form" autocomplete="off">
+                        <table class="table table3 table-bordered survey-table">
+                            <tbody>
+                            <tr>
+                                <th>标 题：</th>
+                                <td colspan="3">
+                                    $!{post.title}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发 帖 人：</th>
+                                <td>
+                                    $!{post.memberName} 发布于  $!date.format('yyyy-MM-dd HH:mm:ss',$!{post.createDate})
+                                </td>
+                                <th>督办部门：</th>
+                                <td>
+                                    #if("$!{post.isAccept}" !=  "")
+                                        督办单位：$!{post.acceptUnitName} | 回复时间：$!date.format('yyyy-MM-dd HH:mm:ss ',$!{post.acceptTime})
+                                    #else
+                                        无需办理
+                                    #end
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>联系人：</th>
+                                <td>
+                                    $!{post.linkman}
+                                </td>
+                                <th>手机号：</th>
+                                <td>
+                                    $!{post.memberPhone}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>IP 地址：</th>
+                                <td>
+                                    $!{post.ip}
+                                </td>
+                                <th>邮箱：</th>
+                                <td>
+                                    $!{post.memberEmail}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>通讯地址：</th>
+                                <td colspan="3">
+                                    $!{post.memberAddress}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>帖子正文：</th>
+                                <td colspan="3">
+                                    $!{post.content}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>附件信息：</th>
+                                <td colspan="3">
+                                    <div>
+                                        <ul style="list-style-type:none" id="files">
+                                            #set($Imgsuffixs="*.png;*.jpg;*.jpeg;*.gif")
+                                            #foreach($file in $!{files})
+                                                <li id="$!{file.id}_li">
+                                                    #set($mongoId="$!{file.mongoId}")
+                                                    #if($mongoId.indexOf("/") == -1)
+                                                        #if($mongoId.indexOf(".")==-1)
+                                                            #set($filePath="$!{fileServerPath}")
+                                                        #else
+                                                            #set($filePath="$!{fileServerNamePath}")
+                                                        #end
+                                                    #else
+                                                        #set($filePath="")
+                                                    #end
+                                                    #if($Imgsuffixs.indexOf($!{file.suffix})>-1)
+                                                        <img src="$!{filePath}$!{mongoId}" style="width: 150px;height: 150px" title="$!{file.fileName}">
+                                                        <br/>
+                                                    #end
+                                                    <a style="text-decoration: underline;color: blue;cursor:pointer;" onclick="downLoad('$!{mongoId}',$!{file.id})">$!{file.fileName}</a>
+                                                    [$!{file.fileSizeKb} KB]
+                                                </li>
+                                            #end
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>阅读记录：</th>
+                                <td colspan="3">
+                                    #foreach($log in $!{logs})
+                                        #if($log.operation == 'View')
+                                            $!{log.memberName}
+                                            #if($!{logs.size()} != $velocityCount)
+                                                ;
+                                            #end
+                                        #end
+                                    #end
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>操作记录：</th>
+                                <td colspan="3">
+                                    <table>
+                                        <tr>
+                                            <th width="100">操作人</th>
+                                            <th width="200">时间</th>
+                                            <th width="50">操作</th>
+                                        </tr>
+                                        #foreach($log in $!{logs})
+                                            #if($log.operation == 'Audit')
+                                                <tr>
+                                                    <td>$!{log.memberName}</td>
+                                                    <td>$!date.format('yyyy-MM-dd HH:mm:ss',$!{log.createDate})</td>
+                                                    <td>
+                                                        #if($!{log.status} == '0')
+                                                            未审核
+                                                        #elseif($!{log.status} == '1')
+                                                            审核
+                                                        #elseif($!{log.status} == '2')
+                                                            屏蔽
+                                                        #elseif($!{log.status} == '3')
+                                                            删除
+                                                        #elseif($!{log.status} == '4')
+                                                            还原
+                                                        #end
+                                                    </td>
+                                                </tr>
+
+                                            #end
+                                        #end
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td colspan="3">
+                                    <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+<script>
+    mini.parse();
+
+    function goBack() {
+        var url = "/bbsPost/list";
+        if(cur.nextpage.t == '1'){
+            url = "/bbsPost/list";
+        }else if(cur.nextpage.t == '2'){
+            url = "/bbsPost/delList";
+        }else if(cur.nextpage.t == '3'){
+            url = "/bbsPost/auditList";
+        }
+        App.getContentHtml(url+"?pageIndex="+cur.nextpage.pageIndex+"&isPublish="+cur.params.isPublish, "");
+    }
+    //下载
+    function downLoad(mongoId,id) {
+        if (!Ls.isEmpty(mongoId)) {
+            var filePath = '$!{fileServerPath}';
+            if (mongoId.indexOf("/") == -1) {
+                if (mongoId.indexOf(".") == -1) {
+                    filePath = "$!{fileServerNamePath}"
+                }
+            } else {
+                filePath = "";
+            }
+            if (!Ls.isEmpty(filePath)) {
+                $("#download").attr("src", "/bbsFile/download/" + mongoId);
+            }else{
+                $("#download").attr("src", "/govbbs/static/file/download?id=" + id);
+            }
+        }
+    }
+</script>

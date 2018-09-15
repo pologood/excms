@@ -1,0 +1,107 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="昵称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChatLog/getPage" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="indexcolumn" width="40" headerAlign="center" align="center">序号</div>
+                        <div field="" width="50" headerAlign="center" align="center" allowSort="flase" renderer="headImg" align="left">头像</div>
+                        <div field="nickname" width="220" headerAlign="center" allowSort="false" align="center">昵称</div>
+                        <div field="msgType" width="100" headerAlign="center" allowSort="flase" align="center" renderer="msgTypeRender">类型</div>
+                        <div field="content" width="100%" headerAlign="center" allowSort="flase" align="center">内容</div>
+                        <div field="createTime" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                             align="center">时间
+                        </div>
+                        <!--  <div field="" width="105" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>-->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    mini.parse();
+
+    cur = {
+        grid:'',
+        params: {
+            dataFlag: 1,
+            siteId: GLOBAL_SITEID
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+    })
+
+
+    function headImg(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<img src="' + rec.headimgurl + '" height="36" width="36"/>';
+        return str;
+    }
+
+    function msgTypeRender(e){
+        var rec = e.record,str = "";
+        if(rec.msgType == 'subscribe'){
+            str = '关注'
+        }else if(rec.msgType == 'unsubscribe'){
+            str = '取消关注'
+        }else if(rec.msgType == 'VIEW'){
+            str = '浏览'
+        }else if(rec.msgType == 'text'){
+            str = '文本信息'
+        }else if(rec.msgType == 'CLICK'){
+            str = '点击事件'
+        }
+        return str;
+
+    }
+
+    function search() {
+        var name = $("#searchKey").val();
+        var groupId = $("#groupId").val();
+        cur.grid.load({nickname: name, groupid: groupId, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        $("#groupId").val("");
+        cur.grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+
+</script>

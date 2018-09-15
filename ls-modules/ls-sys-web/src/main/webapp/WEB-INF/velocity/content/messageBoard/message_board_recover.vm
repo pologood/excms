@@ -1,0 +1,123 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="reply_form" ms-controller="reply_form">
+            <table class="table table-bordered petition-table">
+                <tbody>
+                <tr>
+                    <th style="vertical-align: top;">收回原因：</th>
+                    <td colspan="2">
+                        <textarea id="remarks" name="remarks" ms-duplex="remarks" class="form-control"
+                                  style="width: 100%; visibility:visible ;height:200px"></textarea>
+                    </td>
+                </tr>
+                        <input type="hidden" name="messageBoardId" id="messageBoardId" value="${messageBoardId}"/>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var messageBoardId = "${messageBoardId}";
+    var eweb;
+    var curr = {
+        vm: {}
+    }
+
+    $(document).ready(function () {
+        eweb = Ls.editor("remarks", {style: "Lmini",height: "200"});
+        /*editor = KindEditor.create('textarea[name="remarks"]', {
+            resizeType: 1,
+            allowPreviewEmoticons: false,
+            allowImageUpload: false,
+            items: [
+                'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            filterMode: true
+        });*/
+        var api = Ls.getWin.api;
+        if (!api) return;
+        // 操作对话框
+        api.button({
+                id: 'abcd',
+                focus: true,
+                name: '保 存',
+                callback: function () {
+                    eweb.update();
+                    $("#reply_form").trigger("validate");
+                    return false;
+                }
+            }, {
+                id: 'ab',
+                name: '返回',
+                callback: function () {
+                    goBack();
+                    return false;
+                }
+            }
+        );
+        getVO();
+    });
+
+    function getVO() {
+            data = "";
+            curr.$id = "reply_form";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            avalon.scan($("#reply_form").get(0), curr.vm);
+    }
+
+    $('#reply_form').validator({
+        fields: {
+            'remarks': '收回理由:required;',
+        },
+        valid: function () {
+            saveReply();
+        }
+    })
+
+
+    function saveReply() {
+        var remark = $("#remark").val();
+        /*curr.vm.remarks = editor.html();*/
+        curr.vm.remarks = eweb.getHtml();
+        curr.vm.messageBoardId = $("#messageBoardId").val();
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+
+        Ls.ajax({
+            url: "/messageBoard/recover",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("收回成功", function () {
+                    goBack();
+                });
+            }
+        });
+    }
+
+    function goBack() {
+        Ls.winClose();
+    }
+
+</script>	

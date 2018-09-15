@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <link href="$!{sysStaticPath}/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/plugins.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/components.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/default.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+        .login-wrap {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: -270px 0 0 -428px
+        }
+
+        .login-dialog {
+            /*position: relative;*/
+            margin: 0 auto;
+            background: url(/assets/images/logo_dialog_bg.png) no-repeat;
+            width: 856px;
+            height: 498px;
+            border-radius: 5px !important;
+            box-shadow: 0 0 8px #3789ef;
+        }
+
+        .login-dialog .content h3 {
+            color: #47a9f3;
+            margin: 40px 0 35px 0;
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 4px;
+        }
+
+        .login-dialog .content {
+            position: absolute;
+            top: 55px;
+            right: 55px;
+            background-color: #fff;
+            width: 350px;
+            padding: 0 30px 30px 30px;
+            overflow: hidden;
+            border-radius: 5px !important;
+        }
+
+        .login-dialog .content .login-form {
+            padding: 0;
+            margin: 0
+        }
+
+        .login-dialog .content .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-dialog .content .login-form .login-btn {
+            background-color: #44a4f1 !important;
+            color: #fff;
+            font-size: 18px;
+            line-height: 18px;
+            border: 1px solid #339aec;
+        }
+
+        .login-dialog .content .login-form .login-btn:active,
+        .login-dialog .content .login-form .login-btn:focus,
+        .login-dialog .content .login-form .login-btn:hover {
+            background-color: #449ae7 !important;
+            border-color: #2a7fc2;
+            color: #fff
+        }
+
+        .login-dialog .content .login-form .form-group .form-control {
+            height: 40px
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox-inline {
+            padding: 0
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox {
+            margin-bottom: 0
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox > span {
+            top: 2px
+        }
+
+        .login-dialog .content .login-form .form-group .input-icon > i {
+            font-size: 20px;
+            margin-top: 13px;
+            left: 0;
+        }
+
+        .login-dialog .content .login-form .form-group .input-icon > img {
+            margin: 0 20px
+        }
+
+        .footer-bar {
+            width: 100%;
+            padding: 8px 0;
+            text-align: center;
+            background-color: rgba(0, 0, 0, .2);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            font-size: 14px;
+            color: #fff
+        }
+    </style>
+    <script>
+        //上下文
+        var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERPATH = "$!{fileServerPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERNAMEPATH = "$!{fileServerNamePath}";
+    </script>
+</head>
+<body #if("$!{indexImg}" == "")#else style="background:#fff url('$!{fileServerPath}$!{indexImg}')"#end>
+    #parse("_page_layout/_page_mask.vm")
+<div class="login-wrap">
+    <div class="login-dialog">
+        <div class="content">
+            <form id="login_form" class="login-form" action="$!{rc.contextPath}/login" method="post" autocomplete="off">
+                <h3>用户登录</h3>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa fa-user"></i>
+                        <input name="username" id="username" type="text" class="form-control" style="color:#333"
+                               value="" maxlength="50" placeholder="用户名"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa fa-lock"></i>
+                        <input name="password" id="password" type="password" class="form-control" value=""
+                               maxlength="50" placeholder="密码"/>
+                    </div>
+                </div>
+                <div id="captcha"></div>
+                #*<div class="form-group yzmEl">
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <input class="form-control" type="text" name="code" id="code" placeholder="验证码">
+                            <i class="fa fa-asterisk"></i>
+                        </div>
+                        <span class="input-group-addon pd0" title="点击换一换">
+                        <img id="codeImg" class="hand code-refresh" src="/login/getCode" width="116" height="36"
+                             style="border-top-right-radius: 4px; border-bottom-right-radius: 4px;">
+                    </span>
+                    </div>
+                </div>*#
+  #*          <div class="form-group">
+                <div class="mt-checkbox-inline">
+                    <label class="mt-checkbox mt-radio-outline">
+                        <input type="checkbox" name="rememberUID" id="rememberUID" value="1"> 记住用户名
+                        <span></span>
+                    </label>
+                </div>
+            </div>*#
+               <div class="form-group mt30">
+                    <input type="submit" class="form-control btn login-btn" value="登  录"  id="btn"/>
+                </div>
+          #*      <div class="from-group mt30">
+                    <button type="submit" class="form-control btn btn-success" id="btn">测试</button>
+                </div>*#
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="footer-bar">Copyright © 2005-<span id="currYear">2017</span>安徽龙讯信息科技有限公司</div>
+<script>
+    var security = {
+        exponent: "$!{exponent}",
+        modulus: "$!{modulus}"
+    }
+</script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/security.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/backstretch/backstretch.min.js"></script>
+
+<!-- 极验验证测试start -->
+<script src="http://static.geetest.com/static/tools/gt.js"></script>
+
+
+<script>
+    var loginMgr = function () {
+
+        var loginForm = $('#login_form');
+        var key;
+        try {
+            key = RSAUtils.getKeyPair(security.exponent, '', security.modulus);
+        } catch (e) {
+        }
+
+
+        loginForm.validator({
+            fields: {
+                'username': '用户名:required;',
+                'password': '密码:required;'
+            },
+            valid: function (form) {
+                var me = this;
+                me.holdSubmit();
+                var data = $(form).serializeObject();
+                if (key) {
+                    data.password = RSAUtils.encryptedString(key, data.password);
+                    data.isEncryption = true;
+                }
+               // postLogin(me, data);
+            }
+        })
+
+        var postLogin = function (me, data) {
+            Ls.ajax({
+                url: "/login",
+                data: data
+            }).done(function (text) {
+                if (text.status == 1) {// 登录成功
+                    window.location.replace(GLOBAL_CONTEXTPATH + text.data);
+                } else {
+                    $("#codeImg").click();
+                    Ls.tipsErr(text.desc, function () {
+                        me.holdSubmit(false);
+                    });
+                }
+            }).fail(function () {
+                $("#codeImg").click();
+                me.holdSubmit(false);
+            });
+        }
+
+
+        $(document).ready(function () {
+
+            if (Ls.browser.isIE8OrLower) {
+                window.location.replace(GLOBAL_CONTEXTPATH + "/ie_update");
+                return false;
+            }
+
+            $.backstretch([
+                "/assets/images/login-bg.jpg",
+                "/assets/images/login-bg1.jpg"
+            ], {
+                fade: 1000,
+                duration: 8000
+            });
+
+/*
+            $(".code-refresh").on('click', function () {
+                $("#code").val('');
+                $("#codeImg").attr('src', '/login/getCode?' + new Date().getTime());
+            });
+*/
+
+            setTimeout(function () {
+                $(".code-refresh").trigger('click');
+            }, 1000);
+
+            var hideMask = function () {
+                $('#loading_bd').fadeOut(1500, function () {
+                    $('#loading_mask').fadeOut(200, function () {
+                        $(this).remove();
+                        $("#username").focus();
+                    });
+                    $(this).remove();
+                });
+            }();
+
+            $("#currYear").text(new Date().getFullYear());
+            getchacode();
+        })
+    var getchacode=function () {
+        Ls.ajax({
+            url:"/login/getCode",
+            data:{
+                t: (new Date()).getTime()
+            }
+        }).done(function (data) {
+            initGeetest({
+                gt: data.gt,
+                challenge: data.challenge,
+                offline: !data.success,
+                new_captcha: data.new_captcha,
+                product: "float",
+                width: "290px"
+            }, handler);
+                }
+        )
+    }
+        function handler(captchaObj) {
+            captchaObj.appendTo('#captcha');
+            captchaObj.onReady(function () {
+                $("#wait").hide();
+            }).onClose(function () {
+
+            });
+
+            $('#btn').click(function () {
+                if($('#login_form').isValid() == false) {
+                    captchaObj.reset();
+                    return false;
+                }
+                var result = captchaObj.getValidate();
+                if (!result) { return alert('验证未通过，请重试'); }
+
+                var data = $('#login_form').serializeObject();
+                if (key) {
+                    data.password = RSAUtils.encryptedString(key, data.password);
+                    data.isEncryption = true;
+                }
+                Ls.ajax({
+                    url: "/login",
+                    data: {
+                        geetest_challenge: result.geetest_challenge,
+                        geetest_validate: result.geetest_validate,
+                        geetest_seccode: result.geetest_seccode,
+                        username:$("#username").val(),
+                        password:$("#password").val()
+                    },
+                }).done(function (text) {
+                    if (text.status == 1) {// 登录成功
+                        window.location.replace(GLOBAL_CONTEXTPATH + text.data);
+                    } else {
+                        captchaObj.reset();
+                        Ls.tipsErr(text.desc);
+                    }
+                }).fail(function () {
+                    captchaObj.reset();
+                });
+
+            })
+        }
+    }()
+</script>
+</body>
+</html>

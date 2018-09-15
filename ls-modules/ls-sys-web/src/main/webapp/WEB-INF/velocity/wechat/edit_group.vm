@@ -1,0 +1,90 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="formgrp" ms-controller="formgrp">
+            <div class="form-body">
+                <div class="form-group">
+                    <label>名称</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="" ms-duplex="name">
+                </div>
+
+                <div class="form-group">
+                    <label>备注</label>
+                    <input type="text" class="form-control" id="remark" name="remark" placeholder="" ms-duplex="remark">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    vm = {
+        id: '$!{ID}'
+    }
+    var data;
+    var dialog = Ls.getWin.art, W = Ls.getWin.win, api = Ls.getWin.api;
+
+    jQuery(document).ready(function () {
+
+        api.button(
+            {
+                id: "save_btn",
+                name: "保 存",
+                callback: function () {
+                    saveGroup();
+                    return false;
+                }
+            }
+        )
+
+        Ls.ajaxGet({
+            data: {
+                id: vm.id
+            },
+            url: "/weChat/userMgr/getGroup",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("初始化数据失败");
+                } else {
+                    vm.data = text.data;
+
+                    vm.data.$id = "formgrp";
+
+                    //绑定模型
+                    vm = avalon.define(vm.data);
+
+                    //扫描模型
+                    avalon.scan();
+                }
+            }
+        });
+    })
+
+    var saveGroup = function () {
+        var value = vm.$model;
+        var json = Ls.toJSON(value);
+        Ls.ajax({
+            data: json,
+            url: "/weChat/userMgr/saveGroup",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    Ls.tipsOk("保存成功");
+                    Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+                }
+            }
+        });
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+
+</script>
+</html>

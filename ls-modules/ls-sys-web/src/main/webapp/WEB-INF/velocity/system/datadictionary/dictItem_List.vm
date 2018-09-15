@@ -1,0 +1,192 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;page-body-white" class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+
+                            <button id="adduser_btn" class="btn btn-default btn-add" onclick="add()"> 新 增</button>
+
+                            <button id="adduser_btn" class="btn btn-default btn-delete" onclick="deleteItem()"> 删 除</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/dictItem/getPage"
+                     sizeList="[20,30,50]" pageSize="10"
+                     idField="itemId" multiSelect="true">
+                    <div property="columns">
+                        <!--<div type="indexcolumn"></div> -->
+                        <div type="checkcolumn"></div>
+                        <div field="sortNum" width="30" headerAlign="center" align="center">序号</div>
+                        <div field="name" width="140" headerAlign="center" allowSort="true" align="center">字典项名称</div>
+                        <div field="value" width="120" headerAlign="center" allowSort="true" align="center">value值</div>
+                        <div field="code" width="120" headerAlign="center" allowSort="true" align="center">字典项编码</div>
+                        <div field="description" width="100%" headerAlign="center" allowSort="true">描述</div>
+                        <div width="50" headerAlign="center" allowSort="false" align="center" renderer="defaultVal">默认值</div>
+                        <div width="180" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+    var dId =$!{dictId};
+    var grid = mini.get("datagrid1");
+
+    grid.load({dataFlag: 1, dictId: dId});
+    //grid.sortBy("createDate", "desc");
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid, 60);
+
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        if (!Ls.isEmpty(rec.siteId) || GLOBAL_RIGHTS == "root") {
+            if (rec.isHide == 0 || rec.isHide == null) {
+                hdBtn = '<button class="btn btn-sm btn-default btn-hide" onclick="hide(' + rec.itemId + "," + rec.isHide + ')">隐 藏</button> '
+            } else {
+                hdBtn = '<button class="btn btn-sm btn-default btn-hide" onclick="hide(' + rec.itemId + "," + rec.isHide + ')">显 示</button> '
+            }
+            tgBtn = '<button class="btn btn-sm btn-default btn-edit" onclick="edit(' + rec.itemId + ')">修 改</button> '
+            qsBtn = '<button class="btn btn-sm btn-default btn-delete" onclick="delItem(' + rec.itemId + ')">删 除</button>'
+            str += hdBtn + tgBtn + qsBtn;
+        } else {
+            str = "系统默认";
+        }
+        return str;
+    }
+
+    function defaultVal(e) {
+        var str = "";
+        var rec = e.record;
+        Ls.log(rec.siteId)
+        if (!Ls.isEmpty(rec.siteId) || GLOBAL_RIGHTS == "root") {
+            if (rec.isDefault == 1) {
+                str = "<input type='radio' value='1' id='" + rec.itemId + "' onclick='resetDefault(" + rec.itemId + "," + rec.isDefault + ")' checked/>";
+            } else {
+                str = "<input type='radio' value='1' id='" + rec.itemId + "' onclick='resetDefault(" + rec.itemId + "," + rec.isDefault + ")' />";
+            }
+        } else {
+            if (rec.isDefault == 1) {
+                str = "是";
+            } else {
+                str = "否";
+            }
+        }
+        return str;
+    }
+
+    function resetDefault(itemId, isDefault) {
+        var data = {};
+        if (isDefault == 1) {
+            data = {itemId: itemId, dictId: dId, flag: 0};
+        } else {
+            data = {itemId: itemId, dictId: dId, flag: 1};
+        }
+        Ls.ajaxGet({
+            data: data,
+            url: "/dictItem/setDefault",
+            success: function (text) {
+                grid.reload();
+            }
+        });
+
+    }
+
+    function add() {
+        Ls.openWin("/dictItem/addItem?dictId=" + dId, '550px', '400px', {
+                id: 'dict_item',
+                title: "新增字典项"
+            }
+        )
+    }
+
+    function hide(itemId, isHide) {
+        var data = {};
+        if (isHide == 1) {
+            data = {itemId: itemId, flag: 0};
+        } else {
+            data = {itemId: itemId, flag: 1};
+        }
+
+        Ls.ajaxGet({
+            data: data,
+            url: "/dictItem/setHide",
+            success: function (text) {
+                grid.reload();
+            }
+        });
+    }
+    function edit(id) {
+        Ls.openWin("/dictItem/editItem?itemId=" + id, '550px', '400px', {
+                id: 'dict_item',
+                title: "修改字典项"
+            }
+        )
+    }
+
+    function delItem(id) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: ids
+                },
+                url: "/dictItem/deleteItem",
+                success: function (text) {
+                    grid.reload();
+                }
+            });
+        }
+    }
+
+    function deleteItem() {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            if (confirm("确定删除选中记录？")) {
+                var ids = [];
+                for (var i = 0, l = rows.length; i < l; i++) {
+                    ids[i] = rows[i].itemId;
+                }
+                grid.loading("操作中，请稍后......");
+                Ls.ajaxGet({
+                    data: {
+                        ids: ids
+                    },
+                    url: "/dictItem/deleteItem",
+                    success: function (text) {
+                        grid.reload();
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+    function search() {
+        var name = mini.get("name").getValue();
+        grid.load({name: name, dataFlag: 1});
+    }
+
+    function onKeyEnter(e) {
+        search();
+    }
+
+</script> 

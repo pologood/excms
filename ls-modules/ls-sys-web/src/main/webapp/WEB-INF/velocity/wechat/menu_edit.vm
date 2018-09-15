@@ -1,0 +1,176 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+
+<table class="table table-bordered picture-table">
+    </br>
+    <tbody class="w100p">
+    <tr>
+        <th>菜单名称：</th>
+        <td colspan="3"><input type="text" id="name" ms-duplex="" class="form-control" placeholder=""></td>
+    </tr>
+    <tr>
+        <th> 序 号：</th>
+        <td colspan="3"><input type="number" id="sort" ms-duplex="" class="form-control" placeholder=""></td>
+    </tr>
+    <tr>
+        <th>所属菜单：</th>
+        <td colspan="2">
+            <select name="leves" id="leve1" class="form-control">
+                <option value="1">一级菜单</option>
+                <option value="2">二级菜单</option>
+            </select>
+        </td>
+        <td colspan="2" id="leve2" class="hide">
+            <select name="leves" id="pId" class="form-control">
+                #foreach($lv in $!{LEVE1})
+                    <option value="$!lv.id">$!lv.name</option>
+                #end
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>菜单类型：</th>
+        <td>
+            <div>
+                <label class="radio-inline">
+                    <input type="radio" onclick="goView()" id="view" name="type" value="view" ms-duplex=""> 链接</input>
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" onclick="goKey()" id="click" name="type" value="click" ms-duplex=""> 关键词</input>
+                </label>
+            </div>
+        </td>
+    </tr>
+    <tr id="w_view" class="hide">
+        <th> 链 接：</th>
+        <td colspan="3"><input type="text" id="url" ms-duplex="" class="form-control" placeholder=""></td>
+    </tr>
+    <tr id="w_key" class="hide">
+        <th>关键词：</th>
+        <td colspan="3"><input type="text" id="key" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+    </tr>
+
+    </tbody>
+</table>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cmm = {}
+    var id = "$!{ID}"
+    $(document).ready(function () {
+        $('#leve1').change(function () {
+            var leve1 = $(this).val();
+            if (leve1 == 2) {
+                $("#leve2").removeClass("hide");
+            } else {
+                $("#leve2").addClass("hide");
+            }
+        })
+
+        if (id != null && id != "") {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/weChat/menuMgr/getMenuById",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("拉去数据失败");
+                    } else {
+                        cmm = text.data;
+                        $("#name").val(cmm.name);
+                        $("#sort").val(cmm.sort);
+                        $("#leve1").val(cmm.leves);
+                        if (cmm.leves == 2) {
+                            $("#leve2").removeClass("hide");
+                            $("#pId").val(cmm.pId);
+                        }
+                        $("input[name=type][value='" + cmm.type + "']").attr("checked", 'checked');
+                        if (cmm.type == "view") {
+                            $("#w_view").removeClass("hide");
+                            $("#w_key").addClass("hide");
+                        } else {
+                            $("#w_key").removeClass("hide");
+                            $("#w_view").addClass("hide");
+                        }
+                        $("#url").val(cmm.url);
+                        $("#key").val(cmm.key);
+                    }
+                }
+            });
+        } else {
+            $("#view").attr("checked", true);
+            var type = $("input:radio[name='type']:checked").val();
+            if (type == "view") {
+                $("#w_view").removeClass("hide");
+            } else {
+                $("#w_key").removeClass("hide");
+            }
+
+        }
+    })
+
+    function goView() {
+        $("#w_view").removeClass("hide");
+        $("#w_key").addClass("hide");
+    }
+
+    function goKey() {
+        $("#w_key").removeClass("hide");
+        $("#w_view").addClass("hide");
+    }
+
+    function saveEdit() {
+        cmm.name = $("#name").val();
+        cmm.sort = $("#sort").val();
+        cmm.leves = $("#leve1").val();
+        if (cmm.leves == 2) {
+            cmm.pId = $("#pId").val();
+        }
+        if (cmm.leves == 1 && (cmm.name.length < 0 || Ls.strLen(cmm.name) > 8)) {
+            Ls.tipsInfo("一级菜单字符数在0~8之间");
+            return;
+        }
+        if (cmm.leves == 2 && (cmm.name.length < 0 || Ls.strLen(cmm.name) > 14)) {
+            Ls.tipsInfo("二级菜单字符数在0~14之间");
+            return;
+        }
+        cmm.type = $("input:radio[name='type']:checked").val();
+        cmm.url = $("#url").val();
+        cmm.key = $("#key").val();
+        Ls.ajax({
+            data: cmm,
+            url: "/weChat/menuMgr/saveMenu",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败");
+                } else {
+                    Ls.tipsOk("保存成功");
+                    Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+                }
+            }
+        });
+    }
+
+
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            api.button(
+                {
+                    name: '保 存',
+                    callback: function () {
+                        saveEdit();
+                        return false;
+                    },
+                    focus: true
+                }
+            )
+        })
+    }
+</script>

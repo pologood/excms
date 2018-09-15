@@ -1,0 +1,94 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="430"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="public_report_tree" class="ztree"></ul>
+        </div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light" style="display:none;">
+            <div class="portlet-title">
+                <div class="caption font-grey-silver">
+                    <span class="caption-subject bold uppercase">统计指标</span>
+                </div>
+            </div>
+
+            <div class="portlet-body form col-md-8" style="padding-left: 0;">
+                <form id="public_report_form" role="form" ms-controller="public_report_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>指标名称</label>
+                            <input type="text" name="title" class="form-control" ms-duplex="title">
+                        </div>
+                        <div class="form-group">
+                            <label>单位</label>
+                            <input type="text" name="unit" class="form-control" ms-duplex="unit">
+                        </div>
+                        <div class="form-group">
+                            <label>排序号</label>
+                            <input type="text" name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                        </div>
+
+                        <div class="form-group">
+                            <label>自定义值</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isFill" value="false"
+                                                                   ms-duplex-boolean="isFill">否</label>
+                                <label class="radio-inline"><input type="radio" name="isFill" value="true"
+                                                                   ms-duplex-boolean="isFill">是</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ms-if="nofill_value">
+                            <label>自定义SQL</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isSql" value="false"
+                                                                   ms-duplex-boolean="isSql">否</label>
+                                <label class="radio-inline"><input type="radio" name="isSql" value="true"
+                                                                   ms-duplex-boolean="isSql">是</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ms-if="sql_value">
+                            <label>SQL语句</label>
+                            <textarea class="form-control" name="sql" rows="3" ms-duplex="sql"></textarea>
+                        </div>
+
+                        <div class="form-group" ms-if="nosql_value">
+                            <label>指标统计项</label>
+                            <textarea class="form-control" name="backup1" placeholder="信息公开目录ID，逗号隔开，这个主要针对主动公开数据" rows="4"
+                                      ms-duplex="backup1" readonly
+                                      ms-click="publicReportEdit.selectKeyIds()"></textarea>
+                        </div>
+
+                        <div class="form-actions noborder">
+                            <button type="submit" class="btn blue">保 存</button>
+                            <button type="reset" class="btn default">重 置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        id: "public_report_form",
+        public_report_list_url: "/public/report/getPublicReportList",//查询统计指标列表
+        public_report_url: "/public/report/getPublicReport",//获取统计指标对象
+        public_catalog_url: "/public/catalog/getPublicCatalogSelect",//获取统计指标对象
+        save_url: "/public/report/saveOrUpdate",//保存url
+        public_report_tree_id: "public_report_tree",
+        tree: null,//树对象
+        vm: null,//模型
+        type: null//新增或修改
+    };
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_report_edit.js?v=1"></script>
+<script>
+    $(document).ready(function () {
+        publicReportEdit.init();
+    });
+</script>

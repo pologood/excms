@@ -1,0 +1,160 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row mt10">
+                <div class="col-md-12 col-lg-12">
+                    <button  class="addBtn btn btn-default btn-add" onclick="add()">添 加</button>
+                     <button  class="addBtn btn btn-default btn-add" onclick="deleteAll()">批量删除</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;" onPageChanged="onPageChanged"
+             collapseGroupOnLoad="false"
+             allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             url="/memberRole/getBbsMemberRoleList?siteId=$!{siteId}" showPager="false"
+             sizeList="[10,20,30,50]" pageSize="15"
+             idField="id" multiSelect="true">
+            <div property="columns">
+                <div type="checkcolumn" name="check"></div>
+                <div field="riches" width="100%" headerAlign="center" align="center">积分</div>
+                <div field="" width="100%" headerAlign="center" align="center" renderer="getLink">角色名称</div>
+                <div field="" width="100%" headerAlign="center" align="center" renderer="getStarNumber">星星数</div>
+                <div field="" width="380" headerAlign="center" renderer="renderOpt" align="center">操作
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+
+        var cur = {
+            params: {
+                dataFlag: 1,
+                opt: []
+            },
+        }
+
+
+        var recType = -1;
+
+        $(document).ready(function () {
+            mini.parse();
+            cur.grid = mini.get("datagrid1");
+            cur.grid.load(cur.params);
+            //重置 datagrid 高度
+            Ls.mini_datagrid_height(cur.grid);
+        });
+
+        function getLink(e) {
+            var rec = e.record;
+            var str = '<a onclick="modify(' + rec.id + ')">'+rec.name + '</a>';
+            return str;
+        }
+
+        function getStarNumber(e) {
+            var rec = e.record;
+            var starNumber = rec.starNumber;
+            var str ='';
+            if(rec.starNumber=='1'){
+                str = '<div style="color:red">★</div>';
+            }
+            if(rec.starNumber=='2'){
+                str = '<div style="color:red">★★</div>';
+            }
+            if(rec.starNumber=='3'){
+                str = '<div style="color:red">★★★</div>';
+            }
+            if(rec.starNumber=='4'){
+                str = '<div style="color:red">★★★★</div>';
+            }
+            if(rec.starNumber=='5'){
+                str = '<div style="color:red">★★★★★</div>';
+            }
+            if(rec.starNumber=='6'){
+                str = '<div style="color:red">★★★★★★</div>';
+            }
+            if(rec.starNumber=='7'){
+                str = '<div style="color:red">★★★★★★★</div>';
+            }
+            if(rec.starNumber=='8'){
+                str = '<div style="color:red">★★★★★★★★</div>';
+            }
+            if(rec.starNumber=='9'){
+                str = '<div style="color:red">★★★★★★★★★</div>';
+            }
+            return str;
+        }
+
+        function renderOpt(e) {
+            //操作
+            var rec = e.record;
+            var str = "";
+                str += '<button id="_p" class=" btn btn-default btn-sm" onclick="modify(' + rec.id + ')">修 改</button> ';
+                str += '<button id="_p" class=" btn btn-default btn-sm" onclick="deleteById(' + rec.id + ')">删 除</button>';
+            return str;
+        }
+
+
+        function getIdS() {
+            var rows = cur.grid.getSelecteds();
+            var ids = [];
+            for (i = 0; i < rows.length; i++) {
+                ids.push(rows[i].id);
+            }
+            return ids;
+        }
+
+
+        var deleteAll = function () {
+            var contentIds = getIdS();
+            if (contentIds == null || contentIds.length <= 0) {
+                Ls.tipsInfo("请选择数据！")
+                return;
+            }
+            if (confirm("您确定删除嘛")) {
+                Ls.ajaxGet({
+                    url: "/memberRole/batchDelete",
+                    data: {
+                        ids: contentIds
+                    },
+                    success: function (text) {
+                        Ls.tipsOk("删除成功！")
+                        cur.grid.reload();
+                    }
+                });
+
+            }
+
+        }
+
+        //单个删除
+        function deleteById(id) {
+            if (confirm("确定删除该角色吗？")) {
+                Ls.ajaxGet({
+                    data: {
+                        id: id
+                    },
+                    url: "/memberRole/delete",
+                    success: function (text) {
+                        Ls.tipsOk("删除成功");
+                        cur.grid.reload();
+
+                    }
+                });
+            }
+        }
+
+        //修改
+        function modify(id) {
+                App.getContentHtml('/memberRole/memberRoleInfo?id=' + id,"");
+        }
+
+        //add
+        function add() {
+            App.getContentHtml('/memberRole/add',"");
+        }
+
+
+    </script>

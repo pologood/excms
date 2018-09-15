@@ -1,0 +1,408 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div id="" style="margin:10px 30px">
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">终端详情 - 操作系统</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-group form-inline ">
+                                    <input type="text" name="st_s" id="st_s" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" id="ed_s" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <button type="button" class="btn btn-default btn-search" onclick="visitOS()">查询</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClearOS()">清除条件</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12" style="height:400px" id="v_os_pie"></div>
+                                    <div class="col-md-8 col-sm-12" id="v_os_line" style="height:400px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        ##            <div class="row">
+        ##                <div class="col-md-12 col-sm-12">
+        ##                    <div class="portlet light bordered mb25">
+        ##                        <div class="portlet-title">
+        ##                            <div class="caption">
+        ##                                <i class="icon-bar-chart font-blue"></i>
+        ##                                <span class="caption-subject font-blue bold">终端详情 - 浏览器</span> &nbsp;
+        ##                                <span class="caption-helper"></span>
+        ##                            </div>
+        ##                            <div style="float:right;">
+        ##                                <div class="form-group form-inline ">
+        ##                                    <input type="text" name="st_e" id="st_e" class="form-control w160"
+        ##                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+        ##                                    <input type="text" id="ed_e" class="form-control w160"
+        ##                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+        ##                                    <button type="button" class="btn btn-default btn-search" onclick="visitBrowser()">查询</button>
+        ##                                    <button type="button" class="btn btn-default" onclick="searchClearBrowser()">清除条件</button>
+        ##                                </div>
+        ##                            </div>
+        ##                        </div>
+        ##                        <div class="portlet-body">
+        ##                            <div>
+        ##                                <div class="row">
+        ##                                    <div class="col-md-4 col-sm-12" style="height:400px" id="v_browser_pie"></div>
+        ##                                    <div class="col-md-8 col-sm-12" id="v_browser_line" style="height:400px"></div>
+        ##                                </div>
+        ##                            </div>
+        ##                        </div>
+        ##                    </div>
+        ##                </div>
+        ##            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">终端详情 - 其他</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-group form-inline ">
+                                    <input type="text" name="st_o" id="st_o" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" id="ed_o" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <button type="button" class="btn btn-default btn-search" onclick="visitOther()">查询</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClearOther()">清除条件</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-6 col-sm-12" style="height:400px" id="v_px_pie"></div>
+                                    <div class="col-md-6 col-sm-12" id="v_l_line" style="height:400px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    $(document).ready(function () {
+        Ls.parseEcharts(function () {
+            require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie',
+                'echarts/chart/funnel'
+            ], function (ec) {
+                searchClearOS();
+                visitBrowser();
+                visitOther();
+            })
+        })
+    })
+
+    function searchClearOS() {
+        $("#st_s").val("");
+        $("#ed_s").val("");
+        visitOS();
+    }
+
+    function visitOS() {
+        var cmm = {};
+        cmm.st = $("#st_s").val();
+        cmm.ed = $("#ed_s").val();
+        Ls.ajaxGet({
+            url: "/clientInfo/getClientOs",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+
+                    if (d.menuOS.length > 0 && d.osType.length > 0) {
+                        var option_os_pie = getOptionPie2(d.menuOS, d.osType, d.osStat, '操作系统')
+                        var chart_a1 = require('echarts').init(document.getElementById('v_os_pie'));
+                        chart_a1.setOption(option_os_pie);
+                    } else {
+                        $("#v_os_pie").html("暂无数据");
+                    }
+                    if (d.menuLine.length > 0 && d.timeList.length > 0 && d.lineData.length > 0) {
+                        var option_os_line = getOptionLine(d.menuLine, d.timeList, d.lineData)
+                        var chart_a2 = require('echarts').init(document.getElementById('v_os_line'));
+                        chart_a2.setOption(option_os_line);
+                    } else {
+                        $("#v_os_line").html("暂无数据");
+                    }
+                }
+            }
+        });
+    }
+
+    function visitBrowser() {
+        var cmm = {};
+        cmm.st = $("#st_e").val();
+        cmm.ed = $("#ed_e").val();
+        Ls.ajaxGet({
+            url: "/clientInfo/getBrowser",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    if (d.browserMenu.length > 0 && d.browserData.length > 0) {
+                        var option_b_pie = getOptionPie(d.browserMenu, d.browserData, "浏览器")
+                        var chart_a1 = require('echarts').init(document.getElementById('v_browser_pie'));
+                        chart_a1.setOption(option_b_pie);
+                    } else {
+                        $("#v_browser_pie").html("暂无数据");
+                    }
+                    if (d.browserLine.length > 0 && d.timeList.length > 0 && d.lineData.length > 0) {
+                        var option_browser_line = getOptionLine(d.browserLine, d.timeList, d.lineData)
+                        var chart_a2 = require('echarts').init(document.getElementById('v_browser_line'));
+                        chart_a2.setOption(option_browser_line);
+                    } else {
+                        $("#v_browser_line").html("暂无数据");
+                    }
+                }
+            }
+        });
+    }
+
+    function visitOther() {
+        var cmm = {};
+        cmm.st = $("#st_o").val();
+        cmm.ed = $("#ed_o").val();
+        Ls.ajaxGet({
+            url: "/clientInfo/getOtherInfo",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    if (d.reMenu.length > 0 && d.reData.length > 0) {
+                        var option_px_pie = getOptionPie(d.reMenu, d.reData, "分辨率")
+                        var chart_a1 = require('echarts').init(document.getElementById('v_px_pie'));
+                        chart_a1.setOption(option_px_pie);
+                    } else {
+                        $("#v_px_pie").html("暂无数据");
+                    }
+
+                    if (d.langMenu.length > 0 && d.langData.length > 0) {
+                        var option_l_pie = getOptionPie(d.langMenu, d.langData, "语言")
+                        var chart_a1 = require('echarts').init(document.getElementById('v_l_line'));
+                        chart_a1.setOption(option_l_pie);
+                    } else {
+                        $("#v_l_line").html("暂无数据");
+                    }
+                }
+            }
+        });
+
+    }
+
+    function searchClearOther() {
+        $("#st_o").val("");
+        $("#ed_o").val("");
+        visitOther();
+    }
+
+    function searchClearBrowser() {
+        $("#st_e").val("");
+        $("#ed_e").val("");
+        visitBrowser();
+    }
+
+    function getOptionPie(name, datas, text) {
+        option = {
+            title: {
+                text: text,
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data: name
+            },
+            series: [
+                {
+                    name: text,
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    selectedMode: 'single',
+                    data: datas,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        return option;
+    }
+
+    function getOptionLine(pieName, timeList, data) {
+        option = {
+            title: {
+                text: '',
+                x: 'bottom'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: pieName
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['line', 'bar']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                start: 0,
+                end: 100
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: timeList
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: data,
+        };
+        return option;
+    }
+
+    function getOptionPie2(menuOS, inner, outer, text) {
+        option = {
+            title: {
+                text: text,
+                x: 'center'
+            },
+
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data: []
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            calculable: false,
+            series: [
+                {
+                    name: text,
+                    type: 'pie',
+                    selectedMode: 'single',
+                    radius: [0, 60],
+
+                    x: '20%',
+                    width: '40%',
+                    funnelAlign: 'right',
+
+                    itemStyle: {
+                        normal: {
+                            label: {
+                                position: 'inner'
+                            },
+                            labelLine: {
+                                show: false
+                            }
+                        }
+                    },
+                    data: inner
+                },
+                {
+                    name: text,
+                    type: 'pie',
+                    radius: [90, 140],
+
+                    x: '60%',
+                    width: '35%',
+                    funnelAlign: 'left',
+                    max: 1048,
+                    data: outer
+                }
+            ]
+        };
+        return option;
+    }
+
+</script>

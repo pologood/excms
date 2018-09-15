@@ -1,0 +1,224 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#if("$!{paramObj.type}" == '1')
+<h1 class="newstitle">
+    $!{resultObj.title}
+</h1>
+<div class="newsinfo myinfo voteinfo">
+        <span>调查时间：
+            [ #date_format("$!{resultObj.startTime}","$!{paramObj.dateFormat}") ]
+            至
+            [ #date_format("$!{resultObj.endTime}","$!{paramObj.dateFormat}") ]
+        </span>
+        <span>状态：
+            #if("$!{resultObj.isTimeOut}" == "1")
+                <i class="nostart">未开始</i>
+            #elseif("$!{resultObj.isTimeOut}" == "2")
+                <i class="starting">进行中</i>
+            #elseif("$!{resultObj.isTimeOut}" == "3")
+                <i class="over">已结束</i>
+            #else
+            #end
+       </span>
+</div>
+<div class="vote-info">
+    $!{resultObj.content}
+</div>
+<script>
+    var questionIds = [];
+    var questionType = [];
+    var velocityCounts = [];
+</script>
+<div class="vote-main">
+    #foreach($qu in $resultObj.questions)
+        <script>
+            questionIds.push("$!{qu.questionId}");
+            questionType.push("$!{qu.options}");
+            velocityCounts.push("$!{velocityCount}")
+        </script>
+        #if($!{qu.options} != 3)
+            <div class="vote-lsit">
+                <div class="title">$!{velocityCount}、$!{qu.title}</div>
+                <ul>
+                    #foreach($op in $qu.optionsList)
+                        <li>
+                            <input id="op_$!{op.optionId}" onclick="checkParams($!{qu.questionId},$!{op.optionId},$!{qu.options},'$!{qu.optionsCount}')" name="option_$!{qu.questionId}"
+                                   value="$!{op.optionId}" #if($!{qu.options} == 1) type="radio" #else type="checkbox" #end>$!{op.title}</li>
+                    #end
+                </ul>
+            </div>
+        #else
+            <div class="vote-lsit">
+                <div class="title">$!{velocityCount}、$!{qu.title}</div>
+                <ul>
+                    <li class="vote-textarea"><textarea id="content_$!{qu.questionId}"></textarea></li>
+                </ul>
+            </div>
+        #end
+    #end
+</div>
+    #if($resultObj.questions.size()>0)
+        <div class="vote-code">
+            <span class="text-code"><span style="color:#f00; padding-right:5px;">*</span>验<span class="s01"></span>证<span class="s02"></span>码：</span>
+            <input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            <img id="imgCode" class="img-code" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+        </div>
+        <div class="vote-btn">
+            #if($!{resultObj.isTimeOut} == 2)
+                <button class="btn-submit" type="button" onclick="save()">提交</button>
+                #if($!{resultObj.isVisible} == 1)
+                    <button class="btn-review" type="button" onclick="location.href='$!{resultObj.viewUrl}'">查看</button>
+                #end
+            #end
+            #if($!{resultObj.isTimeOut} == 3)
+                #if($!{resultObj.isVisible} == 1)
+                    <button class="btn-review" type="button" onclick="location.href='$!{resultObj.viewUrl}'">查看</button>
+                #end
+            #end
+        </div>
+    #end
+<script>
+
+    $(document).ready(function (e) {
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        })
+
+    });
+
+    function checkParams(questionId, optionId, options, optionsCount) {
+        if (options == 2) {
+            if ($("input[name=option_" + questionId + "]:checked").length > optionsCount) {
+                $("#op_" + optionId).attr("checked", false);
+                alert("最多可选" + optionsCount + "项!");
+            }
+        }
+    }
+
+    function save() {
+        var dataParams = [];
+        for (var oi = 0; oi < questionType.length; oi++) {
+            var dataQuestion = {themeId: '$!{resultObj.themeId}', questionId: '', optionType: '', optionIds: '', content: ''};
+            var qt = questionType[oi];
+            var vc = velocityCounts[oi];
+            var qids = questionIds[oi];
+            dataQuestion.questionId = qids;
+            dataQuestion.optionType = qt;
+            if (qt == '1') {
+                var optionRadio = $("input[name=option_" + qids + "]:checked");
+                if (optionRadio.length == 0) {
+                    alert("第" + vc + "题未选择选项");
+                    return;
+                } else {
+                    dataQuestion.optionIds = optionRadio.val();
+                }
+            } else if (qt == '2') {
+                var optioncheckBox = $("input[name=option_" + qids + "]:checked");
+                if (optioncheckBox.length == 0) {
+                    alert("第" + vc + "题未选择选项");
+                    return;
+                } else {
+                    var seloptionids = '';
+                    $("input[name=option_" + qids + "]:checked").each(function (i, optionObj) {
+                        seloptionids = (seloptionids == '' ? seloptionids : seloptionids + ",") + optionObj.value;
+                    });
+                    dataQuestion.optionIds = seloptionids;
+                }
+            } else if (qt == '3') {
+                dataQuestion.content = $("#content_" + qids).val();
+                if (dataQuestion.content != '' && dataQuestion.content.length > 1000) {
+                    alert("第" + vc + "题评议内容过长！");
+                    return;
+                }
+            }
+            dataParams.push(dataQuestion)
+        }
+        var checkCode = $("#checkimg").val();
+        if (checkCode == '') {
+            alert("验证码不能为空！");
+            return;
+        }
+        Ls.ajax({
+            url: "/content/saveSurveyWeb",
+            data: {resultList: JSON.stringify(dataParams), checkCode: checkCode}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("提交成功");
+                location.href = "$!{resultObj.viewUrl}";
+            } else {
+                alert(d.desc);
+                $("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+</script>
+
+#else
+<h1 class="newstitle">$!{resultObj.title}</h1>
+<div class="newsinfo myinfo voteinfo">
+    <span>调查时间：
+            [ #date_format("$!{resultObj.startTime}","$!{paramObj.dateFormat}") ]
+            至
+            [ #date_format("$!{resultObj.endTime}","$!{paramObj.dateFormat}") ]
+        </span>
+        <span>状态：
+            #if("$!{resultObj.isTimeOut}" == "1")
+                <i class="nostart">未开始</i>
+            #elseif("$!{resultObj.isTimeOut}" == "2")
+                <i class="starting">进行中</i>
+            #elseif("$!{resultObj.isTimeOut}" == "3")
+                <i class="over">已结束</i>
+            #else
+            #end
+       </span>
+</div>
+<div class="vote-info">
+    $!{resultObj.content}
+</div>
+<table class="vote-show">
+    <tbody>
+        #foreach($qu in $resultObj.questions)
+            #if($!{qu.options} != 3)
+            <tr>
+                <th>$!{velocityCount}、$!{qu.title}</th>
+            </tr>
+                #foreach($op in $qu.optionsList)
+                <tr>
+                    <td>
+                        <div class="vote_con clearfix">
+                            <span class="c1">$!{op.title}</span>
+                                    <span class="c2">
+                                        <span class="progress-bar">
+                                            <span class="progress" style="width:$!{op.progress}%"></span>
+                                        </span>
+                                    </span>
+                            <span class="c3"><i>#if($!{resultObj.isVisible} == 1)$!{op.votesCount}</i> 票#end </span>
+                        </div>
+                    </td>
+                </tr>
+                #end
+            #else
+            <tr>
+                <th>$!{velocityCount}、$!{qu.title}</th>
+            </tr>
+                #foreach($rl in $qu.replys)
+                <tr>
+                    <td>
+                        <div class="vote_content">
+                            $!{rl.content}
+                        </div>
+                    </td>
+                </tr>
+                #end
+            #end
+        #end
+    </tbody>
+</table>
+#end

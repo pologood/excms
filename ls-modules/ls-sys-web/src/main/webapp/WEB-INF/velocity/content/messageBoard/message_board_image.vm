@@ -1,0 +1,21 @@
+<div>
+    <img src="$!{image}" width="600px" height="450px">
+</div>
+<script>
+
+    $(document).ready(function () {
+        var api = Ls.getWin.api;
+        if (!api) return;
+        // 操作对话框
+        api.button({
+                id: 'ab',
+                name: '返回',
+                callback: function () {
+                    Ls.winClose();
+                    return false;
+                }
+            }
+        );
+    });
+
+</script>

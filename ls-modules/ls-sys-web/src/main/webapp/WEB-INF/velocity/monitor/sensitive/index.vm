@@ -1,0 +1,330 @@
+<style>
+    .search_check{ border: 1px solid #c2cad8;height:34px;width:160px;vertical-align: middle;text-align: left;padding: 5px 15px;font-size: 1.1em;background-color: #f0f0f0; }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:10px 20px 0px 20px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">敏感词</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="table-toolbar" style="margin-bottom: 10px">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="pdr10">
+                                    <button type="button" class="btn btn-default btn-add" id="btn-lon"
+                                            onclick="change(0)"> 龙讯云平台词库
+                                    </button>
+                                    <button type="button" class="btn btn-default" id="btn-custom"
+                                            onclick="change(1)"> 自定义词库
+                                    </button>
+                                    <button class="btn btn-default btn-check-all" onclick="checkAll('sensitive')">
+                                        全局检测
+                                    </button>
+                                    <button id="update" type="button" class="btn btn-default"
+                                            onclick="upd(this)"> 在线更新词库
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+
+
+                                <form class="form-inline tr search-toolbar" role="form" onsubmit="return false;">
+                                    <div class="form-group search_check">
+                                        <input id="seriousErr" type="checkbox" onclick="search()" style="margin-right:3px;"> 是否为严重错误
+                                    </div>
+                                    <div  class="form-group" style="margin-top:1px;">
+                                        <input type="text" id="keyValue" name="keyValue" onkeypress="if(event.keyCode == '13'){search()}"  placeholder="关键字" class="form-control" />
+                                    </div>
+
+                                    <button class="btn btn-default" type="button" onclick="search();">搜索</button>
+                                    <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部</button>
+
+                                    <button id="add" type="button" class="btn btn-default btn-add"
+                                            onclick="editOrAddSensitiveEO('add')" hidden="true"> 新增
+                                    </button>
+                                    <button id="import" type="button" class="btn btn-default btn-excel-import"
+                                            onclick="importExcel('easyErr')" hidden="true"> 导入
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div id="datagrid3" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="false"
+                         url="/monitor/wordsSensitive/getPageEOList" sizeList="[5,10,20,50]" pageSize="15 "
+                         idField="id" multiSelect="false" showColumnsMenu="true" sortField="createDate" sortOrder="desc" style="width:100%;display: block"
+                    >
+                        <div property="columns">
+                            <div type="indexcolumn" width="50"></div>
+                            <div field="words" width="40%" align="center" headerAlign="center" allowSort="true" >敏感词</div>
+                            <div field="replaceWords" width="40%" align="center" headerAlign="center">替换词</div>
+                            <div width="115" align="center" headerAlign="center" renderer="seriousErr">严重错误</div>
+                            <div field="createDate" width="20%" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                        #*<div field="siteName" width="50%" align="center" headerAlign="center">来源</div>
+                        <div width="115" align="center" headerAlign="center" allowSort="true" renderer="easyerrDeal">操作</div>*#
+                        </div>
+                    </div>
+                    <div id="datagrid2" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="false"
+                         url="/monitor/wordsSensitive/getPageEOList" sizeList="[5,10,20,50]" pageSize="15"
+                         idField="id" multiSelect="false" showColumnsMenu="true" sortField="createDate" sortOrder="desc" style="width:100%;display:none"
+                    >
+                        <div property="columns">
+                            <div type="indexcolumn" width="50"></div>
+                            <div field="words" width="30%" align="center" headerAlign="center" allowSort="true" >敏感词</div>
+                            <div field="replaceWords" width="30%" align="center" headerAlign="center">替换词</div>
+                            <div field="siteName" width="30%" align="center" headerAlign="center" renderer="renderSiteName">来源</div>
+                            <div width="115" align="center" headerAlign="center" allowSort="true" renderer="seriousErr">严重错误</div>
+                            <div field="createDate" width="150" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                            <div width="120" align="center" headerAlign="center" renderer="sensitiveDeal">操作</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        gridSensitive:mini.get("datagrid2"),
+        gridSensitiveFromCloud:mini.get("datagrid3"),
+        dialog: Ls.getWin.dialog,
+        seriousErr:$('#seriousErr'),
+        params:{
+            provenance:"Cloud"
+        }
+    };
+    $(document).ready(function () {
+        cur.gridSensitiveFromCloud.load({provenance:"Cloud"});
+        cur.gridSensitive.load();
+        /*
+        * grid高度渲染
+        * */
+        Ls.mini_datagrid_height(cur.gridSensitive, 70);
+        Ls.mini_datagrid_height(cur.gridSensitiveFromCloud, 70);
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+//        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+//            var id = e.currentTarget.hash;
+//            if (id == '#tab_1_1') {
+//                cur.gridSensitive.load();
+//            }
+//        });
+        change(0);
+    })
+
+    function change(type) {
+        if(type==0){
+            $("#datagrid3").css("display","block");
+            $("#datagrid2").css("display","none");
+            $("#btn-lon").addClass("btn-add");
+            $("#btn-custom").removeClass("btn-add");
+            $('.btn-excel-import').css("display","none");
+            $('#add').css("display","none");
+            $('#update').css("display","inline-block");
+            cur.params.provenance = "Cloud";
+            search();
+        }else{
+
+            $("#datagrid3").css("display","none");
+            $("#datagrid2").css("display","block");
+            Ls.mini_datagrid_height(cur.gridSensitive, 70);
+            $("#btn-lon").removeClass("btn-add");
+            $("#btn-custom").addClass("btn-add");
+            $('.btn-excel-import').css("display","inline-block");
+            $('#add').css("display","inline-block");
+            $('#update').css("display","none");
+            cur.params.provenance = "Other";
+            search();
+        }
+    }
+
+    //更新
+    function upd(ele) {
+        var text = $(ele).html();
+        $(ele).html("更新中...");
+        Ls.ajaxGet({
+            url: "/monitor/wordsSensitive/getWordsSensitiveList",
+            data: {},
+            success: function (resp) {
+                $(ele).html(text);
+                if (resp.status == 1) {
+                    cur.gridSensitiveFromCloud.reload();
+                    Ls.tips("敏感词同步成功", {times: 2});
+                } else {
+                    Ls.tips("敏感词同步失败，错误信息：" + resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+    /*
+    * 热词链接打开方式映射
+    * */
+    function openType(obj) {
+        if (!Ls.isEmpty(obj)) {
+            var record = obj.record;
+            switch (record.openType) {
+                case 0 :
+                    return "新窗口";
+                    break;
+                case 1 :
+                    return "当前窗口";
+                    break;
+            }
+        }
+    }
+
+    function editOrAddSensitiveEO(type,id) {
+        var url = '/monitor/wordsSensitive/addOrEdit';
+        cur.dialog.data('type', type);
+        var title = "添加敏感词";
+        if (type == 'add') {
+            url = '/monitor/wordsSensitive/addOrEdit?type=add';
+        } else {
+            var node = getSelectedNode('sensitive',id);
+            cur.dialog.data('node', node);
+            title = "修改敏感词";
+        }
+        Ls.openWin(url, '500px', '270px', {
+            title: title
+        });
+    }
+
+
+    function sensitiveDeal(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editOrAddSensitiveEO(\'edit\','+record.id+')">修 改</button> ' +
+                '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delByType(\'sensitive\','+record.id+')">删 除</button>';
+        return diyDom;
+    }
+
+    function seriousErr(obj) {
+        var record = obj.record;
+        var str = "";
+        if(record.seriousErr!=null && record.seriousErr==0){
+            str="是";
+        }else {
+            str="否";
+        }
+        return str;
+    }
+
+    function renderSiteName(obj){
+        var record = obj.record;
+        if(record.provenance == 'Cloud'){
+            return "云平台";
+        }else{
+            return record.siteName;
+        }
+    }
+
+
+    function delByType(type,id) {
+        var node = getSelectedNode(type,id);
+        var url = "/monitor/wordsSensitive/delEO";
+
+        if(confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: url,
+                data: {
+                    id: node.id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.gridSensitive.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function search() {
+        var keyValue = $("#keyValue").val();
+        var seriousErr = cur.seriousErr.is(":checked")?"0":"";
+        if(cur.params.provenance == 'Cloud'){
+            cur.gridSensitiveFromCloud.load($.extend({keyValue: keyValue, seriousErr:seriousErr,pageIndex:0},cur.params));
+        }else{
+            cur.gridSensitive.load($.extend({keyValue: keyValue, seriousErr:seriousErr,pageIndex:0}, cur.params));
+        }
+    }
+
+    function showAll() {
+        $("#keyValue").val('');
+        search();
+    }
+
+    function importExcel(type) {
+
+        var url = '/monitor/wordsSensitive/excel';
+        var title = "导入敏感词";
+        cur.excelgrid = cur.gridSensitive;
+        Ls.openWin(url, '400px', '260px', {
+            title: title
+        });
+    }
+
+    function upload_success() {
+        Ls.tips("上传成功!", {times: 2});
+    }
+
+    function upload_error(msg) {
+        Ls.tips(msg, {times: 3});
+    }
+
+    function exportExcel(type) {
+        var keyValue = $("#keyValue").val();
+        var seriousErr = cur.seriousErr.is(":checked")?"0":"";
+        $("#download_frame").attr("src", "$!{rc.contextPath}/words/" + type + "/import?keyValue=" + keyValue+"&seriousErr=" + seriousErr);
+    }
+
+    function getSelectedNode(type,id) {
+        return cur.gridSensitive.findRow(function(row){
+            if(row.id == id) return true;
+        });
+    }
+
+    function success_save_callback(type,msg) {
+        search();
+        Ls.tips(msg, {times: 2});
+    }
+
+    function checkAll(type) {
+        var title = '全局敏感词检测';
+        Ls.openWin("/monitor/wordsSensitive/checkAll", '900px', '560px', {
+            title: title,
+            init: function () {
+                indexMgr.winName = this.iframe.contentWindow;
+            }
+        });
+    }
+
+    function synWords() {
+        var tips = Ls.tips("同步中",{icons:'loading',autoClose:false});
+        Ls.ajaxGet({
+            url: "/monitor/wordsSensitive/synWords",
+            data: {},
+            success: function (resp) {
+                tips.hide();
+                if(resp.status == 1) {
+                    Ls.tips(resp.desc);
+                    cur.gridSensitive.load();
+                } else {
+                    Ls.tips(resp.desc,{icons:"error"});
+                }
+            },
+            error: function(e) {
+                tips.hide();
+                Ls.tips("系统错误!",{icons:"error"});
+            }
+        });
+    }
+
+</script>

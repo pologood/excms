@@ -1,0 +1,300 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box">
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                            ##                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+##                                    批量操作 <i
+##                                        class="fa fa-angle-down"></i></button>
+##                                <ul class="dropdown-menu">
+##                                    <li class="publishBtn"
+##                                        onclick="cur.typeCode == 'messageBoard' ? batchPublish_messageBoard() : batchPublish()">
+##                                        <a href="javascript:;">批量发布</a></li>
+##
+##                                    <li class="publishBtn" id="batchMove_news" style="display: none"
+##                                        onclick="batchMove_news()"><a href="javascript:;">批量移动</a></li>
+##
+##                                    <li class="publishBtn"
+##                                        onclick="cur.typeCode == 'messageBoard' ? batchDelete_messageBoard() : batchDelete()">
+##                                        <a href="javascript:;">批量删除</a></li>
+##                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form class="form-inline tr search-toolbar" role="form">
+                            ##                                <div class="form-group">
+                            ##                                    <select type="text" id="columnCode" name="columnCode" class="form-control"
+                            ##                                            data-rule="必填项:required;columnCode" placeholder="必填项"></select>
+                            ##                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control"
+                                           placeholder="标题">
+                                    <input type="datetime" id="startTime" class="form-control w105" placeholder="开始时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endTime\')}',readOnly:true})" readonly>
+                                    <input type="datetime" id="endTime" class="form-control w105" placeholder="结束时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startTime\')}',readOnly:true})" readonly>
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()"> 搜 索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;"
+                     onPageChanged="onPageChanged"
+                     collapseGroupOnLoad="false"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                     url="/content/getAuditContents" sizeList="[10,20,30,50]" pageSize="10"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                    ##                        <div type="checkcolumn"></div>
+                        <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                        <div field="columnName" width="200" headerAlign="center" align="center">所属栏目</div>
+                        <div field="" width="50%" headerAlign="center" renderer="goLink">标题</div>
+                        <div field="author" width="100" headerAlign="center">发布人</div>
+                        <div field="publishDate" width="140" headerAlign="center" align="center"
+                             dateFormat="yyyy-MM-dd HH:mm:ss">发布时间
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="template" id="todo_nav">
+    <ul class="sidebar-nav">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <li>
+            <a href="javascript:;" data-code="<?==el.typeCode?>"> <?==el.typeName?>
+            ##                <span id="badge_<?==el.typeCode?>" class="badge badge-info"><?==el.count?></span>
+            </a>
+        </li>
+        <?}?>
+    </ul>
+
+</script>
+
+<script>
+    mini.parse();
+
+    var isSuper = '$!{isSuper}';
+
+    var cur = {
+        columnCode: $("#columnCode"),
+        grid: mini.get("datagrid1"),
+        dialog: Ls.getWin.dialog,
+        // hides: ['public_content', 'ordinaryPage', 'survey', 'linksMgr', 'leaderInfo', 'fileDownload', 'interviewInfo', 'collectInfo', 'reviewInfo', 'onlinePetition', 'workGuide', 'sceneService', 'bbs','commonProblem'],
+        shows: ['articleNews', 'pictureNews', 'videoNews'],
+        typeCode: '$!{typeCode}',
+        showType: '$!{showType}',
+    }
+
+    var gridParam = {
+        dataFlag: 1,
+        pageIndex: 0,
+        pageSize: 20
+    };
+
+    $(document).ready(function () {
+
+
+        //cur.grid.load(gridParam);
+        //重置 datagrid 高度
+
+        Ls.mini_datagrid_height(cur.grid);
+
+        loadTodoNum().done(function () {
+            var todoMenu;
+            todoMenu = $('.sidebar-nav').on('click', 'a', function () {
+                $("#searchKey").val("");
+                gridParam.title = '';
+                var $this =
+                $(this), code = $this.data("code");
+                    $this.parent('li').addClass('active').siblings().removeClass('active');
+                searchByTypeCode(code);
+                cur.typeCode = code;
+                if (cur.typeCode == "articleNews" || cur.typeCode == "pictureNews") {
+                    $("#batchMove_news").removeAttr("style");
+                } else {
+                    $("#batchMove_news").attr("style", "display:none;");
+                }
+
+                getUnAuditColumns();
+
+            })
+
+            if (cur.typeCode) {
+                todoMenu.find('a[data-code="' + cur.typeCode + '"]').trigger('click');
+            } else {
+                todoMenu.find('a:first').trigger('click');
+            }
+
+        });
+    });
+
+
+    function goLink(e) {
+        var rec = e.record
+        var str = "";
+        if (rec.redirectLink != null) {
+            str = '<a target="_blank" href="' + rec.redirectLink + '"><u>' + rec.title + '</u></a>';
+        } else {
+            if (rec.typeCode == "messageBoard") {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.baseContentId + '"><u>' + rec.title + '</u></a>';
+            } else {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.id + '"><u>' + rec.title + '</u></a>';
+            }
+        }
+        return str;
+    }
+
+    function loadTodoNum() {
+        return Ls.ajaxGet({
+            url: "/todolist/loadTodoList",
+            data: {
+                shows: cur.shows.join(","),
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            },
+            success: function (resp) {
+                if (resp == null) {
+                    Ls.tipsErr("加载失败!");
+                } else {
+                    $('#todo_box').html(Ls.template("todo_nav", resp));
+                }
+            }
+        });
+    }
+
+    function refreshTodoNum() {
+        return Ls.ajaxGet({
+            url: "/todolist/loadTodoNum",
+            data: {
+                typeCode: cur.typeCode,
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            },
+
+            success: function (resp) {
+                if (resp.status == 0) {
+                    Ls.tipsErr("加载失败!");
+                } else {
+                    $('#badge_' + cur.typeCode).html(resp.data);
+                }
+            }
+        });
+    }
+
+    //属性筛选
+    function searchByTypeCode(typeCode) {
+        cur.typeCode = typeCode;
+        gridParam.typeCode = typeCode;
+        gridParam.columnId = null;
+        cur.grid.load(gridParam);
+    }
+
+    //标题搜索
+    function search() {
+        var title = $("#searchKey").val();
+        var startTime = $("#startTime").val();
+        var endTime = $("#endTime").val();
+        gridParam.typeCode = cur.typeCode;
+        gridParam.title = title;
+        gridParam.startTime = startTime;
+        gridParam.endTime = endTime;
+        cur.grid.load(gridParam);
+    }
+
+    //显示全部
+    function showAll() {
+        $("#searchKey").val("");
+        $("#startTime").val("");
+        $("#endTime").val("");
+        gridParam.title = '';
+        gridParam.startTime = '';
+        gridParam.endTime = '';
+        search();
+    }
+
+    //打开详情窗口
+    function details(id, typeCode, columnId) {
+        cur.typeCode = typeCode;
+        cur.dialog.data('siteId', GLOBAL_SITEID);
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/todolist/showDetail?typeCode=' + typeCode + '&columnId=' + columnId + '&id=' + id, {
+            id: 'record',
+            title: '内容详情',
+            width: '1000px',
+            height: height + 'px',
+            padding: 0,
+            lock: true,
+        });
+    }
+
+    function callBack(msg) {
+        Ls.tips(msg);
+        cur.grid.load(gridParam);
+    }
+
+    function getUnAuditOrgans() {
+        cur.columnCode.empty();
+        Ls.ajaxGet({
+            url: "/content/getUnAuditColumns",
+        }).done(function (response) {
+            var str = '<option value=""> 请选择栏目 </option> ';
+            if (response != null && response.data != null) {
+                var data = response.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].columnId + '>' + data[i].columnName + '</option> '
+                    }
+                }
+            }
+            cur.columnCode.append(str);
+        });
+    }
+
+    function getUnAuditColumns() {
+        var codeType = cur.typeCode;
+        if (isSuper == 1 && cur.typeCode == 'guestBook') {
+            codeType = 'messageBoard';
+        }
+        cur.columnCode.empty();
+        Ls.ajaxGet({
+            url: "/content/getUnAuditColumns",
+            data: {
+                typeCode: codeType,
+                isDividePublic: cur.isDividePublic,
+                publicColumnId: cur.publicColumnId
+            }
+        }).done(function (response) {
+            var str = '<option value=""> 请选择栏目 </option> ';
+            if (response != null && response.data != null) {
+                var data = response.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].columnId + '>' + data[i].columnName + '</option> '
+                    }
+                }
+            }
+            cur.columnCode.append(str);
+        });
+    }
+</script>

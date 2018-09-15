@@ -1,0 +1,105 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="formLeaderType" role="form" ms-controller="formLeaderType">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>分类名称：</label>
+                    <input name="title" type="text" class="form-control" placeholder="分类名称不能为空" ms-duplex="title">
+                </div>
+
+                <div class="form-group">
+                    <label>排序：</label>
+                    <input name="sortNum" type="text" class="form-control" placeholder="排序不能为空" ms-duplex="sortNum">
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        typeId: '$!{typeId}',
+        params: {
+            siteId: Ls.url.get("siteId"),
+            columnId: Ls.url.get("columnId")
+        }
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                type: "POST",
+                url: "/leaderType/getLeaderType",
+                data: {
+                    typeId: cur.typeId,
+                    siteId:cur.params.siteId,
+                    columnId:cur.params.columnId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formLeaderType"
+                data.$id = cur.$id;
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+
+            })
+
+        };
+
+        getData();
+
+        $('#formLeaderType').validator({
+            fields: {
+                'title': '分类名称:required;length[2~50]',
+                'sortNum':'排序:required;integer;range[0~99999]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            var url = "/leaderType/save";
+            Ls.ajax({
+                url: url,
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        icons: "success", callback: function () {
+                            Ls.winClose();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+</script>
+</body>
+</html>

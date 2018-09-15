@@ -1,0 +1,43 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+	<div region="west" showHeader="false" splitSize="0" width="330" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+			<ul id="catalog_tree" class="ztree"></ul>
+        </div>
+	</div>
+	
+	<div region="center" style="border:none; overflow: auto;">
+		<div class="portlet light"  style="display:none;">
+			<div class="portlet-title">
+				<div class="caption font-grey-silver">
+					<span class="caption-subject bold uppercase">目录信息</span>
+				</div>
+			</div>
+			
+			<div class="portlet-body form col-md-8" style="padding-left: 0;">
+				#parse("/public/catalog/form.vm")
+			</div>
+            <div class="clearfix"></div>
+		</div>
+	</div>
+</div>
+<script>
+var cur = {
+	id : "catalog_form",
+	catalogs_url : "/public/catalog/getCatalogs",//目录列表查询url
+	catalog_url : "/public/catalog/getPublicCatalog",//目录查询url
+	save_url : "/public/catalog/saveOrUpdate",//保存url
+	edit_url : "/public/catalog/edit",//编辑
+	upload_url : "/public/catalog/toUpload",
+	catalog_tree_id : "catalog_tree",//目录树对象
+	tree : null,//树对象
+	type : null,//类型，新增、删除
+	vm : null//模型
+};
+</script>
+<script src="$!{sysStaticPath}/assets/js/plugins/selectPage/selectpage.min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/catalog_manage.js?v=1"></script>
+<script>
+$(document).ready(function(){
+    catalogManage.common();
+});
+</script>

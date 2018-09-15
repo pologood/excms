@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+
+<body>
+<form id="news_form" action="" method="post">
+    <table>
+        <tbody>
+        <tr>
+            <td align="left">
+            </td>
+            <td align="left">
+            </td>
+            <td align="left">
+            </td>
+            <td align="left">
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">颍州西湖镇网址：</td>
+            <td align="left" colspan="6">
+                <input id="yzsfjUri" disabled type="text" style="width: 250px;"  value="http://www.yzxhz.cn/"/>
+                (图片采取)
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">颍州西湖镇目录：</td>
+            <td valign="top">
+                <div style="padding:5px;border: 1px solid black;height: 500px;  overflow: auto;">
+                    <ul id="xhz_tree" class="ztree"></ul>
+                </div>
+            </td>
+            <td valign="top">-> EX8目录：</td>
+            <td valign="top">
+                <div style="padding:5px; border: 1px solid black;height: 500px;  overflow: auto;"
+                ">
+                <ul id="ex8_tree" class="ztree"></ul>
+                </div>
+            </td>
+            <td valign="top">--> 操作：</td>
+            <td valign="top">
+                <button id="doSub" type="button" style="">提交</button>
+                <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center">
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    var cur = {
+        id: "news_form",
+        siteId: '2909490',
+        xhzId: '',
+        ex8siteId: '',
+        xhzUri: 'http://www.yzxhz.cn',
+        columnId:'',
+        ex8_tree: null,
+        xhz_tree: null
+    };
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            var _this = $(this);
+            if (cur.xhzId == '') {
+                alert("西湖镇目录Id未选择!");
+                return;
+            }
+            if (cur.columnId == '') {
+                alert("ex8目录Id未选择!");
+                return;
+            }
+            if (cur.ex8siteId == '') {
+                alert("站点Id不能为空!");
+                return;
+            }
+            if (cur.xhzUri == '') {
+                alert("西湖镇网址不能为空!");
+                return;
+            }
+            if (confirm("确定导入数据？")) {
+                $("#doSub").attr("disabled", "disabled");
+                $("#doSub_msg").show();
+                return Ls.ajax({
+                    url: "/yingzhou/xhz/newsImport",
+                    data: {xhzId:cur.xhzId,xhzUri:cur.xhzUri,columnId:cur.columnId,siteId:cur.ex8siteId}
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        alert("完成导入!");
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+                    } else {
+                        alert(d.desc);
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+
+                    }
+                }).always(function () {
+                    $("#doSub").attr("disabled", false);
+                    $("#doSub_msg").hide();
+                });
+            }
+        });
+
+
+        var ztree_settings_ex6 = {
+            async: {
+                enable: true,
+                url: "/yingzhou/xhz/getXhzTree",
+                autoParam: ["id=parentId"]
+            },
+            data: {
+                simpleData: {
+                    idKey: 'id',
+                    pIdKey: 'parentId'
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, node) {
+                    cur.ssId = ''
+                    // 判断节点展开
+                    if (node.isParent) {
+                        cur.xhz_tree.expandNode(node, !node.open, false, true, true);
+                    } else {
+                        console.info(node);
+                        cur.xhzId=node.id;
+                    }
+                    return false;
+                },
+                onAsyncSuccess: function () {
+                }
+            }
+        };
+        cur.xhz_tree = $.fn.zTree.init($("#xhz_tree"), ztree_settings_ex6);
+
+
+        var ztree_settings_ex8 = {
+            async: {
+                enable: true,
+                url: "/yingzhou/xhz/getEx8Tree?siteId=" + cur.siteId,
+                autoParam: ["id=parentId"]
+            },
+            data: {
+                simpleData: {
+                    idKey: 'id',
+                    pIdKey: 'parentId'
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, node) {
+                    cur.siteId = '';
+                    cur.organId = '';
+                    cur.catId = '';
+                    // 判断节点展开
+                    if (node.isParent) {
+                        cur.tree.expandNode(node, !node.open, false, true, true);
+                    } else {
+                        console.info(node);
+                        cur.columnId=node.id;
+                        cur.ex8siteId=node.siteId;
+                    }
+                    return false;
+                },
+                onAsyncSuccess: function () {
+                }
+            }
+        };
+        cur.ex8_tree = $.fn.zTree.init($("#ex8_tree"), ztree_settings_ex8);
+    });
+
+
+</script>
+</body>
+</html>

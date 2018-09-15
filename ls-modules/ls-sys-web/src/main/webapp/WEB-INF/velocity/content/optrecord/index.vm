@@ -1,0 +1,80 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/content/opt/record/getPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:360px;">
+                    <div property="columns">
+                        <div field="optUserName" width="100" align="center" headerAlign="center" >操作人员</div>
+                        <div field="optOrganName" width="160" align="center" headerAlign="center" >所在单位</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="optType">操作内容</div>
+                        <div field="createDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >操作时间</div>
+                        <div field="columnName" width="100%" align="left" headerAlign="left">备注</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            contentId: Ls.url.get("contentId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({contentId:cur.params.contentId});
+    })
+
+    function optType(obj) {
+        var rec = obj.record;
+        var optType = rec.optType,status = rec.status,rst = '';
+        if(optType == 'add') {
+            rst = "添加";
+        } else if(optType == 'edit') {
+            rst = "修改";
+        } else if(optType == 'publish') {
+            if(status == 0) {
+                rst = "取消";
+            }
+            rst += "发布";
+        } else if(optType == 'move') {
+            rst = "移动";
+        } else if(optType == 'copy') {
+            rst = "复制";
+        } else if(optType == 'push') {
+            rst = "推送";
+        } else if(optType == 'setTop') {
+             if(status == 0) {
+                 rst = "取消";
+             }
+            rst += "置顶";
+        } else if(optType == 'setTitle') {
+            if(status == 0) {
+                rst = "取消";
+            }
+            rst += "设置标题新闻";
+        } else if(optType == 'setNew') {
+            if(status == 0) {
+                rst = "取消";
+            }
+            rst += "加新";
+        } else if(optType == 'refer') {
+            rst = "引用";
+        } else if(optType == 'submit') {
+            rst = "报送";
+        }
+
+        return rst;
+    }
+</script>

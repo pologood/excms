@@ -1,0 +1,5 @@
+#foreach($eo in $resultObj)
+    <li class="num${velocityCount}">
+        <a href="/content/column/$!{paramObj.gotoId}?organId=$!{eo.organId}&organShow=true" class="$!{eo.active}" target="$!{paramObj.target}" title="$!{eo.name}">$!{eo.name}</a>
+    </li>
+#end

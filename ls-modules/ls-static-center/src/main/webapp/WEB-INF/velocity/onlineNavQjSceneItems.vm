@@ -1,0 +1,72 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($isDate="$!{paramObj.isDate}")
+#set($length=$Integer.parseInt($length))
+#if($!{leaf} && $!{unempty})
+<ul class="scene-list list-#if("$!{columnId}"!="")$!{columnId}#else$!{ckcolumnId}#end">
+    #set($c=0)
+    #foreach($eo in $page.data)
+        #set($c= $c + 1)
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <li class="$!{css}">
+            #set($name="$!{eo.name}")
+            #if("$!{eo.linkUrl}" != "")
+                <a href="$!{eo.linkUrl}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+            #else
+                <a href="/content/article/$!{eo.contentId}?guideId=$!{eo.id}&tableColumnId=$!{tableColumnId}&relateColumnId=$!{relateColumnId}" target="$target" title="$!{name}" class="left">
+                    <span style='$style'>#cutstr($!{name},$length)</span>
+                </a>
+            #end
+            #if($isDate == "true")
+                <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+            #end
+        </li>
+    #end
+    #if($!{page.pageCount}>1)
+        <div id="page_scene" class="pagination"></div>
+        <script>
+            Ls.pagination("#page_scene", function (pageIndex) {
+                location.href = "/content/column/$!{ckcolumnId}?columnId=$!{columnId}&pageIndex=" + pageIndex + "&keywords=$!{keywords}";
+            }, {
+                pageCount:$!{page.pageCount},
+                currPage:$!{page.pageIndex} + 1
+            })
+
+            function replaceParamVal(url,paramName,replaceWith) {
+                var re=eval('/('+ paramName+'=)([^&]*)/gi');
+                var newUrl = url.replace(re,paramName+'='+replaceWith);
+                return newUrl;
+            }
+        </script>
+    #end
+    #if($c <= 0)
+        暂无相关数据
+    #end
+</ul>
+#elseif($!{unempty})
+<ul class="scene-class list-#if("$!{columnId}"!="")$!{columnId}#else$!{ckcolumnId}#end">
+    #set($c=0)
+    #foreach($eo in $eos)
+        #set($c= $c + 1)
+        <li>
+            #*<a href="/content/column/$!{ckcolumnId}?columnId=$!{eo.indicatorId}" target="$target" title="$!{eo.name}"
+               style="float:left">#cutstr($!{eo.name},$length)</a>
+*#
+            #if($!{eo.isStartUrl} == 0)
+                <a href="/content/column/$!{eo.indicatorId}" class="$!{eo.active}" target="$!{target}" title="$!{eo.name}" style="float:left">#cutstr($!{eo.name},$length)</a>
+            #else
+                <a href="$!{eo.transUrl}" target="#if($!{eo.transWindow} == 0) _self #else _blank#end" class="$!{eo.active}" title="$!{eo.name}" style="float:left">#cutstr($!{eo.name},$length)</a>
+            #end
+        </li>
+
+
+    #end
+    #if($c <= 0)
+        暂无相关数据
+    #end
+</ul>
+#end

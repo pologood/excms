@@ -1,0 +1,97 @@
+<style>
+	.public_apply .xxgk_sqcon_sq{ display : none}
+	.public_apply .active{ display : block}
+</style>
+<div id="public_apply_manage" class="xxgk_sqxxktop">
+	<ul>
+		<li id="ysqmn1"><a href="#public_apply_catalog_query" data-toggle="tab">依申请公开目录</a></li>
+		<li id="ysqmn5"><a href="#public_apply_sfbz" data-toggle="tab">收费标准</a></li>
+		<li id="ysqmn2"><a href="/Application form.doc" target="_blank">申请表下载</a></li>
+		<li id="ysqmn3"><a href="#public_apply_lct" data-toggle="tab">申请信息流程图</a></li>
+		<li id="ysqmn4" class="reload"><a href="#public_apply_submit" data-toggle="tab">在线申请</a></li>
+		<li id="ysqmn6"><a href="#public_apply_query" data-toggle="tab">依申请公开查询</a></li>
+		<li id="ysqmn7"><a href="#public_apply_statistics" data-toggle="tab">依申请公开统计</a></li>
+		<div class="clear"></div>
+	</ul>
+</div>
+<div class="public_apply">
+    ## 依申请公开目录 start 
+    <div id="public_apply_catalog_query" class="xxgk_sqcon_sq">
+    	{ls:vm file="public_apply_catalog_query_1"}{/ls:vm}
+    </div>
+	## 依申请公开目录 end
+
+    ## 收费标准start
+    <div id="public_apply_sfbz" class="xxgk_sqcon_sq">
+    	<div class="xxgk_sq_lmtop">收费标准</div>
+    	<div class="xxgk_sq_lmcon">
+    		{ls:ordinaryPage id="2657276"}{/ls:ordinaryPage}
+    	</div>
+    </div>
+    ## 收费标准end
+    
+    ## 申请信息流程图start
+    <div id="public_apply_lct" class="xxgk_sqcon_sq">
+    	<div class="xxgk_sq_lmtop">申请信息流程图</div>
+    	<div class="xxgk_sq_lmcon">
+    		{ls:ordinaryPage id="2657280"}{/ls:ordinaryPage}
+    	</div> 
+    </div>
+    ## 申请信息流程图end
+    
+    ## 在线申请start
+    <div id="public_apply_submit" class="xxgk_sqcon_sq">
+    	{ls:vm file="public_apply_submit_1"}{/ls:vm}
+    </div>
+    ## 在线申请end
+    
+    ## 依申请公开查询start
+    <div id="public_apply_query" class="xxgk_sqcon_sq">
+    	{ls:vm file="public_apply_query_1"}{/ls:vm}
+    </div>
+    ## 依申请公开查询end
+    
+    ## 依申请公开统计start
+    <div id="public_apply_statistics" class="xxgk_sqcon_sq">
+        {ls:vm file="public_apply_statistics_1"}{/ls:vm}
+    </div>
+    ## 依申请公开统计end
+</div>
+<script>
+##在线申请的div
+var public_apply = {submit_content:"",submit_detail:false};
+$(document).ready(function(){
+	$('#public_apply_manage a[data-toggle="tab"]').on('shown.ls.tab', function(e){
+		 var hash = e.target.hash;
+		 if (hash == "#public_apply_submit") {//在线申请特殊处理
+		 	if (!public_apply.submit_detail) {
+				public_apply.submit_content = $(hash).html();
+			} else {
+				public_apply.submit_detail = false;
+				$(hash).html(public_apply.submit_content);
+			}
+		 }
+    });
+	var queryId = "$!{context.paramMap.queryId}";//动态查询id
+	if (queryId != ""){//显示详情
+		// 提交
+        Ls.ajax({
+            url: "/public/applyDetail?id=" + queryId
+        }).done(function (d) {
+			public_apply.submit_content = $("#public_apply_submit").html();
+    		public_apply.submit_detail = true;
+    		$("#public_apply_submit").html(Ls.template("public_apply_query_detail_tpl", d.data));
+    		$('#public_apply_manage li').removeClass("active");
+    		$('#public_apply_manage a[href="#public_apply_submit"]').parent().addClass('active');
+    		$('.xxgk_sqcon_sq').removeClass("active");
+    		$('#public_apply_submit').addClass('active');
+        });
+	} else {
+		var active = "$!{paramObj.active}";
+		if(isNaN(active)){//不是数字
+            active = 111;
+		}
+    	$("#public_apply_manage a:eq("+active+")").trigger('click.ls.tab');
+	}
+});
+</script>

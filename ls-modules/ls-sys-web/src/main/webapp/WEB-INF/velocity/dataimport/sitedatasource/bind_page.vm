@@ -1,0 +1,154 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group"  >
+                                    <select class="form-control" name="typeCode" id="typeCode" placeholder="">
+                                        <option value="">请选择栏目类别</option>
+                                        #foreach($eo in $dataSourceTypes)
+                                            <option value="$!{eo}">$!{eo.text}</option>
+                                        #end
+                                    </select>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/dataimportdatasource/getPage" sizeList="[20,30,50]" pageSize="20"
+                     idField="dataSourceId" multiSelect="false">
+                    <div property="columns">
+                        <div type="checkcolumn" width="50" headerAlign="center" align="center"></div>
+                        <div field="manufacturerName" width="180" headerAlign="center" allowSort="flase"  align="center">
+                            厂商名称
+                        </div>
+                        <div field="name" width="180" headerAlign="center" allowSort="flase"  align="center">
+                            数据源名称
+                        </div>
+                        <div field="databaseType" width="180" headerAlign="center" allowSort="flase"  align="center">
+                            数据库类型
+                        </div>
+                        <div field="databaseUri" width="180" headerAlign="center" allowSort="flase"  align="center">
+                            数据库名称
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        W: Ls.getWin.win,
+        grid:'',
+        api: Ls.getWin.api,
+        siteId:"$!{siteId}",
+        url:'/dataimportSiteDataSource/bindDataSource',
+        typeCode:'$!{typeCode}',
+        id:"$!{id}"
+
+    };
+
+
+
+
+
+    $(document).ready(function () {
+        mini.parse();
+
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load({dataFlag: 1});
+
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+         if(''!=cur.id&&''!=cur.typeCode){
+             $("#typeCode").find("option[value = '"+cur.typeCode+"']").attr("selected","selected");
+            $("#typeCode").attr("disabled",true);
+
+         }
+        cur.api.button(
+                {
+                    id: 'save',
+                    className: 'btn-save',
+                    focus: true,
+                    name: '确定',
+                    callback: function () {
+                        bind();
+                        return false;
+                    }
+                },
+                {
+                    id: 'back',
+                    className: 'btn-back',
+                    name: '取消',
+                    callback: function () {
+                        cancel();
+                        return false;
+                    }
+                }
+        );
+
+
+    });
+
+     function bind(){
+         var records = cur.grid.getSelecteds();
+
+         if (null == records || records.length <= 0) {
+             Ls.tips("请选择一条记录!", {times: 2});
+             return;
+         }
+         var dataSourceId =records[0].dataSourceId;
+         var typeCode ='';
+         if(''==cur.id||null==cur.id){
+             typeCode =  $("#typeCode option:selected").val();
+             if(''==typeCode||null==typeCode){
+                 Ls.tips("请选择栏目类别!", {times: 2});
+                 return;
+
+             }
+         }else{
+             typeCode=cur.typeCode;
+         }
+
+
+         Ls.ajax({
+             type:'post',
+             url: cur.url,
+             data: {
+                 id: cur.id,
+                 typeCode: typeCode,
+                 siteId: cur.siteId,
+                 dataSourceId:dataSourceId
+             },
+             success: function (resp) {
+                 if (resp.status == '1') {
+                     Ls.getWin.win.cur.grid.reload();
+                     Ls.winClose();
+                 } else {
+                     Ls.tips(resp.desc, {icons:'error',times: 2});
+                 }
+             }
+         });
+     }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>

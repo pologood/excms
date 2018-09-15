@@ -1,0 +1,103 @@
+#parse("_page_layout/_header.vm")
+<style type="text/css">
+    table.gridtable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #a4d3dd;
+    }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" style="">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <table style="width: 100%">
+                    <tr>
+                        <td align="left" valign="top" style="line-height:23px;">
+                            <br>
+                            #if(${list.size()} > 0)
+##                                采用记录:
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <br>
+                            #if(${list.size()} > 0)
+                                <table class="gridtable" style="width: 100%">
+                                    <tr>
+                                        <th width="10%" style="text-align:center;">序号</th>
+                                        <th width="40%" style="text-align:center;">采集到栏目</th>
+                                        <th width="20%" style="text-align:center;">采编人</th>
+                                        <th width="30%" style="text-align:center;">采编时间</th>
+                                    </tr>
+                                    #foreach($obj in $list)
+                                        <tr>
+                                            <td style="text-align:center;">
+                                                $!{velocityCount}
+                                            </td>
+                                            <td style="text-align:center;">
+                                                #if("" != "$!{obj.columnName}")
+                                                    #if("" != "$!{obj.siteName}")
+                                                        $!{obj.siteName} > $!{obj.columnName}
+                                                    #end
+                                                #end
+                                            </td>
+                                            <td style="text-align:center;">
+                                                $!{obj.userName}
+                                            </td>
+                                            <td style="text-align:center;">
+                                                $!{obj.employDate}
+                                            </td>
+                                        </tr>
+                                    #end
+                                </table>
+                            #end
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div title="south" region="south" showSplit="false" showHeader="false" height="57" showSplitIcon="false" splitSize="2" >
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">关 闭</button>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+    })
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>
+</body>
+</html>

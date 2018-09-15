@@ -1,0 +1,154 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($pageSize="$!{paramObj.pageSize}")
+#set($imgwidth="$!{paramObj.imgwidth}")
+#set($imgheight="$!{paramObj.imgheight}")
+#set($refreshTimes="$!{paramObj.refreshTimes}")
+#set($length=$Integer.parseInt($length))
+#set($times=$Integer.parseInt($refreshTimes))
+<div class="interview-detail">
+
+
+    #set($title="$!{eo.title}")
+    #if("$!{resultObj.picUrl}"!= "")
+        #if($resultObj.picUrl.indexOf(".")>=0)
+            #set($imageLink="$!{fileServerNamePath}$!{resultObj.picUrl}")
+        #else
+            #set($imageLink="$!{fileServerPath}$!{resultObj.picUrl}")
+        #end
+    #else
+        #set($imageLink="/images/no_photo.jpg")
+    #end
+
+    <div class="interview-title">
+        $!{resultObj.title}
+    </div>
+    <div class="ftwz_tit">
+        （<span class="tit">小结分析</span>：本期访谈现场提问总数<i>$!{resultObj.questionCount}</i>条，现场已答复数<i>$!{resultObj.replyCount}</i>条，网友参与数<i>$!{resultObj.memberCount}</i>位）
+    </div>
+    <div class="interview-info">
+        <div class="in-img">
+            <a title="$!{resultObj.title}">
+                <img src="$!{imageLink}" width="$imgwidth" height="$imgheight">
+            </a>
+        </div>
+        <div class="in-info">
+            <p class="p1"><span>时&nbsp;间：</span>$!{resultObj.time}</p>
+            <p class="p2"><span>嘉&nbsp;宾：</span><span class="interview-names" id="userNames_$!{resultObj.interviewId}"></span></p>
+            <p class="in-note p3">
+                <span>摘&nbsp;要：</span>
+                <span class="note-content">$!{resultObj.content}</span>
+            </p>
+            #if($!{resultObj.isOpen} == "1")
+                <p class="p4">
+                    <a class="btn-speak" href="#interview_form">我要发言</a>
+                </p>
+            #end
+        </div>
+    </div>
+    <script>
+        var userNames = "$!{resultObj.userNames}";
+        var namesArray = userNames.split("|");
+        if (namesArray != null && namesArray.length > 0) {
+            var lis = "";
+            for (var i = 0; i < namesArray.length; i++) {
+                lis += "<a>" + namesArray[i] + "</a>";
+            }
+            $("#userNames_$!{resultObj.interviewId}").html(lis);
+        }
+    </script>
+    <div class="interview-desc">
+        <div class="interview-desc-title">
+            <span>访谈详情</span>
+        </div>
+        <div class="desc">
+            $!{resultObj.desc}
+        </div>
+    </div>
+
+    <div id="questionPageDiv" style="display:none;" class="interview-info-list">
+        <ul id="question_page">
+        </ul>
+        <div id="interviewpage" class="pagination"></div>
+    </div>
+    <script>
+        var currentPageIndex = 0;
+        var qds = '0', ps = '0';
+        var pagination = "";
+
+        setInterviewPage(currentPageIndex);
+
+        function setInterviewPage(pageIndex) {
+            Ls.ajax({
+                url: "/content/getQuestionPage",
+                data: {
+                    interviewId:$!{resultObj.interviewId},
+                    pageSize:$!{paramObj.pageSize},
+                    pageIndex: (pageIndex - 1),
+                    dateFormat: "$!{paramObj.dateFormat}"
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    var jsonList = d.data.data;
+                    var pageCount = d.data.pageCount;
+                    var pageIndex = d.data.pageIndex;
+                    if (pageCount == 0) {
+                        $("#question_page").html("暂无相关信息");
+                    } else {
+                        $("#questionPageDiv").show();
+                        var html = '';
+                        for (var i = 0; i < jsonList.length; i++) {
+                            var eo = jsonList[i];
+                            html += '<li>';
+                            html += '<div class="interview-body">';
+                            html += '   <span class="interview-username">[' + eo.name + ']</span>';
+                            html += '   <span class="interview-infonr">' + eo.content + '</span>';
+                            html += '   <span class="interview-datetime\">[' + eo.createWebTime + ']</span>';
+                            html += '</div>';
+                            if (eo.isReply == '1') {
+                                html += '<div class="interview-reply">';
+                                html += '   <span class="interview-username">[' + eo.replyName + ']</span>';
+                                html += '   <span class="interview-infonr">' + eo.replyContent + '</span>';
+                                html += '   <span class="interview-datetime">[' + eo.replyWebTime + ']</span>';
+                                html += '</div>';
+                            }
+                            html += '</li>';
+                        }
+                        $("#question_page").html(html);
+                    }
+
+                    if (pageCount > 1) {
+                        if (!pagination) {
+                            pagination = Ls.pagination("#interviewpage", function (pageIndex) {
+                                currentPageIndex = pageIndex;
+                                currentPageCount = pageCount;
+                                setInterviewPage(pageIndex);
+                            }, {
+                                currPage: (pageIndex + 1),
+                                pageCount: pageCount
+                            });
+                        } else {
+                            pagination.reload((pageIndex + 1), pageCount);
+                        }
+                    } else {
+                        $("#interviewpage").hide();
+                    }
+
+                } else {
+                    alert(d.desc);
+                }
+            });
+        }
+
+        //定义的秒刷新一次
+        setInterval(function () {
+            setInterviewPage(currentPageIndex);
+        },$!{times} * 1000
+        )
+    </script>
+
+    #if($!{resultObj.isOpen} == "1")
+        #parse("interviewInfo_save.vm")
+    #end
+</div>

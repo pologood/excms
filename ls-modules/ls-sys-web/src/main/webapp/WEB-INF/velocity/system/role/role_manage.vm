@@ -1,0 +1,359 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding:5px; overflow: hidden;">
+            <div id="ui_tree" class="ztree"></div>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="center_tab" class="tabbable-line" style=" margin:12px 20px 15px; display: none ">
+            <ul class="nav nav-tabs" id="role_tab">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">角色信息</a>
+                </li>
+                <li>
+                    <a id="menu_tab" style="display: block" href="#tab_1_2" data-toggle="tab">菜单权限</a>
+                </li>
+                <li>
+                    <a id="site_tab" style="display: block" href="#tab_1_3" data-toggle="tab">栏目权限</a>
+                </li>
+                <li>
+                    <a id="info_open_tab" style="display: block" href="#tab_1_4" data-toggle="tab">信息公开权限</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="portlet">
+                        <div class="portlet-body">
+                            <div class="table-toolbar" style="margin-bottom: 10px">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <div class="btn-group">
+                                            <button id="adduser_btn" type="button" class="btn btn-default btn-add">
+                                                添加用户
+                                            </button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default btn-delete" onclick="delRoleUser()">批量删除</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="datagrid1" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" style="width:100%;height:100%;"
+                                 multiSelect="true" allowCellSelect="false" onlyCheckSelection="true" allowCellWrap="true" sizeList="[15,20,50]" pageSize="15"
+                                 url="/system/roleAsg/getAsgEOs">
+                                <div property="columns">
+                                    <div type="checkcolumn" width="40"></div>
+                                    <div field="uid" width="120" align="center" headerAlign="center" allowSort="true">用户名</div>
+                                    <div field="name" width="120" align="center" headerAlign="center" allowSort="true">真实姓名</div>
+                                    <div field="fullOrganName" width="50%" align="left" headerAlign="center" allowSort="true">所属单位</div>
+                                ##                                    <div name="roleCt" width="120" align="center" headerAlign="center" allowSort="true" renderer="roleCt">所属角色</div>
+                                    <div field="siteRights" width="50%" name="siteRights" align="left" headerAlign="center" allowSort="true">已分配站点</div>
+                                    <div field="lastLoginDate" width="140" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">最近登录时间</div>
+                                    <div name="site" width="80" align="center" headerAlign="center" allowSort="true" renderer="siteCt">站点分配</div>
+                                    <div width="60" align="center" headerAlign="center" allowSort="true" renderer="userCt">删除</div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                    <div id="menu_tree_wrap">
+                        <div id="menu_tree" class="ztree" style="margin: 5px;"></div>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-default btn-save" onclick="saveMenuData()">保 存</button>
+                </div>
+                <div class="tab-pane" id="tab_1_3">
+                    <div id="site_opt_tree_wrap">
+                        <div id="site_opt_tree" class="ztree" style="margin: 5px;"></div>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-default btn-save" onclick="saveSiteRightsData()">保 存</button>
+                </div>
+                <div class="tab-pane" id="tab_1_4">
+                    <div id="info_open_opt_tree_wrap">
+                        <div id="info_open_opt_tree" class="ztree" style="margin: 5px;"></div>
+                    </div>
+                    <br>
+                    <button type="button" class="btn btn-default btn-save" onclick="saveInfoOpenRightsData()">保 存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/role_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/menu_select.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/rights_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/info_open_rights.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get("datagrid1"),
+        organIds: [],
+        dialog: Ls.getWin.dialog,
+        isRoot:$!{isRoot}
+    };
+    $(document).ready(function () {
+        role_manage.role();
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.grid.load({roleId: cur.roleId});
+            }
+        });
+    })
+
+    function saveDate() {
+        if (cur.role_code == "super_admin") {
+            return;
+        } else if (cur.role_code == "site_admin") {
+            saveMenuData();
+        } else {
+            saveMenuData();
+            saveSiteRightsData();
+            saveInfoOpenRightsData();
+        }
+    }
+
+    function saveMenuData() {
+        //获取选中的
+        var menuNodes = cur.menuTreeObj.getCheckedNodes(true);
+        var menuRights = "";
+        var optRights = [];
+        if (menuNodes && menuNodes.length > 0) {
+            for (var i = 0; i < menuNodes.length; i++) {
+                if (i > 0) {
+                    menuRights += ",";
+                }
+                menuRights += menuNodes[i].id;
+                var rights = menuNodes[i].rights;
+                if (rights != null) {
+                    for (var j = 0; j < rights.length; j++) {
+                        if (rights[j].checked) {
+                            optRights.push({roleId: cur.roleId, menuId: menuNodes[i].id, optCode: rights[j].code, siteId: GLOBAL_SITEID});
+                        }
+                    }
+                }
+            }
+        }
+
+        var data = {};
+        data.roleId = cur.roleId;
+        data.menuRights = menuRights;
+        data.optRights = JSON.stringify(optRights);
+        Ls.ajax({
+            url: "/role/asg/menu/saveRoleAndRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips("保存成功", {times: 2});
+            }
+        });
+    }
+
+    function saveSiteRightsData() {
+        var allNodes = cur.siteOptTreeObj.getCheckedNodes(true);
+        var rights = [];
+        for (var i = 0; i < allNodes.length; i++) {
+            var functions = allNodes[i].functions;
+            rights.push({roleId: cur.roleId, indicatorId: allNodes[i].indicatorId, optCode: '', type: allNodes[i].type});
+            if (functions != null) {
+                for (var j = 0; j < functions.length; j++) {
+                    if (functions[j].checked) {
+                        rights.push({roleId: cur.roleId, indicatorId: allNodes[i].indicatorId, optCode: functions[j].action, type: allNodes[i].type,siteId: GLOBAL_SITEID});
+                    }
+                }
+            }
+        }
+        var data = {};
+        data.rights = mini.encode(rights);
+        data.roleId = cur.roleId;
+        Ls.ajax({
+            url: "/site/rights/saveRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips(resp.desc, {times: 2});
+            }
+        });
+    }
+
+    function saveInfoOpenRightsData() {
+
+        if (cur.organIds.length <= 0) {
+            Ls.tips("数据未变动!");
+            return;
+        }
+        var allNodes = cur.infoOpenOptTreeObj.getCheckedNodes(true);
+        var rights = [];
+        for (var i = 0; i < allNodes.length; i++) {
+            if (allNodes[i].type == "Organ") {
+                if (!cur.organIds.contain(allNodes[i].organId)) {
+                    continue;
+                }
+                rights.push({roleId: cur.roleId, organId: allNodes[i].organId, code: allNodes[i].code});
+            } else {
+                var functions = allNodes[i].functions;
+                rights.push({roleId: cur.roleId, organId: allNodes[i].organId, code: allNodes[i].code});
+                if (functions != null) {
+                    for (var j = 0; j < functions.length; j++) {
+                        if (functions[j].checked) {
+                            rights.push({roleId: cur.roleId, organId: allNodes[i].organId, code: allNodes[i].code, optCode: functions[j].action,siteId: GLOBAL_SITEID});
+                        }
+                    }
+                }
+            }
+        }
+
+//        console.info(rights);return;
+
+        var data = {};
+        data.rights = mini.encode(rights);
+        data.roleId = cur.roleId;
+        data.organIds = cur.organIds.unique().join(',');
+        Ls.ajax({
+            url: "/info/open/saveRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips(resp.desc, {times: 2});
+            }
+        });
+    }
+
+    function roleCt() {
+        var node = getSelectedNode();
+        return node.name;
+    }
+
+    function siteCt(obj) {
+        var record = obj.record;
+        var rst = '<button class="btn btn-default btn-sm btn-right" onclick="addUserRights(' + record.organId + ',' + record.userId + ')">站点分配</button>';
+        return rst;
+    }
+
+    function userCt(obj) {
+        var record = obj.record;
+        var rst = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delRoleUser('+ record.organId  +','+ record.userId  +')">删 除</button>';
+        return rst;
+    }
+
+    function addUserRights(organId, userId) {
+        var url = '/system/roleAsg/userRight?organId=' + organId + "&userId=" + userId;
+        Ls.openWin(url, '380px', '350px', {
+            title: '站点分配'
+        });
+    }
+
+    function delRoleUser(organId,userId) {
+        var data = {};
+        data.roleId = cur.roleId;
+        if(null != organId && organId != '') {
+            data.organIds = organId;
+            data.userIds = userId;
+        } else {
+            var organIds = null;
+            var userIds = null;
+            var records = cur.grid.getSelecteds();
+            if (null == records || records.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for(var i = 0; i < records.length; i++) {
+                if(null == organIds) {
+                    organIds = records[i].organId;
+                    userIds = records[i].userId;
+                } else {
+                    organIds += "," + records[i].organId;
+                    userIds += "," + records[i].userId;
+                }
+            }
+            data.organIds = organIds;
+            data.userIds = userIds;
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajax({
+                url: "/system/roleAsg/delAsgEO",
+                data: data,
+                success: function (obj) {
+                    cur.grid.load({roleId: cur.roleId});
+                }
+            });
+        }
+    }
+
+    function getSelectedNode() {
+        var node = cur.treeObj.getSelectedNodes();
+        return node[0];
+    }
+
+    function callback_editRole() {
+        if (cur.role_opt_type == 'edit') {
+            if (cur.node_edit != null) {
+                cur.selectNode.name = cur.node_edit.name;
+                cur.selectNode.description = cur.node_edit.description;
+                cur.treeObj.updateNode(cur.selectNode, true);
+                Ls.tips("修改成功!", {times: 2});
+            }
+        } else {
+            if (cur.node_edit != null) {
+                cur.node_edit.id = cur.node_edit.roleId;
+                cur.node_edit.pid = -1;
+                if(cur.node_edit.type == "Column") {
+                    cur.node_edit.icon = GLOBAL_CONTEXTPATH + "/assets/images/site_admin.gif";
+                } else {
+                    cur.node_edit.icon = GLOBAL_CONTEXTPATH + "/assets/images/common_admin.gif";
+                }
+
+                if(GLOBAL_RIGHTS == 'siteAdmin') {
+                    cur.node_edit.pid = GLOBAL_PERSON.organId;
+                    cur.selectNode = cur.treeObj.getNodeByParam("id", GLOBAL_PERSON.organId, null);
+                }
+                var nodes = [cur.node_edit];
+                cur.treeObj.addNodes(cur.selectNode, nodes);
+                Ls.tips("添加成功!", {times: 2});
+            }
+        }
+    }
+
+    function callback_user_select() {
+        cur.grid.load({roleId: cur.roleId});
+        Ls.tips("添加成功!", {times: 2});
+    }
+
+    function callback_user_role_del() {
+        cur.grid.load({roleId: cur.roleId});
+    }
+
+    function reloadGrid() {
+        cur.grid.load({roleId: cur.roleId});
+    }
+
+    /*
+    * 数组去重
+    * */
+    Array.prototype.unique = function () {
+        this.sort();
+        var re = [this[0]];
+        for (var i = 1; i < this.length; i++) {
+            if (this[i] !== re[re.length - 1]) {
+                re.push(this[i]);
+            }
+        }
+        return re;
+    }
+
+    /**
+     * 数组包含
+     * @param e
+     * @returns {boolean}
+     */
+    Array.prototype.contain = function (e) {
+        for (i = 0; i < this.length; i++) {
+            if (this[i] == e)
+                return true;
+        }
+        return false;
+    }
+</script>

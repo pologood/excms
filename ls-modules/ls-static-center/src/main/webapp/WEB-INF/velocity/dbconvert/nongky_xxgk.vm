@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+<body>
+<table>
+    <tbody>
+    <tr>
+        <td valign="top" colspan="6">
+            <button type="button" style="height: 40px; margin:5px;" onclick="importPublicGuide();">导入公开指南</button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importPublicAnnualReport();">导入公开年报
+            </button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublic();">导入依申请公开</button>
+            <button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublicCatalog();">导入依申请公开目录
+            </button>
+            <span>左边所有按钮都是针对所有单位的操作。</span>
+            <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+            <span id="clear_msg" style="color: red;display: none">数据正在清空,请耐心等待(请勿关闭浏览器)。</span>
+        </td>
+    </tr>
+    <tr style="margin-top:20px">
+        <td valign="top" style="width:25%;">农科院信息公开目录：
+            <div style="border: 1px solid black;height:400px;overflow:auto;">
+                <ul id="public_tree" class="ztree"></ul>
+            </div>
+        </td>
+        <td valign="top" style="padding-left:30px;width:25%;">-> EX8信息公开目录：
+            <div style="border: 1px solid black;height:400px;overflow:auto;">
+                <ul id="ex8_public_tree" class="ztree" style="width:350px;"></ul>
+            </div>
+        </td>
+        <td valign="top" style="width:50%">--> 操作：
+            <button type="button" style="height:40px; " onclick="importDrivingPublic();">导入</button>
+            <button type="button" style="height:40px; " onclick="clearPublicInfo();">清空</button>
+            <br/>
+            <span style="margin-left:30px;">可选择对应目录进行数据相关操作。</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</form>
+<script type="text/javascript">
+    var cur = {
+        tree: null,
+        ex8_tree: null,
+        selectNode: null,
+        ex8_selectNode: null
+    }
+
+    var ztree_settings = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/ahnky/xxgk/getPublicTree"
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.selectNode = node;
+                return false;
+            }
+        }
+    };
+
+    var ztree_settings_ex8 = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/ahnky/xxgk/getEx8PublicTree"
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.ex8_selectNode = node;
+                return false;
+            }
+        }
+    };
+
+    $(document).ready(function () {
+        cur.tree = $.fn.zTree.init($("#public_tree"), ztree_settings);
+        cur.ex8_tree = $.fn.zTree.init($("#ex8_public_tree"), ztree_settings_ex8);
+    });
+
+    function importPublicInfo(url) {
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: url,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功");
+                }
+                $("#doSub_msg").hide();
+            }
+        });
+    }
+
+    function importPublicGuide() {
+        importPublicInfo("/ahnky/xxgk/importPublicGuide");
+    }
+
+    function importPublicAnnualReport() {
+        importPublicInfo("/ahnky/xxgk/importPublicAnnualReport");
+    }
+
+    function importApplyPublic() {
+        importPublicInfo("/ahnky/xxgk/importApplyPublic");
+    }
+
+    function importApplyPublicCatalog() {
+        importPublicInfo("/ahnky/xxgk/importApplyPublicCatalog");
+    }
+
+    function importDrivingPublic() {
+        if (cur.selectNode == null || cur.ex8_selectNode == null) {
+            if (!confirm("是否按照目录名称匹配导入？")) {
+                return false;
+            }
+        }
+        var data = {
+            catId: cur.selectNode.id,
+            ex8CatId: cur.ex8_selectNode.id
+        };
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            data: data,
+            url: "/ahnky/xxgk/importDrivingPublic",
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功");
+                }
+                $("#doSub_msg").hide();
+            }
+        });
+    }
+
+    function clearPublicInfo() {
+        if (cur.ex8_selectNode == null) {
+            if (!confirm("是否清空全部数据？")) {
+                return false;
+            }
+        }
+        var data = {
+            catId: cur.ex8_selectNode.id
+        };
+        $("#clear_msg").show();
+        Ls.ajaxGet({
+            url: "/ahnky/xxgk/clear",
+            data: data,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("清空成功");
+                }
+                $("#clear_msg").hide();
+            }
+        });
+    }
+</script>
+</body>
+</html>

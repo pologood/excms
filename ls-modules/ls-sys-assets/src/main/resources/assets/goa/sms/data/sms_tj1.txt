@@ -1,0 +1,10 @@
+{
+  "status":1,"desc":"","data":{
+     "total":0,
+	 "data":[
+	 	{"name":"已使用","color":"#C0504D","y": 1},
+        {"name":"剩余","color":"#4F81BD","y":  99}
+	 ]
+    
+  }
+}

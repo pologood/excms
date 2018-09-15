@@ -1,0 +1,265 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .page-content-white {
+        overflow: auto !important;
+    }
+</style>
+<body class="page-body-white page-content-white">
+<div class="container-fluid">
+    <!-- BEGIN SAMPLE FORM PORTLET-->
+    <div class="portlet light">
+        <div class="portlet-body form">
+            <div class="alert alert-info mb0" role="alert">
+                <strong>温馨提示：</strong> 主题保存后将不可更改。
+            </div>
+            <form role="form" ms-controller="specialForm" id="specialForm" name="specialForm">
+
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="">专题名称</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="专题名称" ms-duplex="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">主题列表</label>
+                        <span class="msg-box" for="themeId"></span>
+                        <div class="special-list clearfix mt10" id="specialTheme"></div>
+                    </div>
+
+                </div>
+
+                <input type="hidden" name="themeId" id="themeId" ms-duplex="themeId">
+            </form>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+##<script src="$!{sysStaticPath}/assets/js/plugins/lightbox/lightbox-min.js"></script>
+<script id="special_list_template" type="text/html">
+    <?
+    if(data && data.length > 0) {
+    ?>
+    <ul class="clearfix">
+        <?
+        for(var i=0,l=data.length; i<l; i++){
+            var el = data[i];
+            var imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+        ?>
+        <li>
+            <div class="thumbnail <? if(el.id==themeId) { ?>active<? } ?>" id="thumbnail_<?=el.id?>">
+                <?
+                if (el.thumb && el.thumb.length > 0) {
+                for(var ii=0,ll=el.thumb.length; ii<ll; ii++) {
+                    var ell=el.thumb[ii];
+                    if(ell.path==null){
+                        imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+                    }else{
+                        if(el.imgPath.indexOf("/") != -1){
+                            imgPath = ell.path
+                        }else if(el.imgPath.indexOf(".") != -1){
+                            imgPath = GLOBAL_FILESERVERNAMEPATH + ell.path
+                        }else{
+                            imgPath = GLOBAL_FILESERVERPATH + ell.path
+                        }
+                    }
+                ?>
+                <a href="/design/previewThumbnail?id=<?=el.id?>" target="_blank" data-lightbox="lightbox-<?=el.id?>" data-title="<?=ell.name?>" style="display: <? if(!ell.defaults){ ?>none<? } ?>">
+                    <img src="<?=imgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;" <? if(el.specialStatus+""=="1"){ ?>
+                    class="dom-gray"<? }?>>
+                </a>
+                <? } ?>
+                <?
+                } else {
+                    imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+                ?>
+                <a href="javascript:void(0)">
+                    <img src="<?=imgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;" <? if(el.specialStatus+""=="1"){ ?>
+                    class="dom-gray"<? }?>>
+                </a>
+                <? } ?>
+                <div class="caption">
+                    <h4><?=el.name?></h4>
+                    #*<p>
+                    <ul class="color-box clearfix">
+                        <li class="w70 tc lhp150">主题皮肤</li>
+                        <?
+                        if (el.skins && el.skins.length > 0) {
+                            for(var ii=0,ll=el.skins.length; ii <ll; ii++) {
+                            var ell = el.skins[ii];
+                        ?>
+                        <li style="background: <?=ell.color?>;"></li>
+                        <?
+                            }
+                        } else {
+                        ?>
+                        <li>&nbsp;</li>
+                        <? } ?>
+                    </ul>
+                    </p>*#
+                    <p class="text-right">
+                        <? if(el.id==themeId) { ?>
+                        <a href="javascript:void(0)" class="btn btn-success" role="button">当前应用主题</a>
+                        <?} else {?>
+                        <a href="javascript:void(0)" id="btn_<?=el.id?>" class="btn btn-primary" role="button" onclick="selectedTheme(<?=el.id?>,this)">应用</a>
+                        <? } ?>
+                    </p>
+                </div>
+            </div>
+        </li>
+        <?
+        }
+        ?>
+    </ul>
+    <?} else {?>
+    <div class="alert alert-info" role="alert">暂无信息！</div>
+    <? } ?>
+    <div id="pagination" class="pagination pull-right mr22"></div>
+</script>
+<script>
+
+    var cur = {
+        formId: 'specialForm',
+        params: {
+            id: '$!{id}'
+        },
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        vm: {},
+        grid: {
+            themeId: "",
+            pageIndex: 0,
+            pageSize: 6,
+            name: "",
+            dataFlag: 1
+        },
+        btnFlag: false
+    }
+
+    $(document).ready(function () {
+        try {
+            cur.api.button(
+                {
+                    id: 'save',
+                    className: 'btn-save',
+                    focus: true,
+                    name: '确定',
+                    callback: function () {
+                        !cur.btnFlag && $("#specialForm").submit();
+                        return false;
+                    }
+                }
+            );
+        } catch (e) {
+        }
+
+        getData().done(function () {
+            getThemeList(cur.grid);
+        });
+
+        validate();
+    })
+
+    function validate() {
+        $('#' + cur.formId).validator({
+            fields: {
+                'name': '专题名称:required;'
+//                'themeId': '主题:required;'
+
+            },
+            valid: function () {
+                saveData();
+            }
+        });
+    }
+
+    function getData() {
+        return Ls.ajaxGet({
+            url: "/special/getSpecial",
+            data: {
+                id: cur.params.id
+            }
+        }).done(function (json) {
+            var data = json.data;
+            data.specialStatus = data.specialStatus ? 1 : 0;
+
+            //已选主题ID
+            cur.grid.themeId = data.themeId;
+            //初始化表单字段
+            cur.initData = Ls.initFORM(cur.formId, data);
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.define(cur.initData);
+            avalon.scan($("#" + cur.formId).get(0), cur.vm);
+        });
+    }
+
+    //分页回调方法
+    function pageCallback(page_index) {
+        cur.grid.pageIndex = page_index;
+        getThemeList(cur.grid);
+        return false;
+    }
+
+    function getThemeList(param) {
+
+        return Ls.ajaxGet({
+            url: "/specialTheme/getPagination",
+            data: param
+        }).done(function (d) {
+
+            d.themeId = cur.grid.themeId;
+            var listHtml = Ls.template("special_list_template", d);
+            $("#specialTheme").html(listHtml);
+
+            //创建分页
+            cur.grid.pageIndex = d.pageIndex;
+            Ls.pagination2({
+                total: d.total,
+                isTotal: true,
+                pageCount: d.pageCount,
+                pageIndex: d.pageIndex,
+                callback: pageCallback
+            });
+
+        });
+
+    }
+
+    function saveData() {
+        var data = Ls.toJSON(cur.vm.$model);
+        cur.btnFlag = true;
+        return Ls.ajax({
+            type: "POST",
+            data: data,
+            url: "/special/saveSpecial",
+            success: function (json) {
+                if (json.status == 1) {
+                    cur.win.search();
+                    cur.win.Ls.tipsOk("操作成功")
+                    Ls.winClose();
+                } else {
+                    Ls.tipsErr(json.desc);
+                }
+                cur.btnFlag = false;
+            }
+        });
+    }
+
+    function selectedTheme(themeId, obj) {
+        if (themeId) {
+            var el = $(obj);
+            //恢复上次选中的
+            $("#thumbnail_" + cur.vm.themeId).removeClass("active");
+            $("#btn_" + cur.vm.themeId).removeClass("btn-success").text("应用");
+
+            //应用当前选中
+            cur.vm.themeId = themeId;
+            $("#thumbnail_" + themeId).addClass("active")
+            el.addClass("btn-success").text("当前选中主题");
+
+//            $('#' + cur.formId).trigger("validate");
+        }
+    }
+
+</script>
+</body>
+</html>

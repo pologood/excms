@@ -1,0 +1,106 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="formDict" ms-controller="formDict">
+            <div class="form-body">
+                <div style="display:none;"><input type="hidden" id="dictId" name="dictId" ms-duplex="dictId" class="form-control" value="$!{DictEO.dictId}"></input></div>
+                <div style="display:none;"><input type="hidden" id="isUsed" name="isUsed" ms-duplex="isUsed" class="form-control" value="$!{DictEO.isUsed}"></input></div>
+
+                <div class="form-group">
+                    <label>字典编码</label>
+                    <input type="text" class="form-control readonly" disabled  name="code" id="code" placeholder="" ms-duplex="code" value="$!{DictEO.code}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>字典名称</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="" ms-duplex="name" value="$!{DictEO.name}">
+                </div>
+
+                <div class="form-group">
+                    <label>是否对外开放 （超管及站点管理员可编辑字典项）</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline"><input type="radio" #if($!{DictEO.isOpen}=="1")checked #end name="isOpen" value="1" ms-duplex-number="isOpen">
+                            是 </label>
+                        <label class="radio-inline"><input type="radio" #if($!{DictEO.isOpen}!="1")checked #end name="isOpen" value="0" ms-duplex-number="isOpen">
+                            否 </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>是否应用</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline"><input type="radio" #if($!{DictEO.isUsed}=="1")checked #end name="isUsed" value="1" ms-duplex-number="isUsed">
+                            是 </label>
+                        <label class="radio-inline"><input type="radio" #if($!{DictEO.isUsed}!="1")checked #end name="isUsed" value="0" ms-duplex-number="isUsed">
+                            否 </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea class="form-control" name="description" id="description" rows="3" placeholder="" ms-duplex="description">$!{DictEO.description}</textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var dialog = Ls.getWin.art, W = Ls.getWin.win, api = Ls.getWin.api;
+
+    $(document).ready(function () {
+        api.button(
+            {
+                id: "save_btn",
+                name: "保 存",
+                callback: function () {
+                    $("#formDict").submit();
+                    return false;
+                }
+            }
+        )
+
+        //验证
+        $('#formDict').validator({
+            fields: {
+                'name': '字典名称:required',
+                'code': '字典编码:required'
+            },
+            valid: function () {
+                saveDict();
+            }
+        });
+
+    })
+
+    var saveDict = function () {
+        var dictId =$!{DictEO.dictId};
+        var code = $("#code").val();
+        var name = $("#name").val();
+        var description = $("#description").val()
+        var isUsed = $("input[name='isUsed']:checked").val();
+        var isOpen = $("input[name='isOpen']:checked").val();
+        var data = {dictId: dictId, isUsed: isUsed, isOpen: isOpen, code: code, name: name, description: description};
+        Ls.ajax({
+            url: "/dataDict/updateDict",
+            data: data
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+		Ls.getWin.win.grid.reload();
+                Ls.winClose();
+            }
+        })
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+</script>

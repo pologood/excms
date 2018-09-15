@@ -1,0 +1,321 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+
+            <h3 class="page-title"> 发文统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-line-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_today">0</span>
+                            </div>
+                            <div class="desc"> 今日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_yesterday">0</span>
+                            </div>
+                            <div class="desc"> 昨日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_week">0</span>
+                            </div>
+                            <div class="desc"> 本周发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-area-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_month">0</span>
+                            </div>
+                            <div class="desc">本月发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-pie-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_history">0</span>
+                            </div>
+                            <div class="desc">历史发文</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <!-- END DASHBOARD STATS 1-->
+            <h3 class="page-title"><i class="icon-bar-chart font-blue"></i>
+                各单位发文排行TOP 10
+                <small></small>
+            </h3>
+            <div>
+                <label></label>
+
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="chartsTime" value="today" checked="checked" onclick="changeCharts('today')"> 今日
+                    </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="yesterday" onclick="changeCharts('yesterday')"> 昨日 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="week" onclick="changeCharts('week')"> 本周 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="month" onclick="changeCharts('month')"> 本月 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="history" onclick="changeCharts('history')"> 历史 </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-8">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 410px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+            <h3 class="page-title">
+                单位发文详细列表
+                <small></small>
+            </h3>
+            <div region="center" style="border:none; overflow: auto;">
+                <div class="portlet light">
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="btn-group">
+                                        <button type="button" id="adduser_btn" class="btn btn-default bt" onclick="addEO()"> 导 出
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <form class="form-inline tr search-toolbar" role="form">
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="text" id="unitName" class="form-control" placeholder="单位名称">
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="text" id="columnName" class="form-control" placeholder="栏目名称">
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" id="startTime" ms-duplex="startTime" class="form-control"
+                                                   placeholder="起始时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" id="endTime" ms-duplex="endTime" class="form-control" placeholder="结束时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-search" onclick="searchModel()">查询</button>
+                                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="datagrid1" class="mini-datagrid" allowResize="true" align="center"
+                             url="/contentModel/getPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                             onlyCheckSelection="true"
+                             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;height:500px"
+                        >
+                            <div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                                <div field="id" width="100%" headerAlign="center" align="center">单位名称</div>
+                                <div field="name" width="100" headerAlign="center" align="center">发文总数</div>
+                                <div field="modelTypeName" width="180" headerAlign="center" align="center">已发布数</div>
+                                <div field="columnTempName" width="180" headerAlign="center" align="center">未发布数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<script type="text/javascript">
+
+    mini.parse();
+    var chartsData = [];
+    var chartsUnit = [];
+    var chartsTime = 'today';
+
+    $(document).ready(function () {
+
+        Ls.parseEcharts(function () {
+            doChange();
+        })
+
+    })
+
+    function doChange() {
+        // 使用
+        require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie'
+            ], function (ec) {
+                Ls.ajaxGet({
+                    url: "/statistics/getChartsList/",
+                    data: {chartsTime: chartsTime, typeCode: 'articleNews'}
+                }).done(function (d) {
+                    var d = d.data;
+                    if (d == null || d.length <= 0) {
+                        chartsData = [];
+                        chartsUnit = [];
+                    }
+                    for (var i = 0, l = d.length; i < l; i++) {
+                        chartsData[i] = d[i].count;
+                        chartsUnit[i] = d[i].organName;
+                    }
+                    option_a = {
+                        grid: {
+                            x: 50,
+                            x2: 20,
+                            y: 50
+                        },
+                        title: {
+                            text: '',
+                            subtext: ''
+                        },
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        legend: {
+                            show: false,
+                            data: ['发文数量']
+                        },
+                        toolbox: {
+                            show: true,
+                            feature: {
+                                magicType: {show: true, type: ['line', 'bar']},
+                                restore: {show: true},
+                                saveAsImage: {show: true}
+                            }
+                        },
+                        calculable: true,
+                        xAxis: [
+                            {
+                                type: 'category',
+                                axisLabel: {
+                                    interval: 0
+                                },
+                                data: chartsUnit
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value'
+                            }
+                        ],
+                        series: [
+                            {
+                                name: '发文数量',
+                                type: 'bar',
+                                color: '1bb2d8',
+                                itemStyle: {
+                                    normal: {
+                                        label: {
+                                            show: true,
+                                            position: 'top',
+                                            color: '#88b0bb'
+                                        }
+                                    }
+                                },
+                                data: chartsData
+
+                            }
+                        ],
+                        color: [
+                            '#FF8C00', '#1bb2d8', '#99d2dd', '#88b0bb', '#88b0bb',
+                            '#1c7099', '#038cc4', '#75abd0', '#afd6dd', '#88b0bb'
+                        ]
+                    };
+
+                    var chart_a = ec.init(document.getElementById('statistics_a'));
+                    chart_a.setOption(option_a);
+
+                });
+
+            }
+        );
+    }
+
+    function getChartsList(chartsTime) {
+        Ls.ajaxGet({
+            url: "/charts/getChartsList/",
+            data: {chartsTime: chartsTime, typeCode: 'articleNews'}
+        }).done(function (d) {
+            var d = d.data;
+            if (d == null || d.length <= 0) {
+                chartsData = [];
+                chartsUnit = [];
+                return;
+            } else {
+                for (var i = 0, l = d.length; i < l; i++) {
+                    chartsData[i] = d[i].count;
+                    chartsUnit[i] = d[i].organName;
+                }
+            }
+        });
+    }
+
+    var get_todoNumber = function () {
+        Ls.ajaxGet({
+            url: "/statistics/getCount/",
+            data: {typeCode: 'articleNews'}
+        }).done(function (d) {
+            var d = d.data;
+            for (var i = 0, l = d.length; i < l; i++) {
+                $("#count_" + d[i].chartsTime).text(d[i].count);
+            }
+        });
+    }()
+
+    function changeCharts(time) {
+        chartsTime = time;
+        doChange();
+    }
+
+</script>

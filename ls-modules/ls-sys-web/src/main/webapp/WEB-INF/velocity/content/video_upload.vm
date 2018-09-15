@@ -1,0 +1,115 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="video_form" role="form" ms-controller="video_form">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>视频地址：</label>
+                    <div class="input-group mb0">
+                        <input type="hidden" name="mongoId" id="mongoId" value=""/>
+                        <input type="text" id="videoName" name="videoName" class="form-control">
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default btn-default-upload"
+                                    onclick="uploadVideo()"><i class=" fa fa-upload">上传</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>宽度：</label>
+                    <input id="weightV" name="weightV" type="text" class="form-control" placeholder="高度不能为空"
+                           value="500">
+                </div>
+
+                <div class="form-group">
+                    <label>高度：</label>
+                    <input id="heightV" name="heightV" type="text" class="form-control" placeholder="宽度不能为空"
+                           value="400">
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        siteId: Ls.url.get("siteId"),
+        columnId: Ls.url.get("columnId"),
+        videoPath: '',
+        videoName: ''
+    }
+
+    $(document).ready(function () {
+
+        $('#video_form').validator({
+            fields: {
+                'videoName': '视频:required;',
+                'weightV': '高度:required;integer',
+                'heightV': '宽度:required;integer'
+            },
+            valid: function () {
+                //debugger
+                $("#mongoId").val(cur.videoPath);
+                if (W.article)  W.article.videoStatus = 0;//文章新闻视频需要转换
+                if (W.pic)  W.pic.videoStatus = 0;//图片新闻视频需要转换
+                if (W.cur) W.cur.videoStatus = 0; //针对信息公开或者具有cur需要转换视频的业务
+                api.close();
+            }
+        });
+
+        api.button(
+                {
+                    name: '保存',
+                    id: 'btn_save',
+                    focus: true,
+                    callback: function () {
+                        $("#video_form").submit();
+                        return false;
+                    }
+                },
+                {
+                    name: '取消',
+                    id: 'btn_cancel',
+                    callback: function () {
+                        api.close();
+                        return false;
+                    }
+                }
+        );
+    })
+
+    function uploadVideo() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                var mongoId = serverData.mongoId;
+                cur.videoName = serverData.fileName;
+                $("#videoName").val(cur.videoName).attr("disabled", true);
+                cur.videoPath = serverData.mongoId + "?" + cur.videoName;
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传视频',
+            upload_url: "/videoNews/uploadVideo?sessionId=" + GLOBAL_SESSIONID,
+            post_params: {
+                "siteId": cur.siteId,
+                "columnId": cur.columnId
+            },
+            file_size_limit: "1024 MB",
+            file_types: "*.asx;*.asf;*.mpg;*.wmv;*.3gp;*.mov;*.avi;*.flv;*.mp4",
+            file_types_description: "Video Files",
+            file_upload_limit: 1,  //配置上传个数
+        });
+    }
+</script>
+</body>
+</html>

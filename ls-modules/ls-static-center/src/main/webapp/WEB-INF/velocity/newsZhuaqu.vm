@@ -1,0 +1,21 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($num="$!{paramObj.num}")
+#set($num=$Integer.parseInt($num))
+#foreach($eo in $resultObj)
+    #if(${velocityCount}<=$num)
+        #set($title="#filterHtml($!{eo.infoTitle})")
+        #if("$!{title}"=="")
+            #set($title="&nbsp;")
+        #end
+    <li class="$!{css} num${velocityCount}">
+        <a href="$!{eo.infoUrl}" target="target" title="$!{title}">
+            <span class="title" >#cutstr($title,$length)</span>
+        </a>
+        #if("$!{eo.infoDate}"!="")
+            <span class="right date">$eo.infoDate.substring(5,10)</span>
+        #end
+    </li>
+    #end
+#end

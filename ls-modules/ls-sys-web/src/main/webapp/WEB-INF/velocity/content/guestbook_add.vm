@@ -1,0 +1,252 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+  <ul class="nav nav-tabs">
+    <li class="active">
+      <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab_1_1">
+
+      <form role="form" id="guestForm" ms-controller="guestForm">
+        <table class="table table-bordered petition-table">
+          <tbody>
+          #if($recType==0)
+          <tr  class="unit">
+            <th>收信单位：</th>
+            <td colspan="2">
+              <select class="form-control" id="receiveId" name="receiveId" ms-duplex="receiveId" placeholder="请选择收信单位">
+                <option value="">请选择收信单位</option>
+                #foreach($s in $recList)
+                  <option value="$!{s.recUnitId}">$!{s.recUnitName}</option>
+                #end
+              </select>
+            </td>
+          </tr>
+          #end
+          #if($recType==1)
+          <tr  class="user">
+            <th>收信领导：</th>
+            <td colspan="2">
+              <select class="form-control" id="receiveUserCode" name="receiveUserCode" ms-duplex="receiveUserCode"  placeholder="请选择收信领导">
+                <option value="">请选择收信领导</option>
+                #foreach($s in $recList)
+                  <option value="$!{s.recUserId}">$!{s.recUserName}</option>
+                #end
+              </select>
+            </td>
+          </tr>
+          #end
+            #if($codeList)
+            <tr id="codeId">
+              <th>留言类别：</th>
+              <td colspan="2">
+                <select class="form-control" id="classCode" name="classCode" ms-duplex="classCode" class="form-control" placeholder="请选择留言类别">
+                  <option value="">请选择留言类别</option>
+                  #foreach($s in $codeList)
+                    <option value="$!{s.classCode}">$!{s.className}</option>
+                  #end
+                </select>
+              </td>
+            </tr>
+            #end
+          <tr>
+            <th>您的姓名：</th>
+            <td colspan="2">
+              <input type="text" name="personName" ms-duplex="personName" class="form-control" placeholder="">
+            </td>
+          </tr>
+          <tr>
+            <th>联系电话：</th>
+            <td colspan="2">
+              <input type="text" name="personPhone" ms-duplex="personPhone" class="form-control"  placeholder="提示：固话不支持短线'-'">
+            </td>
+          </tr>
+          <tr>
+            <th>留言标题：</th>
+            <td colspan="2">
+              <input type="text" name="title" ms-duplex="title" class="form-control" placeholder="">
+            </td>
+          </tr>
+          <tr>
+            <th style="vertical-align: top;">主题内容：</th>
+            <td colspan="2">
+              <textarea  name="guestBookContent" ms-duplex="guestBookContent" class="form-control" style="width: 100%; height: 60px; visibility: visible;"></textarea>
+            </td>
+          </tr>
+
+          <tr>
+            <th>公开留言内容：</th>
+            <td colspan="2">
+              <label class="radio-inline">
+                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="1"> 是
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="0"> 否
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <th>公开个人信息：</th>
+            <td colspan="2">
+              <label class="radio-inline">
+                <input type="radio" name="isPublicInfo" ms-duplex-number="isPublicInfo" value="1"> 是
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="isPublicInfo" ms-duplex-number="isPublicInfo" value="0"> 否
+              </label>
+            </td>
+          </tr>
+          <tr>
+            <th>留言日期：</th>
+            <td>
+              <input type="datetime" name="addDate" ms-duplex="addDate" class="form-control"
+                     onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+          </tr>
+          <tr>
+            <th></th>
+            <td colspan="2">
+              <button class="btn btn-default btn-save" type="submit"> 保 存</button>
+              <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  var curr = {
+    vm: "",
+    pageIndex: '$!{pageIndex}',
+  };
+  var columnId='$!{columnId}';
+  var recType='$!{recType}';
+  var codeType="$!{codeType}";
+  var eweb;
+  $(document).ready(function () {
+    /*editor = KindEditor.create('textarea[name="guestBookContent"]', {
+      resizeType: 1,
+      allowPreviewEmoticons: false,
+      allowImageUpload: false,
+      items: [
+        'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+      afterCreate: function () {
+        this.sync();
+      },
+      afterBlur: function () {
+        this.sync();
+      },
+      filterMode: true
+    });*/
+    eweb = Ls.editor("guestBookContent", {style: "Lmini", height: "200"});
+    getVO();
+
+  });
+  function getVO() {
+    Ls.ajax({
+      type: "POST",
+      url: "/guestBook/addVO",
+      data: {}
+    }).done(function (d) {
+      if (!d.status) {
+        Ls.tipsErr(d.desc);
+        return;
+      }
+      var data = d.data;
+      data.receiveId = Ls.isEmpty(data.receiveId) ? "" : data.receiveId;
+      data.receiveUserCode = Ls.isEmpty(data.receiveUserCode) ? "" : data.receiveUserCode;
+      data.classCode = Ls.isEmpty(data.classCode) ? "" : data.classCode;
+
+      curr.$id = "guestForm";
+      //初始化表单字段
+      curr.init = Ls.initFORM(curr.$id, data);
+      //如果模型已经绑定，不再绑定
+      curr.vm = avalon.vmodels[curr.$id];
+      if (!curr.vm) {
+        curr.vm = avalon.define(curr.init);
+      } else {
+        Ls.assignVM(curr.vm, data);
+      }
+      //avalon.scan(document.body, curr.vm);
+      avalon.scan($("#guestForm").get(0),curr.vm);
+      //.html(data.guestBookContent);
+    });
+  }
+    /*提交更新*/
+    $("button[type='submit']").on("click", function () {
+        eweb.update();
+    })
+  $('#guestForm').validator({
+    rules: {
+    },
+    fields: {
+      'title': '标题:required;length[1~250];',
+      'personName': '您的姓名:required;length[1~32];',
+      'personPhone': '联系电话:required;mobile|tel_1|shortTel;',
+      'guestBookContent': '内容:required;'
+    },
+    valid: function () {
+      //Ls.tips('验证成功！' ,{icons: "success"});
+      doSave();
+    }
+  });
+
+
+  function saveVO() {
+    if(recType!=null&&recType!=''){
+      if(recType=='0'&&Ls.isEmpty(curr.vm.receiveId)){
+        Ls.tips("收信单位不能为空",{icons:"info"});
+        return;
+      }
+      if(recType=='1'&&Ls.isEmpty(curr.vm.receiveUserCode)){
+        Ls.tips("收信领导不能为空",{icons:"info"});
+        return;
+      }
+    }
+    if(codeType=="1"&&Ls.isEmpty(curr.vm.classCode)){
+      Ls.tips("留言类型不能为空",{icons:"info"});
+      return;
+    }
+    curr.vm.columnId = content_mgr.node.indicatorId;
+    curr.vm.siteId = GLOBAL_SITEID;
+    //curr.vm.guestBookContent = editor.html();
+    curr.vm.guestBookContent = eweb.getHtml();
+    curr.vm.recType=recType;
+    //curr.vm.text = editor.html();
+    curr.vm.text = eweb.getHtml();
+    return 1;
+  }
+  function doSave() {
+    if (saveVO() == 1) {
+      var value = curr.vm.$model;
+      value = Ls.toJSON(value);
+      Ls.ajax({
+        type: "POST",
+        url: "/guestBook/saveVO",
+        data: value
+      }).done(function (text) {
+        if (!text.status) {
+          Ls.tipsErr(text.desc);
+          return;
+        } else {
+          Ls.tipsOk("保存成功");
+          goBack();
+          return;
+        }
+      });
+    }
+  }
+
+
+  function goBack() {
+    content_mgr.getContentApp('/guestBook/index?pageIndex=' + curr.pageIndex);
+  }
+
+
+
+
+
+</script>

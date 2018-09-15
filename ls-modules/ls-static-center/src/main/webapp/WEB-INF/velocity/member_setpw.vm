@@ -1,0 +1,170 @@
+<div class="list-wp">
+        	<div class="nav-current">会员中心 > 忘记密码</div>
+            <div class="user-info">
+                <table>
+                    <form name="getQuestionForm" action="" method="post">
+                         <tr>
+                            <td class="label">账号：</td>
+                            <td class="inpt td-password">
+                                <input type="text" id="uid" name="uid" value="$!{resultObj.uid}" maxlength="15"/>
+                                <input type="hidden" id="getQuestion" name="getQuestion" value="1"/>
+                                <input type="submit" class="sub" value="获取问题验证">
+                                #if("$!{resultObj.memberIsExist}" == false)
+                                    <span>账号不存在,请重新输入</span>
+                                #end
+                            </td>
+                        </tr>
+                    </form>
+                    <tr>
+                        <td class="label">密码验证问题：</td>
+                        <td class="inpt td-password">
+                            <input type="text" id="question" name="question" value="$!{resultObj.question}"  disabled />
+                            #if("$!{resultObj.memberIsExist}" == true && "$!{resultObj.question}" == '')
+                                <span>此用户未设置密保问题</span>
+                            #end
+                        </td>
+                    </tr>
+					 <tr>
+                        <td class="label">密码验证答案：</td>
+                        <td class="inpt td-password">
+							<input type="text" id="answer" name="answer"  maxlength="50"/>
+						    <input class="sub" type="button" onclick="checkAnswer()" value="答案验证">
+						</td>
+                    </tr>
+					<tr style="display:none;" class="spw">
+                        <td class="label">新密码：</td>
+                        <td class="inpt td-password"><input type="password"  id="newPw" /></td>
+                    </tr>
+					<tr style="display:none;" class="spw">
+                        <td class="label">确认密码：</td>
+                        <td class="inpt td-password"><input type="password" id="cfPw" /></td>
+                    </tr>
+					<tr style="display:none;" class="spw">
+            			<td class="label">验<span class="s01"></span>证<span class="s02"></span>码：</td>
+            			<td class="inpt td-code">
+            				<input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            		  <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                      </td>
+            		</tr>
+                    <tr style="display:none;" class="spw">
+                        <td></td>
+                        <td>
+                            <input class="sub" type="button" onclick="setPw()" value="保存">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+ </div>
+<script>
+var validateSite = "$!{paramObj.validateSite}";
+var siteId = "$!{resultObj.siteId}";
+var memberId = "$!{resultObj.memberId}";
+$(document).ready(function(e) {
+	$("#imgCode").on('click',function(){
+		var _this = $(this);
+		_this.attr("src","/member/getCode?s="+Math.random());
+	});
+    $("form").submit(function(){
+        var uid = $("#uid").val();
+        if(uid == ''){
+            alert("账号不能为空");
+            return false;
+        }
+        return true;
+    });
+});
+
+function getQuestion(){
+       var uid = $("#uid").val();
+	   if(uid == ''){
+	     alert("账号不能为空");
+		 return;
+	   }
+
+       Ls.ajax({
+            url:"/member/getQuestion",
+            data:{uid:uid,siteId:siteId} 
+        }).done(function (d) {
+		       memberId = '';
+			   $("#question").val('');
+            if(d.status == 1) {
+			   var json = d.data;
+			   memberId = json.id;
+			   $("#question").val(json.question);
+            }else{
+                alert(d.desc);
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+}
+
+function checkAnswer(){
+    var answer = $("#answer").val();
+    if(memberId == ''){
+	     alert("验证问题不能为空");
+		 return;
+	}
+	if(answer == ''){
+	     alert("答案不能为空");
+		 return;
+	}
+      Ls.ajax({
+            url:"/member/checkAnswer",
+            data:{memberId:memberId,answer:answer} 
+        }).done(function (d) {
+            if(d.status == 1) {
+			     alert("验证成功！");
+				 $(".spw").show();
+            }else{
+                alert(d.desc);
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+}
+
+function setPw() {
+
+
+ var newPw = $("#newPw").val();
+		var newPw = $("#newPw").val();
+		var cfPw = $("#cfPw").val();
+		var checkCode = $("#checkimg").val();
+        var uid = $("#uid").val();
+        var question = $("#question").val();
+        var answer = $("#answer").val();
+		if(newPw == ''){
+		   alert("新密码不能为空！");
+           return;
+		}
+		if(cfPw == ''){
+		   alert("密码确认不能为空！");
+           return;
+		}else{
+		   if(newPw != cfPw){
+		    alert("密码确认不正确！");
+            return;
+		   }
+		}
+		if(checkCode == ''){
+		   alert("验证码不能为空！");
+           return;
+		}
+        Ls.ajax({
+            url:"/member/setPassword",
+            data:{memberId:memberId,siteId:siteId,newPw:newPw,cfPw:cfPw,checkCode:checkCode,uid:uid,question:question,answer:answer}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("密码修改成功！");
+                location.href = "/member/login/"+siteId;
+            } else {
+                alert(d.desc);
+				$("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+	
+</script>

@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="/assets/goa/res/css/common.css">
+    <link rel="stylesheet" href="/assets/goa/res/app/common/css/common.css">
+    <link rel="stylesheet" href="/assets/goa/res/css/icons.css">
+    <style type="text/css">
+        /*html,body{ overflow:hidden;}*/
+        .box{
+            -moz-border-radius:3px;
+            -khtml-border-radius:3px;
+            -webkit-border-radius:3px;
+            border-radius:3px;
+        }
+        .box-header{
+            height:34px;padding:0 0 0 50px;line-height:34px;
+            background:url(/assets/goa/res/images/flie.png) 12px -2px no-repeat;
+            border-bottom:#A4BED4 solid 3px;
+        }
+        .box-header h3{ font-size:22px;}
+        .box-header h2{
+            height: 100%;
+            width: auto;
+            float: left;
+            font-size: 14px;
+            position: relative;
+            margin: 0;
+            line-height: 34px
+        }
+        .box-ctrls{
+            width: auto;
+            float: right;
+            padding: 2px 8px 0 0;
+            margin: 0
+        }
+        .box-ctrls a{ text-decoration:none; color:#666}
+        .box-ctrls a:hover{ color:#F60}
+        .box-con{
+            padding:10px;
+        }
+        .box-con ul{}
+        .box-con ul li{line-height:26px; height:26px; width:100%; *width:auto;white-space:nowrap;text-overflow:ellipsis;overflow:hidden; font-size:14px;}
+        .box-con ul li a{color:#001f3f}
+        .box-con ul li a:hover{ color:#F60}
+        .box-con ul li .time{ font-size:11px; color:#AAA;}
+        .box-skin-gray{ border:#e6e6e6 solid 1px; }
+
+        .toolbar{ height:35px; line-height:35px;}
+
+        .mt60{ margin-top:60px !important;}
+
+    </style>
+</head>
+<body>
+
+<div id="mainBody" style="padding-top:50px;">
+    <div class="main-con">
+
+        <div id="blockCon" >
+
+        </div>
+
+    </div>
+</div> <!-- mainBody -->
+
+<!-- 页面加载loading 在页面渲染之前显示,渲染结束后隐藏  -->
+<div id="pageLoading" class="ls-loading">
+    <div class="ls-loading-img"></div>
+</div>
+
+<script type="template" id="tpl_block">
+    {foreach data as el index}
+    {if index%2 ==0 }
+    <div class="row-fluid mb10">
+        {/if}
+        <div class="span6">
+            <div class="box">
+                <div class="box-header">
+                    <h3>{el.packageName}</h3>
+                </div> <!--  box-header  -->
+                <div class="box-con">
+                    <ul class="list">
+                        {foreach el.processList as sel index}
+                        <li>
+                            <i class="icon_arrow"></i><a class="list-item" onclick="cur.fn.read({sel.processId},'{sel.name}')">{sel.name}</a><span class="time">({$formatDate(sel.create)})</span>
+                        </li>
+                        {/foreach}
+                    </ul>
+                </div> <!-- box-con -->
+            </div> <!-- box -->
+        </div>
+        {if index%2 !=0 }
+    </div> <!-- row -->
+    {/if}
+    {/foreach}
+</script>
+
+<script src="/assets/goa/core/jquery.min.js"></script>
+<script src="/assets/goa/core/boot.js" debug="0" font-icon="1" miniui="1"></script>
+<script src="/app/common/js/config.js"></script>
+<script>
+    // 配置当前页面所有ajax默认的访问地址
+    //Ls.ajax.url=rpc.admin.mgr.sys;
+    Ls.ajax.url='/';
+    var cur={
+        viewModel : {},
+        fn:{},
+        controller:{
+            process : Ls.ajax.url + 'process/'
+        },
+        action:{
+            getPackageList : 'getPackageList'
+        },
+        el:{},
+        params:{
+            moduleCode:'$!{moduleCode}',
+            processBusinessType:'$!{processBusinessType}',
+            dataId:'$!{dataId}',
+            columnId : '$!{columnId}'
+        },
+        dg:Ls.dialog.get(),
+        page:{}
+    };
+
+    $(document).ready(function(){
+        // 获取页面加载提示对象
+        cur.el.loading = $("#pageLoading");
+        cur.el.listItem = $(".list-item");
+        // 解析页面
+        mini.parse();
+        cur.fn.getList();
+
+        // 隐藏页面加载提示
+        cur.el.loading.hide();
+    });
+
+    cur.fn.getList = function (){
+        var url = cur.controller.process + cur.action.getPackageList;
+        return Ls.ajax.get(url,{moduleCode:cur.params.moduleCode},function(json){
+            var data = json.data;
+            if(Ls.isNul(data) || data.length == 0){
+                $("#blockCon").html("<h3 style='font-size:22px;'>未设置流程,请联系管理员设置流程!</h3>");
+            }else{
+                Ls.tpl.render('tpl_block','#blockCon', json ,function(){
+
+                });
+            }
+        });
+    };
+
+    cur.fn.read = function(processId,name){
+        var h = $(window).height()-50;
+        var url = "/process/processForm";
+        url = url.setUrlParam("moduleCode",cur.params.moduleCode)
+                 .setUrlParam("processId",processId)
+                 .setUrlParam("processName",encodeURI(name))
+                 .setUrlParam("startFlow",1)
+                 .setUrlParam("processBusinessType",cur.params.processBusinessType)
+                 .setUrlParam("dataId",cur.params.dataId)
+                 .setUrlParam("columnId",cur.params.columnId);
+        window.open (url,name,'height='+window.screen.availHeight+',width='+window.screen.availWidth)
+    };
+
+</script>
+</body>
+</html>

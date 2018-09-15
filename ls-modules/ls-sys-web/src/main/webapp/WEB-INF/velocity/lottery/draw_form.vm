@@ -1,0 +1,128 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0, maximum-scale=2.0" />
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="copyright" content="Copyright ? 2013 Lonsun.cn." />
+    <meta name="description" content="" />
+    <link rel="stylesheet" type="text/css" href="/css/longsun.css">
+</head>
+<script language="JavaScript">
+    javascript:window.history.forward(1);
+</script>
+
+    #parse("/lottery/lottrty_footer.vm")
+<body class="hdbodybg" style="background:#ff9690;" >
+<div class="dt_ban"><img src="/images/dt_ban.jpg" width="640" height="428"></div>
+<div class="dtbox">
+    <form  role="form" id="answerForm">
+        <div class="hdtitle">一共3题，当前为第$!{titleNum}题<div id="true" hidden="hidden">答题错误,正确答案:$!{true} </div> </div>
+        <div class="hd_nrbg">
+            #set($answerEOs=$eo.answerEOs)
+            <div class="hdtit1">1 .$!{eo.lotteryTitle} </div>
+            <input type="hidden" name="lotteryId" id="lotteryId" value="$!{eo.lotteryId}">
+
+            <div class="dtlist">`
+                #foreach($answer  in $answerEOs)
+                    $!{answer.answerOption} <input type="radio" name="answer" value="$!{answer.answerId}" >$!{answer.answer}</br>
+                #end
+
+            </div>
+
+        </div>
+    </form>
+</div>
+<div class="dtbtn xytbtn"><a href="javascript:void(0)" onclick="subPerson()"><img src="/images/xytbtn.jpg" width="211" height="64" /></a></div>
+</body>
+
+<script>
+    var cur={
+        name:"$!{name}",
+        phone:"$!{phone}",
+        titleNum: "$!{titleNum}"
+
+    };
+    $(document).ready(function () {
+        $("input[name='answer']:first").attr("checked","checked");
+
+    })
+    $('#answerForm').validator({
+        fields: {
+
+        },
+        valid: function () {
+            doSave();
+        },
+        timely:1,
+        msgClass: "n-right"
+    });
+
+
+    function subPerson(){
+        $("#answerForm").submit();
+
+
+    }
+
+    function doSave (){
+        var name =cur.name;
+        var phone =cur.phone;
+        if( null==$("input[name='answer']:checked").val()||''==$("input[name='answer']:checked").val()){
+            alert("请选择一项!");
+            return;
+        }
+        if($("input[name='answer']:checked").val()!=$!{true}){
+            $("#true").show();
+
+
+        }
+
+
+        Ls.ajax({
+            type: "POST",
+            url: "/lotteryDraw/subAnswer",
+            data: {name:name,phone:phone,lotteryId:$("#lotteryId").val(),answerId:$("input[name='answer']:checked").val()}
+        }).done(function (text) {
+            if (text.status!=1) {
+                alert(text.desc);
+                return;
+            }
+
+
+
+
+            if(cur.titleNum==3){
+                window.location.href="/lotteryDraw/drawResult?name="+name+"&phone="+phone;
+                return;
+            }
+
+
+            Ls.ajax({
+                type: "GET",
+                url: "/lotteryDraw/checkUser",
+                data: {name:name,phone:phone}
+            }).done(function (text) {
+                if (text.status != 1) {
+                    alert(text.desc);
+                    return;
+                }
+
+                window.location.href="/lotteryDraw/drawForm?name="+name+"&phone="+phone+"&titleNum="+text.data;
+
+            });
+
+
+
+
+        });
+
+    }
+
+
+
+
+
+</script>
+</html>

@@ -1,0 +1,646 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">主题信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="post_form" role="form" ms-controller="post_form" autocomplete="off">
+                        <table class="table table-bordered survey-table">
+                            <tbody>
+                            <tr>
+                                <th>主题：</th>
+                                <td colspan="3">
+                                    <input type="text" name="title" id="title" ms-duplex="title" class="form-control" placeholder="主题不能为空">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>所属版块：</th>
+                                <td colspan="3">
+                                    <label class="checkbox-inline pl0">
+                                        <select id="plateId" class="form-control w180" name="plateId" ms-duplex="plateId" placeholder="请选择版块">
+                                        ##                                            <option ms-repeat-option="bbsPlates" ms-attr-value="plateId">{{name}}</option>
+                                        </select>
+                                    </label>
+                                </td>
+                            ##                                <th>信息类型：</th>
+                            ##                                <td>
+                            ##                                    <label class="checkbox-inline pl0">
+                            ##                                        <select id="infoKey" class="form-control w180" name="infoKey"
+                            ##                                                ms-duplex="infoKey" placeholder="请选择信息类型">
+                            ##
+                            ##                                        </select>
+                            ##                                    </label>
+                            ##                                </td>
+                            </tr>
+                            <tr>
+                                <th>督办单位：</th>
+                                <td>
+                                    <label class="checkbox-inline pl0">
+                                        <select id="acceptUnitId" class="form-control w180" name="acceptUnitId"
+                                                ms-duplex="acceptUnitId" placeholder="请选择督办单位">
+                                        ##                                            <option ms-repeat-option="acceptUnits" ms-attr-value="organId">{{name}}</option>
+                                        </select>
+                                    </label>
+                                </td>
+                                <th>处理状态：</th>
+                                <td>
+                                    <label class="checkbox-inline pl0">
+                                        <select id="acceptStatus" disabled class="form-control w180" name="" placeholder="">
+                                        </select>
+                                    </label>
+                                </td>
+
+                            </tr>
+                            <tr>
+                                <th>发帖人：</th>
+                                <td>
+                                    <input type="text" name="memberName" id="memberName" ms-duplex="memberName" class="form-control" placeholder="发帖人不能为空">
+                                </td>
+                                <th>手机号：</th>
+                                <td >
+                                    <input type="text" name="memberPhone" id="memberPhone" ms-duplex="memberPhone" class="form-control" placeholder="手机号不能为空">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>联系人：</th>
+                                <td>
+                                    <input type="text" name="linkman" id="linkman" ms-duplex="linkman" class="form-control" placeholder="">
+                                </td>
+                                <th>邮箱：</th>
+                                <td>
+                                    <input type="text" name="memberEmail" id="memberEmail" ms-duplex="memberEmail" class="form-control" placeholder="">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发帖时间：</th>
+                                <td>
+                                    <input type="datetime" name="startTime" id="createDate" ms-duplex="createDate" class="form-control readonly w180" placeholder="开始时间不能为空"
+                                           readonly>
+                                </td>
+                                <th>逾期日期：</th>
+                                <td>
+                                    <input type="datetime" name="" id="overdueTimes"  class="form-control readonly w180" placeholder="逾期日期不能为空"
+                                           readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" onchange="changeTimes()">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>黄牌日期：</th>
+                                <td>
+                                    <input type="datetime" name="" disabled id="yellowTimes"  class="form-control readonly w180" placeholder="黄牌日期不能为空"
+                                           readonly >
+                                </td>
+                                <th>红牌日期：</th>
+                                <td>
+                                    <input type="datetime" disabled name="" id="redTimes"  class="form-control readonly w180" placeholder="红牌日期不能为空"
+                                           readonly>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>属性设置：</th>
+                                <td colspan="3">
+                                ##                                        <label class="checkbox-inline pl0"> <input type="checkbox" id="isPublish" name="isPublish"  value="1">已审核</label>
+                                    <label class="checkbox-inline pl0">
+                                        <select id="isPublish" class="form-control w100" name="isPublish"
+                                                ms-duplex="isPublish" placeholder="请选择状态">
+                                            <option value="0">待审核</option>
+                                            <option value="1">已审核</option>
+                                            <option value="2">屏蔽</option>
+                                        </select>
+                                    </label>
+                                ##                                    <label class="checkbox-inline"><input type="checkbox" id="isHeadTop" name="isHeadTop"  value="1">总置顶</label>
+                                    <label class="checkbox-inline"><input type="checkbox" id="isTop" name="isTop"  value="1">置顶</label>
+                                    <label class="checkbox-inline"><input type="checkbox" id="isEssence" name="isEssence"  value="1">推荐 / 精华</label>
+                                    <label class="checkbox-inline"><input type="checkbox" id="isLock" name="isLock"  value="1">锁定(帖子不能回复)</label>
+                                ##     <label class="checkbox-inline"><input type="checkbox" id="isColse" name="isColse"  value="1">封此主题</label><a onclick="showCloseDesc()" style="color: red">(添加注释)</a>
+                                </td>
+                            </tr>
+                            ##                            <tr id="colseDesc_str" class="dn">
+                            ##                                <th>封贴注释：</th>
+                            ##                                <td colspan="3">
+                            ##                                    <input type="text" name="colseDesc" id="colseDesc" ms-duplex="colseDesc" class="form-control" placeholder="">
+                            ##                                </td>
+                            ##                            </tr>
+                            ##                            <tr>
+                            ##                                <th>属性设置：</th>
+                            ##                                <td colspan="3">
+                            ##                                    <label class="checkbox-inline"><input type="checkbox" id="isHeadTop" name="isHeadTop"  value="1">总置顶</label>
+                            ##                                    <label class="checkbox-inline"><input type="checkbox" id="isTop" name="isTop"  value="1">置顶</label>
+                            ##                                    <label class="checkbox-inline"><input type="checkbox" id="isLock" name="isLock"  value="1">锁定(帖子不能回复)</label>
+                            ##                                    <label class="checkbox-inline"><input type="checkbox" id="isEssence" name="isEssence"  value="1">推荐 / 精华</label>
+                            ##                                </td>
+                            ##                            </tr>
+                            <tr>
+                                <th>通讯地址：</th>
+                                <td colspan="3">
+                                    <input type="text" name="memberAddress" id="memberAddress" ms-duplex="memberAddress" class="form-control" placeholder="">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th style="vertical-align: top;">内容：</th>
+                                <td colspan="3">
+                                    <textarea name="content" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                                </td>
+                            </tr>
+                            <tr id="fileUpload" class="dn">
+                                <th>附件上传：</th>
+                                <td colspan="3">
+                                    <button type="button" class="btn btn-default btn-upload" onclick="uploadFile()">
+                                        <i class="fa fa-upload"></i> 上传
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>附件信息：</th>
+                                <td colspan="3" >
+                                    <div>
+                                        <ul style="list-style-type:none" id="files">
+                                            #set($Imgsuffixs="*.png;*.jpg;*.jpeg;*.gif")
+                                            #foreach($file in $!{files})
+                                                <li id="$!{file.id}_li">
+                                                    #set($mongoId="$!{file.mongoId}")
+                                                    #if($mongoId.indexOf("/") == -1)
+                                                        #if($mongoId.indexOf(".") !=-1)
+                                                            #set($filePath="$!{fileServerNamePath}")
+                                                        #else
+                                                            #set($filePath="$!{fileServerPath}")
+                                                        #end
+                                                    #else
+                                                        #set($filePath="")
+                                                    #end
+                                                    #if($Imgsuffixs.indexOf($!{file.suffix})>-1)
+                                                        <img src="$!{filePath}$!{mongoId}" style="width: 150px;height: 150px" title="$!{file.fileName}">
+                                                        <br/>
+                                                    #end
+                                                    <a style="text-decoration: underline;color: blue;cursor:pointer;" onclick="downLoad('$!{mongoId}',$!{file.id})">$!{file.fileName}</a>
+                                                    [$!{file.fileSizeKb} KB]
+                                                    <span style="text-decoration: underline;color: blue;cursor:pointer;" onclick="delFile($!{file.id})">[删除]</span>
+                                                </li>
+                                            #end
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <button class="btn btn-default btn-save" type="submit" id="saveArticle"> 保 存</button>
+                                    <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+<script>
+    mini.parse();
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+            acceptUnitId:'',
+            plateId:'',
+            isPublish:'',
+            postId:cur.nextpage.postId,
+            overdueTimes:'0',
+            yellowTimes:'0',
+            redTimes:'0',
+            fileIds:[]
+        },
+        columnId:0,
+        handelOrgan:$("#acceptUnitId"),
+        plates:$("#plateId"),
+//        infoKeys:$("#infoKey"),
+        accepted:$("#acceptStatus"),
+        overdueTimes:$("#overdueTimes"),
+        yellowTimes:$("#yellowTimes"),
+        redTimes:$("#redTimes"),
+        fileUpload:$("#fileUpload"),
+        editor: '',
+        clickBtn: '',
+        isHeadTop:$("#isHeadTop"),
+//        isPublish:$("#isPublish"),
+        isColse:$("#isColse"),
+        isTop:$("#isTop"),
+        isLock:$("#isLock"),
+        isEssence:$("#isEssence"),
+        clickNum:0,
+        imgsuffixs:"*.png;*.jpg;*.jpeg;*.gif"
+    };
+    $(document).ready(function () {
+        getData();
+        //创建编辑器
+        createKindEditor();
+
+    })
+
+    function showCloseDesc(){
+        if(cursave.clickNum == 0){
+            $("#colseDesc_str").show();
+            cursave.clickNum = 1;
+        }else{
+            $("#colseDesc_str").hide()
+            cursave.clickNum = 0;
+        }
+    }
+    //拉取数据
+    function getData() {
+        Ls.ajaxGet({
+            url: "/bbsPost/getPost",
+            data: {
+                postId: cursave.params.postId
+            }
+        }).done(function (d) {
+
+            data = d.data;
+            data.$id = "post_form";
+            data.siteId = cursave.params.siteId;
+            data.bbsPlates = [];
+            data.acceptUnits=[]
+            cursave.vm = avalon.define(data);
+            avalon.scan($("#post_form").get(0), cursave.vm);
+
+            if(!Ls.isEmpty(data.postId)){
+                if(!Ls.isEmpty(data.isAccept)){
+                    cursave.accepted.html("<option value='"+data.isAccept+"'>"+(data.isAccept == 1?"已回复":"未回复")+"</option>")
+                }
+                cursave.params.acceptUnitId = data.acceptUnitId;
+                cursave.params.isPublish = data.isPublish;
+                cursave.params.plateId = data.plateId;
+                if(data.isHeadTop == 1){cursave.isHeadTop.attr("checked",true)}
+                if(data.isTop == 1){cursave.isTop.attr("checked",true)}
+                if(data.isLock == 1){cursave.isLock.attr("checked",true)}
+                if(data.isEssence == 1){cursave.isEssence.attr("checked",true)}
+//                if(data.isPublish == 1){cursave.isPublish.attr("checked",true)}
+                if(data.isColse == 1){
+                    cursave.isColse.attr("checked",true);
+                    $("#colseDesc_str").show();
+                    cursave.clickNum = 1;
+                }
+                /*cursave.editor.html(data.content);*/
+                eweb.setHtml(data.content);
+            } else {
+                cursave.fileUpload.show();
+            }
+            var d = new Date();
+            if(!Ls.isEmpty(data.overdueTimes)){
+                cursave.params.overdueTimes = data.overdueTimes;
+                d.setTime(data.overdueTimes * 1000);
+                cursave.overdueTimes.val(d.format('yyyy-MM-dd h:m:s'));
+            }
+            if(!Ls.isEmpty(data.yellowTimes)){
+                cursave.params.yellowTimes = data.yellowTimes;
+                d.setTime(data.yellowTimes * 1000);
+                cursave.yellowTimes.val(d.format('yyyy-MM-dd h:m:s'));
+            }
+            if(!Ls.isEmpty(data.redTimes)){
+                cursave.params.redTimes = data.redTimes;
+                d.setTime(data.redTimes * 1000);
+                cursave.redTimes.val(d.format('yyyy-MM-dd h:m:s'));
+            }
+            //加载论坛
+            getBbsPlates(data.plateId);
+            //加载单位
+            getOrgans(data.acceptUnitId);
+            //加载leixing
+//            getInfoKeys(data.infoKey);
+
+        })
+    };
+
+    /*提交更新*/
+    $("button[type='submit']").on("click", function () {
+        eweb.update();
+    })
+
+    function changeTimes() {
+        var selectTimeStr = cursave.overdueTimes.val(), d = new Date();
+        var oldOverDt = parseInt(cursave.params.overdueTimes), yellows = parseInt(cursave.params.yellowTimes),
+                reds = parseInt(cursave.params.redTimes);
+        try {
+            var dt = new Date(Date.parse(selectTimeStr.replace(/-/g, "/")));
+            var selectTimes= parseInt(dt.getTime()/1000);
+            if(oldOverDt > selectTimes){
+                var cz = oldOverDt - selectTimes;
+                yellows = yellows - cz;
+                reds = reds - cz;
+            }else if(oldOverDt < selectTimes){
+                var cz = selectTimes - oldOverDt;
+                yellows = yellows + cz;
+                reds = reds + cz;
+            }
+            d.setTime(yellows * 1000);
+            cursave.yellowTimes.val(d.format('yyyy-MM-dd h:m:s'));
+            d.setTime(reds * 1000);
+            cursave.redTimes.val(d.format('yyyy-MM-dd h:m:s'));
+            cursave.params.overdueTimes = selectTimes;
+            cursave.params.yellowTimes = yellows
+            cursave.params.redTimes = reds;
+            cursave.vm.overdueTimes = selectTimes;
+            cursave.vm.yellowTimes = yellows
+            cursave.vm.redTimes = reds
+        }catch (e){
+        }
+
+    }
+
+    //    function getInfoKeys(key){
+    //        Ls.ajaxGet({
+    //            url: "/bbsPost/getBbsType",
+    //            data: {}
+    //        }).done(function (d) {
+    //            var data = d.data;
+    //            var htmls = "<option value=''>--选择--</option>"
+    //            if(data != null){
+    //                var ok = false;
+    //                if(!Ls.isEmpty(key)){
+    //                    ok = true;
+    //                }
+    //                $.each(data,function(i,p){
+    //                    var str = ""
+    //                    if(ok){
+    //                        str = (key == p.value ? "selected":"");
+    //                        if(str == 'selected'){
+    //                            ok = false;
+    //                        }
+    //                    }
+    //                    htmls +="<option "+str+" value='"+p.value+"'>"+p.key+"</option>"
+    //                })
+    //            }
+    //            cursave.infoKeys.html(htmls)
+    //        });
+    //    }
+
+    function getBbsPlates(plateId){
+        Ls.ajaxGet({
+            url: "/bbsPlate/getPlates",
+            data: {}
+        }).done(function (d) {
+            var data = d.data;
+            var htmls = "<option value=''>--选择--</option>"
+            if(data != null){
+                var ok = false;
+                if(!Ls.isEmpty(plateId)){
+                    ok = true;
+                }
+                $.each(data,function(i,p){
+                    var str = ""
+                    if(ok){
+                        str = (plateId == p.plateId ? "selected":"");
+                        if(str == 'selected'){
+                            ok = false;
+                        }
+                    }
+                    htmls +="<option parentIds='"+p.parentIds+"' "+str+" value='"+p.plateId+"'>"+p.name+"</option>"
+
+                })
+            }
+            cursave.plates.html(htmls)
+        });
+    }
+    function getOrgans(acceptUnitId){
+        Ls.ajaxGet({
+            url: "/organ/getSiteOrgans",
+            data: {}
+        }).done(function (d) {
+            var data = d.data;
+//            cursave.vm.acceptUnits = data;
+            var htmls = "<option value=''>无需办理</option>"
+            if(data != null){
+                var ok = false;
+                if(!Ls.isEmpty(acceptUnitId)){
+                    ok = true;
+                }
+                $.each(data,function(i,o){
+                    var str = "";
+                    if(ok){
+                        str = (acceptUnitId == o.organId ? "selected":"");
+                        if(str == 'selected'){
+                            ok = false;
+                        }
+                    }
+                    htmls +="<option "+str+" value='"+o.organId+"'>"+o.name+"</option>"
+                })
+            }
+            cursave.handelOrgan.html(htmls);
+        });
+    }
+
+    $('#post_form').validator({
+        rules: {},
+        fields: {
+            'title': '主题:required;length[2~100]',
+            'plateId': '所属版块:required;',
+            'memberName': '会员名称:required;length[2~20]',
+            'memberPhone': '联系电话:required;mobile;length[2~20]',
+            'memberEmail': '电子邮箱:length[2~50]',
+            'linkman':'联系人:length[2~30]',
+            'memberAddress': "联系地址:length[2~100]",
+            'colseDesc':'封贴注释:length[2~100]',
+            'content': "内容:required;"
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    function addPost () {
+        var data = Ls.toJSON(cursave.vm.$model);
+        if(cursave.isHeadTop.is(":checked")){  data.isHeadTop = 1;}else{data.isHeadTop = 0}
+        if(cursave.isTop.is(":checked")){data.isTop = 1;}else{data.isTop = 0}
+        if(cursave.isLock.is(":checked")){data.isLock = 1;}else{data.isLock = 0}
+        if(cursave.isEssence.is(":checked")){data.isEssence = 1;}else{data.isEssence = 0}
+//        if(cursave.isPublish.is(":checked")){data.isPublish = 1;}else{data.isPublish = 0}
+        if(cursave.isColse.is(":checked")){data.isColse = 1;}else{data.isColse = 0}
+        data.acceptUnitName = "";
+        if(!Ls.isEmpty(data.acceptUnitId)){
+            data.acceptUnitName = cursave.handelOrgan.find("option:selected").text()
+        }else{
+            data.isAccept= null;
+        }
+        if(!Ls.isEmpty(data.plateId)){
+            data.plateName = cursave.plates.find("option:selected").text();
+            data.parentIds = cursave.plates.find("option:selected").attr("parentIds");
+        }
+//        if(!Ls.isEmpty(data.infoKey)){
+//            data.infoName = cursave.infoKeys.find("option:selected").text()
+//        }
+        //编辑时数据改变
+        if(!Ls.isEmpty(data.postId)){
+            if(Ls.isEmpty(data.acceptUnitId)){
+                data.isAccept = null;
+            }else if(data.acceptUnitId !=null && cursave.params.acceptUnitId != data.acceptUnitId){
+                data.isAccept = 0;
+                data.changeFiled = 'isAccept';
+            }
+            if(cursave.params.isPublish != data.isPublish){
+                data.changeFiled = data.changeFiled+"/"+'isPublish';
+            }
+            if(cursave.params.plateId != data.plateId){
+                data.changeFiled = data.changeFiled+"/"+'plateId';
+            }
+        }
+        /*data.content = cursave.editor.html();*/
+        data.content = eweb.getHtml();
+        data.fileIds = cursave.params.fileIds.join(",");
+        var url = "/bbsPost/saveOrUpdate";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+
+    function createKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cursave.columnId});
+        /*cursave.editor = KindEditor.create('textarea[name="content"]', {
+            items:["source","|","undo","redo","|","plainpaste","wordpaste","emoticons","baidumap","mtxx","|","justifyleft","justifycenter","justifyright","indent","outdent","removeformat","clearhtml","quickformat","image","multiimage","insertfile","formatblock","fontsize","|","forecolor","hilitecolor","bold","italic","underline","strikethrough","|","table","link","unlink","fullscreen"],
+            uploadJson: GLOBAL_CONTEXTPATH + '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: GLOBAL_CONTEXTPATH + '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: cursave.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+    }
+
+    function goBack(){
+        var url = "/bbsPost/list";
+        if(cur.nextpage.t == '1'){
+            url = "/bbsPost/list";
+        }else if(cur.nextpage.t == '2'){
+            url = "/bbsPost/delList";
+        }else if(cur.nextpage.t == '3'){
+            url = "/bbsPost/auditList";
+        }
+        App.getContentHtml(url+"?pageIndex="+cur.nextpage.pageIndex+"&isPublish="+cur.params.isPublish, "");
+//        App.getContentHtml("/bbsPost/list","");
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+
+
+    /*-------------------------------------------- 图片轮播处理-------------------------------------------------------*/
+
+    function uploadFile() {
+        Ls.uploadFile(function (files) {
+            addfile(files);
+            return true;
+        }, {
+            file_size_limit: "5 MB",
+            file_types: "*.png;*.jpg;*.jpeg;*.gif;*.doc;*.docx;*.xls;*.xlsx;*.txt",
+            file_upload_limit: "5",  //配置上传个数
+            upload_url: '/bbsFile/fileUpload',
+            post_params: {
+                "siteId": cursave.params.siteId,
+                "columnId": 0,
+                "desc": "论坛信息"
+            }
+        })
+    }
+
+    function addfile(files) {
+        var htmls = "";
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            cursave.params.fileIds.push(file.id)
+            htmls +="<li id='"+file.id+"_li'>"
+            if(cursave.imgsuffixs.indexOf(file.suffix) > -1){
+##                htmls +="<img src='$!{fileServerPath}"+file.mongoId+"' style='width: 150px;height: 150px' title='"+file.fileName+"'>";
+                htmls +="<img src='$!{fileServerNamePath}"+file.fileName+"' style='width: 150px;height: 150px' title='"+file.fileName+"'>";
+                htmls +="<br/>";
+            }
+            htmls +="<a onclick=\"downLoad('"+file.mongoId+"')\" style='text-decoration: underline;color: blue;cursor:pointer;'>"+file.fileName+"</a>";
+            htmls +=" ["+file.fileSizeKb+" KB] <span style='text-decoration: underline;color: blue;cursor:pointer;' onclick='delFile("+file.id+")'>[删除]</span></li>";
+        }
+        $("#files").append(htmls);
+    }
+
+    function delFile(fileId){
+        var ids = [];
+        ids.push(fileId);
+        ids = ids.join(",");
+        if (confirm("确认删除吗？")) {
+            Ls.ajaxGet({
+                url: "/bbsFile/deleteFiles?isDel=1&ids=" + ids,
+                success: function (text) {
+                    Ls.tipsOk("删除成功！");
+                    $("#"+fileId+"_li").remove();
+                }
+            });
+        }
+    }
+
+    //下载
+    function downLoad(mongoId,id){
+        if (!Ls.isEmpty(mongoId)) {
+            var filePath = '$!{fileServerNamePath}';
+            if (mongoId.indexOf(".") == -1) {
+                if (mongoId.indexOf("/mongo/") >= 0) {
+                    filePath = ""
+                }
+            } else {
+                filePath = "";
+            }
+            if (!Ls.isEmpty(filePath)) {
+                $("#download").attr("src", "/bbsFile/download/" + mongoId);
+            }else{
+                $("#download").attr("src", "/govbbs/static/file/download?id=" + id);
+            }
+        }
+    }
+</script>

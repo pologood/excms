@@ -1,0 +1,36 @@
+<div class="xxgk_lmcon" id="xxgk_lmcon">
+	<table border="0" cellpadding="0" cellspacing="1" width="100%" bgcolor="#dddddd" style="font-size:14px;">
+	<tbody>
+	#set($xxgkData=$resultObj.data)
+	#if($xxgkData && $xxgkData.size() > 0)
+		<tr class="lmcj_title" bgcolor="#fff9e1">
+			<td width="430" height="42" align="center" bgcolor="#f1f1f1"><strong>单位名称</strong></td>
+			<td width="130" height="42" align="center" bgcolor="#f1f1f1"><strong>主动公开信息</strong></td>
+			<td width="150" height="42" align="center" bgcolor="#f1f1f1"><strong>收到申请公开数</strong></td>
+			<td width="100" height="42" align="center" bgcolor="#f1f1f1"><strong>已回复数</strong></td>
+			<td height="42" align="center" bgcolor="#f1f1f1"><strong>合计</strong></td>
+		</tr>
+		#foreach($vo in $xxgkData)
+			<tr>
+				<td height="30" align="center" bgcolor="#FFFFFF"><a href="/public/column/$!{vo.organId}?type=4&action=list" title="$!{vo.organName}" target="_blank">$!{vo.organName}</a></td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.drivingCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.applyCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.replyCount}</td>
+				<td align="center" bgcolor="#FFFFFF">$!{vo.total}</td>
+			</tr>
+		#end
+		<tr>
+			<td align="center" bgcolor="#F1F1F1" height="34"><strong>合计：&nbsp;$!{resultObj.organCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.drivingCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.applyCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.replyCount}</strong></td>
+			<td align="center" bgcolor="#F1F1F1"><strong>$!{resultObj.total}</strong></td>
+		</tr>
+	#else
+		<tr>
+			<td align="center" bgcolor="#F1F1F1" height="34"><strong>暂无相关数据</strong></td>
+		</tr>
+	#end
+    </tbody>
+    </table>
+</div>

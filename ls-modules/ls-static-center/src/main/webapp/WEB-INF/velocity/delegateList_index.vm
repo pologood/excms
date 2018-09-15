@@ -1,0 +1,32 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #if("$!{eo.picPath}"!= "")
+        #set($picPath="$!{eo.picPath}")
+        #if($picPath.indexOf("http://") >= 0)
+            #set($imageLink="$!{eo.picPath}")
+        #elseif($picPath.indexOf(".") >= 0)
+            #set($imageLink="$!{fileServerNamePath}$!{eo.picPath}")
+        #else
+            #set($imageLink="$!{fileServerPath}$!{eo.picPath}")
+        #end
+    #else
+        #set($imageLink="/assets/images/no_photo.jpg")
+    #end
+
+<li>
+    <div class="ld_pic"><a href="/delegate/getDelegateById?id=$eo.id" target="_blank"> <img src="$imageLink" width="63" height="84" border="0" alt="$eo.name"></a></div>
+    <div class="ld_text"> <span class="name"><a href="/delegate/getDelegateById?id=$eo.id" target="_blank">$eo.name</a></span> <span class="zy">
+        #foreach($vo in $delegationList)
+                #if($!{eo.delegation}==$vo.code)
+                   $vo.key
+               #end
+         #end
+    </span></div>
+</li>
+
+#end
+
+
+

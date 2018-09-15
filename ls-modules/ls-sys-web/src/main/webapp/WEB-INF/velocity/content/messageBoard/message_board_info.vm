@@ -1,0 +1,415 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="portlet light ">
+
+    <div class="portlet-body">
+
+        <div id="message_board_info_body" class="doc-manage">
+
+        </div>
+
+    </div>
+</div>
+</body>
+    #parse("_page_layout/_footer.vm")
+<script id="message_board_info_template" type="text/html">
+    <table class="table guestbook-list2">
+        <tbody>
+        <?var el= data?>
+        <tr>
+            <th scope="row" class="w40">
+                <input type="hidden" name="id" id="id" value="<?=el.id?>">
+            </th>
+            <td>
+
+                <div class="message-title">
+                    <?if(el.className!=null){?><a style="color:red;" title="留言类型">[<?=el.className?>]</a> <?}?>
+                    <?=el.title?>
+                </div>
+                <div class="message-attr" title="<?=resourceType?>">
+                    网友：<?=el.personName?>&nbsp;&nbsp;&nbsp;
+                    添加日期：<?=el.addDate?>&nbsp;&nbsp;&nbsp;
+                    <?if(el.isSuper==1){?>
+                    手机号码：<?=el.personPhone?>&nbsp;&nbsp;&nbsp;
+                    IP地址：<?=el.personIp?>&nbsp;&nbsp;&nbsp;
+                    <?}?>
+                    查询编号 ：<?=el.docNum?>&nbsp;&nbsp;&nbsp;
+                    查询密码：<?=el.randomCode?>
+                    <?if(el.isPublic==0){?>
+                    【不公开】
+                    <?}else{?>
+                    【公开】
+                    <?}?>
+                    满意度：<?=el.commentName?>&nbsp;&nbsp;&nbsp;
+                    <?if(el.isSuper==0&&el.forwardAttachId!=null){?>
+                    <a href="javascript:void(0);" onclick="downLoad('<?=el.forwardAttachId?>')" style="color:#117CEA;">附件查看</a>
+                    <?}?>
+                </div>
+                <div class="message-body">
+                    <?==el.messageBoardContent?>
+                </div>
+                <?if(el.attachId!=null){?>
+                <div>
+                    <a href="javascript:void(0);" onclick="downLoad('<?=el.attachId?>')" style="color:#117CEA;">附件查看</a>
+                </div>
+                <?}?>
+                <div class=" reply<?=el.id?>">
+                </div>
+                <div class="message-bottom">
+                    <span class="pull-right">
+                        <ol class="tools-bar">
+                          <li>
+                            <button type="button" class="editBtn btn btn-default btn-xs"
+                                    onclick="modify(<?=el.baseContentId?>)">修改
+                            </button>
+                          </li>
+                          <li>
+                            <button type="button"
+                                    class="publishBtn btn btn-default btn-xs <? if(el.isPublish==1){?> green-meadow<?}?>"
+                                    id="p_<?=el.baseContentId?>"
+                                    onclick="changePublish(<?=el.baseContentId?>,<?=el.isPublish?>)">发布
+                            </button>
+                          </li>
+                            <li>
+                            <button type="button" class="dealBtn btn btn-default btn-xs"
+                                    onclick="reply(<?=el.baseContentId?>,<?=el.columnId?>,<?=el.id?>,<?=0?>)">办理
+                            </button>
+                            </li>
+                            <li>
+                            <button type="button" class="forwardBtn btn btn-default btn-xs"
+                                    onclick="forwardById(<?=el.id?>
+                                )">转办</button>
+                            </li>
+
+                          <li>
+                            <button type="button" class="btn btn-default btn-xs"
+                                    onclick="record(<?=el.id?>)">转办记录
+                            </button>
+                          </li>
+                          <li>
+                               <a class="btn btn-default btn-xs" style="border:0;"
+                                  href="/messageBoard/doPrint?id=<?=el.id?>&baseContentId=<?=el.baseContentId?>&columnId=<?=el.columnId?>"
+                                  target="_blank">打印受理单</a>
+                          </li>
+                        </ol>
+                    </span>
+                    <div class="clearfix"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination pull-right"></div>
+    <div class="clearfix"></div>
+    <iframe name="download" id="download" style="display: none;"></iframe>
+</script>
+<script>
+
+    var cur = {
+        columnId: '',
+        opt: []
+    };
+
+    var baseContentId = $!{baseContentId};
+    var columnId = $!{columnId};
+    var deal = $!{deal};
+    var forward = $!{forward};
+    var publish = $!{publish};
+    var edit = $!{edit};
+    var Recover = $!{recover};
+    var Apply = $!{apply};
+
+    $(document).ready(function () {
+        getInfoData();
+    });
+
+
+    //修改
+    function modify(id) {
+
+        Ls.openWin('/messageBoard/modify?id=' + id + '&columnId=' + columnId + '&type=3', '600px', '480px', {
+            id: 'modify',
+            title: '修改操作',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+    }
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish:isPublish
+            },
+            url: "/articleNews/changePublish",
+            success: function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+                var isSuccess = text.data;
+                if (isSuccess == 1) {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("取消发布成功");
+                    getInfoData();
+                } else {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("发布成功");
+                    getInfoData();
+
+                }
+
+            }
+        });
+    }
+
+    //后台打开回复弹窗
+    function reply(id, columnId, messageBoardId, isSuper) {
+
+        Ls.openWin('/messageBoard/messageBoardReply?id=' + id + '&&messageBoardId=' + messageBoardId + '&&columnId=' + columnId + '&&isSuper=' + isSuper, '600px', '380px', {
+            id: 'reply',
+            title: '回复留言',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+
+    }
+
+    //后台打开收回弹窗
+    function recover(id) {
+        Ls.openWin('/acceptCenter/recoverRecord?id=' + id + '&&columnId=' + columnId, '600px', '380px', {
+            id: 'recover',
+            title: '收回',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+
+    }
+
+    //查看图片
+    function queryImage(image) {
+        Ls.openWin('/messageBoard/queryImage?image=' + image, '600px', '450px', {
+            id: 'image',
+            title: '查看图片',
+            padding: 0,
+            close: function () {
+            }
+        });
+
+    }
+
+    //后台打开审核弹窗
+    function apply(messageBoardId, applyStatus) {
+        if (applyStatus == 1) {
+            Ls.tipsInfo("您提交的申请正在处理,请耐心等待!");
+            return;
+        }
+        Ls.openWin('/messageBoard/messageBoardApply?messageBoardId=' + messageBoardId + '&&applyStatus=' + applyStatus, '600px', '380px', {
+            id: 'apply',
+            title: '申请延期',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+
+    }
+
+    //打开转办功能窗口
+    function forwardById(id) {
+        Ls.openWin('/messageBoard/messageBoardForward?id=' + id + '&columnId=' + columnId, '500px', '480px', {
+            id: 'message_button_forward',
+            title: "留言转办",
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            },
+            close: function () {
+                getInfoData();
+            }
+        });
+    }
+
+
+    //单个删除
+    function deleteById(id) {
+        if (confirm("确定删除留言？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/messageBoard/delete",
+                success: function (text) {
+                    getInfoData();
+                    Ls.tipsOk("删除成功");
+                }
+            });
+        }
+    }
+
+    //单个回复删除
+    function deleteReply(id, replyId) {
+        if (confirm("确定删除回复内容？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    replyId: replyId
+                },
+                url: "/messageBoard/deleteReply",
+                success: function (text) {
+                    getInfoData();
+                    Ls.tipsOk("删除成功");
+                }
+            });
+        }
+    }
+
+    //后台打开退回弹窗
+    function goBack(id) {
+
+        Ls.openWin('/messageBoard/messageBoardGoBack?id=' + id, '600px', '280px', {
+            id: 'goBack',
+            title: '退回',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+
+    }
+
+
+    //后台打开回复弹窗
+    function updateReply(replyId) {
+        Ls.openWin('/messageBoard/updateReply?id=' + replyId + '&columnId=' + columnId, '600px', '380px', {
+            id: 'updateReply',
+            title: '回复留言',
+            padding: 0,
+            close: function () {
+                getInfoData();
+            }
+        });
+
+    }
+
+    //打开转办记录窗口
+    function record(id) {
+        Ls.openWin('/messageBoard/queryForwardRecord?id=' + id + '&columnId=' + columnId, '700px', '400px', {
+            id: 'record',
+            title: '转办记录',
+            padding: 0
+
+        });
+    }
+
+    //修改
+    var doAdd = function (id) {
+        content_mgr.getContentApp("/messageBoard/add?columnId=" + columnId + "&&pageIndex=" + cur.pageIndex);
+    };
+
+    //下载
+    function downLoad(attachId) {
+        var url = "/fileCenter/download/" + attachId;
+        $("#download").attr("src", url);
+    }
+
+    //拉取数据
+    function getInfoData() {
+
+        return Ls.ajaxGet({
+            url: "/messageBoard/getMessageBoardInfo",
+            data: {
+                id: baseContentId
+            }
+        }).done(function (d) {
+                    var listHtml = Ls.template("message_board_info_template", d);
+                    $("#message_board_info_body").html(listHtml);
+                    if (d.data.replyVOList != null && d.data.replyVOList.length > 0) {
+                        for (var i = 0; i < d.data.replyVOList.length; i++) {
+                            var attachId = d.data.replyVOList[i].attachId;
+                            var replyId = d.data.replyVOList[i].id;
+                            var s = "";
+                            var imageUrl = "";
+                            var edit = '';
+                            var receiveName = d.data.replyVOList[i].receiveName;
+                            var username = d.data.replyVOList[i].username;
+                            var content = (receiveName == null ? '' : receiveName) + '&nbsp;&nbsp;&nbsp;' + d.data.replyVOList[i].createDate;
+                            if (d.data.replyVOList[i].isSuper == 1) {
+                                s = "<span style='color:red;'>汇总&nbsp;&nbsp;&nbsp;</span>";
+
+                            }
+                            if (attachId != null) {
+                                imageUrl += '<a href="javascript:void(0);" onclick="downLoad(' + "'" + d.data.replyVOList[i].attachId + "'" + ')"><span  style="color:#117CEA;">附件查看</span></a>'
+                            }
+
+                            $(".reply" + d.data.replyVOList[i].messageBoardId).append(
+                                    '<div class="message-reply">'
+                                    + '<div class="replyUser">'
+                                    + s + content
+                                    + '</div>'
+                                    + '<div class="replyContent">'
+                                    + '<div>' + d.data.replyVOList[i].replyContent + '</div>'
+                                    + '</div>'
+                                    + '<div class="clearfix">'
+                                    + '<div style="float: left">'
+                                    + imageUrl
+                                    + '</div>'
+                                    + '<div style="float: right;">'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '</div>'
+                                    + '<br />');
+                        }
+                    }
+                    getSuper();
+                }
+        );
+
+    }
+
+    function getSuper() {
+        if (publish == 1) {
+            $(".publishBtn").attr("disabled", false);
+            $(".publishBtn").removeClass("disabled");
+        }
+        if (edit == 1) {
+            $(".editBtn").attr("disabled", false);
+            $(".editBtn").removeClass("disabled");
+        }
+        if (deal == 1) {
+            $(".dealBtn").attr("disabled", false);
+            $(".dealBtn").removeClass("disabled");
+        }
+        if (forward == 1) {
+            $(".forwardBtn").attr("disabled", false);
+            $(".forwardBtn").removeClass("disabled");
+        }
+        if (Recover == 1) {
+            $(".recoverBtn").attr("disabled", false);
+            $(".recoverBtn").removeClass("disabled");
+        }
+        if (Apply == 1) {
+            $(".applyBtn").attr("disabled", false);
+            $(".applyBtn").removeClass("disabled");
+        }
+    }
+</script>
+</HTML>
+
+
+
+
+
+
+

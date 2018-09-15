@@ -1,0 +1,128 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar" style="width:100%;">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="addContentRule()">添 加</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-delete" onclick="batchDel()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/db/collect/getPageContentEOs" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 400px"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="fromColumn" width="150" align="center" headerAlign="center">来源字段</div>
+                        <div field="toColumn" width="150" align="center" headerAlign="center">入库字段</div>
+##                        <div field="filterCondition" width="100" align="left" headerAlign="center">过滤条件</div>
+                        <div field="defaultValue" width="150" align="center" headerAlign="center">默认值</div>
+                        <div width="115" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        taskId:Ls.getWin.dialog.data("taskId"),
+        dbType:Ls.getWin.dialog.data("dbType")
+    };
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.taskId});
+        cur.api.button(
+            {id:'back',className:'btn-back',name:'关闭',callback:function(){Ls.winClose();return false;}}
+        );
+    })
+
+    function opt(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editContentRule('+record.id+')">修 改</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel('+record.id+')">删 除</button>';
+        return edit + del;
+    }
+
+    function addContentRule() {
+        cur.dialog.data("taskId",cur.taskId);
+        cur.dialog.data("type","add");
+        cur.dialog.data("dbType",cur.dbType);
+        Ls.openWin("/db/collect/addOrEditContentRule", '600px', '200px', {
+            title: "添加采集规则"
+        });
+    }
+
+    function editContentRule(id) {
+        var record = cur.grid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+        cur.dialog.data("type","edit");
+        cur.dialog.data("record",record);
+        cur.dialog.data("taskId",cur.taskId);
+        cur.dialog.data("dbType",cur.dbType);
+        Ls.openWin("/db/collect/addOrEditContentRule", '600px', '200px', {
+            title: "编辑采集规则"
+        });
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if(id != null && id!= "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/db/collect/deleteContentRules",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function callback(msg) {
+        Ls.tips(msg, {times: 2});
+        cur.grid.reload();
+    }
+</script>
+</body>
+</html>

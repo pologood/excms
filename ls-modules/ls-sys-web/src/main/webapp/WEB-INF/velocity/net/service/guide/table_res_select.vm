@@ -1,0 +1,241 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <button id="adduser_btn" type="button" style="float:left" class="btn btn-default btn-add" onclick="addTableResources()">
+                                添加
+                            </button>
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                               placeholder="表格名称">
+
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="true" allowResize="true"
+                     url="/tableResources/getPageEOs" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 300px"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="name" width="100%" align="left" headerAlign="center" renderer="table_name">表格名称</div>
+                        <div field="organName" width="150" align="center" align="center" headerAlign="center">单位名称</div>
+                        <div field="" width="150" align="center" headerAlign="center" allowSort="true" renderer="joinDate">加入日期</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" onclick="confirm()">确 定</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">取 消</button>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        ser_key:$('#ser_key'),//查询关键字
+        organ_ser:$('#organId_ser'),//查询部门选择组件
+        organ:$('#organId'),//添加修改部门选择组件
+        map:new Map(),
+        table_select:art.dialog.data('table_select'),
+        table_select_ids:art.dialog.data('table_select_ids'),
+        table_select_names:art.dialog.data('table_select_names'),
+        columnId:art.dialog.data('columnId')
+//        typeCode: art.dialog.data("typeCode");
+
+    };
+    $(document).ready(function () {
+
+        if(cur.table_select_ids != null && cur.table_select_ids != "") {
+            var ids = cur.table_select_ids.split(",");
+            var names = cur.table_select_names.split(",");
+            for(var i=0;i<ids.length;i++) {
+                cur.map.put(ids[i],names[i]);
+            }
+        }
+
+        search();
+        cur.grid.on('select',function(sender,record) {
+            var record = sender.record;
+            cur.map.put(record.id,record.name);
+        });
+
+        cur.grid.on('deselect',function(sender,record) {
+            var record = sender.record;
+            cur.map.remove(record.id);
+        });
+
+        cur.grid.on('load',function(sender,xhr,data) {
+            //选中已选择记录
+            var rows = cur.grid.findRows(function(row){
+                if(cur.map.get(row.id) != null) {
+                    cur.map.put(row.id,row);
+                    return true;
+                };
+            });
+
+            for(var i=0;i<rows.length;i++) {
+                cur.grid.setSelected(rows[i]);
+            }
+        });
+    })
+
+    function confirm() {
+        var win = Ls.getWin.win;
+        win.callback_table_select(cur.map.getKeys(),cur.map.getValues());
+        Ls.winClose();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({keys:'name', keyValue: keyValue,organId:cur.organ.val(),columnId:cur.columnId});
+    }
+
+    function joinDate(obj) {
+        var record = obj.record;
+        var joinDate = record.joinDate;
+
+        if(null != joinDate && typeof joinDate == 'object') {
+            record.joinDate = joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+            return joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+        } else {
+            return joinDate;
+        }
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.organ.val('');
+        search();
+    }
+
+    function Map() {
+
+        var mapObj = {};
+
+        this.put = function (key, value) {
+            mapObj[key] = value;
+        };
+
+        this.remove = function (key) {
+            if (mapObj.hasOwnProperty(key)) {
+                delete mapObj[key];
+            }
+        };
+
+        this.get = function (key) {
+            if (mapObj.hasOwnProperty(key)) {
+                return mapObj[key];
+            }
+            return null;
+        };
+
+        this.getKeys = function () {
+            var keys = [];
+            for (var k in mapObj) {
+                keys.push(k);
+            }
+            return keys;
+        };
+
+        this.getValues = function () {
+            var values = [];
+            for (var k in mapObj) {
+                values.push(mapObj[k]);
+            }
+            return values;
+        }
+
+        // 遍历map
+        this.each = function (fn) {
+            for (var key in mapObj) {
+                fn(key, mapObj[key]);
+            }
+        };
+
+        this.toString = function () {
+            var str = "{";
+            for (var k in mapObj) {
+                str += "\"" + k + "\" : \"" + mapObj[k] + "\",";
+            }
+            str = str.substring(0, str.length - 1);
+            str += "}";
+            return str;
+        }
+
+    }
+
+    Date.prototype.pattern=function(fmt) {
+        var o = {
+            "M+" : this.getMonth()+1, //月份
+            "d+" : this.getDate(), //日
+            "h+" : this.getHours()%12 == 0 ? 12 : this.getHours()%12, //小时
+            "H+" : this.getHours(), //小时
+            "m+" : this.getMinutes(), //分
+            "s+" : this.getSeconds(), //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季度
+            "S" : this.getMilliseconds() //毫秒
+        };
+        var week = {
+            "0" : "\u65e5",
+            "1" : "\u4e00",
+            "2" : "\u4e8c",
+            "3" : "\u4e09",
+            "4" : "\u56db",
+            "5" : "\u4e94",
+            "6" : "\u516d"
+        };
+        if(/(y+)/.test(fmt)){
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        if(/(E+)/.test(fmt)){
+            fmt=fmt.replace(RegExp.$1, ((RegExp.$1.length>1) ? (RegExp.$1.length>2 ? "\u661f\u671f" : "\u5468") : "")+week[this.getDay()+""]);
+        }
+        for(var k in o){
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
+    function addTableResources(){
+        art.dialog.data('columnId', cur.columnId);
+        Ls.openWin("/tableResources/addNew", '700px', '450px', {
+            id:'edit',
+            title: "添加表格资源"
+        });
+    }
+</script>
+</body>
+</html>

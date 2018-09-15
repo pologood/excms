@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sAction = URLParams["action"];
+        var sCaption = lang["DlgPasteGecko"];
+
+        if (sAction == "text") {
+            sCaption += "(" + lang["DlgPasteGeckoText"] + ")";
+        } else if (sAction == "word") {
+            sCaption += "(Word)";
+        }
+
+
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function ok() {
+            var s_Html = "";
+            var s_EventType = "html";
+            if (sAction == "text") {
+                s_EventType = "text";
+                s_Html = HTMLEncode($("d_text").value);
+            } else {
+                s_Html = $("d_iframe").contentWindow.document.body.innerHTML;
+                if (sAction == "word") {
+                    s_Html = _CleanWord(s_Html);
+                }
+            }
+            EWIN.insertHTML(s_Html);
+            parent.Ok({flag: "Paste", type: s_EventType});
+        }
+
+
+        function _CleanWord(s_Html) {
+            s_Html = s_Html.replace(/<!--\[if\s(gte mso [0-9]+|gte vml [0-9]+)\]>[\s\S]*?<!\[endif\]-->/gi, "");
+            //
+            <!--[if !mso]-->
+            <!--[if !vml]-->
+            <!--[if !mso & !vml]-->
+            <!--[if !supportLists]-->
+            <!--[if !RotText]-->
+            <!--[endif]-->
+            s_Html = s_Html.replace( / <!--\[if\s!\w[^\]]*?\]-->([\s\S
+        ]*
+                ?
+        )<!--\[endif\]-->
+            /gi,"$1");
+
+            //class="..."
+            s_Html = s_Html.replace(/<(\w[^>]*?)\sclass\s*=\s*\"[^>]*?\"([^>]*)>/gi, "<$1$2>");
+            //class='...'
+            s_Html = s_Html.replace(/<(\w[^>]*?)\sclass\s*=\s*\'[^>]*?\'([^>]*)>/gi, "<$1$2>");
+            //class=abc
+            s_Html = s_Html.replace(/<(\w[^>]*?)\sclass\s*=\s*[^\s>\'\"]*?([^>]*)>/gi, "<$1$2>");
+            //<w lang=zh-cn>
+            s_Html = s_Html.replace(/<(\w[^>]*?)\slang\s*=\s*[^\s>]*([^>]*)>/gi, "<$1$2>");
+            s_Html = s_Html.replace(/<\\?\?xml[^>]*>/gi, "");
+            s_Html = s_Html.replace(/<\/?\w+:[^>]*>/gi, "");
+
+            // <span ...>   </span>
+            s_Html = _ReplaceMatchLoop(s_Html, "<span(?=[\\s>])[^>]*>\s*</span>", "");
+            // style="mso-ascii-font-family:&quot;Times New Roman&quot;;"     -->  style="mso-ascii-font-family:'Times New Roman';"
+            s_Html = _ReplaceMatchLoop(s_Html, "(<\\w[^>]*?style\\s*=\\s*\"[^\\\"]*?)&quot;([^>]*?>)", "$1'$2");
+            // style="x1:y1;mso-x1:y1;mso-x2:y2"   -->    style="x1:y1"
+            s_Html = _ReplaceMatchLoop(s_Html, "(<\\w[^>]*?style\\s*=\\s*\"[^\\\"]*?)(mso-[a-zA-Z\-]+?:[^;\\\">]+)([^>]*?>)", "$1$3");
+            // style="x1:y1 ;;; x2:y2  ; ;"    -->  style="x1:y1;x2:y2"
+            s_Html = _ReplaceMatchLoop(s_Html, "(<\\w[^>]*?style\\s*=\\s*\"[^\\\"]*?)[\\s\\;]+\\;\\s*([^>]*?>)", "$1;$2");
+            // style=" ;; x:y"    -->   style="x:y"
+            s_Html = s_Html.replace(/(<\w[^>]*?style\s*=\s*\")[\s;]+([^>]*?>)/gi, "$1$2")
+            // style=""
+            s_Html = s_Html.replace(/(<\w[^>]*?)style\s*=\s*\"\s*\"([^>]*?>)/gi, "$1$2")
+            return s_Html;
+        }
+
+        function _ReplaceMatchLoop(s_Original, s_Pattern, s_Replace) {
+            var o_Reg = new RegExp(s_Pattern, 'gi');
+            var s_Ret = "";
+            while (true) {
+                s_Ret = s_Original.replace(o_Reg, s_Replace);
+                if (s_Ret == s_Original) {
+                    break;
+                } else {
+                    s_Original = s_Ret;
+                }
+            }
+            return s_Ret;
+        }
+
+
+        function HTMLEncode(s_Html) {
+            if (s_Html == null) {
+                return "";
+            }
+            s_Html = s_Html.replace(/&/gi, "&amp;");
+            s_Html = s_Html.replace(/\"/gi, "&quot;");
+            s_Html = s_Html.replace(/</gi, "&lt;");
+            s_Html = s_Html.replace(/>/gi, "&gt;");
+            s_Html = s_Html.replace(/ (?= )/gi, "&nbsp;");
+            s_Html = s_Html.replace(/\n/gi, "<br>");
+            return s_Html;
+        }
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+            parent.InnerDialogLoaded(sCaption);
+            if (sAction == "text") {
+                $("d_text").focus();
+            } else {
+                var o_Win = $("d_iframe").contentWindow;
+                o_Win.document.designMode = 'on';
+                o_Win.focus();
+            }
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr>
+                    <td>
+
+                        <table border=0 cellpadding=0 cellspacing=3>
+                            <script type="text/javascript">
+                                if (sAction == "text") {
+                                    document.write("<tr><td>" + lang["DlgPasteGeckoMsg"] + "</td></tr>");
+                                    document.write("<tr><td><textarea id=d_text style='width:400px;height:240px;'></textarea></td></tr>");
+                                } else {
+                                    document.write("<tr><td>" + lang["DlgPasteGeckoSecurity"] + "<br>" + lang["DlgPasteGeckoMsg"] + "</td></tr>");
+                                    document.write("<tr><td><iframe id=d_iframe style='width:400px;height:240px;'></iframe></td></tr>");
+                                }
+                            </script>
+
+                        </table>
+
+                </tr>
+
+                <tr>
+                    <td height=5></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <table border=0 cellpadding=0 cellspacing=0 width="100%">
+                            <tr>
+                                <td noWrap align=right>&nbsp; <input type=submit class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input
+                                    type=button class="dlgBtnCommon dlgBtn" value='' onclick="parent.Cancel()" lang=DlgBtnCancel>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

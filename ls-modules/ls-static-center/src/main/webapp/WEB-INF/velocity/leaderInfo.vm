@@ -1,0 +1,23 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($length=$Integer.parseInt($length))
+<div class="sy_ldjj fl">
+    #if($resultObj.picUrl.indexOf("/mongo")>=0)
+        #set($filePath="")
+    #elseif($resultObj.picUrl.indexOf(".")>=0)
+        #set($filePath="$!{fileServerNamePath}")
+    #else
+        #set($filePath="$!{fileServerPath}")
+    #end
+    <div class="ld_pic fl"><a href="$!{resultObj.linkUrl}" target="$!{paramObj.target}"><img src="$!{filePath}$!{resultObj.picUrl}" width="86" height="105" /></a></div>
+    <div class="ld_con fl">
+        <h3>工作分工</h3>
+        <div class="ld_fg">$!{resultObj.work}</div>
+        <h3>工作简历</h3>
+        <div class="ld_jl">$!{resultObj.jobResume}
+##            <a href="#">[查看详情]</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+</div>

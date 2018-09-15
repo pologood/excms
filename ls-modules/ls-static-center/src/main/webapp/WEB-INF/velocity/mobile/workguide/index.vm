@@ -1,0 +1,60 @@
+#set($_title="服务列表")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="fuwutit">$!{eo.name}</div>
+    <div class="content_body fuwucon">
+        <h3>事项名称</h3>
+        <div class="fu_con">
+            $!{eo.name}
+        </div>
+
+        <h3>设定依据</h3>
+        <div class="fu_con">
+            $!{eo.setAccord}
+        </div>
+
+        <h3>申请条件</h3>
+        <div class="fu_con">
+            $!{eo.applyCondition}
+        </div>
+
+        <h3>办理材料</h3>
+        <div class="fu_con">
+            $!{eo.handleData}
+        </div>
+
+        <h3>办理流程</h3>
+        <div class="fu_con">
+            $!{eo.handleProcess}
+        </div>
+
+        <h3>办理地点</h3>
+        <div class="fu_con">
+            $!{eo.handleAddress}
+        </div>
+
+        <h3>办事时间</h3>
+        <div class="fu_con">
+            $!{eo.handleDate}
+        </div>
+
+        <h3>联系电话</h3>
+        <div class="fu_con">
+            $!{eo.phone}
+        </div>
+
+        <h3>备注</h3>
+        <div class="fu_con">
+            $!{eo.content}
+        </div>
+    </div>
+</div>
+<!-- 正文 -->
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+</body>
+</html>

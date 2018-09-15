@@ -1,0 +1,545 @@
+<style>
+    .siteWordsSyncInfo{
+        width: 100%;
+        min-height:60px;
+    }
+    .siteWordsSyncInfo strong{
+        font-size: 14px;
+    }
+    .siteWordsSyncInfo hr{
+        margin-top: 5px; margin-bottom:  5px;
+    }
+    .siteWordsSyncInfo ul{
+        padding-left:20px;
+        line-height: 1em;
+        float: left;
+    }
+    .siteWordsSyncInfo ul li{
+        float: left;
+        margin-right:30px;
+        line-height: 1.6em;
+    }
+    .siteWordsSyncInfo ul.errorMsg li{
+        clear: both;
+        line-height: 1.6em;
+    }
+    .table tr td.backspace{
+        padding-left: 2em;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="table-toolbar">
+                <div class="row">
+                    <div align="center">
+                        #if("$!{isRegistered}"=="1")
+                            <h1>云监测服务注册<font color="blue">（已注册）</font></h1>
+                        #else
+                            <h1>云监测服务注册<font color="red">（未注册）</font></h1>
+                        #end
+                    </div>
+                </div>
+                <form role="form" id="article_form" ms-controller="article_form">
+                    <table class="table table-bordered article-table">
+                        <tr>
+                            <td colspan="2">开始监测前，您需要：</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="backspace">步骤1、服务校验。注册通过后，可获取“国家普查标准监测项”、易错词、敏感词及获得龙讯云平台提供的“站点可用性”日常监测服务。输入标识码开始注册。</td>
+                        </tr>
+                        <tr>
+                            <td width="500px">
+                                <input type="text" style="width:400px;margin-left:100px;" #if("$!{isRegistered}"=="1") readonly="readonly" #end id="code" value="$!{code}" class="form-control" placeholder="标识码" />
+                            </td>
+                            <td align="left" >
+                                #if("$!{isRegistered}"=="1")
+
+                                #else
+                                    <input style="margin-top:5px;" id="checkBtn" type="button" onclick="checkCode()" value="开始注册"/>
+                                #end
+
+                            </td>
+                        </tr>
+##                        <tr >
+##                            <td width="500px">
+##                                <input type="hidden" id="siteIds" name="siteIds" />
+##                                <textarea id="siteNames" name="siteNames" style="width:400px;margin-left:100px;" readonly class="form-control" placeholder="选择监测站点" style="height: 70px;" />
+##                            </td>
+##                            <td align="left" >
+##                                <input style="margin-top:27px;" type="button" onclick="chooseSites()" value="选择监测站点"/>
+##                            </td>
+##                        </tr>
+##                        <tr>
+##                            <td colspan="2" align="left">
+##                                <label>
+##                                    <input type="checkbox"  style="margin-left:100px;" id="registeredSites" onclick="changeSites()"/>所有已开通站点
+##                                </label>
+##                            </td>
+##                        </tr>
+##                        <tr>
+##                            <td colspan="2"><input style="margin-left:100px;" type="button" id="checkBtn" onclick="checkCode()" value="开始注册"/></td>
+##                        </tr>
+                        <tr>
+                            <td colspan="2" class="backspace">步骤2、注册通过后，请至“网站栏目基本信息表”菜单中配置监测栏目</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="backspace">步骤3、完成步骤2后，在“任务列表”菜单中启动监测</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">开通监测服务后，您可以：</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="backspace">
+                                1、更新站群词库<button onclick="syncWords()"  type="button" class="btn-sm btn btn-default btn-add "  style="margin-left: 2em;" >更新词库</button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="portlet light">
+            <div class="table-toolbar">
+                <div class="row">
+                    <div align="center">
+                        <h1>监测站点信息</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="ableMonitor()">批量开通</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="disableMonitor()">批量取消开通</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="syncSetting()">批量同步监测配置</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/code/getSites?dataFlag=1" showPager="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="siteName" width="100%" align="center" headerAlign="center">站点名称</div>
+                        <div field="" width="200" align="center" headerAlign="center" renderer="isRegistered" >是否开通监测服务</div>
+                        <div field="" width="200" align="center" headerAlign="center" renderer="registeredTime" >开通时间</div>
+                        <div field="" width="300" align="center" headerAlign="center" renderer="renderOp">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        isRegistered:$!{isRegistered},
+        code:"$!{code}",
+        action: {
+            syncEasyerr: '/monitor/wordsEasyerr/getWordsEassyErrList',
+            syncSensitive: '/monitor/wordsSensitive/getWordsSensitiveList'
+        },
+        syncMsg:{
+            words: {success: new Array(), error: new Array()},
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load();
+    })
+
+    function chooseSites(){
+        var siteIds = $("#siteIds").val();
+        var r = "/monitor/code/chooseSites?siteIds=" + siteIds ;
+
+        Ls.openWin(r, "400px", "400px", {
+            id: "chooseSites",
+            title: "选择监测站点",
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.ok();
+                console.log(data);
+                var siteIds_ = data.siteIds;
+                var siteNames_ = data.siteNames;
+
+                $("#siteIds").val(siteIds_);
+                $("#siteNames").val(siteNames_);
+            }
+        })
+    }
+
+    function checkCode() {
+//        var siteIds = $("#siteIds").val();
+//        var siteNames = $("#siteNames").val();
+        var code = $("#code").val();
+        if(code==null||code==""){
+            Ls.tipsInfo("请输入标识码");
+            return;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            url: "/monitor/code/register",
+            data: {
+                code:code
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                Ls.tipsOk("注册成功",function(){
+                    var sites = resp.data;
+                    //此处需要调用同步数据接口
+                    Ls.ajax({
+                        type: "POST",
+                        url: "/monitor/code/syncConfigFromCloud",
+                        data: {
+                            siteIds:sites
+                        }
+                    }).done(function (resp) {
+                        if (resp.status == 0) {
+                            Ls.tipsErr(resp.desc);
+                        } else {
+                            Ls.tipsOk("监测配置同步完成");
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    function changeSites() {
+        if($('#registeredSites').is(':checked')) {//选中
+            if(cur.siteIds==null||cur.siteIds==""){
+                Ls.tipsInfo("当前没有已开通的站点");
+                return;
+            }
+            $("#siteIds").val(cur.siteIds);
+            $("#siteNames").val(cur.siteNames);
+        }else{
+            $("#siteIds").val("");
+            $("#siteNames").val("");
+        }
+    }
+
+    function isRegistered(e) {
+        var rec = e.record;
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            return "<font color='red'>未开通</font>";
+        }else{
+            var isRegistered = rec.isRegistered;
+            if(isRegistered==1||isRegistered=="1"){//已开通
+                return "<font color='green'>已开通</font>";
+            }else{
+                return "<font color='red'>未开通</font>";
+            }
+        }
+    }
+
+    function registeredTime(e) {
+        var rec = e.record;
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            return "-";
+        }else{
+            var registeredTime = rec.registeredTime;
+            var isRegistered = rec.isRegistered;
+            if(isRegistered==1||isRegistered=="1"){//已开通
+                return Ls.dateFormat(registeredTime, "yyyy-MM-dd hh:mm:ss");
+            }else{
+                return "-";
+            }
+        }
+    }
+
+    function renderOp(e) {
+        var rec = e.record;
+        var ableBth = '<button class="btn btn-default btn-sm btn-edit" onclick="ableMonitor(' + rec.siteId + ')">开通监测服务</button> ';
+        var disableBth = '<button class="btn btn-default btn-sm btn-delete" onclick="disableMonitor(' + rec.siteId + ')">取消开通监测服务</button> ';
+        var sync = '<button class="btn btn-default btn-sm btn-edit" onclick="syncSetting(' + rec.siteId + ',' + rec.isRegistered + ')">同步监测配置</button> ';
+//        var syncWords = '<button class="btn btn-default btn-sm btn-edit" onclick="syncSiteWords(' + rec.siteId + ',\'' + rec.SiteName + '\',' + rec.isRegistered + ')">同步词库</button> ';
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            return ableBth + sync;
+        }else{
+            var isRegistered = rec.isRegistered;
+            if(isRegistered==1||isRegistered=="1"){//已开通
+                return disableBth + sync;
+            }else{
+                return ableBth + sync;
+            }
+        }
+    }
+
+    function ableMonitor(id){
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            Ls.tipsInfo("还未注册，请先注册");
+            return ;
+        }
+        var siteIds = [];
+        if (id != null && id != "") {
+            siteIds.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && siteIds.length <= 0) {
+                Ls.tipsInfo("请选择一条记录!");
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                siteIds.push(records[i].siteId);
+            }
+        }
+
+        if (confirm('确定开通选中站点?')) {
+            Ls.ajaxGet({
+                url: "/monitor/code/ableMonitor",
+                data: {
+                    "siteIds[]": siteIds,
+                    "code":cur.code
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips("开通成功", {times: 2});
+                        cur.grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {icons: "error", times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function disableMonitor(id){
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            Ls.tipsInfo("还未注册，请先注册");
+            return ;
+        }
+        var siteIds = [];
+        if (id != null && id != "") {
+            siteIds.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tipsInfo("请选择一条记录!");
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                siteIds.push(records[i].indicatorId);
+            }
+        }
+
+        if (confirm('确定取消开通选中站点?')) {
+            Ls.ajaxGet({
+                url: "/monitor/code/disableMonitor",
+                data: {
+                    "siteIds[]": siteIds,
+                    "code":cur.code
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips("取消开通成功", {times: 2});
+                        cur.grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {icons: "error", times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function syncSetting(id,isRegistered){
+        if(cur.isRegistered==0||cur.isRegistered=="0"){//未注册
+            Ls.tipsInfo("还未注册，请先注册");
+            return ;
+        }
+        var siteIds = [];
+        if (id != null && id != "") {
+            if(isRegistered==1||isRegistered=="1"){//已开通
+                siteIds.push(id);
+            }else{
+                Ls.tipsInfo("请先开通站点!");
+                return;
+            }
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tipsInfo("请选择一条记录!");
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                var isRegistered = records[i].isRegistered;
+                if(isRegistered==1||isRegistered=="1"){//已开通
+                    siteIds.push(records[i].indicatorId);
+                }else{
+                    Ls.tipsInfo("请先开通站点!");
+                    return;
+                }
+            }
+        }
+
+        if (confirm('确定同步选中站点监测配置?')) {
+            Ls.ajaxGet({
+                url: "/monitor/code/syncConfigFromCloud",
+                data: {
+                    "siteIds[]": siteIds,
+                    "code":cur.code
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips("同步成功", {times: 2});
+                        cur.grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {icons: "error", times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    //批量同步词库
+    function syncWords(){
+        var tips = Ls.tipsLoading("正在同步易错词，请耐心等待！", {
+            autoClose: false
+        });
+        Ls.ajaxGet({
+            url: cur.action.syncEasyerr,
+            success: function (resp) {
+                tips.hide();
+                if (resp.status == 1) {
+                    tips = Ls.tipsLoading("正在同步敏感词，请耐心等待！", {
+                        autoClose: false
+                    });
+                    Ls.ajaxGet({
+                        url: cur.action.syncSensitive,
+                        success: function (resp) {
+                            tips.hide();
+                            if (resp.status == 1) {
+                                Ls.tipsOk("词库同步成功！");
+                            } else {
+                                Ls.tipsErr("敏感词同步失败，" + resp.desc);
+                            }
+                            return;
+                        },
+                        error:function(){
+                            tips.hide();
+                            Ls.tipsErr("敏感词同步失败，服务端异常！");
+                            return;
+                        }
+                    });
+                } else {
+                    Ls.tipsErr("易错词同步失败，"+ resp.desc);
+                }
+                return;
+            },
+            error:function(){
+                tips.hide();
+                Ls.tipsErr("易错词同步失败，服务端异常！");
+                return;
+            }
+        });
+    }
+
+
+    function syncSiteWords(siteList, index){
+        //如果递归到最后一条，则展示结果
+        if(siteList.length  == index){
+            //弹窗展示操作结果
+            showSyncWordsResult(cur.syncMsg.words.success, cur.syncMsg.words.error);
+            return;
+        }
+        var siteId = siteList[index].siteId;
+        var siteName = siteList[index].siteName;
+        if(siteId == undefined || siteId == null){
+            cur.syncMsg.words.error.push("未知站点【" + siteName + "】，无法同步！");
+            return syncSiteWords(siteList, ++index);
+        }
+        var tips = Ls.tipsLoading("正在同步站点【" + siteName + "】易错词，请勿刷新或关闭浏览器！", {
+            autoClose: false
+        });
+        Ls.ajaxGet({
+            url: cur.action.syncEasyerr,
+            data: { siteId: siteId},
+            success: function (resp) {
+                tips.hide();
+                if (resp.status == 1) {
+                    tips = Ls.tipsLoading("正在同步站点【" + siteName + "】敏感词，请勿刷新或关闭浏览器！", {
+                        autoClose: false
+                    });
+                    Ls.ajaxGet({
+                        url: cur.action.syncSensitive,
+                        data: { siteId: siteId},
+                        success: function (resp) {
+                            if (resp.status == 1) {
+                                cur.syncMsg.words.success.push(siteName);
+                            } else {
+                                cur.syncMsg.words.error.push("敏感词同步失败：" +resp.desc);
+                            }
+                            tips.hide();
+                            syncSiteWords(siteList, ++index);
+                            return;
+                        },
+                        error:function(){
+                            tips.hide();
+                            cur.syncMsg.words.error.push("敏感词同步失败，服务端异常！");
+                            syncSiteWords(siteList, ++index);
+                            return;
+                        }
+                    });
+                } else {
+                    cur.syncMsg.words.error.push("易错词同步失败：" +resp.desc);
+                    syncSiteWords(siteList, ++index);
+                }
+                return;
+            },
+            error:function(){
+                tips.hide();
+                cur.syncMsg.words.error.push("易错词同步失败，服务端异常！");
+                syncSiteWords(siteList, ++index , message);
+                return;
+            }
+        });
+    }
+
+    function showSyncWordsResult(successMsg, errMsg){
+        var content = new Array();
+        content.push("<div style='width: 360px;height:170px;text-align: left;'>");
+        content.push("<div class='siteWordsSyncInfo' ><strong>同步成功的站点</strong>");
+        content.push("<hr >");
+        if(successMsg.length > 0){
+            content.push("<ul><li>");
+        }
+        content.push(successMsg.join("</li><li>"));
+        if(successMsg.length > 0){
+            content.push("</li></ul>");
+        }
+        content.push("</div>");
+
+        content.push("<div class='siteWordsSyncInfo' ><strong>同步失败的站点</strong>");
+        content.push("<hr >");
+        if(errMsg.length > 0){
+            content.push("<ul class='errorMsg'><li>");
+        }
+        content.push(errMsg.join("</li><li>"));
+        if(errMsg.length > 0){
+            content.push("</li></ul>");
+        }
+        content.push("</div></div>");
+        Ls.openWin({
+            title:"批量同步词库结果",
+            height:'200px',
+            esc:false,
+            content: content.join("")
+        });
+        //展示完成后结果集清空
+        cur.syncMsg.words.success = new Array();
+        cur.syncMsg.words.error = new Array();
+    }
+
+
+</script>

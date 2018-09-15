@@ -1,0 +1,183 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" id="adduser_btn" class="btn btn-default btn-add" onclick="addEO()"> 新 增
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" id="adduser_btn" class="btn btn-default btn-delete" onclick="delEOs()"> 删 除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <select class="form-control" type="text" id="session_advice" name="session">
+                                        <option value="">请选择届次</option>
+                                        #foreach($eo in $sessionList)
+                                            <option value="$!{eo.code}">$!{eo.key}</option>
+                                        #end
+                                    </select>
+                                    <input type="text" id="leader" class="form-control" placeholder="领衔人">
+                                    <input type="text" id="title" class="form-control" placeholder="标题">
+                                    <button type="button" class="btn btn-default btn-search" onclick="doSearch()">查询</button>
+                                    <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid1" class="mini-datagrid" allowResize="true"
+                     url="/advice/getPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height:500px"
+                >
+                    <div property="columns">
+                        <!--<div type="indexcolumn"></div>        -->
+                        <div type="checkcolumn"  width="50">选项</div>
+                        <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                        <div field="num" width="100"  headerAlign="center" align="center">建议编号</div>
+                        <div field="type" width="100" headerAlign="center" align="center">分类</div>
+                        <div field="title" width="100%"  headerAlign="center" align="center">标题</div>
+                        <div field="leader" width="100"  headerAlign="center" align="center">领衔人</div>
+                        <div field="attendant" width="180"  headerAlign="center" align="center">附议人</div>
+                        <div field="organizer" width="100"  headerAlign="center" align="center">主办单位</div>
+                        <div field="coOrganizer" width="180"  headerAlign="center" align="center">协办单位</div>
+                        <div field="dealStatus" width="100" headerAlign="center" align="center">处理状态</div>
+                        <div width="115" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END THEME GLOBAL SCRIPTS -->
+#*<script src="$!{rc.contextPath}/assets/js/pages/model_manage.js"></script>*#
+<script>
+    $(document).ready(function () {
+        mini.parse();
+        grid = mini.get("datagrid1");
+        grid.load();
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid);
+
+    });
+
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        editBtn = '<button class="btn btn-default btn-sm btn-edit" onclick="addEO(1,' + rec.id + ')"> 修 改 </button> '
+        delBtn = '<button class="btn btn-default btn-sm btn-delete" onclick="deleteEO(' + rec.id + ')">删 除</button>'
+        str += editBtn + delBtn;
+        return str;
+    }
+
+    function deleteEO(id) {
+        var ids=getIds();
+        Ls.log(ids);
+
+        if (id == null) {
+            mini.alert("请选择删除的项");
+            return;
+        }
+        var ids=[];
+        ids.push(id);
+        if (confirm('确定要删除吗?')) {
+            Ls.ajaxGet({
+                url: "/advice/delEO",
+                data: {
+                    ids: ids
+                },
+            }).done(function (data) {
+                if (!data.status) {
+                    Ls.tips(data.desc, {icons: "error"});
+                    return;
+                } else {
+                    Ls.tipsOk("删除成功");
+                    grid.load();
+                    return;
+                }
+            });
+        }
+    }
+
+
+    function delEOs() {
+        var ids=getIds();
+        if (confirm('确定要删除吗?')) {
+            Ls.ajaxGet({
+                url: "/advice/delEO",
+                data: {
+                    ids: ids
+                },
+            }).done(function (data) {
+                if (!data.status) {
+                    Ls.tips(data.desc, {icons: "error"});
+                    return;
+                } else {
+                    Ls.tipsOk("删除成功");
+                    grid.load();
+                    return;
+                }
+            });
+        }
+    }
+
+
+    function getIds(){
+        var check = [];
+        var grid = mini.get("datagrid1");
+        var rows = grid.getSelecteds ();
+        if (rows == null||rows.length==0) {
+            mini.alert("请选择删除的项");
+            return;
+        }
+        Ls.log(rows);
+        for(var i=0; i<rows.length; i++){
+            check.push(rows[i].id);
+        }
+        return check;
+
+    }
+
+
+    function addEO(i, id) {
+        var url = '/advice/toEdit';
+        if (i == 1) {
+            if (id == null) {
+                Ls.tipsInfo("请选择修改项");
+                return;
+            }
+            url = '/advice/toEdit?id=' + id ;
+        }
+        getContentApp(url);
+    }
+
+    //加载内容
+    var getContentApp = function (url, options) {
+        return App.getContentAjax(url, options).done(function (res) {
+            $(".page-content-body").html(res);
+        });
+    }
+
+    function doSearch() {
+        var session=$("#session_advice").val();
+        var leader=$("#leader").val();
+        var title = $("#title").val();
+        grid = mini.get("datagrid1");
+        grid.load({session:session,leader:leader,title: title});
+    }
+    function searchClear() {
+        $("#session_advice").val('');
+        $("#leader").val('');
+        $("#title").val('');
+        grid = mini.get("datagrid1");
+        grid.load();
+    }
+</script>

@@ -1,0 +1,47 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+<table border="1"  class="vote_show">
+  <caption class="title">$!{resultObj.title}</caption>
+  <tbody>
+#foreach($qu in $resultObj.questions)	
+    <tr>
+      <td>$!{velocityCount}、$!{qu.title}</td>
+    </tr>
+	#foreach($op in $qu.optionsList)
+    <tr>
+      <td>
+        <div>
+          <ul>
+            <li>
+              <span class="c1">$!{op.title}</span>
+              <span class="c2">
+                <span class="progress-bar">
+                  <span class="progress" style="width:实际数值"></span>
+                </span>
+              </span>
+              <span class="c3"> #if($!{resultObj.isVisible} == 1)$!{op.votesCount} 票#end </span>
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+	#end
+	#foreach($rl in $qu.replys)
+    <tr>
+      <td>
+        <div>
+          <ul>
+            <li>
+              $!{rl.content}
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+	#end
+#end	
+  </tbody>
+</table>

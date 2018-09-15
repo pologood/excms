@@ -1,0 +1,99 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar" style="margin-bottom: 7px;">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="cancelPub()"> 批量取消 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 430px"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="siteName" width="50%" align="center" headerAlign="center">站点名称</div>
+                        <div field="columnName" width="50%" align="center" headerAlign="center">栏目名称</div>
+                        <div width="85" align="center" headerAlign="center" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        record:Ls.getWin.dialog.data("record"),
+    };
+
+    $(document).ready(function () {
+
+        cur.grid.setUrl("/msg/submit/hn/getColumnPageList?msgId=" + cur.record.id + "&optCode=edit&status=1");
+        cur.grid.reload();
+
+        cur.api.button(
+            {id:'back',className:'btn-back',focus:true,name:'返回',callback:function(){Ls.winClose();return false;}}
+        );
+
+    })
+
+    function siteName() {
+        return cur.win.GLOBAL_SITENAME;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var cancelpublish = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="cancelPub(' + record.columnId +')">取消发布</button> ';
+        return cancelpublish;
+    }
+
+    function cancelPub(columnId) {
+
+        var columnIds = [];
+        if(columnId != null && columnId != "") {
+            columnIds.push(columnId);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for(var i = 0; i < records.length; i++) {
+                columnIds.push(records[i].columnId);
+            }
+        }
+
+        Ls.ajaxGet({
+            url: "/msg/submit/hn/cancelPublish",
+            data: {
+                "columnIds[]": columnIds,
+                msgId:cur.record.id
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    cur.grid.reload();
+                    cur.win.cur.grid.reload();
+                    Ls.tips(resp.desc, {times: 2});
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

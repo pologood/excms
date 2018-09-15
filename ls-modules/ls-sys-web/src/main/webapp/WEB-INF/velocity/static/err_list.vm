@@ -1,0 +1,146 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form" id="staticCtrl" ms-controller="staticCtrl">
+
+        <div class="table-toolbar" style="width:100%;">
+            <div class="row">
+            </div>
+        </div>
+        <div id="datagrid" class="mini-datagrid" allowCellSelect="true" allowResize="true" allowCellWrap="true"
+             url="/taskInfo/getByTaskId?taskId=$!{taskId}" sizeList="[5,10,20,50]" pageSize="13" onlyCheckSelection="true"
+             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 300px">
+            <div property="columns">
+                <div type="checkcolumn"></div>
+                <!-- modeName -->
+                <div field="title" width="330" align="left" headerAlign="center">信息标题</div>
+                <div width="100%" align="left" headerAlign="center" allowSort="true" renderer="errDetail">错误信息</div>
+                <div field="updateDate" dateFormat="yyyy-MM-dd HH:mm:ss" width="150" align="center" headerAlign="center" allowSort="true" renderer="">发生时间</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+
+    var cur = {
+        ctrl: "staticCtrl",
+        grid: mini.get('datagrid'),
+        searchKey: $('#searchKey'),
+        win: Ls.getWin.win
+    };
+
+    // 重置 datagrid 高度
+    Ls.mini_datagrid_height(cur.grid, 55);
+
+    var initData = {
+        dropdown_text: "属性筛选",
+        msg_status: 1,
+        search: function () {
+            search();
+        },
+        showAll: function () {
+            showAll();
+        },
+        setRead: function (e, type, status) {
+
+            var ids;
+            if (type == 1) {
+                var rows = cur.grid.getSelecteds();
+                if (rows.length > 0) {
+                    var ids = [];
+                    for (var i = 0, l = rows.length; i < l; i++) {
+                        ids.push(rows[i].id);
+                    }
+                    ids = ids.join(",")
+                } else {
+                    Ls.tips("未选择任务消息！");
+                    return false;
+                }
+            }
+
+            Ls.ajaxGet({
+                data: {
+                    ids: ids
+                },
+                url: "/message/" + (type == 1 ? "readMessage" : "readAllMessage")
+            }).done(function () {
+                cur.win.indexMgr.getMsgList();
+                search();
+            });
+        },
+        setStatus: function (e, status) {
+            var target = e.target;
+            cur.vm.dropdown_text = target.innerHTML;
+            cur.vm.msg_status = status;
+            getStatusMsg(status);
+        }
+    }
+
+    $(document).ready(function () {
+
+        initAvalon();
+
+        cur.grid.load({messageStatus: cur.vm.msg_status}, function () {
+            if (cur.vm.dropdown_text == "属性筛选") {
+                cur.vm.dropdown_text = "未读消息"
+            }
+        });
+
+    })
+
+    function initAvalon() {
+        initData.$id = cur.ctrl;
+        cur.vm = avalon.define(initData);
+    }
+
+    function search() {
+        var keyValue = cur.searchKey.val();
+        cur.grid.load({title: keyValue, messageStatus: cur.vm.msg_status});
+    }
+
+    function showAll() {
+        cur.searchKey.val('');
+        cur.vm.dropdown_text = "属性筛选";
+        cur.vm.msg_status = "";
+        search();
+    }
+
+    function msgStatus(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.messageStatus == 1) {
+            str = "<span class='font-red'>未读</span>";
+        } else {
+            str = "<span>已读</span>";
+        }
+        return str;
+    }
+
+    function getStatusMsg() {
+        var keyValue = cur.searchKey.val();
+        cur.grid.load({title: keyValue, messageStatus: cur.vm.msg_status});
+    }
+
+    var detail = "";
+    function errOpen() {
+        top.Ls.openWin("", 700, 500, {
+            id: 'errDetail',
+            padding: 20,
+            content: '<div style="height: 480px; overflow: auto;">' + detail + '</div>'
+        });
+    }
+
+    function errDetail(e) {
+        var rec = e.record;
+        detail = rec.detail;
+        str = '<a href="javascript:void(0)" onclick="errOpen()"><u>' + rec.log + '</u></a>';
+        return str;
+    }
+
+</script>
+</body>
+</html>

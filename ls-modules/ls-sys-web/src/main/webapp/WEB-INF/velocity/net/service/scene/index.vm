@@ -1,0 +1,242 @@
+<div id="menuContent"
+     style="display:none;position: absolute; z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: hidden;background-color: InactiveBorder">
+    <ul id="treeDemo" class="ztree"></ul>
+</div>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="addScene()">
+                                    添加
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text" id="columnId" style="display: none" name="columnId" disabled ms-duplex="columnId" class="form-control readonly"
+                                               ms-duplex="columnId">
+                                        <input type="text" id="columnName" class="form-control readonly">
+
+                                        <div class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showTree()">
+                                                <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    查询
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="true" allowResize="true"
+                     url="/scene/service/getPageEOs" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="true"
+                     idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                >
+                    <div property="columns">
+                        <div type="indexcolumn"></div>
+                        <div field="name" width="100%" align="left" headerAlign="center" renderer="scene_name">标题</div>
+                        <div field="columnName" width="150" align="center" align="center" headerAlign="center">栏目</div>
+                        <div field="joinDate" width="150" align="center" headerAlign="center" dataType="string" allowSort="false" renderer="joinDate">加入日期</div>
+                        <div width="50" align="center" headerAlign="center" renderer="scene_publish">发布</div>
+                        <div width="115" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/column_ser_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        columnId: $('#columnId'),//添加修改部门选择组件
+        columnName: $('#columnName'),
+        ser_key: $('#ser_key')//查询关键字
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+        column_select_tree.init();
+    })
+
+    /**
+     * 添加法规
+     */
+    function addScene() {
+        art.dialog.data('type', 'add');
+        art.dialog.data('siteId', GLOBAL_SITEID);
+        Ls.openWin("/scene/service/addOrEdit", '900px', '525px', {
+            title: "添加场景服务"
+        });
+    }
+
+    /**
+     * 编辑法规
+     */
+    function editScene() {
+        var record = cur.grid.getSelected();
+        art.dialog.data('type', 'edit');
+        art.dialog.data('siteId', GLOBAL_SITEID);
+        art.dialog.data('record', record);
+        Ls.openWin("/scene/service/addOrEdit", '900px', '525px', {
+            title: "修改场景服务"
+        });
+    }
+
+    function callback_add_or_edit(msg) {
+        cur.grid.load();
+        Ls.tips(msg, {times: 2});
+    }
+
+    function delScene() {
+        var record = cur.grid.getSelected();
+
+        if(confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/scene/service/delete",
+                data: {
+                    id: record.id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.load();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            };
+        });
+    }
+
+    function scene_name(obj) {
+        var record = obj.record;
+        var diyDom = '<a href="#"  target="_black"><u>' + record.name + '</u></a>';
+        return diyDom;
+    }
+
+    function joinDate(obj) {
+        var record = obj.record;
+        var joinDate = record.joinDate;
+
+        if (null != joinDate && typeof joinDate == 'object') {
+            record.joinDate = joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+            return joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+        } else {
+            return joinDate;
+        }
+    }
+
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editScene()">修 改</button> ' +
+            '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delScene()">删 除</button>';
+        return diyDom;
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({keys: 'name', keyValue: keyValue, columnId: cur.columnId.val()});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.columnId.val('');
+        cur.columnName.val('');
+        search();
+    }
+
+    /**
+     * 发布法规
+     */
+    function scene_publish(obj) {
+        var record = obj.record;
+        var diyDom = '<a id=' + record.id + ' onclick="publish(this)"><img src="$!{sysStaticPath}/assets/images/noclick.gif" border="0" title="发布" ></a>';
+        if (record.publish == 1) {
+            diyDom = '<a id=' + record.id + ' onclick="cancel_publish(this)"><img src="$!{sysStaticPath}/assets/images/click.gif" border="0" title="取消发布" ></a>';
+        }
+
+        return diyDom;
+    }
+
+    function publish(obj) {
+        if(confirm('确定发布?')) {
+            Ls.ajaxGet({
+                url: "/scene/service/publish",
+                data: {
+                    ids: $(obj).attr('id'),
+                    publish: 1
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.load();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function cancel_publish(obj) {
+        if(confirm('确定取消发布?')) {
+            Ls.ajaxGet({
+                url: "/scene/service/publish",
+                data: {
+                    ids: $(obj).attr('id'),
+                    publish: 0
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.load();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function beforenodeselect(e) {
+        //禁止选中父节点
+        if (e.isLeaf == false) e.cancel = true;
+    }
+</script>

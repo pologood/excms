@@ -1,0 +1,61 @@
+<style type="text/css">
+    #pageBackgroundImgSrcDiv {
+        position: relative;
+    }
+    .download-btn {
+        display: none;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        color: #e4e2e2;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
+    }
+    .download-btn:hover {
+        color: #fff;
+        text-decoration: none;
+    }
+    #pageBackgroundImgSrcDiv:hover .download-btn{
+        display: block;
+        background: rgba(0,0,0,.5);
+    }
+</style>
+
+<div id="attrForm" class="sui-form form-horizontal sui-validate pd10 " style="padding-top: 10px; ">
+    <div class="control-group">
+        <!--<label class="control-label"></label>-->
+        <div class="controls">
+            <a id="addPageBackgroundBtn" href="javascript:void(0);" class="sui-btn btn-primary btn-xlarge">上传页面背景</a>
+            <a href="javascript:void(0);" v-on:click="setPageBackgroundNone" class="sui-btn btn-xlarge">恢复默认背景</a>
+        </div>
+    </div>
+
+    <div class="sui-msg msg-large msg-block msg-error" v-if="isShowHaveImgMsg">
+        <div class="msg-con">请上传页面背景图片</div>
+        <s class="msg-icon"></s>
+    </div>
+
+    <div class="control-group">
+        <!--<label class="control-label"></label>-->
+        <div class="controls" id="pageBackgroundImgSrcDiv">
+            <img :src="imgSrc" :options="placeholder" :class="placeholderClass" style="width:500px;height: 100px">
+            <a href="javascript:;" class="download-btn" v-on:click="downloadFile" v-if="imgSrc">下载</a>
+            <iframe src="" id="logoImg" frameborder="0" name="logoImg" style="display: none;" border="0"></iframe>
+        </div>
+    </div>
+
+    <fieldset v-if="isHaveImg">
+        <legend>背景属性设置</legend>
+        <sui-control-group title="重复" >
+            <sui-dropdown v-model="backgroundRepeat" @on-target-change="onBackgroundRepeatChange"
+                          items="[{text:'无',value:'no-repeat'},{text:'水平方向',value:'repeat-x'},{text:'垂直方向',value:'repeat-y'},{text:'水平垂直方向',value:'repeat'}]">
+            </sui-dropdown>
+        </sui-control-group>
+    </fieldset>
+
+
+</div>

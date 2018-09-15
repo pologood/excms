@@ -1,0 +1,709 @@
+<style>
+    .pagination {
+        display: block;
+    }
+
+    .btn-info {
+        padding: 6px 8px;
+    }
+
+    .btn-default {
+        padding: 6px 8px;
+    }
+
+    .screen {
+        margin-right: 10px;
+    }
+
+    .screen:hover, .screen:focus {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .classify-con{
+        display: none;
+        padding: 28px 42px 15px 42px;
+        border: 1px solid #E4E4E4;
+        font-size: 14px;
+    }
+
+    .classify-con dd.on {
+        color: red;
+    }
+
+    .classify>dt {
+        float: left;
+    }
+
+    .classify dd {
+        float: left;
+        padding: 0 15px;
+        border-right: 1px solid #cccccc;
+        cursor: pointer;
+    }
+
+    .classify dd:nth-last-of-type(1) {
+        border-right: none;
+    }
+
+    .clearfix.classify-special {
+        margin-left: 69px;
+    }
+
+    .clearfix.classify-special dd {
+        margin-bottom: 12px;
+    }
+
+    dl.classify.classify-special-con{
+        margin-bottom: 5px;
+    }
+
+    .desc-box {
+        padding-left: 20px;
+    }
+
+    .desc-box>li {
+        float: left;
+        width: 50%;
+        list-style-type: none;
+        font-size: 14px;
+        color: #7d7a7a;
+    }
+
+    .desc-box>li.times{
+        width: 30%;
+        text-align: left;
+    }
+    .desc-box>li.date{
+        width: 70%;
+        text-align:right;
+    }
+    .desc-box>li.times>span{
+        display: inline-block;
+        width: 25px;
+        height: 25px;
+        background: url(/assets/images/special-down.png) 0 0 no-repeat;
+        background-size: contain;
+        vertical-align: bottom;
+        margin-right: 3px;
+    }
+
+    .desc-box>li.date>span{
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background: url('$!{rc.contextPath}/assets/images/special-time.png') 0 0 no-repeat;
+        background-size: contain;
+        vertical-align: bottom;
+        margin-right: 3px;
+    }
+
+    .temple-btn>a {
+        width: 43%;
+        border-radius: 5px !important;
+    }
+
+    .temple-btn>a:first-child {
+        margin-right: 20px;
+    }
+
+    .special-hot {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background: url('$!{rc.contextPath}/assets/images/special-hot.png') 0 0 no-repeat;
+        background-size: contain;
+        vertical-align: bottom;
+        margin-left: 3px;
+    }
+
+    .special-new {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: url('$!{rc.contextPath}/assets/images/special-new.png') 0 0 no-repeat;
+        background-size: contain;
+    }
+
+    .special-appliance {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: url('$!{rc.contextPath}/assets/images/special-appliance.png') 0 0 no-repeat;
+        background-size: contain;
+    }
+
+    .special-new>span{
+        position: absolute;
+        font-size: 16px;
+        color: #FFF;
+        font-weight: 700;
+    }
+
+    .special-new>span.new{
+        transform:rotate(47deg);
+        -ms-transform:rotate(47deg); 	/* IE 9 */
+        -moz-transform:rotate(47deg); 	/* Firefox */
+        -webkit-transform:rotate(47deg); /* Safari 和 Chrome */
+        -o-transform:rotate(47deg);
+        right: 11px;
+        top: 16px;
+    }
+
+    .special-new>span.appliance, .special-new>span.updateAble, .special-new>span.downloading{
+        transform:rotate(46deg);
+        -ms-transform:rotate(46deg); 	/* IE 9 */
+        -moz-transform:rotate(46deg); 	/* Firefox */
+        -webkit-transform:rotate(46deg); /* Safari 和 Chrome */
+        -o-transform:rotate(46deg);
+        right: 5px;
+        top: 14px;
+    }
+
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light clearfix">
+            <div class="portlet-body form">
+                <div class="tabbable-line">
+                    <ul class="nav nav-tabs ">
+                        <li class="active">
+                            <a href="#tab_1" data-toggle="tab" onclick="switchTab(false);"> 本地模板 </a>
+                        </li>
+                        <li>
+                            <a href="#tab_2" data-toggle="tab" onclick="switchTab(true);"> 云模板 </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt5">
+                        <div class="tab-pane active" id="tab_1">
+                            <div style="padding: 5px;">
+                                <div class="table-toolbar">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-default btn-add" onclick="editTheme()">添加模板</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-9">
+                                            <form class="form-inline tr search-toolbar" role="form">
+                                                <div class="form-group">
+                                                    <input type="text" id="name" name="name" class="form-control" placeholder="名称">
+                                                </div>
+                                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                                    搜索
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                                    显示全部
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="special_list" class="special-list clearfix"></div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab_2">
+                            <div style="padding: 5px;">
+                                <div class="table-toolbar">
+                                    <div class="">
+                                        <div class="col-md-3">
+                                        </div>
+                                        <div class="col-lg-9 mb20">
+                                            <form class="form-inline tr search-toolbar" role="form">
+                                                <a href="javascript:void(0);" class="screen">
+                                                    <i class="fa fa-2x fa-angle-down" style="vertical-align: sub;"></i>
+                                                    <span>展开筛选</span>
+                                                </a>
+                                                <div class="form-group">
+                                                    <input type="text" id="name2" name="name" class="form-control" placeholder="名称">
+                                                </div>
+                                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                                    搜索
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                                    显示全部
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-12 classify-con">
+                                            <dl class="classify clearfix">
+                                                <dt>上传时间：</dt>
+                                                #foreach($item in $times)
+                                                    <dd class="timesAgo" data-timesago="$!item.name">$!item.text</dd>
+                                                #end
+                                            </dl>
+                                            <dl class="classify clearfix classify-special-con">
+                                                <dt>专题分类：</dt>
+                                                <div class="clearfix classify-special" id="specialTypeList">
+
+                                                </div>
+                                            </dl>
+                                            <dl class="classify clearfix">
+                                                <dt>排序方式：</dt>
+                                                <dd data-sortfield="downloadNum" data-sortorder="desc">下载量</dd>
+                                                <dd data-sortfield="createDate" data-sortorder="desc">上传时间</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="special_list2" class="special-list clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            #*<div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                 url="/specialTheme/getPagination?dataFlag=1" sizeList="[5,10,20,50]" pageSize="10"
+                 idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                <div property="columns">
+                    <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                    <div field="name" width="100%" align="center" headerAlign="center">主题名称</div>
+                ##                        <div field="path" width="40%" align="center" headerAlign="center">主题路径</div>
+                    <div field="selectColor" width="20%" align="center" headerAlign="center">可选颜色</div>
+                    <div width="100" align="center" headerAlign="center" renderer="renderImg">缩略图</div>
+                    <div field="createDate" align="center" headerAlign="center" dateFormat="yyyy-MM-dd">创建日期</div>
+                    <div width="110" align="center" headerAlign="center" renderer="opt">操作</div>
+                </div>
+            </div>*#
+
+
+            </div>
+        </div>
+    </div>
+</div>
+##<script src="$!{sysStaticPath}/assets/js/plugins/lightbox/lightbox-min.js"></script>
+<script id="special_theme_list_tpl" type="text/html">
+    <?
+    if(data && data.length > 0) {
+    ?>
+    <ul class="clearfix">
+        <?
+        for(var i=0,l=data.length; i<l; i++){
+            var el = data[i], NoImgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg", colorArr;
+        ?>
+        <li>
+            <div class="thumbnail">
+                <?
+                if (el.thumb && el.thumb.length > 0) {
+                for(var ii=0,ll=el.thumb.length; ii<ll; ii++) {
+                var ell=el.thumb[ii], imgPath="" ;
+                if(ell.path==null || ell.path.length <=0){
+                imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+                }else{
+                if(ell.path.indexOf("/") !=-1){
+                imgPath = ell.path
+                } else if (ell.path.indexOf(".") !=-1){
+                imgPath = (GLOBAL_FILESERVERNAMEPATH||"") + ell.path
+                } else {
+                imgPath = (GLOBAL_FILESERVERPATH||"") + ell.path
+                }
+                }
+                ?>
+                <a href="/design/previewThumbnail?id=<?=el.id?>" data-lightbox="lightbox-<?=el.id?>" data-title="<?=ell.name?>" style="display: <? if(!ell.defaults){ ?>none<? } ?>"
+                   target="_blank">
+                    <? if(ell.defaults){ ?>
+                    <img src="<?=imgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                    <? } else { ?>
+                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                    <? } ?>
+                </a>
+                <? } ?>
+                <?
+                } else {
+                ?>
+                <a href="javascript:void(0)">
+                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                </a>
+                <? } ?>
+                <div class="caption">
+                    <h4><?=el.name?></h4>
+                    <p>
+                    <ul class="color-box clearfix" title="主题皮肤">
+                        <li class="w70 tc lhp150">主题皮肤</li>
+                        <?
+                        if (el.skins && el.skins.length > 0) {
+                        for(var ii=0,ll=el.skins.length; ii<ll; ii++) {
+                                var ell=el.skins[ii];
+                                ?>
+                            <li style="background: <?=ell.color?>;"></li>
+                            <?
+                            }
+                        } else {
+                        ?>
+                            <li>&nbsp;</li>
+                            <? } ?>
+                    </ul>
+                    </p>
+                    <p class="text-right">
+                        <a href="/design/previewThumbnail?id=<?=el.id?>" class="btn btn-info" role="button" target="_blank">预览</a>
+                        <a href="<?= GLOBAL_FILESERVERNAMEPATH  ?>/<?=el.path?>" class="btn btn-default" role="button" target="_blank">导出</a>
+                        <a href="javascript:void(0)" class="btn btn-default" role="button" onclick="editTheme(<?=el.id?>)">修改</a>
+                        <a href="javascript:void(0)" class="btn btn-default" role="button" onclick="deleteSpecialTheme(<?=el.id?>)">删除</a>
+                    </p>
+                </div>
+            </div>
+        </li>
+        <?
+        }
+        ?>
+    </ul>
+    <?} else {?>
+    <div class="alert alert-info" role="alert">暂无信息！</div>
+    <? } ?>
+    <div id="pagination" class="pagination mr22 text-right"></div>
+</script>
+
+<script id="special_theme_list_tpl2" type="text/html">
+    <?
+    if(data && data.length > 0) {
+    ?>
+    <ul class="clearfix">
+        <?
+        for(var i=0,l=data.length; i<l; i++){
+            var el = data[i], NoImgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg", colorArr;
+        ?>
+        <li>
+            <div class="thumbnail" style="position: relative;">
+                <?
+                var previewImgPath = el.imgPath;
+                if (el.thumb && el.thumb.length > 0) {
+                for(var ii=0,ll=el.thumb.length; ii<ll; ii++) {
+                var ell=el.thumb[ii], imgPath="" ;
+                if(ell.path==null || ell.path.length <=0){
+                imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+                }else{
+                if(ell.path.indexOf("/") !=-1){
+                imgPath = ell.path
+                } else if (ell.path.indexOf(".") !=-1){
+                imgPath = (GLOBAL_FILESERVERNAMEPATH||"") + ell.path
+                } else {
+                imgPath = (GLOBAL_FILESERVERPATH||"") + ell.path
+                }
+                }
+                ?>
+                <a href="/design/previewThumbnail?id=<?=el.id?>&imgPath=<?=previewImgPath?>" target="_blank">
+                    <? if(ell.defaults){ ?>
+                    <img src="<?=imgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                    <? } else { ?>
+                ##                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                    <? } ?>
+                </a>
+                <? } ?>
+                <?
+                } else {
+                ?>
+                <a href="javascript:void(0)">
+                    <img src="<?=NoImgPath?>" data-holder-rendered="true" style="height: 200px; width: 100%; display: block;">
+                </a>
+                <? } ?>
+                <div class="caption">
+                    <h4 style="height: 30px;"><?=el.name?><?if(el.hot == true){?><span class="special-hot"></span><?}?></h4>
+                    <p>
+                    <ul class="desc-box clearfix">
+                        <li class="times"><span></span><?=el.downloadNum?></li>
+                        <li class="date"><span></span> <?= Ls.isEmpty(el.createDate) ? '' : el.createDate.substring(0,10) ?></li>
+                    </ul>
+                    </p>
+                    <p class="temple-btn">
+                        <?if(el.downloadStatus == 0){?>
+                        <a href="javascript:void(0);" class="btn btn-default disabled" role="button" target="_blank">下载中</a>
+                        <?} else if(el.downloadStatus == 1 && el.version > el.localVersion){?>
+                        <a onclick="cur.downloadTheme(<?=el.id?>,<?=el.version?>)" href="javascript:void(0);" class="btn btn-default" role="button" >更新新版本</a>
+                        <?} else if(el.downloadStatus == 1 && el.version == el.localVersion){?>
+                        <a href="javascript:void(0);" class="btn btn-default disabled" role="button" target="_blank">已下载</a>
+                        <?}else{?>
+                        <a onclick="cur.downloadTheme(<?=el.id?>,<?=el.version?>)" href="javascript:void(0);" class="btn btn-default" role="button"><?if(el.version > el.localVersion){?>更新新版本<?}else{?>下载<?}?></a>
+                        <?}?>
+                        <a href="javascript:void(0);" class="btn btn-info" role="button" target="_blank" onclick="preview(this)">预览</a>
+                    </p>
+                </div>
+                <div class="special-new <? if(el.downloadStatus == 1 && el.version == el.localVersion){?> special-appliance<?}?>">
+                    <?if( el.downloadStatus == 0){?>
+                    <span class="downloading">下载中</span>
+                    <?} else if(el.downloadStatus == 1 && el.version > el.localVersion) {?>
+                    <span class="updateAble">新版本</span>
+                    <?} else if(el.downloadStatus == 1 && el.version == el.localVersion) {?>
+                    <span class="appliance">已应用</span>
+                    <?} else if( el.isNew ) {?>
+                    <span class="new">最新</span>
+                    <?} else{?>
+                    <?}?>
+                </div>
+            </div>
+        </li>
+        <?
+        }
+        ?>
+    </ul>
+    <?} else {?>
+    <div class="alert alert-info" role="alert">暂无信息！</div>
+    <? } ?>
+    <div id="pagination1" class="pagination mr22 text-right"></div>
+</script>
+
+<script id="specialTypeListTmpl" type="text/html">
+    <?
+        for(var i=0,l=data.length; i<l; i++){
+            var item = data[i];
+        ?>
+    <dd data-id="<?=item.id?>"><?=item.name?></dd>
+    <?
+        }
+        ?>
+</script>
+<script>
+    mini.parse();
+    var cur = {
+        name: $("#name"),
+        name2: $("#name2"),
+        url: {
+            specialThemeEdit: '/specialTheme/specialThemeEdit',
+            specialThemeTypeList:'/special/cloud/theme/getTypeList',
+            downloadTheme:'/special/cloud/theme/downloadTheme',
+        },
+        grid: {
+            pageIndex: 0,
+            pageSize: 12,
+            name: "",
+            dataFlag: 1
+        },
+        grid2: {
+            pageIndex: 0,
+            pageSize: 12,
+            name: "",
+            dataFlag: 1
+        },
+        specialThemeType:[],
+        flag: true,
+        isCloud:false,
+        downloadTheme:function(id,version){
+            Ls.ajaxGet({url: cur.url.downloadTheme,data:{id:id,version:version}}).done(function (d) {
+                if(d.status == 0){
+                    Ls.tipsErr(d.desc);
+                    return false;
+                }else{
+                    getCloudData(cur.grid2);
+                }
+                Ls.tipsOk("下载中");
+            });
+        },
+        sort: true,
+        parm: {}
+    };
+    indexMgr.updateCloud = function () {
+        return getCloudData(cur.grid2);
+    }
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        getData(cur.grid);
+        $(".screen").click(function () {
+            var fa = $(this).find('i');
+            fa.hasClass('fa-angle-down') ? fa.removeClass('fa-angle-down').addClass('fa-angle-up').next().text('收起筛选') : fa.removeClass('fa-angle-up').addClass('fa-angle-down').next().text('展开筛选');
+            $(".classify-con").slideToggle(function () {
+
+            });
+        });
+        //初始化云模板查询
+        initCloudQuery();
+
+        $(".classify-con").on('click', 'dd', function () {
+            var self = $(this);
+            self.addClass('on').siblings().removeClass('on');
+
+            if (self.hasClass('timesAgo')) {
+                $.extend(cur.parm, {
+                    timesAgo: self.data('timesago')
+                });
+            }else if(self.data('sortorder') === 'desc') {
+                var type = self.data('sortfield');
+                var sort = cur.sort ? 'desc' : 'asc';
+                $.extend(cur.parm, {
+                    sortField: type,
+                    sortOrder: sort
+                });
+            }else {
+                $.extend(cur.parm, {
+                    specialType: self.data('id')
+                });
+            }
+
+            $.extend(cur.parm, cur.grid2);
+            getCloudData(cur.parm).done(function () {
+                if(self.data('sortorder')) {
+                    cur.sort = !cur.sort;
+                }
+            });
+        })
+
+
+    })
+
+    function switchTab(value){
+        cur.isCloud = value;
+        search();
+    }
+
+    function initCloudQuery(){
+        Ls.ajaxGet({url: cur.url.specialThemeTypeList}).done(function (d) {
+            if(d.status == 0){
+                Ls.tipsErr("加载类型列表失败");
+                return false;
+            }
+            var listHtml = Ls.template("specialTypeListTmpl", d);
+            $("#specialTypeList").html(listHtml);
+        });
+    }
+
+    //分页回调方法
+    function pageCallback(page_index) {
+        cur.grid.pageIndex = page_index - 1;
+        getData(cur.grid);
+        return false;
+    }
+
+    function pageCallback1(page_index) {
+        cur.grid2.pageIndex = page_index - 1;
+        getCloudData(cur.grid2);
+        return false;
+    }
+
+    //拉取数据
+    function getData(param) {
+        if(cur.isCloud){
+            getCloudData(param);
+        }else {
+            return Ls.ajaxGet({
+                url: "/specialTheme/getPagination",
+                data: param
+            }).done(function (d) {
+
+                var listHtml = Ls.template("special_theme_list_tpl", d);
+                $("#special_list").html(listHtml);
+                //创建分页
+                Ls.pagination3("#pagination", pageCallback, {
+                    pageSize: cur.grid.pageSize,
+                    currPage: d.pageIndex + 1,
+                    pageCount: d.pageCount,
+                });
+
+            });
+        }
+    }
+    //拉取数据
+    function getCloudData(param) {
+        return Ls.ajaxGet({
+            url: "/special/cloud/theme/getSpecialList",
+            data: param
+        }).done(function (d) {
+            $.each(d.data, function(i, v){
+                v.isNew = new Date().getTime() - new Date(v.createDate).getTime() < 15*24*60*60*1000;
+            })
+
+            var listHtml2 = Ls.template("special_theme_list_tpl2", d);
+            $("#special_list2").html(listHtml2);
+
+            $("#special_list2").find('.special-new').each(function (i, v) {
+                if (Ls.isEmpty($(v).text().trim())) {
+                    $(v).remove();
+                }
+            })
+            //创建分页
+            Ls.pagination3("#pagination1", pageCallback1, {
+                pageSize: cur.grid2.pageSize,
+                currPage: d.pageIndex + 1,
+                pageCount: d.pageCount,
+            });
+
+        });
+    }
+
+    /*
+    * 添加
+    * */
+    function editTheme(id) {
+        var url = cur.url.specialThemeEdit;
+        var title = '添加模板';
+        if (id) {
+            url = url + '?id=' + id;
+            title = '编辑模板';
+        }
+        Ls.openWin(url, '500px', '390px', {
+            title: title
+        });
+    }
+
+    function deleteSpecialTheme(id) {
+        if (confirm('是否确定删除?')) {
+            Ls.ajax({
+                type: "POST",
+                data: {id: id},
+                url: "/specialTheme/deleteSpecialTheme",
+                success: function (json) {
+                    if (json.status == 1) {
+                        Ls.tipsOk("操作成功", function () {
+                            search()
+                        });
+                    } else {
+                        Ls.tipsErr(json.desc);
+                    }
+                }
+            });
+        }
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editTheme(' + record.id + ')">修改</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="deleteSpecialTheme(' + record.id + ')">删 除</button>';
+        return edit + del;
+    }
+
+    function renderImg(obj) {
+        var record = obj.record;
+        var str = '';
+        if (!Ls.isEmpty(record.imgPath)) {
+            var path = "";
+            if (record.imgPath.indexOf(".") == -1) {
+                path = GLOBAL_FILESERVERPATH + record.imgPath;
+            } else {
+                path = GLOBAL_FILESERVERNAMEPATH + record.imgPath;
+            }
+            str = '<img width="80" height="80" src="' + path + '" />'
+        }
+        return str;
+    }
+
+
+    function search() {
+        $(".classify-con dd.on").removeClass('on');
+        cur.parm = {}
+
+        if (cur.isCloud) {
+            cur.grid2.name = cur.name2.val();
+            getData(cur.grid2);
+        }else {
+            cur.grid.name = cur.name.val();
+            getData(cur.grid);
+        }
+    }
+
+    function showAll() {
+        cur.name.val('');
+        cur.name2.val('');
+        search();
+    }
+
+    function preview(self) {
+        $(self).attr('href', $(".thumbnail>a:first").attr('href'));
+    }
+</script>

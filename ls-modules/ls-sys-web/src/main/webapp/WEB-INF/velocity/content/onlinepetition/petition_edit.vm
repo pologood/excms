@@ -1,0 +1,344 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="petitionForm" ms-controller="petitionForm">
+                <table class="table table-bordered petition-table">
+                    <tbody>
+                    <tr>
+                        <th>标题：</th>
+                        <td colspan="2">
+                            <input type="text" name="title" ms-duplex="title" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>信件目的：</th>
+                        <td colspan="2">
+                            <select class="form-control" id="purposeCode" name="purposeCode" ms-duplex="purposeCode" class="form-control" placeholder="请选择信件目的">
+                              <option value="">请选择信件目的</option>
+                                #foreach($s in $pList)
+                                  <option value="$!{s.code}">$!{s.key}</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>信件类别：</th>
+                        <td colspan="2">
+                            <select class="form-control" id="categoryCode" name="categoryCode" ms-duplex="categoryCode" class="form-control" placeholder="请选择信件类别">
+                              <option value="">请选择信件类别</option>
+                                #foreach($s in $cList)
+                                  <option value="$!{s.code}">$!{s.key}</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                    #if($recType=='0')
+                    <tr>
+                        <th>受理单位：</th>
+                        <td colspan="2">
+                            <select class="form-control" id="recUnit" name="recUnitId" ms-duplex="recUnitId" class="form-control" placeholder="请选择受理单位">
+                              <option value="">请选择受理单位</option>
+                                #foreach($s in $recList)
+                                  <option value="$!{s.recUnitId}">$!{s.recUnitName}</option>
+                                #end
+                            </select>
+                        </td>
+                    </tr>
+                    #end
+                    <tr>
+                        <th>您的姓名：</th>
+                        <td colspan="2">
+                            <input type="text" name="author" ms-duplex="author" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>您的职业：</th>
+                        <td colspan="2">
+                            <input type="text" name="occupation" ms-duplex="occupation" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>联系电话：</th>
+                        <td colspan="2">
+                            <input type="text" name="phoneNum" ms-duplex="phoneNum" class="form-control" placeholder="提示：固话不支持短线'-'">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>联系地址：</th>
+                        <td colspan="2">
+                            <input type="text" name="address" ms-duplex="address" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td colspan="2">
+                            <textarea id="video_content" name="content" ms-duplex="content" class="form-control" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr class="hide">
+                        <th>附件：</th>
+                        <td colspan="2">
+                            <input id="video_content" name="attachId" ms-duplex="attachId" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>附件：</th>
+                        <td colspan="2">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" id="attachName" name="attachName" ms-duplex="attachName" class="form-control">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default btn-default-upload" type="button" onclick="uploadAttachment()">上传
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </button>
+                                    </div>
+                                    <!-- /btn-group -->
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>是否公开：</th>
+                        <td colspan="2">
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="1"> 是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="0"> 否
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>发布日期：</th>
+                        <td>
+                            <input type="datetime" name="publishDate" ms-duplex="publishDate" class="form-control"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <button class="btn btn-default btn-save" type="submit"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var curr = {
+        vm: "",
+        pageIndex: '$!{pageIndex}',
+    };
+    var eweb;
+    var recType = '$!{recType}';
+    $(document).ready(function () {
+        eweb = Ls.editor("video_content", {cusdir: "/" + GLOBAL_SITEID + "/" + content_mgr.node.columnId});
+        /*editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/videoNews/upload?siteId=' + GLOBAL_SITEID + "&&columnId=" + content_mgr.node.indicatorId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId:content_mgr.node.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+        getVO();
+    });
+
+    function getVO() {
+        var contentId = "${contentId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getVO",
+            data: {id: contentId}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            data = d.data;
+            data.categoryCode = Ls.isEmpty(data.categoryCode) ? "" : data.categoryCode;
+            data.purposeCode = Ls.isEmpty(data.purposeCode) ? "" : data.purposeCode;
+            if(!Ls.isEmpty(recType)&&recType=='0'){
+              data.recUnitId = Ls.isEmpty(data.recUnitId) ? "" : data.recUnitId;
+            }
+            curr.$id = "petitionForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            //avalon.scan(document.body, curr.vm);
+            avalon.scan($("#petitionForm").get(0), curr.vm);
+            /*editor.html(data.content);*/
+            eweb.setHtml(data.content);
+        });
+    }
+
+    /*提交更新*/
+    $('button[type="submit"]').on("click", function(){
+        eweb.update();
+    })
+
+    $('#petitionForm').validator({
+        rules: {
+           // mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']
+        },
+        fields: {
+            'title': '标题:required;length[1~250];',
+            'purposeCode': '信件目的:required;',
+            'categoryCode': '信件类型:required;',
+            'author': '您的姓名:required;length[1~32]',
+            'phoneNum': '联系电话:required;mobile|tel_1|shortTel;',
+            'content': '内容:required;'
+        },
+        valid: function () {
+            //Ls.tips('验证成功！' ,{icons: "success"});
+            doSave();
+        }
+    });
+
+
+    function savePetition() {
+        curr.vm.columnId = content_mgr.node.indicatorId;
+        curr.vm.siteId = GLOBAL_SITEID;
+        /*curr.vm.content = editor.text();*/
+        curr.vm.content = eweb.getText();
+        if ('0' == recType && Ls.isEmpty(curr.vm.recUnitId)) {
+            Ls.tips("收信单位不能为空", {icons: "info"});
+            return;
+        }
+       // curr.vm.text = editor.html();
+        return 1;
+    }
+    function doSave() {
+        if (savePetition() == 1) {
+            var value = curr.vm.$model;
+            value = Ls.toJSON(value);
+            Ls.ajax({
+                type: "POST",
+                url: "/onlinePetition/saveVO",
+                data: value
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                } else {
+                    Ls.tipsOk("保存成功");
+                    goBack();
+                    return;
+                }
+            });
+        }
+    }
+
+
+    function goBack() {
+        content_mgr.getContentApp('/onlinePetition/index?pageIndex=' + curr.pageIndex);
+    }
+
+    function uploadAttachment() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                curr.vm.attachId = filePath[0].fileName;
+                curr.vm.attachName = filePath[0].fileName;
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传附件',
+            file_size_limit: "20 MB",
+            file_types: "*.zip;*.rar;*.doc;*.docx;*.xls;*.xlsx;*.ppt;*.pptx;*.txt;*.jpg;*.gif;*.bmp;*.pdf",
+            file_upload_limit: 1,  //配置上传个数
+            post_params: {
+            "type":"NotDefined"
+            }
+        });
+    }
+    function getCategoryCode() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getCategoryCode",
+            data: {}
+        }).done(function (text) {
+            var str = '<option value=""> 请选择信件类型 </option> ';
+            if (text != null) {
+                var data = text;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].code + '>' + data[i].key + '</option> ';
+                    }
+                }
+            }
+            $("#categoryCode").append(str);
+            getVO();
+        });
+    }
+    function getPurposeCode() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getPurposeCode",
+            data: {}
+        }).done(function (text) {
+            var str = '<option value=""> 请选择信件目的 </option> ';
+            if (text != null) {
+                var data = text;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].code + '>' + data[i].key + '</option> '
+                    }
+                }
+            }
+            $("#purposeCode").append(str);
+        });
+    }
+    function getRecUnit() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getRecUnitOrPerson",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            setUnit=true;
+            var str = '<option value=""> 请选择受理单位 </option> ';
+            if (text.status) {
+                var data = text.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> '
+                    }
+                }
+            }
+            $("#recUnit").append(str);
+        });
+    }
+</script>

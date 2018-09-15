@@ -1,0 +1,158 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form" id="messageCtrl" ms-controller="messageCtrl">
+        <div class="table-toolbar" style="width:100%;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" ms-click="setRead($event,1)">批量设置已读</a></li>
+                            <li><a href="javascript:;" ms-click="setRead($event,2)">全部设为已读</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> {{dropdown_text}} <i class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" ms-click="setStatus($event,1)">未读消息</a></li>
+                            <li><a href="javascript:;" ms-click="setStatus($event,2)">已读消息</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" ms-click="search($event)">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default btn-show-all" ms-click="showAll($event)">
+                            显示全部
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="datagrid" class="mini-datagrid" allowCellSelect="true" allowResize="true"
+             url="/message/getPage" sizeList="[5,10,20,50]" pageSize="20" onlyCheckSelection="true"
+             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 300px">
+            <div property="columns">
+                <div type="checkcolumn"></div>
+                <div width="60" align="center" headerAlign="center" renderer="msgStatus">状态</div>
+                <!-- modeName -->
+                <div field="messageSystemEO.title" width="120" align="center" align="center" headerAlign="center">消息标题</div>
+                <div field="messageSystemEO.content" width="100%" align="left" headerAlign="center" allowSort="true" renderer="">消息内容</div>
+                <div field="messageSystemEO.createDate" dateFormat="yyyy-MM-dd HH:mm:ss" width="150" align="center" headerAlign="center" allowSort="true" renderer="">发送时间</div>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+
+    var cur = {
+        ctrl: "messageCtrl",
+        grid: mini.get('datagrid'),
+        searchKey: $('#searchKey'),
+        win: Ls.getWin.win
+    };
+
+    // 重置 datagrid 高度
+    Ls.mini_datagrid_height(cur.grid, 55);
+
+    var initData = {
+        dropdown_text: "属性筛选",
+        msg_status: 1,
+        search: function () {
+            search();
+        },
+        showAll: function () {
+            showAll();
+        },
+        setRead: function (e, type, status) {
+
+            var ids;
+            if (type == 1) {
+                var rows = cur.grid.getSelecteds();
+                if (rows.length > 0) {
+                    var ids = [];
+                    for (var i = 0, l = rows.length; i < l; i++) {
+                        ids.push(rows[i].id);
+                    }
+                    ids = ids.join(",")
+                } else {
+                    Ls.tips("未选择任务消息！");
+                    return false;
+                }
+            }
+
+            Ls.ajaxGet({
+                data: {
+                    ids: ids
+                },
+                url: "/message/" + (type == 1 ? "readMessage" : "readAllMessage")
+            }).done(function () {
+                cur.win.indexMgr.getMsgList();
+                search();
+            });
+        },
+        setStatus: function (e, status) {
+            var target = e.target;
+            cur.vm.dropdown_text = target.innerHTML;
+            cur.vm.msg_status = status;
+            getStatusMsg(status);
+        }
+    }
+
+    $(document).ready(function () {
+
+        initAvalon();
+
+        cur.grid.load({messageStatus: cur.vm.msg_status}, function () {
+            if (cur.vm.dropdown_text == "属性筛选") {
+                cur.vm.dropdown_text = "未读消息"
+            }
+        });
+
+    })
+
+    function initAvalon() {
+        initData.$id = cur.ctrl;
+        cur.vm = avalon.define(initData);
+    }
+
+    function search() {
+        var keyValue = cur.searchKey.val();
+        cur.grid.load({title: keyValue, messageStatus: cur.vm.msg_status});
+    }
+
+    function showAll() {
+        cur.searchKey.val('');
+        cur.vm.dropdown_text = "属性筛选";
+        cur.vm.msg_status = "";
+        search();
+    }
+
+    function msgStatus(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.messageStatus == 1) {
+            str = "<span class='font-red'>未读</span>";
+        } else {
+            str = "<span>已读</span>";
+        }
+        return str;
+    }
+
+    function getStatusMsg() {
+        var keyValue = cur.searchKey.val();
+        cur.grid.load({title: keyValue, messageStatus: cur.vm.msg_status});
+    }
+
+</script>
+</body>
+</html>

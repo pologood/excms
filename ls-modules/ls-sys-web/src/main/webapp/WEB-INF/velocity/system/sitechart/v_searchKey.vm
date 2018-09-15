@@ -1,0 +1,90 @@
+ <style>
+	.tc{
+		text-align:center;
+	}
+ </style>
+ <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+	<div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+	<div id="" style="margin:10px 30px">
+		
+	<div class="row">
+       <div class="col-md-12 col-sm-12">
+            <div class="portlet light bordered mb25">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-bar-chart font-blue"></i>
+                        <span class="caption-subject font-blue bold">搜索词</span> &nbsp;
+                        <span class="caption-helper"></span>
+                    </div>
+					<div style="float:right;">
+						 <div class="form-group form-inline search-toolbar">
+							<input type="text" name="key" id="key" class="form-control w160" placeholder="搜索词"/>
+                            <input type="text" name="st" id="st" class="form-control w160"
+                                   placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                            <input type="text" name="ed" id="ed" class="form-control w160"
+                                   placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+							<button type="button" class="btn btn-default btn-search" onclick="search()">查询</button>
+                            <button type="button" class="btn btn-default" onclick="searchClear()">清除条件</button>
+                         </div>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                        <table class="table table-hover doc-list">
+                			<thead>
+                            <tr><th></th><th style="width:12%">来访次数</th><th style="width:12%">百度</th><th style="width:12%">360搜索</th><th style="width:12%">搜狗</th><th style="width:12%">谷歌</th><th style="width:12%">其他</th></tr>
+                            </thead>
+                			<tbody id="searchKeyTotal">
+                            </tbody>
+                        </table>
+                     </div>
+                     <div><hr  style="heigth:10px"/></div>
+                    <div id="doc_list_body">
+                    </div>
+                    <div id="pagination" class="pagination text-right mr22"></div>
+                </div>
+            </div>
+        </div>
+    </div>	
+		
+    </div>
+    </div>
+ </div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/sitechart/v_searchKey.js"></script>
+<script >
+    $(document).ready(function () {
+		search();
+    })
+
+	function search(){
+		var st=$("#st").val();
+		var ed=$("#ed").val();
+		var key=$("#key").val();
+		var data={};
+		data.st=st;
+		data.ed=ed;
+		data.key=key;
+		Ls.ajaxGet({
+            url: "/visitSource/getSearchKeyTotal",
+			data:data,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+					var d=data.data;
+					var str="";
+					str+="<tr><td class='bold'><div style='margin-left:20px;width:30%;'>总体概况</div></td><td>"+d.count+"</td><td>"+d.baidu+"</td><td>"+d.so+"</td><td>"+d.soso+"</td><td>"+d.google+"</td><td>"+d.other+"</td></tr>";
+					
+					$("#searchKeyTotal").html(str);
+                }
+            }
+        });
+		v_searchKey.getData(st,ed,key);
+	}
+	
+	function searchClear(){
+		$("#st").val('');
+		$("#ed").val('');
+		$("#key").val('');
+		search();
+	}
+</script>

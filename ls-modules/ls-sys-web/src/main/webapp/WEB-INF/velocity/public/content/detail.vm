@@ -1,0 +1,189 @@
+#parse("_page_layout/_header.vm")
+<style>
+
+    body {
+        font-size: 14px !important;
+    }
+
+    .xxgk_sqnrbox {
+        margin-left: 20px;
+    }
+
+    .yi_area1 {
+        width: 650px;
+        background: #f8f8f8;
+        color: #04a06c;
+        font-size: larger;
+    }
+
+    .yi_area2 {
+        width: 650px;
+        background: #f8f8f8;
+        color: #04a06c;
+        font-size: larger;
+    }
+
+    .bor1 {
+        text-align: right;
+        background: #f8f8f8;
+        padding-right: 15px;
+    }
+
+    .bor {
+        background: #f8f8f8;
+    }
+
+    .bor4 {
+        background: #f8f8f8;
+
+    }
+
+    table {
+        border: 1px solid #dddddd;
+        text-align: center;
+    }
+
+    table td {
+        border: 1px solid #dddddd;
+    }
+
+    @media (max-width: 1366px) {
+        .page-content-white {
+            overflow-y: auto!important;
+        }
+    }
+
+</style>
+<body class="page-body-white page-content-white">
+<!--startprint-->
+<div class="xxgk_sqnrbox">
+    <div class="xxgk_sqr yi_area1" style="margin-top: 10px">申请人信息</div>
+    <div class="xxgk_sqrxx yi_arear">
+        #if("$!{vo.type}" == "person")
+            <table width="650">
+                <tbody>
+                <tr>
+                    <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+                    <td class="bor1" height="30" width="100">姓&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                    <td class="bor2" style="position:relative;" width="253">$!{vo.name}</td>
+                    <td class="bor1" width="100">工作单位</td>
+                    <td class="bor2" width="318">$!{vo.organName}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">证件名称</td>
+                    <td width="253" class="bor2">$!{vo.cardTypeName}</td>
+                    <td width="100" class="bor1">证件号码</td>
+                    <td width="318" class="bor2">$!{vo.cardNum}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">电子邮箱</td>
+                    <td width="253" class="bor2">$!{vo.mail}</td>
+                    <td width="100" class="bor1">邮政编码</td>
+                    <td width="318" class="bor2">$!{vo.postalNum}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">联系电话</td>
+                    <td width="253" class="bor2">$!{vo.phone}</td>
+                    <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+                    <td width="318" class="bor2">$!{vo.fax}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">联系地址</td>
+                    <td colspan="3" class="bor2">$!{vo.address}</td>
+                </tr>
+                </tbody>
+            </table>
+        #elseif("$!{vo.type}" == "organ")
+            <table width="100%">
+                <tbody>
+                <tr>
+                    <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+                    <td class="bor1" height="30" width="100">组织机构名称</td>
+                    <td class="bor2" width="253">$!{vo.organName}</td>
+                    <td class="bor1" width="100">组织机构代码</td>
+                    <td width="318" class="bor2">$!{vo.organCode}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">法人代表</td>
+                    <td class="bor2">$!{vo.legalName}</td>
+                    <td width="100" class="bor1">联系人姓名</td>
+                    <td width="318" class="bor2">$!{vo.contactName}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">联系电话</td>
+                    <td class="bor2">$!{vo.contactPhone}</td>
+                    <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+                    <td width="318" class="bor2">$!{vo.fax}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">联系地址</td>
+                    <td colspan="3" class="bor2">$!{vo.address}</td>
+                </tr>
+                <tr>
+                    <td width="100" height="30" class="bor1">&nbsp;</td>
+                    <td colspan="3" class="bor2">&nbsp;</td>
+                </tr>
+                </tbody>
+            </table>
+        #end
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="xxgk_sqnrbox">
+    <div class="xxgk_sqr1 yi_area2" style="margin-top: 10px">所需信息情况</div>
+    <div class="xxgk_sqrxx yi_arear">
+        <table width="650">
+            <tbody>
+            <tr>
+                <td class="bor" align="center" height="104" width="169" style="*width:170px;">所需信息的内容<br/>描述</td>
+                <td colspan="3" class="bor3" width="708">$!{vo.content}</td>
+            </tr>
+            <tr>
+                <td width="169" height="104" align="center" class="bor" style="*width:170px;">所需信息的用途</td>
+                <td colspan="3" class="bor3" width="708">$!{vo.use}</td>
+            </tr>
+            <tr>
+                <td width="169" height="60" align="center" class="bor" style="*width:170px;">所需信息的指定提供方式（可选）</td>
+                <td colspan="3" class="bor3" width="708">$!{vo.provideType}</td>
+            </tr>
+            <tr>
+                <td width="169" height="60" align="center" class="bor" style="*width:170px;">获取信息的方式（可选）</td>
+                <td colspan="3" class="bor3" width="708">$!{vo.receiveType}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="clear"></div>
+</div>
+<div class="xxgk_sqnrbox">
+    <div class="xxgk_sqr yi_area1" style="margin-top: 10px;">回复情况</div>
+    <div class="xxgk_sqrxx yi_arear">
+        <table width="650" style="margin-bottom: 10px">
+            <tbody>
+            <tr>
+                <td class="bor" align="center" height="156" width="169" style="*width:170px;">备注</td>
+                <td colspan="3" class="bor3" width="">$!{vo.replyContent}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="clear"></div>
+</div>
+<!--endprint-->
+<div align="center" style="margin-bottom:10px">
+    <button onclick="preview();" type="button" class="editBtn btn btn-default btn-add">打 印</button>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    function preview() {
+        var oldHtml = window.document.body.innerHTML;
+        var sprnstr = "<!--startprint-->";
+        var eprnstr = "<!--endprint-->";
+        var printHtml = oldHtml.substring(oldHtml.indexOf(sprnstr) + 17);
+        printHtml = printHtml.substring(0, printHtml.indexOf(eprnstr));
+        window.document.body.innerHTML = printHtml;
+        window.print();
+        window.document.body.innerHTML = oldHtml;
+    }
+</script>

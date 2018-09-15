@@ -1,0 +1,188 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+  <div class="portlet-body form">
+
+    <form role="form" id="petitionForm" ms-controller="petitionForm">
+      <table class="table table-bordered petition-table">
+        <tbody>
+        <tr>
+          <th>标题：</th>
+          <td colspan="2" ms-text="title">
+          </td>
+        </tr>
+        <tr>
+          <th>信件目的：</th>
+          <td colspan="2" ms-text="purposeCode">
+          </td>
+        </tr>
+        <tr>
+          <th>信件类别：</th>
+          <td colspan="2" ms-text="categoryCode">
+          </td>
+        </tr>
+        <tr id="petition_unit">
+          <th>受理单位：</th>
+          <td colspan="2" ms-text="recUnitId">
+          </td>
+        </tr>
+        <tr>
+          <th>您的姓名：</th>
+          <td colspan="2" ms-text="author">
+          </td>
+        </tr>
+        <tr>
+          <th>您的职业：</th>
+          <td colspan="2" ms-text="occupation">
+          </td>
+        </tr>
+        <tr>
+          <th>联系电话：</th>
+          <td colspan="2" ms-text="phoneNum">
+          </td>
+        </tr>
+        <tr>
+          <th>联系地址：</th>
+          <td colspan="2" ms-text="address">
+          </td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top;">内容：</th>
+          <td colspan="2" ms-text="content">
+          </td>
+        </tr>
+        <tr>
+          <th>是否公开：</th>
+          <td colspan="2" ms-text="isPublic">
+          </td>
+        </tr>
+        <tr>
+          <th>创建日期：</th>
+          <td ms-text="createDate"></td>
+        </tr>
+        <tr>
+          <th>附件：</th>
+          <td colspan="2" ms-text="attach|html">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </form>
+
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+  var curr = {
+    vm: "",
+    pageIndex: '$!{pageIndex}',
+  };
+  var setUnit = false;
+
+  $(document).ready(function () {
+    getVO();
+  });
+
+  function getVO() {
+    var contentId = "${contentId}";
+    Ls.ajax({
+      type: "POST",
+      url: "/onlinePetition/getVO",
+      data: {id: contentId}
+    }).done(function (d) {
+      if (!d.status) {
+        Ls.tipsErr(d.desc);
+        return;
+      }
+      data = d.data;
+      data.categoryCode = Ls.isEmpty(data.categoryCode) ? "" : data.categoryCode;
+      data.purposeCode = Ls.isEmpty(data.purposeCode) ? "" : data.purposeCode;
+      data.recUnitId = Ls.isEmpty(data.recUnitId) ? "" : data.recUnitId;
+      data.$id = "petitionForm";
+      if (data.isPublic == 0) {
+        data.isPublic = "不公开";
+      } else {
+        data.isPublic = "公开";
+      }
+
+      data.attach = ""
+      if (data.attachId) {
+        var url='/onlinePetition/downloadFile?attachId=' + data.attachId + '&&s=' + Math.random();
+        data.attach = '<a href='+url +'target="_blank">' + data.attachName + '</a>'
+      }
+
+      curr.vm = avalon.define(data);
+      avalon.scan($("#petitionForm").get(0), curr.vm);
+
+      getPurposeCode();
+      getCategoryCode();
+      if (GLOBAL_SITETYPE == 'SUB_Site') {
+        $("#petition_unit").hide();
+      } else {
+        $("#petition_unit").show();
+        getRecUnit();
+      }
+
+    });
+  }
+
+  function getCategoryCode() {
+    Ls.ajax({
+      type: "POST",
+      url: "/onlinePetition/getCategoryCode",
+      data: {}
+    }).done(function (text) {
+      if (text != null) {
+        var data = text;
+        var length = data.length;
+        for (i = 0; i < length; i++) {
+          if (jQuery.trim(data[i].code) == curr.vm.categoryCode) {
+            curr.vm.categoryCode = data[i].key;
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  function getPurposeCode() {
+    Ls.ajax({
+      type: "POST",
+      url: "/onlinePetition/getPurposeCode",
+      data: {}
+    }).done(function (text) {
+      if (text != null) {
+        var data = text;
+        var length = data.length;
+        for (i = 0; i < length; i++) {
+          if (jQuery.trim(data[i].code) == curr.vm.purposeCode) {
+            curr.vm.purposeCode = data[i].key;
+            break;
+          }
+        }
+      }
+    });
+  }
+
+  function getRecUnit() {
+    Ls.ajax({
+      type: "POST",
+      url: "/onlinePetition/getRecUnitOrPerson",
+      data: {columnId:curr.vm.columnId}
+    }).done(function (text) {
+      setUnit = true;
+      if (text.status) {
+        var data = text.data;
+        var length = data.length;
+        for (i = 0; i < length; i++) {
+          if (jQuery.trim(data[i].recUnitId) == curr.vm.recUnitId) {
+            curr.vm.recUnitId = data[i].recUnitName;
+            break;
+          }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

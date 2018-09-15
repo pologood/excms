@@ -1,0 +1,431 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div title="center" region="center" style="border:none; overflow: auto;">
+            <form id="task_edit_form" role="form" ms-controller="task_edit_form">
+                <div class="form-body">
+                    <table class="table table-bordered article-table" style="margin-top:18px;margin-bottom: 0px;">
+                        <tr>
+                            <th>任务名称:</th>
+                            <td>
+                                <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                                <input type="text" id="taskName" name="taskName" class="form-control" data-rule="任务名称:required;" placeholder="" ms-duplex="taskName">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>所属栏目:</th>
+                            <td>
+                                <input type="text" id="columnId" name="columnId" style="display: none" ms-duplex="columnId">
+                                <input type="text" id="cSiteId" name="cSiteId" style="display: none" ms-duplex="cSiteId">
+                                <input type="text" id="columnName" name="columnName" class="form-control readonly" readonly data-rule="所属栏目:required;" placeholder="" ms-duplex="columnName" onclick="columnSelect()">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>采集域名:</th>
+                            <td>
+                                <input type="text" id="webDomain" name="webDomain" class="form-control" data-rule="采集域名:required;data-rule-url=[/^http(s)?:\/\//i, webDomain]" data-tip="" placeholder="例如：（http://www.xxxx.com）" ms-duplex="webDomain">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>分页规则:</th>
+                            <td>
+                                <input type="text" id="regexUrl" name="regexUrl" class="form-control" data-rule="分页规则:required;data-rule-url=[/^http(s)?:\/\//i, regexUrl]" data-tip="" placeholder="例如：（http://www.xxxx.com/doc/[*]_page.html）" ms-duplex="regexUrl">
+                            </td>
+                            <td width="80">
+                                <button type="button" class="btn btn-default btn-add" onclick="addPageParam()">插入分页参数</button>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>默认首页:</th>
+                            <td>
+                                <input type="text" id="defaultUrl" name="defaultUrl" class="form-control" data-rule="" placeholder="采集默认首页，如果采集分页规则包含首页，则不需要填写" ms-duplex="defaultUrl">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" align="right">开始元素:</td>
+                            <td>
+                                <textarea id="targetBeginDom" name="targetBeginDom" class="form-control" style="width: 100%;height: 80px;" placeholder="" ms-duplex="targetBeginDom"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" align="right">结束元素:</td>
+                            <td>
+                                <textarea id="targetEndDom" name="targetEndDom" class="form-control" style="width: 100%;height: 80px;" placeholder="" ms-duplex="targetEndDom"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr>
+                            <th>分页类型:</th>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="pageType" value="number" ms-duplex-string="pageType" checked> 数 字 </label> &nbsp;&nbsp;
+                                    <label class="radio-inline"><input type="radio" name="pageType" value="character" ms-duplex-string="pageType"> 字 母 </label> &nbsp;&nbsp;
+                                    <label class="radio-inline"><input type="radio" name="pageType" value="auto" ms-duplex-string="pageType"> 自定义 </label>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                        <tr ms-visible="pageType=='number'" class="dn">
+                            <th>开始页码:</th>
+                            <td>
+                                <input type="text" id="pageBeginNumber" name="pageBeginNumber" class="form-control" data-rule="" data-tip="" placeholder="数字[0~9]" ms-duplex="pageBeginNumber">
+                            </td>
+                            <th>结束页码:</th>
+                            <td>
+                                <input type="text" id="pageEndNumber" name="pageEndNumber" class="form-control" data-rule="pageEndNumber" data-tip=""  placeholder="数字[0~9]" ms-duplex="pageEndNumber">
+                            </td>
+                            <td width="60">
+                                <span><input id="zeroFill" name="zeroFill" type="checkbox" ms-duplex-checked="zeroFill">补零</span>
+                            </td>
+                            <td width="60">
+                                <button type="button" class="btn btn-default btn-add" onclick="scanPage()">预览分页</button>
+                            </td>
+                        </tr>
+                        <tr ms-visible="pageType=='character'" class="dn">
+                            <th>开始字符:</th>
+                            <td>
+                                <input type="text" id="pageBeginChar" name="pageBeginChar" class="form-control" data-rule="" placeholder="字符[a~z]区分大小写" placeholder="" ms-duplex="pageBeginChar">
+                            </td>
+                            <th>结束字符:</th>
+                            <td>
+                                <input type="text" id="pageEndChar" name="pageEndChar" class="form-control" data-rule="" placeholder="字符[a~z]区分大小写"  placeholder="" ms-duplex="pageEndChar">
+                            </td>
+                            <td width="60">
+                                <button type="button" class="btn btn-default btn-add" onclick="scanPage()">预览分页</button>
+                            </td>
+                        </tr>
+                        <tr ms-visible="pageType=='auto'" class="dn">
+                            <td valign="top" align="right">分页链接:</td>
+                            <td>
+                                <textarea id="pageList" name="pageList" class="form-control" style="width: 100%;height: 80px;" placeholder="多个以 '逗号' 隔开 " ms-duplex="pageList"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td>
+                            </td>
+                        </tr>
+                    </table>
+
+                   <table id="scan_table" class="table table-bordered article-table" style="display:none;margin-bottom: 0px" >
+                        <tr>
+                            <th></th>
+                            <td>
+                                <textarea id="sacn_regexurl" class="form-control" style="width: 100%;height: 200px;"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td align="right">
+                                <button type="button" class="btn btn-default btn-add" onclick="closeScanPage()">关闭</button>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="table table-bordered article-table" style="margin-bottom: 0px" >
+                        <tr>
+                            <th>链接规则:</th>
+                            <td>
+                                <input type="text" id="regexHref" name="regexHref" class="form-control" data-rule="链接规则:required;" data-tip="例如：（http://www.xxxx.com/doc/.*.html）" placeholder=".*代表模糊匹配参数" ms-duplex="regexHref">
+                            </td>
+                            <td width="80" style="vertical-align: middle">
+                                (<font color="red">*</font>必填项)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" align="right">过滤URL:</td>
+                            <td>
+                                <textarea id="filterRegexUrl" name="filterRegexUrl" class="form-control" style="width: 100%;height: 80px;" placeholder="多个以 '逗号' 隔开 例如：（http://www.xxx.con/1_.*html,http://www.xxx.con/2_.*html） .*代表模糊匹配参数" ms-duplex="filterRegexUrl"></textarea>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" align="right">引用方式:</td>
+                            <td>
+                                <select type="text" id="employType" name="employType" class="form-control" data-rule="引用方式:required;" placeholder="" ms-duplex="employType">
+                                    <option value="Manual" selected>手动</option>
+                                    <option value="Auto">自动</option>
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>是否推送:</th>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="isPush" value="1" ms-duplex-string="isPush" checked> 是 </label> &nbsp;&nbsp;
+                                    <label class="radio-inline"><input type="radio" name="isPush" value="0" ms-duplex-string="isPush"> 否 </label> &nbsp;&nbsp;
+                                </div>
+                            </td>
+                        <tr>
+                        </tr>
+                            <th>推送标识:</th>
+                            <td>
+                                <input type="text" id="pushUrlFlag" name="pushUrlFlag" class="form-control" data-rule="推送标识:required;" ms-duplex="pushUrlFlag">
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td valign="top" align="right">线程数:</td>
+                            <td>
+                                <select type="text" id="threads" name="threads" class="form-control" data-rule="线程数:required;" placeholder="" ms-duplex="threads">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="15">15</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="300">300</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+
+
+##                    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+##                        <tr>
+##                            <td valign="top" align="right">过滤URL:</td>
+##                            <td>
+##                                <textarea id="filterRegexUrl" name="filterRegexUrl" class="form-control" style="width: 100%;height: 80px;" placeholder="多个以 '逗号' 隔开 例如：（http://www.xxx.con/1_.*html,http://www.xxx.con/2_.*html） .*代表模糊匹配参数" ms-duplex="filterRegexUrl"></textarea>
+##                            </td>
+##                        </tr>
+##
+##                        <tr>
+##                            <th>定时CRON:</th>
+##                            <td>
+##                                <input type="text" id="cron" name="cron" class="form-control" placeholder="" ms-duplex="cron">
+##                            </td>
+##                        </tr>
+##                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "task_edit_form",
+        form: $('#task_edit_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type"),
+        pageParam:"[*]",
+        pageChar:[
+                'a','b','c','d','e','f','g','h','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z',
+                'A','B','C','D','E','F','G','H','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+            ]
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+                zeroFill:false,
+                pageSort:'asc'
+            });
+        } else {
+            cur.model = cur.dialog.data("record");
+            if(cur.model.zeroFill == "true") {
+                cur.model.zeroFill = true;
+            } else {
+                cur.model.zeroFill = false;
+            }
+
+        }
+        setData(cur.model);
+    })
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function columnSelect() {
+        cur.dialog.data("columnId",cur.vm.columnId);
+        cur.dialog.data("cSiteId",cur.vm.cSiteId);
+        Ls.openWin("/data/collect/columnSelect", '300px', '300px', {
+            id:"column_select",
+            title: "栏目选择"
+        });
+    }
+
+    function column_callback(columnId,cSiteId,name) {
+        cur.vm.columnId = columnId;
+        cur.vm.cSiteId = cSiteId;
+        cur.vm.columnName = name;
+    }
+
+    function saveData() {
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/data/collect/saveTask";
+        } else if(cur.type == 'copy') {
+            url = "/data/collect/copyTask";
+        } else {
+            url = "/data/collect/updateTask";
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                taskName: cur.vm.taskName,
+                columnId:cur.vm.columnId,
+                cSiteId:cur.vm.cSiteId,
+                webDomain: cur.vm.webDomain,
+                defaultUrl:cur.vm.defaultUrl,
+                regexUrl: cur.vm.regexUrl,
+                targetBeginDom:cur.vm.targetBeginDom,
+                targetEndDom:cur.vm.targetEndDom,
+                pageType:cur.vm.pageType,
+                pageBeginNumber: cur.vm.pageBeginNumber,
+                pageEndNumber: cur.vm.pageEndNumber,
+                zeroFill:cur.vm.zeroFill,
+                pageBeginChar: cur.vm.pageBeginChar,
+                pageEndChar: cur.vm.pageEndChar,
+                pageList:cur.vm.pageList,
+                pageSort: cur.vm.pageSort,
+                regexHref:cur.vm.regexHref,
+                filterTag: cur.vm.filterTag,
+                filterRegexUrl: cur.vm.filterRegexUrl,
+                cron: cur.vm.cron,
+                employType:cur.vm.employType,
+                threads:cur.vm.threads,
+                isPush:cur.vm.isPush,
+                pushUrlFlag:cur.vm.pushUrlFlag
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function saveAndExec() {
+
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+    function addPageParam() {
+        var tx = document.getElementById('regexUrl');
+        insertAtCursor(tx, cur.pageParam);
+    }
+
+    function scanPage() {
+        var scanRegexUrl = "";
+        var regexUrl = cur.vm.regexUrl;
+        var pageBeginNumber = parseInt(cur.vm.pageBeginNumber);
+        var pageEndNumber = parseInt(cur.vm.pageEndNumber);
+        var pageBeginChar = cur.vm.pageBeginChar;
+        var pageEndChar = cur.vm.pageEndChar;
+        var pageType = cur.vm.pageType;
+        var zeroFill = cur.vm.zeroFill;
+
+        if(regexUrl == "") {
+            Ls.tips("分页符规则不能为空!",{icons: "info"});return;
+        }
+
+        if(pageType == "number") {
+            for(var i = pageBeginNumber ;i <= pageEndNumber ; i++) {
+                if(scanRegexUrl == "") {
+                    scanRegexUrl = regexUrl.replace(cur.pageParam,(zeroFill&&(i < 10)?"0":"") + i);
+                } else {
+                    scanRegexUrl += "\n" + regexUrl.replace(cur.pageParam,(zeroFill&&(i < 10)?"0":"") + i);
+                }
+            }
+        } else if(pageType == 'character') {
+            for(var i=0;i<cur.pageChar.length;i++) {
+                if(cur.pageChar[i] == pageBeginChar) {
+                    scanRegexUrl = regexUrl.replace(cur.pageParam,cur.pageChar[i]);
+                } else if(cur.pageChar[i] == pageEndChar) {
+                    scanRegexUrl += "\n" + regexUrl.replace(cur.pageParam,cur.pageChar[i]);
+                    break;
+                } else if(cur.pageChar[i] != pageEndChar) {
+                    if(scanRegexUrl == "") {
+                        continue;
+                    }
+                    scanRegexUrl += "\n" + regexUrl.replace(cur.pageParam,cur.pageChar[i]);
+                }
+            }
+        }
+
+        $('#sacn_regexurl').val(scanRegexUrl);
+        $('#scan_table').show();
+    }
+
+    function closeScanPage() {
+        $('#scan_table').hide();
+    }
+
+    function insertAtCursor(myField, myValue) {
+
+        //IE
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+            sel.select();
+        }
+        //MOZILLA/NETSCAPE
+        else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            var restoreTop = myField.scrollTop;
+            myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+            if (restoreTop > 0) {
+                myField.scrollTop = restoreTop;
+            }
+            /*myField.focus(); //解决chrome浏览器光标位置改变问题*/
+            myField.selectionStart = startPos + myValue.length;
+            myField.selectionEnd = startPos + myValue.length;
+        } else {
+            myField.value += myValue;
+            /*myField.focus(); //解决chrome浏览器光标位置改变问题*/
+        }
+    }
+</script>

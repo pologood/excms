@@ -1,0 +1,132 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="alert alert-info pd10">
+                    <div>1、该素材管理为用户自定义素材管理;</div>
+                    <div>2、素材发布后可链接发布自微信客户端。</div>
+                </div>
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group">
+                                <button id="deletes" class="btn btn-default btn-add" onclick="addArticle()"> 新 增</button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="articleGrid" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChat/mateMgr/getArticelPage" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                        <div field="title" width="220" headerAlign="center" align="left" allowSort="flase" align="left">标题</div>
+                        <div field="description" width="100%" headerAlign="center" align="left" allowSort="flase" align="left">描述</div>
+                        <div field="" width="100" headerAlign="center" allowSort="true" renderer="renderType" align="center">类型</div>
+                        <div field="publishDate" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                             align="center">发布时间
+                        </div>
+                        <div field="" width="115" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+    var data;
+    mini.parse();
+    var grid = mini.get("articleGrid");
+    //重置 datagrid 高度
+    grid.load({dataFlag: 1});
+    Ls.mini_datagrid_height(grid, 120);
+    $(document).ready(function () {
+
+    })
+
+    function renderType(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.type == 1) {
+            str = "图文";
+        } else if (rec.type == 2) {
+            str = "原文链接";
+        }
+        return str;
+    }
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<button id="" class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.id + ')">修 改</button> '
+            + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="deleteArt(' + rec.id + ',\'' + rec.mediaId + '\')">删 除</button>';
+        return str;
+    }
+
+    function addArticle() {
+        Ls.openWin("/weChat/pushMsg/editArticle", {
+            width: '760px',
+            height: '540px',
+            lock: true,
+            title: '新增素材',
+        });
+    }
+
+    function edit(id) {
+        Ls.openWin("/weChat/mateMgr/editArticle?id=" + id, {
+            width: '760px',
+            height: '550px',
+            lock: true,
+            title: '修改素材',
+        });
+    }
+
+    function deleteArt(id, mateId) {
+        if (confirm("确定删除？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    mateId: mateId
+                },
+                url: "/weChat/mateMgr/deleteArt",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("删除失败");
+                    } else {
+                        Ls.tipsOk("删除成功");
+                        grid.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    function search() {
+        var name = $("#searchKey").val()
+        grid.load({title: name, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+
+</script>

@@ -1,0 +1,403 @@
+<style>
+    #public_content_form span.required {
+        color: #da1202;
+    }
+
+    #public_class_content {
+        background: #dae6f0 !important;
+    }
+
+    ul.vztree li span.button.switch {
+        margin-right: 5px
+    }
+
+    ul.vztree li ul {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    ul.vztree ul ul li {
+        display: inline-block;
+        white-space: normal
+    }
+
+    ul.vztree > li > ul > li {
+        display: inline-block;
+        padding: 5px
+    }
+
+    ul.vztree > li {
+        padding: 3px 10px;
+    }
+
+    ul.vztree li {
+        white-space: normal !important
+    }
+
+    ul.vztree > li > a > span {
+        font-size: 15px;
+        font-weight: 700
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full {
+        background-position: -15px 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full_focus {
+        background-position: -15px -21px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full {
+        background-position: 0 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full_focus {
+        background-position: 0px -20px;
+    }
+
+    ul.vztree li a.curSelectedNode {
+        border: none;
+        height: auto;
+        background: none;
+        padding-top: 1px;
+    }
+
+</style>
+#set($hasEdit=$shiro.hasPublicButton("edit"))
+#set($hasPublish=$shiro.hasPublicButton("publish"))
+#if("$!{type}" == "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG")
+<div id="public_synMsgCat_content"
+     style="display:none;position: absolute; z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: hidden;background-color: InactiveBorder">
+    <ul id="public_synMsgCat_tree" class="ztree"></ul>
+</div>
+#end
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">文章信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+            <form role="form" id="public_content_form" ms-controller="public_content_form">
+                <table class="table table-bordered public-info-table">
+                    <tbody #if("$!{type}" != "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG")class="th100"#end>
+                    <tr>
+                        <th><span class="required">*</span>标题：</th>
+                        <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control"></td>
+                    </tr>
+                        #if("$!{type}" == "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG")
+                        <tr>
+                            <th><span class="required">*</span>所属分类：</th>
+                            <td>
+                                <div class="input-group">
+                                    <div id="public_class_content"
+                                         style="display:none; position: absolute; top:34px; left:0px; min-height: 156px; z-index: 10000; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                                        <ul id="public_class_tree" class="ztree vztree"></ul>
+                                    </div>
+
+                                    <input id="public_classIds" type="hidden" name="classIds" ms-duplex="classIds"
+                                           class="form-control"/>
+                                    <input id="public_classParentIds" type="hidden" name="parentClassIds"
+                                           ms-duplex="parentClassIds" class="form-control"/>
+                                    <input id="public_classNames" type="text" ms-duplex="classNames" name="classNames"
+                                           class="form-control readonly" readonly onclick="showTree('public_class')"/>
+
+                                    <div class="input-group-btn">
+                                        <button id="public_class_btn" class="btn btn-default btn-default-upload"
+                                                type="button" onclick="showTree('public_class')"><i
+                                            class="fa fa-caret-down"></i></button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 索引号：</th>
+                            <td><input type="text" name="indexNum" ms-duplex="indexNum" placeholder="组织机构编码/年月-流水号(5位)"
+                                       class="form-control readonly"
+                                       readonly></td>
+                        </tr>
+                        <tr>
+                            <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 文号：</th>
+                            <td><input type="text"#if("$!{verify}" == "0")data-rule="文号:required;length(~100)"
+                                       data-msg-length="文号最多填写100个字符" #end name="fileNum" ms-duplex="fileNum"
+                                       class="form-control"></td>
+                        </tr>
+                        #end
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 关键词：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="关键词:required;length(~300)"
+                                   data-msg-length="关键字最多填写300个字符" #end name="keyWords" ms-duplex="keyWords"
+                                   id="keyWords" class="form-control"></td>
+                    </tr>
+                    #*
+                    <tr>
+                        <th>内容概述：</th>
+                        <td><textarea class="form-control" name="summarize" ms-duplex="summarize" id="summarize" rows="3" placeholder="内容概述"></textarea></td>
+                    </tr>
+                    *#
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 作者：</th>
+                        <td>
+                            <input type="text"#if("$!{verify}" == "0")data-rule="作者:required;length(~10)"
+                                   data-msg-length="作者最多填写10个字符" #end name="author" id="author" ms-duplex="author"
+                                   class="form-control" placeholder="" maxlength="20"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 来源：</th>
+                        <td>
+                            <div class="input-group" id="resMark">
+                                <input type="text"#if("$!{verify}" == "0")data-rule="来源:required;length(~30)"
+                                       data-msg-length="来源最多填写30个字符" #end id="resources" name="resources"
+                                       ms-duplex="resources" class="form-control"
+                                       onclick="publicContentEdit.getResource()" maxlength="80"/>
+                                <div class="input-group-btn">
+                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                            onclick="publicContentEdit.getResource()">
+                                        <i class="fa fa-caret-down" id="select_icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 发文日期：</th>
+                        <td><input type="datetime" id="publishDate" name="publishDate" ms-duplex="publishDate"
+                                   class="form-control readonly" #if("$!{verify}" == "0")
+                                   data-rule="发布日期:required;" #end
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>排序日期：</th>
+                        <td>
+                            <input type="datetime" id="sortDate" ms-duplex="sortDate" class="form-control readonly"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 生效日期：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="生效日期:required;length(~100)"
+                                   data-msg-length="生效日期最多填写100个字符"#end name="effectiveDate" ms-duplex="effectiveDate"
+                                   class="form-control"/></td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 废止日期：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="废止日期:required;length(~100)"
+                                   data-msg-length="废止日期最多填写100个字符" #end name="repealDate" ms-duplex="repealDate"
+                                   class="form-control"/></td>
+                    </tr>
+                    <tr>
+                        <th>属性：</th>
+                        <td colspan="2">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" #if("$!{isLink}" == "true") checked #end id="isLink"
+                                       class="publishBtn" value="1">是否跳转
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr id="OutLink" #if("$!{isLink}" == "false") class="hide" #end>
+                        <th>跳转地址：</th>
+                        <td>
+                            <input type="text" id="redirectLink" name="redirectLink" ms-duplex="redirectLink"
+                                   class="form-control" placeholder="请输入地址">
+                        </td>
+                    </tr>
+
+                    <tr id="checkWords" #if("$!{isLink}" == "true") class="hide" #end>
+                        <th>内容过滤：</th>
+                        <td>
+                            <button class="btn btn-default btn-reset" id="errorWords" type="button"
+                                    onclick="contentCheck('EASYERR')">易错词检测
+                            </button>
+                            <button class="btn btn-default btn-reset" id="senWords" type="button"
+                                    onclick="contentCheck('SENSITIVE')">敏感词检测
+                            </button>
+                            <button class="btn btn-default btn-reset" id="hotWords" type="button"
+                                    onclick="contentCheck('HOT')">热词检测
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="edit_content" #if("$!{isLink}" == "true") class="hide" #end>
+                        <th style="vertical-align: top;"><span class="required">*</span>内容：</th>
+                        <td colspan="2">
+                            <textarea id="public-info-content" readonly name="content" ms-duplex="content"
+                                      style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            #if($hasPublish && $hasEdit)
+                                <button class="publishBtn btn btn-default btn-save-release" type="button"
+                                        id="saveAndPublish">保存并发布
+                                </button>
+                            #end
+                            #if($hasEdit)
+                                <button class="editBtn btn btn-default btn-save" type="button" id="savePublicContent">保
+                                    存
+                                </button>
+                            #end
+                            #if("$!{type}" != "PUBLIC_GUIDE")
+                                <button class="btn btn-default btn-reset" type="button" onclick="goBack()">返 回</button>
+                            #end
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/public/class_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/organ_catalog_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/column_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_content_edit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/contentCheck.js"></script>
+<script>
+    var referNews = false;
+    $(document).ready(function () {
+        cur.videoStatus = 100; //默认无视频
+        cur.isLink = "$!{isLink}";
+        cur.redirectLink = "";
+
+        //跳转点击事件
+        $("#isLink").click(function () {
+            checkContentMode();
+            if ($("#isLink").is(':checked')) {
+                $("#OutLink").removeClass("hide");
+                $("#edit_content").addClass("hide");
+                $('#' + cur.id).validator("setField", "content", null);
+                $("#redirectLink").val(cur.redirectLink);
+                cur.isLink = true;
+            } else {
+                $("#OutLink").addClass("hide");
+                $("#edit_content").removeClass("hide");
+                $('#' + cur.id).validator("setField", "content", "内容:required;");
+                $("#redirectLink").val('');
+                cur.isLink = false;
+            }
+        });
+
+        //渲染表单对象
+        Ls.ajaxGet({
+            #if("$!{type}" == "PUBLIC_GUIDE")
+                url: "/public/content/getPublicContentByVO",
+                data: {
+                    siteId: GLOBAL_SITEID,
+                    organId: cur.organId,
+                    catId: cur.node.id
+                }
+            #else
+                url: "/public/content/getPublicContent?contentId=$!{contentId}" + "&organId=" + cur.organId
+            #end}).done(function (d) {
+            var data = d.data;
+            if ("$!{contentId}" == "") {//添加
+                data.type = cur.type;
+                data.siteId = GLOBAL_SITEID;
+                data.organId = cur.organId;
+                if ("$!{type}" == "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG" || "$!{type}" == "PUBLIC_GUIDE" || "$!{type}" == "PUBLIC_INSTITUTION") {
+                    data.catId = cur.node.id;
+                }
+            }
+            data.$id = cur.id;
+            cur.redirectLink = data.redirectLink;
+            cur.contentId = "$!{contentId}";
+            referNews = data.referNews;
+            if ("$!{contentId}" == "") {//添加
+                // 添加来源和作者
+                if (!data.author) {
+                    data.author = GLOBAL_PERSON.name;
+                }
+                if (!data.resources) {
+                    data.resources = GLOBAL_PERSON.unitName;
+                }
+                #if("$!{verify}" == "0")
+                    if (!data.effectiveDate) {
+                        data.effectiveDate = data.publishDate;
+                    }
+                    if (!data.fileNum) {
+                        data.fileNum = "无";
+                    }
+                    if (!data.repealDate) {
+                        data.repealDate = "五年";
+                    }
+                #end
+            }
+
+            // 如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[data.$id];
+            if (!cur.vm) {
+                // 绑定模型
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan(document.body, cur.vm);
+            //初始化编辑器，包括敏感词检测
+            publicContentEdit.init();
+
+            if(referNews){//引用新闻这些字段不让修改
+                $("#title").addClass("readonly");
+                $("#title").attr("readonly","readonly");
+                $("#author").addClass("readonly");
+                $("#author").attr("readonly","readonly");
+                $("#resources").addClass("readonly");
+                $("#resources").attr("readonly","readonly");
+                $("#resources").removeAttr("onclick");
+                $("#icon_btn").removeAttr("onclick");
+                $("#publishDate").removeAttr("onclick");
+
+                var timer = setInterval(function () {
+                    if (eweb.editObj.setReadOnly) {
+                        eweb.editObj.setReadOnly('2');
+                        $("#"+ eweb.editObj.IframeId).contents().find('#eWebEditor').contents().find('#eWebEditor_FixWidth_DIV').css('min-height', '470px');
+                        clearInterval(timer)
+                    }
+                }, 100)
+
+//                Ls.editor("public-info-content", {style: "Lstandard3_1", cusdir: "/" + GLOBAL_SITEID + "/" + 0});
+            }
+
+            #if("$!{type}" == "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG")
+                //加载分类
+                class_select_tree.init('public_class', data.classIds);
+            #end
+            #if("$!{type}" != "PUBLIC_GUIDE" && "$!{isLink}" == "false")
+                //内容检测
+                checkContentMode();
+            #end
+        });
+
+        //验证
+        $('#' + cur.id).validator({
+            rules: {
+                classNames: function (element, param, field) {
+                    return cur.class_select_tree_root_ids.length ==
+                        $("#public_classParentIds").val().split(",").length || '各分类每一项都必须选择至少一个';
+                }
+            },
+            fields: {
+                'title': '标题:required;length[~200]'
+                #if("$!{isLink}" == "false"), 'content': '内容:required;'#end
+                #if("$!{type}" == "DRIVING_PUBLIC" || "$!{type}" == "PUBLIC_CATALOG")
+                    , 'classNames': '所属分类:required;classNames'
+                #end
+            },
+            valid: function () {
+                /*editor.sync();*/
+                eweb.update();
+                #if("$!{type}" != "PUBLIC_GUIDE")
+                    publicContentEdit.save(function () {
+                        goBack(true);
+                    });
+                #else
+                    publicContentEdit.save();
+                #end
+            }
+        });
+    });
+</script>

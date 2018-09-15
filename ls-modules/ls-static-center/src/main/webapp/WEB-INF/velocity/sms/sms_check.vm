@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>我的收藏</title>
+    <meta name="keywords" content="{ls:keyWords /}">
+    <meta name="description" content="{ls:description /}">
+    <link rel="stylesheet" type="text/css" href="/assets/css/core-min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <script type="text/javascript" src="/assets/js/jquery-min.js"></script>
+    <script type="text/javascript" src="/assets/js/core-min.js"></script>
+</head>
+<body style="background:transparent !important;">
+<form method="post" name="smsCheck_form" id="smsCheck_form">
+    <table width="100%" class="correction-table">
+        <tbody>
+        <tr>
+            <th><span>*</span> 手机号：</th>
+            <td>
+                <input type="text" name="phone" id="phone" class="form-control" placeholder="" maxlength="11">
+                <a id="smsSend" class="c_sms" href="javascript:sendSms();">发送短信</a>
+            </td>
+        </tr>
+        <tr>
+            <th><span>*</span> 短信验证码：</th>
+            <td><input type="text" name="smsCode" id="smsCode" class="form-control" placeholder="" maxlength="6"></td>
+        </tr>
+        <tr>
+            <td colspan="4" class="btn-group">
+                <input id="smsCheck_form_btn" class="btn btn-submit" type="button" value="确定">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+    var cur={
+        siteId:'',
+        memberId:''
+    }
+    $("#smsCheck_form_btn").on('click', function () {
+        $("#smsCheck_form").trigger("validate");
+    });
+
+    $(document).ready(function () {
+        getMember();
+        using("validator", function () {
+            $("#smsCheck_form").validator({
+                fields: {
+                    phone: "手机号:required;mobile;length[~11];",
+                    smsCode: "短信验证码:required;"
+                },
+                valid: function () {
+                    saveData()
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+        });
+    })
+
+    function saveData() {
+        var data = {};
+        data.phone = $("#phone").val();
+        data.smsCode = $("#smsCode").val();
+        if(data.phone == ''){  Ls.tipsErr("手机号码不能为空！"); return; }
+        if(data.smsCode == ''){  Ls.tipsErr("验证码不能为空！"); return; }
+        return Ls.ajax({
+            url: "/member/cz/updatePhone",
+            data: data,
+            success: function (text) {
+                if (text.status == 1) {
+                    Ls.tipsOk("验证成功", {
+                        callback: function () {
+                            try {
+                                parent.Ls.dialog.get("dialog").close();
+                            } catch (e) {
+                            }
+                        }
+                    });
+                } else {
+                    Ls.tipsErr(text.desc);
+                }
+            }
+        }).always(function () {
+        });
+    }
+    function getMember() {
+        try{
+            cur.siteId= parent.cur_c.siteId;
+        }catch(e){}
+        Ls.ajax({
+            url: "/member/getMemberVO",
+            data: {},
+            success: function (text) {
+                if (text.status == 1) {
+                    var m = text.data;
+                    $("#phone").val(m.phone);
+                    cur.memberId = m.id;
+                } else {
+                    Ls.tipsErr(text.desc,{callback:function(){
+                        parent.location.href = "/member/login/"+cur.siteId;
+                    }
+                    });
+                }
+
+            }
+        }).always(function () {
+        });
+    }
+
+    function sendSms(){
+        if($('#phone').isValid()) {
+            var data = {};
+            data.phone = $("#phone").val();
+            data.memberId = cur.memberId;
+            data.siteId = cur.siteId;
+            if (data.phone == '') {
+                Ls.tipsErr("手机号码不能为空！");
+                return;
+            }
+            if (data.memberId == '') {
+                Ls.tipsErr("会员id不能为空！");
+                return;
+            }
+            Ls.tipsOk("短信发送中...");
+            var timeCount = 60, timer;
+            timer = setInterval(function () {
+                timeCount--;
+                setTimeCount(timeCount, timer);
+            }, 1000);
+            Ls.ajax({
+                url: "/member/cz/getSmsCode",
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tipsOk('短信发送成功!');
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+                setTimeCount(0, timer);
+            }).fail(function () {
+                Ls.tipsErr('短信发送失败!');
+                setTimeCount(0, timer);
+            });
+        }
+    }
+    //定时处理
+    function setTimeCount(timeCount,timer){
+        if(timeCount != 0){
+            $("#smsSend").html(timeCount);
+            $("#smsSend").attr("href","#")
+        }else{
+            $("#smsSend").html("发送短信");
+            $("#smsSend").attr("href","javascript:sendSms();")
+            clearInterval(timer);
+        }
+    }
+
+</script>
+<style>
+    .correction-table{clear:both;font-size:14px;overflow:hidden;}
+    .correction-table th{width:100px;text-align:right;padding:2px 10px 2px 0;}
+    .correction-table th span{color:#f00;}
+    .correction-table td{padding:4px 0;}
+    .correction-table td select{padding:3px 5px;border:#ddd 1px solid;}
+    .correction-table td input{height:24px;line-height:24px;width:220px;padding:0 5px;border:#ddd 1px solid;}
+    .correction-table td input#checkCode{width:100px;}
+    .correction-table td textarea{width:340px;height:120px;padding:3px 5px;border:#ddd 1px solid;}
+    .correction-table td.btn-group{padding-left:113px!important;}
+    .correction-table td.btn-group input{background:#c49044;height:30px;line-height:30px;cursor:pointer;border:0;outline:none;color:#fff;padding:0 10px;margin-right:10px;width:100px;}
+    .c_sms{ display: inline-block; padding:0 15px; height:26px; line-height:26px; background:#c49044; color:#fff; text-decoration:none;}
+    a.c_sms:hover{ color:#fff;}
+
+
+
+</style>
+<script type="text/javascript" src="/js/nav.js"></script>
+</body>
+</html>

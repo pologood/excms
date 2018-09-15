@@ -1,0 +1,204 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+    <!--<div class="portlet-title">
+      <div class="caption font-grey-silver">
+        <span class="caption-subject bold uppercase">用户列表</span>
+      </div>
+      <div class="tools"></div>
+    </div>-->
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="batchPublish(1)">批量发布</a></li>
+                            <li><a href="javascript:;" onclick="batchPublish(0)">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" onclick="deletes()">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchByType('isPublish',1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchByType('isPublish',0)">未发布</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" id="checkAll" onclick="checkAll()" class="btn btn-default btn-all-check"> 全 选</button>
+
+                    </div>
+                </div>
+                <div class="col-md-7">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <label></label>
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="评论内容">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="searchContent()">搜索</button>
+                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="guestbook_list_body" class="doc-manage">
+
+        </div>
+
+
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/content/comments/comments_mgr.js"></script>
+<script>
+    var cmm = {
+        contentId: '$!{contentId}'
+    }
+
+    $(document).ready(function () {
+        guestbook_manage.init();
+    })
+
+    //全选，取消全选
+    function checkAll() {
+        if (cur.c == 0) {
+            //alert(cur.c)
+            $("input[name='check']").prop("checked", true);
+            cur.c = 1;
+            return;
+        } else {
+            //alert(1)
+            $("input[name='check']").prop("checked", false);
+            cur.c = 0;
+            return;
+        }
+    }
+
+    //搜索
+    function searchContent() {
+        cur.content = $("#searchKey").val();
+        //alert(cur.content);
+        guestbook_manage.getData(0, cur.content, '', '')
+    }
+
+    //显示全部
+    function searchClear() {
+        cur.content = "";
+        $("#searchKey").val("");
+        cur.condition = "";
+        cur.status = "";
+        guestbook_manage.getData(0, "", '', '')
+    }
+
+
+    //改变发布状态
+    function changePublish(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                mark: 1
+            },
+            url: "/commentMgr/changStatus",
+            success: function (text) {
+                if (text.status == 1) {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("操作成功");
+                    guestbook_manage.getData(cur.pageIndex, "", "", "");
+                } else {
+                    Ls.tipsOk("操作失败");
+                }
+
+            }
+        });
+    }
+
+    //批量发布
+    function batchPublish(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        Ls.ajax({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                status: type
+            },
+            url: "/commentMgr/batchChangePublish",
+            success: function (text) {
+                if (text.status == 1) {
+                    guestbook_manage.getData(cur.pageIndex, "", "", "");
+                    Ls.tipsOk("操作成功");
+                } else {
+                    Ls.tipsOk("操作失败");
+                }
+
+            }
+        });
+    }
+
+    //属性筛选
+    function searchByType(type, status) {
+        cur.condition = type;
+        cur.status = status;
+        guestbook_manage.getData(0, cur.content, type, cur.status);
+    }
+
+    //单个删除
+    function deleteById(id) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("确定删除该评论？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: ids
+                },
+                url: "/commentMgr/deletes",
+                success: function (text) {
+                    Ls.tipsOk("删除成功");
+                    guestbook_manage.getData(0, cur.content, cur.condition, cur.status);
+                }
+            });
+        }
+    }
+
+    //批量删除
+    function deletes() {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/commentMgr/deletes",
+                success: function (text) {
+                    Ls.tipsOk("批量删除成功");
+                    guestbook_manage.getData(0, cur.columnId, cur.content, cur.condition, cur.status);
+                }
+            });
+        }
+    }
+
+
+</script>

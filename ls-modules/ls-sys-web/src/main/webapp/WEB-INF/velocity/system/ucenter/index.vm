@@ -1,0 +1,10 @@
+<!--Tabs-->
+<div id="mainTabs" class="mini-tabs" activeIndex="0" style="width:100%;height:100%;" plain="false" onactivechanged="">
+  <div title="组织管理" url="/organ/unitPage">
+  </div>
+  <div title="用户管理" url="/person/userPage">
+  </div>
+</div>
+<script>
+  mini.parse();
+</script>

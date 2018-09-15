@@ -1,0 +1,6 @@
+#foreach($eo in $resultObj)
+<li>
+    <em></em>
+    <a href="$!{eo.link}" target="$!{target}" title="$!{eo.title}">#cutstr($!{eo.title},$!{eo.length})</a>
+</li>
+#end

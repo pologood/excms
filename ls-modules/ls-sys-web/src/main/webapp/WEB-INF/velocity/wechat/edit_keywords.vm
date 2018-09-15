@@ -1,0 +1,245 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white" style=" overflow: auto;">
+<style>
+    .tr_b {
+        border: 2px solid green;
+    }
+</style>
+<table class="table table-bordered picture-table">
+    </br>
+    <tbody class="w100p">
+    <tr>
+        <th style="width:130px;">关键词：</th>
+        <td><input type="text" id="keyWords" ms-duplex="" class="form-control w300" placeholder=""></td>
+        <td></td>
+    </tr>
+    <tr>
+        <th>类 型：</th>
+        <td>
+            <div>
+                <label class="radio-inline">
+                    <input type="radio" onclick="goView()" id="viewType" name="type" value="text" ms-duplex="">文本</input>
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" onclick="goKey()" id="urlType" name="type" value="news" ms-duplex="">图文</input>
+                </label>
+            </div>
+
+        </td>
+    </tr>
+    <tr class="hide" id="w_content">
+        <th>内 容：</th>
+        <td><textarea class="form-control" id="content" name="content" style="width: 100%;height:250px; visibility: visible;"></textarea></td>
+    </tr>
+    <tr class="hide" id="w_news">
+        <th>图 文：</th>
+        <td>
+            <div style="width:310px;background-color:#F5F5F5;" id="">
+                <table align="center" width="300">
+                    <tbody id="article">
+
+                    </tbody>
+                </table>
+            </div>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cmm = {}
+    var _cmm = {}
+    _cmm.news = [];
+    cmm.artList = [];
+    var indicate = 0;
+    var id = "$!{ID}"
+    $(document).ready(function () {
+        if (id != null && id != "") {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/weChat/autoMsg/getKeywords",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("拉去数据失败");
+                    } else {
+                        //Ls.tips("保存成功",{icons:"success"});
+                        cmm = text.data;
+                        cmm.articles = [];
+                        $("#keyWords").val(cmm.keyWords);
+                        $("input[name=type][value='" + cmm.msgType + "']").attr("checked", 'checked');
+                        if (cmm.msgType == "text") {
+                            $("#w_content").removeClass("hide");
+                            $("#w_news").addClass("hide");
+                            cmm.artList = [];
+                        } else {
+                            $("#w_news").removeClass("hide");
+                            $("#w_content").addClass("hide");
+                            _cmm.news = cmm.newsList;
+                            initNews(cmm.newsList);
+                            delete cmm.newsList;
+                        }
+                        $("#content").val(cmm.content);
+                        $("#articles").val(cmm.articles);
+                    }
+                }
+            });
+        } else {
+            $("#viewType").attr("checked", true);
+            var type = $("input:radio[name='type']:checked").val();
+            if (type == "text") {
+                $("#w_content").removeClass("hide");
+            } else {
+                $("#w_news").removeClass("hide");
+            }
+
+        }
+    })
+
+    function goView() {
+        $("#w_content").removeClass("hide");
+        $("#w_news").addClass("hide");
+    }
+
+    function goKey() {
+        $("#w_news").removeClass("hide");
+        $("#w_content").addClass("hide");
+        Ls.openWin("/weChat/mateMgr/mateList", {
+            width: '550px',
+            height: '350px',
+            lock: true,
+            id: 212111,
+            title: '素材列表',
+        });
+    }
+
+    function saveEdit() {
+        cmm.keyWords = $("#keyWords").val();
+        cmm.msgType = $("input:radio[name='type']:checked").val();
+        if (cmm.keyWords.length <= 0) {
+            Ls.tipsInfo("关键词不能为空");
+            return;
+        }
+        if (cmm.msgType == "news") {
+            if (cmm.artList == '') {
+                Ls.tipsInfo("图文消息的图文不能为空");
+                return;
+            }
+        }
+        cmm.content = $("#content").val();
+        delete cmm.newsList;
+        Ls.ajax({
+            data: cmm,
+            url: "/weChat/autoMsg/saveKeywords",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败");
+                } else {
+                    Ls.tipsOk("保存成功");
+                    Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+
+                }
+            }
+        });
+    }
+
+
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            api.button(
+                {
+                    name: '保 存',
+                    callback: function () {
+                        saveEdit();
+                        return false;
+                    },
+                    focus: true
+                }
+            )
+        })
+    }
+
+
+    function initNews(articles) {
+        indicate = 0;
+        cmm.artList = [];
+        var list = "";
+        for (var i = 0; i < articles.length; i++) {
+            cmm.artList.push(articles[i].id);
+            if (indicate == 0) {
+                var title = articles[i].title;
+                var tt;
+                if (title.length > 40) title = title.substr(0, 40);
+                list += '<tr title="点击移除" id="tr_' + indicate + '" onMouseOver="mouseOver(' + indicate + ')" onMouseOut="mouseOut(' + indicate + ')" style="cursor:pointer;" onclick="removeNews(' + indicate + ')"  style="height:100px;"><td colspan="2"><div  style="margin:5px;position: relative"><img width="290" height="90" src="' + formatImgAddress(articles[i].thumbImg) + '"/>' +
+                    '<div style="width:290px;opacity:0.8;position:absolute;z-index:999;bottom:0px;background-color:gray;color:white;height:auto"> ' + title + '</div></div></td></tr>';
+                indicate++;
+            } else {
+                list += '<tr title="点击移除" id="tr_' + indicate + '"  onMouseOver="mouseOver(' + indicate + ')" onMouseOut="mouseOut(' + indicate + ')" style="cursor:pointer;" onclick="removeNews(' + indicate + ')"><td style="width:220px;"><div style="margin-left:20px">' + articles[i].title + '</div></td><td style="width:80px;"><div style="margin:5px 0"><img style="margin:5px;" width="70" height="55" src="' + formatImgAddress(articles[i].thumbImg) + '"/></div></td></tr>';
+                indicate++;
+            }
+        }
+        $("#article").html(list);
+    }
+
+    function formatImgAddress(src){
+        if(src == undefined || src == null){
+            return "";
+        }
+        if(src.indexOf("/") != -1){
+            return src;
+        }
+        if(src.indexOf(".") != -1){
+            return GLOBAL_FILESERVERNAMEPATH + src;
+        }
+        return GLOBAL_FILESERVERPATH + src;
+    }
+
+    function mouseOver(it) {
+        $("#tr_" + it).addClass("tr_b");
+    }
+
+    function mouseOut(it) {
+        $("#tr_" + it).removeClass("tr_b");
+    }
+    function getNews(e) {
+        var rec = e.record;
+        _cmm.news.push(rec);
+        cmm.artList.push(e.record.id);
+        var list = "";
+        if (indicate == 0) {
+            list = '<tr title="点击移除" id="tr_' + indicate + '"  onMouseOver="mouseOver(' + indicate + ')" onMouseOut="mouseOut(' + indicate + ')" style="cursor:pointer;"  onclick="removeNews(' + indicate + ')"  style="height:100px;"><td colspan="2"><div style="margin:5px;"><img width="290" height="90" src="' + formatImgAddress(rec.thumbImg) + '"/>' +
+                '<div style="width:290px;opacity:1;position:relative;z-index:999;bottom:0px;background-color:gray;color:white;height:auto"> ' + rec.title + '</div></div></td></tr>';
+            indicate++;
+        } else if (indicate > 0 && indicate < 9) {
+            list = '<tr title="点击移除" id="tr_' + indicate + '"  onMouseOver="mouseOver(' + indicate + ')" onMouseOut="mouseOut(' + indicate + ')" style="cursor:pointer;" onclick="removeNews(' + indicate + ')"><td style="width:220px;"><div style="margin-left:20px">' + rec.title + '</div></td><td style="width:80px;"><div style="margin:5px 0"><img style="margin:5px;" width="70" height="55" src="' + formatImgAddress(rec.thumbImg) + '"/></div></td></tr>';
+            indicate++;
+        } else {
+            return "error";
+        }
+        $("#article").append(list);
+        $("#newsList").val(cmm.artList)
+        return "ok";
+    }
+
+    Array.prototype.baoremove = function (dx) {
+        if (isNaN(dx) || dx > this.length) {
+            return false;
+        }
+        this.splice(dx, 1);
+    }
+
+    function removeNews(indicate) {
+        _cmm.news.baoremove(indicate);
+        cmm.artList.baoremove(indicate);
+        initNews(_cmm.news);
+    }
+</script>

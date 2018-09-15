@@ -1,0 +1,200 @@
+#parse("_page_layout/_header.vm")
+<style>
+    th {
+        text-align: right;
+    }
+</style>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:5px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">留言信息</a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">留言回复</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" style="overflow:auto;height:530px">
+                <div class="tab-pane active" id="tab_1_1">
+                    <table class="table table-bordered picture-table">
+                        <tbody class="w100p">
+                        <tr>
+                            <th>所属类型：</th>
+                            <td><input type="text" id="typeCode" ms-duplex="typeCode" #if($!{typeCode}=="guestBook") value="留言管理" #esle value="$!{typeCode}" #end class="form-control" placeholder=""></td>
+                        </tr>
+                       <tr>
+                            <th>标题：</th>
+                            <td colspan="3"><input type="text" id="title" ms-duplex="title" value="$!{eo.title}" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>留言人：</th>
+                            <td><input type="text" id="personName" ms-duplex="personName" value="$!{geo.personName}" class="form-control" placeholder=""></td>
+                            <th>联系方式：</th>
+                            <td><input type="text" id="personPhone" ms-duplex="personPhone" value="$!{geo.personPhone}" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>留言时间：</th>
+                            <td><input type="datetime" id="createDate" ms-duplex="createDate" value="$!{eo.createDate}" class="form-control"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly></td>
+                            <th>提交IP：</th>
+                            <td><input type="text" id="personIp" ms-duplex="personIp" value="$!{geo.personIp}" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>留言内容：</th>
+                            <td><textarea class="form-control" style="" id="guestBookContent" name="guestBookContent" rows="8" placeholder="" ms-duplex="guestBookContent">$!{geo.guestBookContent}</textarea></td>
+						</tr>
+                        </tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane" id="tab_1_2">
+                    <table class="table table-bordered picture-table">
+                        <tbody>
+                       <!--<tr>
+                            <th>回复状态：</th>
+                            <td>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="enableStatus" ms-duplex-number="isResponse"
+                                                       #if($!{geo.isResponse}==1)checked="true" #end value="1"> 已回复
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="enableStatus" ms-duplex-number="isResponse"
+                                                       #if($!{geo.isResponse}==0)checked="true" #end value="0"> 未回复
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>-->
+                        <tr>
+                            <th>发布状态：</th>
+                            <td>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isPublish" ms-duplex-number="isPublish"
+                                                       #if($!{eo.isPublish}==1)checked="true" #end value="1"> 已发布
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isPublish" ms-duplex-number="isPublish"
+                                                       #if($!{eo.isPublish}==0)checked="true" #end value="0"> 未发布
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>回复时间：</th>
+                            <td><input type="replyDate" id="replyDate" ms-duplex="replyDate" value="$!{geo.replyDate}" class="form-control" style="width:250px;"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly></td>
+                        </tr>
+                        <tr>
+                            <th>回复内容：</th>
+                            <td><textarea class="form-control" id="responseContent" name="responseContent" rows="8" placeholder="" ms-duplex="responseContent">$!{geo.responseContent}</textarea></td>
+                        </tr>
+						<tr>
+                            <th></th>
+                            <td colspan="2">
+                                <button class="publishBtn btn btn-default btn-save-release" onclick" type="button" onclick="saveAndPublish()"> 保存并发布</button>
+                                <button class="btn btn-default btn-save" type="button" onclick="detailSave()"> 保 存</button>
+                              <!--<button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>-->
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+function detailSave(){
+        //var pageIndex ='${pageIndex}';
+		var id = '${id}';
+		var title = $("#title").val();
+		var personName = $("#personName").val();
+		var personPhone = $("#personPhone").val();
+		//var guestBookTime = $("#guestBookTime").val();
+		var personIp = $("#personIp").val();
+		var guestBookContent = $("#guestBookContent").val();
+		var createDate=$("#createDate").val();
+		var replyDate = $("#replyDate").val();
+		var responseContent = $("#responseContent").val();
+		
+        var data = {
+		    id:id,
+            title: title,
+            personName: personName,
+            personPhone: personPhone,
+			createDate:createDate,
+			personIp:personIp,
+			guestBookContent:guestBookContent,
+			replyDate:replyDate,
+			responseContent:responseContent,
+        };
+		//Ls.log(data)	
+		
+        Ls.ajax({
+            data:data,
+            url: "/unAuditContent/detailSave",
+            success: function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                Ls.winClose();
+                Ls.getWin.win.grid.reload();
+            }			
+            }
+
+        });		
+    }
+	
+	//保存并发布
+	function saveAndPublish(){
+        //var pageIndex ='${pageIndex}';
+		var isPublish = 1;
+		var id = '${id}';
+		var title = $("#title").val();
+		var personName = $("#personName").val();
+		var personPhone = $("#personPhone").val();
+		//var guestBookTime = $("#guestBookTime").val();
+		var personIp = $("#personIp").val();
+		var guestBookContent = $("#guestBookContent").val();
+		var createDate=$("#createDate").val();
+		var replyDate = $("#replyDate").val();
+		var responseContent = $("#responseContent").val();
+		
+        var data = {
+		    id:id,
+            title: title,
+            personName: personName,
+            personPhone: personPhone,
+			createDate:createDate,
+			personIp:personIp,
+			guestBookContent:guestBookContent,
+			replyDate:replyDate,
+			responseContent:responseContent,
+			isPublish:isPublish,
+        };
+		//Ls.log(data)	
+		//Ls.log(isPublish)	
+        Ls.ajax({
+            data:data,
+            url: "/unAuditContent/detailSave",
+            success: function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                Ls.winClose();
+                Ls.getWin.win.grid.reload();
+            }			
+            }
+
+        });		
+    }
+</script>

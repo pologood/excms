@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>专题设计器</title>
+    <!-- <link rel="stylesheet" href="lib/artdialog/artdialog-min.css"> -->
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/css/custom-min.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/res/ui/miniui/3.2/themes/default/miniui.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/design/pkg/common-designer.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/res/editor/kindeditor/4.1.10/themes/default/default.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/design/static/lib/sui/css/sui.min.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/design/static/lib/sui/css/sui-append.min.css"/>
+    <link rel="stylesheet" href="$!{frontStaticPath}/assets/design/pkg/common.css"/>
+    <style>
+        html, body {
+            overflow: hidden
+        }
+
+        .aui_content {
+            display: block !important;
+            height: 100%;
+        }
+
+        .page-title {
+
+            width: 180px;
+            text-align: center;
+        }
+
+        .designer .topbar td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .designer .topbar td .item {
+            color: #fff;
+            /*border: 1px solid #F0F0F0;*/
+            height: 55px;
+            width: 80px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+
+        .designer .topbar td .item:hover,
+        .designer .topbar td .item-sub a.item-icon:hover,
+        .designer .tdcon .item-sub a.item-icon:hover {
+            color: #333;
+            background-color: #67AFF7;
+            /*border: 1px solid #C9CACD;*/
+            text-decoration: none;
+        }
+
+        .designer .item-active {
+            background-color: #67AFF7;
+            /*border: 1px solid #cfbc1a!important;*/
+            text-decoration: none;
+        }
+
+        .designer .topbar td .item-text {
+            text-decoration: none;
+        }
+
+        .designer .topbar td .item-sub {
+            color: #333;
+        }
+
+        /*.topbar td .item-sub *{vertical-align: middle;}*/
+        .designer .topbar td .item-sub .item-text {
+            display: inline-block;
+            width: 25px;
+        }
+
+        .designer #north {
+            overflow: visible !important
+        }
+
+        .designer #north .mini-layout-region-body {
+            overflow: inherit !important
+        }
+
+        .designer .ls-select-page {
+
+        }
+
+        .designer .ls-select-page .dropdown-inner {
+            background: #fff;
+        }
+
+    </style>
+</head>
+<body class="designer">
+<div id="layout1" class="mini-layout" style="width:100%;*width:auto;height:100%;overflow: hidden">
+    <!-- 顶部导航 -->
+    <div title="north" region="north" class="app-header" bodyStyle="overflow:hidden; background:#57a3f1" height="83" splitSize="5" showHeader="false" showSplit="false">
+
+
+        <table height="80" style="width: 1080px;">
+            <tr>
+                <td valign="middle" class="page-title">
+                    <h3 style="font-size:26px; color:#FFF; font-weight: bold; font-family: Microsoft YaHei, 微软雅黑 ">专题设计</h3>
+
+                </td>
+                <td class="tl" style="padding-left:10px; vertical-align:middle; text-align: center" valign="middle">
+
+                    <table class="topbar" id="topbar">
+                        <tr>
+                            <td valign="middle" rowspan="2"><img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/vline.png" alt=""></td>
+                            <td valign="middle" rowspan="2"><!-- <img src="imgs/vline.png" alt=""> --></td>
+                            <td style="padding-left:5px;">
+
+                        <span id="ztPages" class="sui-dropdown dropdown-bordered select dropdown-xlarge ls-select-page">
+                            <span class="dropdown-inner">
+                                <a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                                    <input value="首页" name="pageName" type="hidden"><i class="caret"></i><span>首页</span>
+                                </a>
+                                <ul role="menu" class="sui-dropdown-menu">
+                                    <li role="presentation" v-for="(el,index) in menus"><a role="menuitem" tabindex="-1" href="javascript:void(0);" :value="el.name"
+                                                                                           v-on:click="goTemplate(el)">{{el.name}}</a></li>
+                                    <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="列表页">列表页</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="阅读页">阅读页</a></li> -->
+                                </ul>
+                            </span>
+                        </span>
+                                <!--sui-dropdown-->
+                            </td>
+
+                            <td style="padding-left:5px;">
+                                <a class="item" title="保存" id="topIcon_saveForm">
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/keep.png" alt="">
+                                    <div>保存</div>
+                                </a>
+                            </td>
+                            <td style="padding-right:5px;">
+                                <a class="item" title="撤消" id="topIcon_historyUndo">
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/revoke.png" alt="">
+                                    <div>撤消</div>
+                                </a>
+                            </td>
+                            <td style="padding-right:5px;">
+                                <a class="item" title="预览" id="topIcon_preview">
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/preview.png" alt="">
+                                    <div>预览</div>
+                                </a>
+                            </td>
+
+                            <td valign="middle" rowspan="2"><img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/vline.png" alt=""></td>
+
+                            <!--<td style="padding-right:5px;">-->
+                            <!--<a class="item" title="组件" id="topIcon_module">-->
+                            <!--<img src="./imgs/module.png" alt="">-->
+                            <!--<div>组件</div>-->
+                            <!--</a>-->
+                            <!--</td>-->
+
+                            <td style="padding-right:5px;">
+                                <a class="item" title="布局" id="topIcon_layout">
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/document.png" alt="">
+                                    <div>布局</div>
+                                </a>
+                            </td>
+
+                            <td style="padding-right:5px;">
+                                <a class="item" title="皮肤" id="topIcon_theme"
+
+                                   data-placement="bottom"
+                                >
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/title.png" alt="">
+                                    <div>皮肤</div>
+                                </a>
+                            </td>
+
+                            <td style="padding-right:5px;">
+                                <a class="item" title="背景" id="topIcon_background">
+                                    <img src="$!{frontStaticPath}/assets/design/static/dev-include/main-index-layout-north/imgs/background.png" alt="">
+                                    <div>背景</div>
+                                </a>
+                            </td>
+
+                            <td style="padding-right:5px;" class="dn">
+                                <a class="item" title="测试数据快速导入" id="topIcon_testDataImport">
+
+                                    <div>测试数据快速导入</div>
+                                </a>
+                            </td>
+
+                        </tr>
+
+
+                        <!--<tr>-->
+                        <!--<td class="gray" align="center" colspan="3">表单</td>-->
+                        <!---->
+                        <!---->
+                        <!---->
+                        <!--</tr>-->
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div> <!-- north -->
+
+    <!-- 左侧区域 -->
+    <!--<div region="west" title="" showHeader="true" bodyStyle="background:#F0F0F0; " showSplitIcon="true"  splitSize="6"  width="140"  showSplit="true">-->
+    <!--</div> &lt;!&ndash; west &ndash;&gt;-->
+
+    <!-- 主内容区域 -->
+    <div title="center" region="center" style="border:0; " bodyStyle="width:100%;height:100%;overflow: hidden">
+        <!--<iframe src="page/tpl2/index.html?t=design" id="mainIframe" frameborder="0" name="mainIframe" style="width:100%;height:100%;overflow: hidden" border="0"></iframe>-->
+        <iframe src="about:blank" id="mainIframe" frameborder="0" name="mainIframe" style="width:100%;height:100%;" border="0"></iframe>
+    </div> <!-- center -->
+</div> <!-- mini-layout -->
+
+
+<script data-framework src="$!{frontStaticPath}/assets/design/static/lib/jquery.min.js"></script>
+<script src="$!{frontStaticPath}/assets/design/pkg/common-designer.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/design/pkg/designer.js"></script>
+<script>
+    var GLOBAL_SITEID = "$!{site.indicatorId}";
+    var GLOBAL_SESSIONID = "$!{sessionId}";
+    var GLOBAL_SITENAME = "$!{site.name}";
+    var GLOBAL_SITEURI = '$!{site.uri}';
+    var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+    var GLOBAL_FILESERVERPATH = "$!{fileServerPath}";
+    var GLOBAL_FILESERVERNAMEPATH = "$!{fileServerNamePath}";
+    var GLOBAL_HTMLFILEPATH = "$!{site.uri}";
+    var GLOBAL_PERSON = '#if("$!{person}" != "")$!{person}#else{}#end';
+    var GLOBAL_RIGHTS = "$!{rightsCode}";
+    var OPT_SPLIT = "|";
+    var GLOBAL_SITETYPE = "$!{site.type}";
+</script>
+<script src="$!{frontStaticPath}/assets/res/ui/miniui/3.2/miniui.js"></script>
+<script src="$!{frontStaticPath}/assets/js/core-min.js"></script>
+<script src="$!{frontStaticPath}/assets/res/editor/kindeditor/4.1.10/kindeditor.min.js"></script>
+<script src="$!{frontStaticPath}/assets/res/editor/kindeditor/4.1.10/lang/zh_CN.js"></script>
+<script>
+    //require.async('./widget/app/index.js');
+    // 定义设计器中的引用名称,必须叫rootApp
+    // 在模板iframe中会引用rootApp这个名称
+    var rootApp = require('app/entry/main-index');
+    $.Site.init(rootApp);
+</script>
+</body>
+</html>

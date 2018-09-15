@@ -1,0 +1,96 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="manufacturer_form" role="form" ms-controller="manufacturer_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>厂商名称</label>
+                            <input type="text" name="name" class="form-control" placeholder="" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>产品版本</label>
+                            <input type="text" name="productName" class="form-control" placeholder=""
+                                   ms-duplex="productName">
+                        </div>
+                        <div class="form-group">
+                            <label>唯一编码</label>
+                            <input type="text" name="uniqueCode" class="form-control" placeholder=""
+                                   ms-duplex="uniqueCode">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "manufacturer_form",
+        manufacturerId: '$!{manufacturerId}'
+    };
+    $(document).ready(function () {
+        Ls.ajaxGet({
+            url: "/manufacturer/getManufacturer",
+            data: {
+                id: cur.manufacturerId
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                cur.$id = cur.id;
+                data.$id = cur.$id;
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels[data.$id];
+                if (!cur.vm) {
+                    //绑定模型
+                    cur.vm = avalon.define(data);
+                }
+                avalon.scan($("#" + cur.id).get(0), cur.vm);
+            } else {
+                Ls.tipsErr("加载数据失败!");
+            }
+        });
+        //验证
+        $('#' + cur.id).validator({
+            fields: {
+                'name': '厂商名称:required;',
+                'productName': '产品名称:required;',
+                'uniqueCode': '唯一编码:required;'
+            },
+            valid: function () {
+                var me = this;
+                // 提交表单之前，hold住表单，防止重复提交
+                me.holdSubmit();
+                var data = Ls.toJSON(cur.vm.$model);
+                Ls.ajax({
+                    url: "/manufacturer/saveOrUpdate",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips('操作成功!', {
+                            icons: "success", callback: function () {
+                                Ls.getWin.api.close();
+                                Ls.getWin.win.cur.grid.reload();
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                me.holdSubmit(false);
+                            }
+                        });
+                    } else {
+                        Ls.tips(d.desc, {
+                            icons: "error",
+                            callback: function () {
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                                me.holdSubmit(false);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>

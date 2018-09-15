@@ -1,0 +1,6 @@
+#set($eo=$resultObj)
+#if($eo=="0"||$eo=="1")
+    $message
+#else
+    #parse("guestBookInfo.vm")
+#end

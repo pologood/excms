@@ -1,0 +1,462 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .select-control {
+        /*background-color: #fff;*/
+        /*background-image: none;*/
+        border: 1px solid #c2cad8;
+        /*border-radius: 4px;*/
+        /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+        color: #4d6b8a;
+        /*display: block;*/
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;*/
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="msg_info_form" ms-controller="msg_info_form">
+                    <div class="form-body">
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th><font style="font-family: verdana, sans-serif;color: #FF0303;font-size: 16px;font-weight: bold;">警告:</font></th>
+                                <td>
+                                    <font style="font-family: verdana, sans-serif;color: #FF0303;font-size: 15px;font-weight: bold;">切勿在本系统中传输涉密文件或涉密信息</font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>标题：</th>
+                                <td>
+                                    <input type="text" name="id" class="form-control" style="display: none"
+                                           ms-duplex="id">
+                                    <input type="text" id="title" name="title" maxlength="40" class="form-control"
+                                           data-rule="必填项:required;title" placeholder="标题名称" ms-duplex="title">
+                                </td>
+                                <td class="w300" rowspan="7">
+                                    <div class="thumb_layout">
+                                        <div id="pic_upload" class="thumb" onclick="uploadPic()" title="缩略图只显示于网站首页或频道页中图片部分。&#10;如果要在正文中显示图片，请在“编辑文章”的编辑器中上传图片。">
+                                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt=""
+                                                 id="imageLink"/>
+                                        </div>
+                                        <div class="thum-delete" id="delImg" onclick="deletePic()" title="删除"><i
+                                            class="fa fa-trash"></i></div>
+                                        <div class="thum-upload" id="uploadImg" onclick="uploadPic()" title="上传"><i
+                                            class="fa fa-upload"></i></div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>报送人：</th>
+                                <td>
+                                    <input type="text" id="provider" maxlength="20" readonly name="provider" class="form-control readonly"
+                                           data-rule="必填项:required;provider" placeholder="报送人" ms-duplex="provider">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>所属单位：</th>
+                                <td>
+                                    <input type="text" id="submitUnitName" maxlength="20" readonly name="submitUnitName" class="form-control readonly"
+                                           data-rule="必填项:required;submitUnitName" placeholder="报送单位" ms-duplex="submitUnitName">
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>作者：</th>
+                                <td>
+                                    <input type="text" id="author" name="author" maxlength="20" ms-duplex="author"
+                                           class="form-control" placeholder=""/>
+                                </td>
+                                <th>发布日期：</th>
+                                <td>
+                                    <input type="datetime" id="publishDate" ms-duplex="publishDate"
+                                           class="form-control readonly"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})"
+                                           readonly/>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>来源：</th>
+                                <td>
+                                    <div class="input-group" id="resMark">
+                                        <input type="text" id="sources" maxlength="20" name="sources"
+                                               class="form-control" ms-duplex="sources" placeholder=""/>
+
+                                        <div class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload"
+                                                    type="button" onclick="showRes()">
+                                                <i class="fa fa-caret-down" id="select_icon"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">报送栏目:</td>
+                                <td>
+                                    <textarea name="sources" id="column_select_lable" class="form-control readonly" readonly rows="2" onclick="columnsSelect()"
+                                              data-rule="必填项:required;sources"   placeholder="点击选择报送栏目，如不清楚报送至哪个栏目，请选择市政府网站下【其他栏目(信息报送专用)】"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right">传阅对象:</td>
+                                <td>
+                                    <textarea id="user_select_lable" class="form-control readonly" rows="2" readonly onclick="usersSelect()"
+                                              placeholder="点击选择传阅对象"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">编辑文章：</th>
+                                <td colspan="2">
+                                    <textarea id="content" name="content" style="width: 100%;height: 350px;"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "msg_info_form",
+        form: $('#msg_info_form'),
+        type: Ls.getWin.dialog.data("type"),
+        publishDate: $('#publishDate'),
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        dialog: Ls.getWin.dialog,
+        record: Ls.getWin.dialog.data("record") || {}
+    };
+
+    $(document).ready(function () {
+        initKindEditor();
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+                provider: cur.win.GLOBAL_PERSON.name,
+                submitUnitName: cur.win.GLOBAL_PERSON.unitName,
+                sources: cur.win.GLOBAL_PERSON.unitName,
+                publishDate: Ls.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss")
+            });
+
+            $("#provider").addClass("readonly");
+            $("#provider").attr("disabled", true);
+
+            $("#submitUnitName").addClass("readonly");
+            $("#submitUnitName").attr("disabled", true);
+        } else {
+
+            if (cur.record.status == 2) {
+                $("#title").addClass("readonly");
+                $("#title").attr("disabled", true);
+
+                $("#author").addClass("readonly");
+                $("#author").attr("disabled", true);
+
+                $("#provider").addClass("readonly");
+                $("#provider").attr("disabled", true);
+
+                $("#submitUnitName").addClass("readonly");
+                $("#submitUnitName").attr("disabled", true);
+
+                $("#publishDate").addClass("readonly");
+                $("#publishDate").attr("disabled", true);
+
+                $("#sources").addClass("readonly");
+                $("#sources").attr("disabled", true);
+
+                $("#pic_upload").attr("onclick", "");
+                $("#delImg").attr("onclick", "");
+                $("#uploadImg").attr("onclick", "");
+
+                //cur.editor.readonly();
+            }
+
+            cur.model = cur.record;
+            cur.model.submitUnitName = cur.win.GLOBAL_PERSON.unitName;
+            if (typeof cur.model.publishDate == 'object') {
+                cur.model.publishDate = Ls.dateFormat(cur.model.publishDate, "yyyy-MM-dd hh:mm:ss")
+            }
+            //cur.editor.html(cur.model.content);
+            cur.eweb.setHtml(cur.model.content);
+        }
+        setData(cur.model);
+
+        var columnHnEOs = cur.model.columnHnEOs;
+        if (columnHnEOs && columnHnEOs.length > 0) {
+            cur.vm.columnsList = [];
+            var name = "";
+            for (var i = 0; i < columnHnEOs.length; i++) {
+                var column = {
+                    siteId: columnHnEOs[i].siteId,
+                    siteName: columnHnEOs[i].siteName,
+                    id: columnHnEOs[i].columnId,
+                    name: columnHnEOs[i].columnName,
+                    organId: columnHnEOs[i].organId,
+                    code: columnHnEOs[i].code,
+                    type: columnHnEOs[i].columnTypeCode
+                };
+                cur.vm.columnsList.push(column);
+                var j = i + 1;
+                if ("" == name) {
+                    name = "【" + j + "】" + columnHnEOs[i].siteName + " >> " + columnHnEOs[i].columnName;
+                } else {
+                    name += "\r\n" + "【" + j + "】" + columnHnEOs[i].siteName + " >>" + columnHnEOs[i].columnName;
+                }
+            }
+            $('#column_select_lable').val(name);
+        }
+
+        var userHnEOs = cur.model.userHnEOs;
+        if (userHnEOs && userHnEOs.length > 0) {
+            cur.vm.usersList = [];
+            var userNames = "";
+            for (var i = 0; i < userHnEOs.length; i++) {
+                var user = {name: userHnEOs[i].name, userId: userHnEOs[i].userId, organId: userHnEOs[i].organId, unitId: userHnEOs[i].unitId};
+                cur.vm.usersList.push(user);
+                if ("" == userNames) {
+                    userNames = userHnEOs[i].name;
+                } else {
+                    userNames += "," + userHnEOs[i].name;
+                }
+            }
+            $('#user_select_lable').val(userNames);
+        }
+
+        if (cur.vm.imageLink != null) {
+            $("#imageLink").attr("src", (cur.vm.imageLink.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + cur.vm.imageLink)
+            $("#uploadImg").hide();
+        }
+
+        cur.api.button({
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    eweb.update();
+                    saveData();
+                    return false;
+                }
+            }, {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+    })
+
+    function showRes() {
+        Ls.dropDowns('resMark', {
+            css: {
+                overflow: "auto"
+            },
+            ajax: {
+                url: "/msg/submit/msgFrom"
+            },
+            html: function (formId, d) {
+                var h = [];
+                for (var i = 0, l = d.length; i < l; i++) {
+                    h.push('<li><a href="javascript:void(0)">' + d[i].key + '</a></li>')
+                }
+                return h.join("")
+            }
+        })
+    }
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    /**
+     * 保存数据
+     */
+    function saveData() {
+        cur.vm.status = 0;
+        if (!cur.form.isValid()) {
+            return;
+        }
+        if (cur.type == 'add') {
+            url = "/msg/submit/hn/saveEntity"
+        } else {
+            url = "/msg/submit/hn/updateEntity"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                title: cur.vm.title,
+                provider: cur.vm.provider,
+                submitUnitName: cur.vm.submitUnitName,
+                author: cur.vm.author,
+                sources: cur.vm.sources,
+                imageLink: cur.vm.imageLink,
+                status: cur.vm.status,
+                backReason: cur.vm.backReason,
+                publishDate: cur.publishDate.val(),
+                //content: cur.editor.html(),
+                content: cur.eweb.getHtml(),
+                siteId: cur.win.GLOBAL_SITEID,
+                columnsList: JSON.stringify(cur.vm.columnsList),
+                usersList: JSON.stringify(cur.vm.usersList)
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback_add_or_edit(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                    cur.win.search();
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function initKindEditor() {
+        cur.eweb = Ls.editor("content", {cusdir: "/" + parent.GLOBAL_SITEID + "/" + 0});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            isCompress:1,
+            filterMode: false,
+            siteId: parent.GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH
+        });*/
+    }
+
+    /**
+     * 缩略图上传
+     */
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.vm.imageLink = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + data[0].fileName);
+                $("#uploadImg").hide();
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "type": "NotDefined"
+            }
+        })
+    }
+
+    /**
+     * 删除缩略图
+     */
+    function deletePic() {
+        if (cur.vm.imageLink == null) {
+            Ls.tipsInfo("图片不存在！");
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.imageLink
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.imageLink = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc);
+                cur.win.search();
+            }
+        })
+    }
+
+    function columnsSelect() {
+        var data = [];
+        if (cur.vm.columnsList) {
+            data = cur.vm.columnsList;
+        }
+        Ls.selectColumn(function (arg) {
+            Ls.log("返回值：", arg)
+            if (arg) {
+
+                var name = "";
+                for (var i = 0; i < arg.list.length; i++) {
+                    var j = i + 1;
+                    if ("" == name) {
+                        name = "【" + j + "】" + arg.list[i].siteName + " >> " + arg.list[i].name;
+                    } else {
+                        name += "\r\n" + "【" + j + "】" + arg.list[i].siteName + " >>" + arg.list[i].name;
+                    }
+                }
+                $('#column_select_lable').val(name);
+
+//                $('#column_select_lable').val(arg.names);
+                cur.vm.columnsList = arg.list;
+            }
+        }, {
+            data: {
+                list: data
+            }
+        });
+    }
+
+    function usersSelect() {
+        var data = [];
+        if (cur.vm.usersList) {
+            data = cur.vm.usersList;
+        }
+        Ls.selectUnitUser(function (arg) {
+            Ls.log("返回值：", arg)
+            if (arg && arg.list.length > 0) {
+                $('#user_select_lable').val(arg.names);
+                cur.vm.usersList = arg.list;
+            }
+        }, {
+            organIds: 4964516,
+            data: {
+                list: data
+            }
+        });
+    }
+</script>
+</body>
+</html>

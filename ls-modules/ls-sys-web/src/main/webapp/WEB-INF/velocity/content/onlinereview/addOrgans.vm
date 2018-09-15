@@ -1,0 +1,96 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="mini-fit">
+    <div class="mini-fit">
+        <ul class="ztree" id="treeview2"></ul>
+    </div>
+</div>
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;" borderStyle="border-left:0;border-bottom:0;border-right:0;">
+    <a class="mini-button" id="transmit" style="width:60px;">确定</a>
+    <span style="display:inline-block;width:25px;"></span>
+    <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+
+    var cur = {
+        siteId: Ls.url.get("siteId"),
+        organIds: Ls.url.get("organIds")
+    }
+
+    var setting = {
+        async: {
+            enable: false
+        },
+        isEdit: true,
+        view: {},
+        check: {
+            enable: true,
+            autoCheckTrigger: true,
+            chkboxType: {"Y": "", "N": ""}
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'organId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {}
+    };
+
+    $(document).ready(function () {
+        SetData();
+    });
+
+    function SetData() {
+        Ls.ajaxGet({
+            url: "/organ/getOrgansBySiteId?siteId=" + cur.siteId,
+        }).done(function (json) {
+            if (json.data == 1) {
+                Ls.tipsErr("参数错误，站点为空");
+                return;
+            }
+            var data = json.data;
+            cur.treeObj = jQuery.fn.zTree.init($("#treeview2"), setting, data);
+            cur.treeObj.expandAll(true);
+            if (cur.organIds != null && cur.organIds != '') {
+                var ids = cur.organIds.split(",");
+                for (var i = 0; i < ids.length; i++) {
+                    var node = cur.treeObj.getNodeByParam("organId", ids[i], null);
+                    cur.treeObj.checkNode(node, true, true);
+                }
+            }
+        });
+        return;
+
+    }
+
+    $('#transmit').on('click', function () {
+        var nodes = cur.treeObj.getCheckedNodes(true);
+        var ids = "";
+        var names = "";
+        if (nodes != null && nodes != "") {
+            for (i = 0; i < nodes.length; i++) {
+                if (i == nodes.length - 1) {
+                    ids += nodes[i].organId;
+                    names += nodes[i].name;
+                } else {
+                    ids += nodes[i].organId + ",";
+                    names += nodes[i].name + ",";
+                }
+            }
+        }
+        var parent = art.dialog.opener;
+        parent.cur.organIds = ids;
+        parent.cur.vm.organNames = names;
+        Ls.winClose();
+    });
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+</script>
+</body>

@@ -1,0 +1,3 @@
+#foreach($eo in $resultObj.contents)
+<li><span class="num$!{velocityCount}">$!{velocityCount}.</span><a href="$!{eo.link}" title="$!{eo.title}" target="_blank">$!{eo.title}</a></li>
+#end

@@ -1,0 +1,61 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0, maximum-scale=2.0" />
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="copyright" content="Copyright ? 2013 Lonsun.cn." />
+    <meta name="description" content="" />
+    <link rel="stylesheet" type="text/css" href="/css/longsun.css">
+</head>
+    #parse("/lottery/lottrty_footer.vm")
+<body class="hdbodybg" >
+<!--第四步开始-->
+<div class="hdnum4" id="hd04" >
+    <div class="hdtitle">答题结果</div>
+    <!--主体内容-->
+    <div class="hd_nrbg">
+        <div class="hdtit1">$!{info}</div>
+        <div class="hdinfo">(每人每天最多可领取一个红包，送完为止)</div>
+        <div class="hdyes"><img src="/images/hdyes.jpg" width="277" height="267"></div>
+
+    </div>
+    <!--主体内容--->
+    <div class="hdbotbg">
+        <div class="zdbtn1" id="draw"><a href="/lotteryDraw/drawPage?name=$!{name}&phone=$!{phone}"><img src="/images/chbbtn.jpg" width="313" height="64"></a></div>
+    </div>
+</div>
+<!--第四步结束-->
+
+
+</body>
+
+
+<script>
+
+    var cur={
+        name:"$!{name}",
+        phone:"$!{phone}",
+
+    }
+
+    $(document).ready(function () {
+        if(null!==$!{error}&&""!==$!{error}&&$!{error}>0){
+            $("#draw").hide();
+
+        }
+
+
+
+
+    })
+
+
+
+
+
+</script>
+
+
+</html>

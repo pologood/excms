@@ -1,0 +1,306 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">主题信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="formtheme" ms-controller="formtheme">
+                <table class="table table-bordered survey-table">
+                    <tbody>
+                    <tr>
+                        <th>主题：</th>
+                        <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control" placeholder="主题不能为空"></td>
+                    </tr>
+                    <tr>
+                        <th>排序时间：</th>
+                        <td>
+                            <input type="datetime" name="sortNum" id="sortNum" ms-duplex="sortNum" class="form-control readonly" placeholder="排序时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>是否跳转：</th>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isLink" value="1" ms-duplex-string="isLink">是</label>
+                                <label class="radio-inline"><input type="radio" name="isLink" value="0" ms-duplex-string="isLink">否</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>开始时间：</th>
+                        <td>
+                            <input type="datetime" name="startTime" id="startTime" ms-duplex="startTime" class="form-control readonly" placeholder="开始时间不能为空"
+                                   readonly onClick="WdatePicker({startDate:'%y-%M-%d 00:00',dateFmt:'yyyy-MM-dd HH:mm',maxDate: '#F{$dp.$D(\'endTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>结束时间：</th>
+                        <td>
+                            <input type="datetime" id="endTime" name="endTime" ms-duplex="endTime" class="form-control readonly" placeholder="结束时间不能为空"
+                                   readonly onClick="WdatePicker({startDate:'%y-%M-%d 00:00',dateFmt:'yyyy-MM-dd HH:mm',minDate: '#F{$dp.$D(\'startTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr class="dn" ms-visible="isLink==1">
+                        <th>跳转URL：</th>
+                        <td>
+                            <input type="text" name="linkUrl" ms-duplex="linkUrl" class="form-control" placeholder="请填写跳转URL">
+                        </td>
+                    </tr>
+                    <tr class="dn" ms-visible="isLink==0">
+                        <th>显示方式：</th>
+                        <td>
+                            <label class="checkbox-inline pl0 pr10">
+                                <input type="radio" name="options" value="1" ms-duplex-string="options" ms-attr-disabled="isUpdate"> 文字列表
+                            </label>
+                            <label class="checkbox-inline pl0 pr10">
+                                <input type="radio" name="options" value="0" ms-duplex-string="options" ms-attr-disabled="isUpdate"> 图片列表
+                            </label>
+                            <label class="checkbox-inline pl10">
+                                <button id="btn-survey-extend" type="button" class="btn btn-xs btn-default btn-survey-extend" ms-click="extend"> 扩展信息
+                                    <i class="fa fa-angle-double-down"></i>
+                                </button>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr class="dn" ms-visible="isLink==0 && isExtend==1">
+                        <th>结果可见：</th>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isVisible" value="1" ms-duplex-string="isVisible">是</label>
+                                <label class="radio-inline"><input type="radio" name="isVisible" value="0" ms-duplex-string="isVisible">否</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="dn" ms-visible="isLink==0 && isExtend==1">
+                        <th>限制规则：</th>
+                        <td>
+                            <label class="checkbox-inline pl0">
+                                <select id="ipLimit" class="form-control" name="ipLimit"
+                                        ms-duplex="ipLimit" placeholder="请选择内容模型">
+                                    <option value="1">总共</option>
+                                    <option value="0">每天</option>
+                                </select>
+                            </label>
+                            <label class="checkbox-inline pl0">
+                                <input name="ipDayCount" class="form-control w90" placeholder="" ms-duplex="ipDayCount">
+                            </label>
+                            <label class="pl0 txt-readonly">
+                                &nbsp;每IP允许投票次数。
+                            </label>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td>
+                            <textarea name="content" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
+                            <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                            <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var cur = {
+        columnId: content_mgr.indicatorId,
+        siteId: GLOBAL_SITEID,
+        themeId: '$!{themeId}',
+        typeCode: 'survey',
+        editor: '',
+        ipLimitStatus: '1',
+        isLink: '',
+        clickBtn: ''
+    };
+    var eweb;
+    $(document).ready(function () {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.columnId});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: GLOBAL_CONTEXTPATH + '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId:cur.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/survey/theme/getSurveyTheme",
+                data: {
+                    id: cur.themeId,
+                    siteId: cur.siteId,
+                    columnId: cur.columnId,
+                    type: cur.type
+                }
+            }).done(function (d) {
+
+                var nowDate = new Date();
+                data = d.data;
+                cur.$id = "formtheme"
+                data.$id = cur.$id;
+                data.columnId = cur.columnId;
+                data.siteId = cur.siteId;
+                data.typeCode = cur.typeCode;
+                data.ipDayCount = data.ipDayCount || 1;
+                data.ipLimit = data.ipLimit || 0;
+                data.isExtend = 0;
+                data.isUpdate = false;
+                data.startTime = data.startTime || Ls.dateFormat(nowDate, "yyyy-MM-dd 00:00");
+                data.endTime = data.endTime || Ls.dateFormat(nowDate, "yyyy-MM-dd 00:00");
+                if (data.hasClild == '1') {
+                    data.isUpdate = true;
+                }
+                data.extend = function (a, b) {
+                    cur.vm.isExtend = !cur.vm.isExtend;
+                }
+
+                cur.vm = avalon.vmodels[data.$id];
+                if (!cur.vm) {
+                    cur.vm = avalon.define(data);
+                } else {
+                    Ls.assignVM(cur.vm, data);
+                }
+                avalon.scan($("#ID").get(0), cur.vm);
+                /*cur.editor.html(data.content);*/
+                eweb.setHtml(data.content);
+                try{
+                    if(data.themeId == null || data.themeId == ''){
+                        data.sortNum = parseInt(new Date().getTime()/1000);
+                    }
+                    if(data.sortNum != null && data.sortNum != ""){
+                        var d = new Date();
+                        d.setTime(data.sortNum * 1000);
+                        $("#sortNum").val(d.format('yyyy-MM-dd h:m:s'));
+                    }
+                }catch (e){
+                }
+            })
+        };
+        getData();
+
+        $('#formtheme').validator({
+            rules: {
+                myRule: function (el, param, field) {
+                    var isTrue = ( cur.vm.isLink == '1' ? true : false);
+                    return isTrue;
+                },
+                myRule1: function (el, param, field) {
+                    var isTrue = ( cur.vm.isLink == '0' ? true : false);
+                    return isTrue;
+                }
+            },
+            fields: {
+                'title': '标题:required;length[2~50]',
+                'sortNum': '排序:required;',
+                'startTime': '开始时间:required(myRule1);',
+                'endTime': '结束时间:required(myRule1);',
+                'ipDayCount': '票数限制:integer;range[1~50]',
+                'linkUrl': '转链地址:required(myRule);'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+    })
+
+
+    $("#saveArticle").click(function () {
+        cur.clickBtn = 0;
+        $('#formtheme').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        cur.clickBtn = 1
+        cur.vm.isPublish = 1;
+        $('#formtheme').submit();
+    })
+
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        /*var content = cur.editor.html();*/
+        var content = eweb.getHtml();
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+         }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        if (cur.isLink == '0') {
+            data.linkUrl = '';
+        }
+        data.content = content;
+        data.questions = []
+        Ls.ajax({
+            url: "/survey/theme/saveSurvey",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function goBack() {
+        content_mgr.getContentApp("/survey/index?indicatorId=&pageIndex=");
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+</script>

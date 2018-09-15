@@ -1,0 +1,17 @@
+#set($_title="公开年报详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+	#parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="content_title xxgk_tit">$!{publicContentInfo.title}</div>
+    <div class="content_date content_ftit">#date_format("$!{publicContentInfo.publishDate}",'yyyy-MM-dd')</div>
+    <div class="content_body">
+        <p style="text-indent:2em;">$!{publicContentInfo.content}</p>
+    </div>
+</div>
+	#parse("/mobile/parse_footer.vm")
+<!--分享 -->
+	#parse("/mobile/parse_share.vm")
+</body>
+</html>

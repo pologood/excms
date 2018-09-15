@@ -1,0 +1,92 @@
+#set($_title="主题预览")
+#parse("_page_layout/_header.vm")
+<style>
+    html, body {
+        overflow-y: auto;
+    }
+
+    .thumb {
+        text-align: center;
+        margin: 10% auto 0 auto;
+        width: 850px;
+    }
+
+    .thumb li {
+        margin-right: 12px;
+        float: left;
+    }
+
+    .thumb li, .thumb li img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .thumb li a span {
+        text-align: center;
+        display: block;
+        color: #ffffff;
+        line-height: 180%;
+        font-size: 14px;
+    }
+
+    .lb-image {
+        width: auto !important;
+        height: auto !important;
+    }
+</style>
+<body>
+<div class="thumb clearfix" id="specialTheme"></div>
+<script>var data = #if("$!{data}"=="")"{}"#else{thumb:$!{data}}#end;</script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/lightbox/lightbox.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script id="thumb_template" type="text/html">
+    <?
+    if (thumb && thumb.length > 0) {
+    for(var i=0,l=thumb.length; i<l; i++) {
+        var el = thumb[i], imgPath = "";
+
+        if(el.path==null){
+            imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg";
+        }else{
+            if(el.path.indexOf("/")!=-1){
+                imgPath = el.path;
+            }else if(el.path.indexOf(".") != -1){
+                imgPath = (GLOBAL_FILESERVERNAMEPATH||"") + el.path;
+            }else{
+                imgPath = (GLOBAL_FILESERVERPATH||"") + el.path;
+            }
+        }
+    ?>
+    <li>
+        <a href="<?=imgPath?>" data-lightbox="lightbox-0" data-title="<?=el.name?>" style="display:">
+            <img src="<?=imgPath?>" data-holder-rendered="true" style="display: block;" <? if(el.specialStatus+""=="1"){ ?>
+            class="dom-gray"<? }?>>
+            <span><?=el.name?></span>
+        </a>
+    </li>
+    <?
+        }
+    ?>
+    <?
+    } else {
+        imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/no.photo.jpg"
+    ?>
+    <li>
+        <a href="javascript:void(0)">
+            <img src="<?=imgPath?>" data-holder-rendered="true" style="display: block;" <? if(el.specialStatus+""=="1"){ ?>
+            class="dom-gray"<? }?>>
+        </a>
+    </li>
+    <?
+    }
+    ?>
+</script>
+<script>
+    $(document).ready(function () {
+        var listHtml = Ls.template("thumb_template", data);
+        $("#specialTheme").html(listHtml).find("img:first").click();
+    })
+</script>
+</body>
+</html>

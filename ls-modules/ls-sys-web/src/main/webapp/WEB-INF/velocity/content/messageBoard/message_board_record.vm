@@ -1,0 +1,60 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+  <div class="portlet-body form">
+    <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" multiSelect="false"
+         sizeList="[5,10,15]" pageSize="5" allowCellSelect="true" onlyCheckSelection="true"
+         url="/messageBoard/getRecord">
+      <div property="columns">
+        <div field="username" width="80" headerAlign="center" align="center" allowSort="false">转办人姓名</div>
+        <div field="createDate" width="110" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" align="center"
+             allowSort="true">转办时间
+        </div>
+		<div field=" " width="90" headerAlign="center" align="center" allowSort="false" renderer="goLink">转办到</div>
+        <div field="remarks" width="130" headerAlign="center" align="center" allowSort="false">备注</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+  var id = '$!{id}';
+  var recType = '$!{recType}';
+  $(document).ready(function () {
+    
+    mini.parse();
+    var grid = mini.get("datagrid1");
+    grid.load({dataFlag: 1, id: id});
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+  })
+
+  cancel = function () {
+    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+    parent.layer.close(index); //再执行关闭
+
+  }
+
+  function goLink(e) {
+      var rec = e.record;
+      var str='';
+      if (recType == 0) {
+           str = rec.receiveUnitName;
+       }
+      if (recType == 1) {
+           str = rec.receiveUserName;
+      }
+      return str;
+  }
+
+  function defaultDays(e) {
+      var rec = e.record;
+      var str= rec.defaultDays+'天';
+      return str;
+  }
+
+</script>
+</html>

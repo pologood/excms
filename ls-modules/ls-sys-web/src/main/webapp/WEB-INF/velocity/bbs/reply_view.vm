@@ -1,0 +1,167 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">回复信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="reply_form" role="form" ms-controller="reply_form" autocomplete="off">
+                        <table class="table table3 table-bordered survey-table">
+                            <tbody>
+                            <tr style="background-color:#f8f8f8">
+                                <th>主题回顾</th>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>标 题：</th>
+                                <td colspan="3">
+                                    $!{post.title}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发 帖 人：</th>
+                                <td>
+                                    $!{post.memberName}
+                                </td>
+                                <th>发帖时间：</th>
+                                <td>
+                                    $!date.format('yyyy-MM-dd HH:mm:ss ',$!{post.createDate})
+                                    #if("$!{post.isAccept}" !=  "") (督办单位：$!{post.acceptUnitName}) #end
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>帖子正文：</th>
+                                <td colspan="3">
+                                    $!{post.content}
+                                </td>
+                            </tr>
+                            <tr style="background-color:#f8f8f8">
+                                <th>回复信息</th>
+                                <td colspan="3">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>回 复 人：</th>
+                                <td>
+                                    $!{reply.memberName}
+                                </td>
+                                <th>回复时间：</th>
+                                <td>
+                                    $!date.format('yyyy-MM-dd HH:mm:ss',$!{reply.createDate})
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>审核信息：</th>
+                                <td colspan="3">
+                                    #if("$!{reply.isPublish}" == "0")
+                                        未审核
+                                    #elseif("$!{reply.isPublish}" == "1")
+                                        $!{reply.auditUserName} 审核于   $!date.format('yyyy-MM-dd HH:mm:ss',$!{reply.auditTime})
+                                    #elseif("$!{reply.isPublish}" == "2")
+                                        $!{reply.auditUserName} 屏蔽于   $!date.format('yyyy-MM-dd HH:mm:ss',$!{reply.auditTime})
+                                    #end
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th style="vertical-align: top;">内 容：</th>
+                                <td colspan="3">
+                                    $!{reply.content}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">附件信息：</th>
+                                <td colspan="3">
+                                    <div>
+                                        <ul style="list-style-type:none" id="files">
+                                            #set($Imgsuffixs="*.png;*.jpg;*.jpeg;*.gif")
+                                            #foreach($file in $!{files})
+                                                <li id="$!{file.id}_li">
+                                                    #set($mongoId="$!{file.mongoId}")
+                                                    #if($mongoId.indexOf("/") == -1)
+                                                        #if($mongoId.indexOf(".") !=-1)
+                                                            #set($filePath="$!{fileServerNamePath}")
+                                                        #else
+                                                            #set($filePath="$!{fileServerPath}")
+                                                        #end
+                                                    #else
+                                                        #set($filePath="")
+                                                    #end
+                                                    #if($Imgsuffixs.indexOf($!{file.suffix})>-1)
+                                                        <img src="$!{filePath}$!{mongoId}" style="width: 150px;height: 150px" title="$!{file.fileName}">
+                                                        <br/>
+                                                    #end
+                                                    <a style="text-decoration: underline;color: blue;cursor:pointer;" onclick="downLoad('$!{mongoId}',$!{file.id})">$!{file.fileName}</a>
+                                                    [$!{file.fileSizeKb} KB]
+                                                </li>
+                                            #end
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+<script>
+    mini.parse();
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+            replyId:"$!{reply.replyId}"
+        },
+        columnId:0
+    };
+    $(document).ready(function () {
+        //创建编辑器
+
+    })
+
+    function goBack(){
+        var url = "/bbsReply/list";
+        if(cur.nextpage.t == '1'){
+            url = "/bbsReply/list";
+        }else if(cur.nextpage.t == '2'){
+            url = "/bbsReply/auditList";
+        }
+        App.getContentHtml(url+"?pageIndex="+cur.nextpage.pageIndex+"&isPublish="+cur.params.isPublish,"");
+    }
+
+    //下载
+    function downLoad(mongoId,id){
+        if (!Ls.isEmpty(mongoId)) {
+            var filePath = '$!{fileServerPath}';
+            if (mongoId.indexOf("/") == -1) {
+                if (mongoId.indexOf(".") != -1) {
+                    filePath = "$!{fileServerNamePath}"
+                }
+            } else {
+                filePath = "";
+            }
+            if (!Ls.isEmpty(filePath)) {
+                $("#download").attr("src", "/bbsFile/download/" + mongoId);
+            }else{
+                $("#download").attr("src", "/govbbs/static/file/download?id=" + id);
+            }
+        }
+    }
+</script>

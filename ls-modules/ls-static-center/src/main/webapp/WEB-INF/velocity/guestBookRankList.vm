@@ -1,0 +1,18 @@
+<table width="960" border="0" cellspacing="0" cellpadding="0" class="phy_table">
+    <tr class="title">
+        <th width="24%">单位名称</th>
+        <th width="19%">咨询数</th>
+        <th width="19%">已回复</th>
+        <th width="19%">未回复</th>
+        <th width="19%">回复满意率</th>
+    </tr>
+    #foreach($eo in $resultObj)
+        <tr class="bg_w">
+            <td>$!{eo.organName}</td>
+            <td>$!{eo.recCount}</td>
+            <td>$!{eo.dealCount}</td>
+            <td>$!{eo.undoCount}</td>
+            <td>$!{eo.rate} %</td>
+        </tr>
+    #end
+</table>

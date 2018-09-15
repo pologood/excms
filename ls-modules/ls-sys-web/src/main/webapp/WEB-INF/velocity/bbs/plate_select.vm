@@ -1,0 +1,106 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="pd10" style="overflow: hidden;">
+    <ul class="ztree" id="treeview2" style="overflow:hidden;"></ul>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+
+    mini.parse();
+
+    var cur = {
+        plateId:'',
+        postIds:'${postIds}'
+    }
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+
+    var setting = {
+        async: {
+            enable: false
+        },
+        isEdit: true,
+        view: {},
+//        check: {
+//            enable: true,
+//            autoCheckTrigger: true,
+//            chkboxType: {"Y": "ps", "N": "ps"}
+//        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'plateId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: onClick
+        }
+    };
+
+    $(document).ready(function () {
+
+        SetData();
+
+        api.button({
+            id: "transmit",
+            name: "确 定",
+            callback: function () {
+                if(Ls.isEmpty(cur.plateId)){
+                    Ls.tipsErr("请选择版块")
+                    return false;
+                }
+                if(Ls.isEmpty(cur.postIds)){
+                    Ls.tipsErr("请选择主题")
+                    return false;
+                }
+                Ls.ajaxGet({
+                    url: "/bbsPost/move?postIds="+cur.postIds+"&plateId="+cur.plateId
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips("移动成功！")
+                        Ls.winClose();
+                    } else {
+                        Ls.tipsErr(d.desc)
+                        return false;
+                    }
+                })
+                return false;
+            }
+        }, {
+            name: '取 消',
+            callback: function () {
+
+            }
+        })
+
+    });
+    function SetData() {
+        Ls.ajaxGet({
+            url: "/bbsPlate/getPlates",
+        }).done(function (json) {
+            if (json.status == 0) {
+                Ls.tipsErr("参数错误");
+                return;
+            }
+            cur.treeObj = jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+            cur.treeObj.expandAll(true);
+        });
+        return;
+
+    }
+
+    function onClick(event, treeId, node) {
+        if (node.isParent) {
+            cur.treeObj.expandNode(node);
+        }else{
+            cur.plateId = node.plateId;
+        }
+    }
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+</script>
+</body>

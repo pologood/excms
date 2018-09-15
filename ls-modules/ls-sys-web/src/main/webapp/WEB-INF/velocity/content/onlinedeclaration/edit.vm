@@ -1,0 +1,261 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="declarationForm" ms-controller="declarationForm">
+                <table class="table table-bordered petition-table">
+                    <tbody>
+                    <tr>
+                        <th>申请人：</th>
+                        <td colspan="2">
+                            <input type="text" name="personName" ms-duplex="personName" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>单位：</th>
+                        <td colspan="2">
+                            <input type="text" name="unitName" ms-duplex="unitName" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>事项名称：</th>
+                        <td colspan="2">
+                            <input type="text" name="title" ms-duplex="title" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                      #if($recType=='0')
+                      <tr>
+                          <th>受理单位：</th>
+                          <td colspan="2">
+                              <select class="form-control" id="recUnit" name="recUnitId" ms-duplex="recUnitId" class="form-control" placeholder="请选择受理单位">
+                                  <option value="">请选择受理单位</option>
+                                #foreach($s in $recList)
+                                    <option value="$!{s.recUnitId}">$!{s.recUnitName}</option>
+                                #end
+                              </select>
+                          </td>
+                      </tr>
+                      #end
+                    <tr>
+                        <th>联系地址：</th>
+                        <td colspan="2">
+                            <input type="text" name="address" ms-duplex="address" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>联系电话：</th>
+                        <td colspan="2">
+                            <input type="text" name="phoneNum" ms-duplex="phoneNum" class="form-control" placeholder="提示：固话不支持短线'-'">
+                        </td>
+                    </tr>
+                    <tr class="hide">
+                        <th>附件：</th>
+                        <td colspan="2">
+                            <input id="video_content" name="attachId" ms-duplex="attachId" class="form-control">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>附件：</th>
+                        <td colspan="2">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="text" id="attachName" name="attachName" ms-duplex="attachName" class="form-control">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default btn-default-upload" type="button" onclick="uploadAttachment()">上传
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </button>
+                                    </div>
+                                    <!-- /btn-group -->
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">事实和理由：</th>
+                        <td colspan="2">
+                            <textarea id="video_content1" name="factReason" ms-duplex="factReason" class="form-control" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <button class="btn btn-default btn-save" type="submit"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    var curr = {
+        vm: "",
+        pageIndex: '$!{pageIndex}',
+    };
+    var eweb;
+    var recType='$!{recType}';
+    $(document).ready(function () {
+        eweb = Ls.editor("video_content1", {cusdir: "/" + GLOBAL_SITEID + "/" + content_mgr.node.columnId});
+        /*editor = KindEditor.create('textarea[name="factReason"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/videoNews/upload?siteId=' + GLOBAL_SITEID + "&&columnId=" + content_mgr.node.indicatorId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId:content_mgr.node.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+        getVO();
+    });
+
+    function getVO() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlineDeclaration/getVO",
+            data: {id: null}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            data = d.data;
+            if(!Ls.isEmpty(recType)&&recType=='0'){
+                data.recUnitId = Ls.isEmpty(data.recUnitId) ? "" : data.recUnitId;
+            }
+            curr.$id = "declarationForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            //avalon.scan(document.body, curr.vm);
+            avalon.scan($("#declarationForm").get(0),curr.vm);
+        });
+    }
+    /*提交更新*/
+    $("button[type='submit']").on("click", function () {
+        eweb.update();
+    })
+    $('#declarationForm').validator({
+        rules: {
+            mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']
+        },
+        fields: {
+            'personName':'申请人:required;length[1~40]',
+            'unitName':'单位:required;length[1~150];',
+            'title': '标题:required;length[1~250];',
+            'address':'联系地址:required;length[1~80];',
+            'phoneNum': '联系电话:required;mobile|tel_1|shortTel;',
+            'attachName':'附件:length[0~80]',
+            'factReason': '事实和理由:required;'
+        },
+        valid: function () {
+            //Ls.tips('验证成功！' ,{icons: "success"});
+            doSave();
+        }
+    });
+
+
+    function saveDeclaration() {
+        curr.vm.columnId = content_mgr.node.indicatorId;
+        curr.vm.siteId = GLOBAL_SITEID;
+        /*curr.vm.content = editor.text();*/
+        curr.vm.content = $(eweb.name).val();
+        if('0'==recType&&Ls.isEmpty(curr.vm.recUnitId)){
+            Ls.tips("受理单位不能为空",{icons:"info"});
+            return;
+        }
+        // curr.vm.text = editor.html();
+        return 1;
+    }
+    function doSave() {
+        if (saveDeclaration() == 1) {
+            var value = curr.vm.$model;
+            value = Ls.toJSON(value);
+            Ls.ajax({
+                type: "POST",
+                url: "/onlineDeclaration/saveVO",
+                data: value
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                } else {
+                    Ls.tipsOk("保存成功");
+                    goBack();
+                    return;
+                }
+            });
+        }
+    }
+
+
+    function goBack() {
+        content_mgr.getContentApp('/onlineDeclaration/index?pageIndex=' + curr.pageIndex);
+    }
+
+    function uploadAttachment() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                curr.vm.attachId = filePath[0].fileName;
+                curr.vm.attachName = filePath[0].fileName;
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传附件',
+            file_size_limit: "20 MB",
+            file_types: "*.doc;*.docx;*.xls;*.xlsx;*.ppt;*.htm;*.html;*.txt;*.zip;*.rar;*.gz;*.bz2",
+            file_upload_limit: 1,  //配置上传个数
+            post_params: {
+            "type":"NotDefined"
+            }
+        });
+    }
+
+    function getRecUnit() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getRecUnitOrPerson",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            setUnit=true;
+            var str = '<option value=""> 请选择受理单位 </option> ';
+            if (text.status) {
+                var data = text.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> '
+                    }
+                }
+            }
+            $("#recUnit").append(str);
+        });
+    }
+</script>

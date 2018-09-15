@@ -1,0 +1,62 @@
+#set($type="$!{resultObj.type}")
+<div class="mem-wp">
+	<div class="wp-l left">
+    	<div class="user-wp">
+        	<!-- <div class="user-img"><img src="#" width="50" height="50"/></div> -->
+            <div class="user-info">
+            	<li class="username">$!{resultObj.member.name}</li>
+                <li class="tips">欢迎登录会员中心</li>
+            </div>
+        </div>
+        <div class="nav-menu">
+        	<ul>
+                <li #if($type == "member") class="line" #end onclick="clickType('member')">个人资料</li>
+            	<li #if($type == "liuyan") class="line" #end onclick="clickType('liuyan')">我的留言</li>
+                <li #if($type == "post") class="line" #end onclick="clickType('post')">我的帖子</li>
+				<li #if($type == "uppw") class="line" #end onclick="clickType('uppw')">密码修改</li>
+				<li #if($type == "safe") class="line" #end onclick="clickType('safe')">安全验证</li>
+                <li onclick="logout()">退出</li>
+            </ul>
+        </div>
+    </div>
+    <div class="wp-r right">
+		<!-- 个人资料修改 -->
+		#if($!{resultObj.type} == "member") 
+		  #parse("member_save.vm")
+		<!-- 留言-->
+		#elseif($!{resultObj.type} == "liuyan") 
+		<!-- 帖子 -->
+		#elseif($!{resultObj.type} == "post") 
+		<!-- 留言-->
+		#elseif($!{resultObj.type} == "uppw") 
+			 #parse("member_uppw.vm")
+	    #elseif($!{resultObj.type} == "safe") 
+			 #parse("member_safe.vm")
+		#else
+		#end
+    </div>
+</div>
+<script>
+var siteId = "$!{resultObj.siteId}";
+function logout(){
+   if(confirm("确定退出吗？")){
+     Ls.ajax({
+            url: "/member/logout",
+            data: {}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("退出成功");
+                location.href = "/member/login/"+siteId;
+            } else {
+                alert(d.desc);
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+	}	
+}
+
+function clickType(type){
+   location.href = "/member/center/"+siteId+"?type="+type;
+}
+</script>

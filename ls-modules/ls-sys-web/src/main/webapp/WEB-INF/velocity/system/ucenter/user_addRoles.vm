@@ -1,0 +1,158 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <ul class="ztree" id="treeview2" style="overflow:hidden;"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+#*<div class="pd10" style="overflow: hidden;">
+    <ul class="ztree" id="treeview2" style="overflow:hidden;"></ul>
+</div>*#
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+
+    var cur = {}
+    var setting = {
+        async: {
+            enable: false
+        },
+        isEdit: true,
+        view: {},
+        check: {
+            enable: true,
+            autoCheckTrigger: true,
+            chkboxType: {"Y": "ps", "N": "ps"}
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'id',
+                pIdKey: 'pid'
+            }
+        },
+        callback: {},
+        data: {
+            key: {
+                title: "id"
+            }
+        }
+    };
+
+    var roleIds = '${roleIds}';
+    roleIds = (roleIds == 'null' ? '' : roleIds);
+    $(document).ready(function () {
+
+        SetData();
+
+        api.button({
+            id: "transmit",
+            name: "确 定",
+            callback: function () {
+                var nodes = cur.treeObj.getCheckedNodes(true);
+                var ids = "";
+                var names = "";
+                if (nodes != null && nodes != "") {
+                    for (i = 0; i < nodes.length; i++) {
+                        if (nodes[i].id != '' && nodes[i].id != '-1' && nodes[i].id != '-2' && nodes[i].type != 'Organ') {
+                            if (i == nodes.length - 1) {
+                                ids += nodes[i].id;
+                                names += nodes[i].name;
+                            } else {
+                                ids += nodes[i].id + ",";
+                                names += nodes[i].name + ",";
+                            }
+                        }
+
+                    }
+                }
+                var parent = art.dialog.opener;
+                parent.cur.vm.upRoleIds = ids;
+                parent.cur.vm.upRoleNames = names;
+                Ls.winClose();
+            }
+        }, {
+            name: '取 消',
+            callback: function () {
+
+            }
+        })
+
+    });
+    function SetData() {
+        Ls.ajaxGet({
+            url: "/role/conf/getTreeByScope?scope=2&roleIds=" + roleIds,
+        }).done(function (json) {
+            if (json.data == 1) {
+                Ls.tipsErr("参数错误，站点为空");
+                return;
+            }
+            var data = json.data;
+            var superadmin = false;
+            var hasRoles = false;
+            if (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var node = data[i];
+                    if (node.code == 'site_admin' || node.code == 'super_admin') {
+                        superadmin = true;
+                    } else {
+                        hasRoles = true;
+                    }
+                }
+            }
+
+            var treedata = [];
+            if (superadmin) {
+                //添加根节点
+                data.push({
+                    "id": -1,
+                    "name": "管理角色",
+                    "roleId": '',
+                    "font": {
+                        "font-weight": "bold",
+                        "color": "#666666"
+                    },
+                    "isParent": true
+                })
+            }
+            if (hasRoles) {
+                //添加根节点
+                data.push({
+                    "id": -1,
+                    "name": "普通角色",
+                    "roleId": '',
+                    "font": {
+                        "font-weight": "bold",
+                        "color": "#666666"
+                    },
+                    "isParent": true
+                })
+            }
+            cur.treeObj = jQuery.fn.zTree.init($("#treeview2"), setting, data);
+            cur.treeObj.expandAll(true);
+            if (roleIds != null && roleIds != '') {
+                var ids = roleIds.split(",");
+                for (var i = 0; i < ids.length; i++) {
+                    var node = cur.treeObj.getNodeByParam("id", ids[i], null);
+                    console.info(node);
+                    cur.treeObj.checkNode(node, true, true);
+                }
+            }
+        });
+        return;
+
+    }
+
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+</script>
+</body>

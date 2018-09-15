@@ -1,0 +1,331 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">征集信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form id="formCollect" role="form" ms-controller="formCollect" autocomplete="off">
+                <table class="table table-bordered article-table">
+                    <tbody>
+                    <tr>
+                        <th>征集标题：</th>
+                        <td>
+
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" name="title" id="title" ms-duplex="title" class="form-control" placeholder="征集标题不能为空">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                        <td class="w300" rowspan="6">
+
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:195px;height:150px;" alt="" id="imageLink"/>
+                                </div>
+                                <div class="thum-delete" id="delImg" onclick="del()"><i class="fa fa-trash"></i></div>
+                                <div class="thum-upload" id="uploadImg" onclick="fileUpload()"><i class="fa fa-upload"></i></div>
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>排序时间：</th>
+                        <td>
+                            <input type="datetime" name="sortNum" id="sortNum" ms-duplex="sortNum" class="form-control readonly" placeholder="排序时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>开始时间：</th>
+                        <td>
+                            <input type="datetime" name="startTime" id="startTime" ms-duplex="startTime" class="form-control readonly" readonly placeholder="开始时间不能为空"
+                                   onClick="WdatePicker({startDate:'%y-%M-%d 00:00',dateFmt:'yyyy-MM-dd HH:mm',maxDate: '#F{$dp.$D(\'endTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>到期时间：</th>
+                        <td>
+                            <input type="datetime" id="endTime" name="endTime" ms-duplex="endTime" class="form-control readonly" readonly placeholder="结束时间不能为空"
+                                   onClick="WdatePicker({startDate:'%y-%M-%d 00:00',dateFmt:'yyyy-MM-dd HH:mm',minDate:'#F{$dp.$D(\'startTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;"></th>
+                        <td colspan="2">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>转链：</th>
+                        <td>
+
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <input type="text" name="linkUrl" id="linkUrl" ms-duplex="linkUrl" class="form-control" placeholder="" maxlength="60">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">详细内容：</th>
+                        <td colspan="2">
+                            <textarea name="content" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">小结分析：</th>
+                        <td colspan="2">
+                            <textarea name="desc" class="form-control" rows="5" placeholder="" ms-duplex="desc"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">征集结果：</th>
+                        <td colspan="2">
+                            <textarea name="result" class="form-control" rows="5" placeholder="" ms-duplex="result"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <div class="form-actions noborder">
+                                <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                                <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    var cur = {
+        infoId: '$!{infoId}',
+        editor: '',
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID
+        },
+        clickBtn: ''
+    }
+    var eweb;
+    $(document).ready(function () {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.params.columnId});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: cur.params.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/collectInfo/getCollectInfo",
+                data: {
+                    infoId: cur.infoId,
+                    columnId: cur.params.columnId,
+                    siteId: cur.params.siteId
+                }
+            }).done(function (d) {
+
+                var nowDate = new Date();
+                data = d.data;
+                cur.$id = "formCollect"
+                data.$id = cur.$id;
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                data.startTime = data.startTime || Ls.dateFormat(nowDate, "yyyy-MM-dd 00:00");
+                data.endTime = data.endTime || Ls.dateFormat(nowDate, "yyyy-MM-dd 00:00");
+
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0), cur.vm);
+                /*cur.editor.html(data.content);*/
+                eweb.setHtml(data.content);
+                if (data.picUrl != null && data.picUrl != "") {
+                    if(data.picUrl.indexOf(".") != -1){
+                        $("#imageLink").attr("src", '$!{fileServerNamePath}' + data.picUrl)
+                    }else{
+                        $("#imageLink").attr("src", '$!{fileServerPath}' + data.picUrl)
+                    }
+                    $("#uploadImg").hide();
+                }
+                try{
+                    if(data.collectInfoId == null || data.collectInfoId == ''){
+                        data.sortNum = parseInt(new Date().getTime()/1000);
+                    }
+                    if(data.sortNum != null && data.sortNum != ""){
+                        var d = new Date();
+                        d.setTime(data.sortNum * 1000);
+                        $("#sortNum").val(d.format('yyyy-MM-dd h:m:s'));
+                    }
+                }catch (e){
+                }
+            })
+        };
+        getData();
+    })
+
+
+    $("#saveArticle").click(function () {
+        eweb.update();
+        cur.clickBtn = 0;
+        $('#formCollect').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        eweb.update();
+        cur.clickBtn = 1;
+        cur.vm.isIssued = 1;
+        $('#formCollect').submit();
+    })
+
+    $('#formCollect').validator({
+        fields: {
+            'title': '征集标题:required;length[2~100]',
+            'sortNum': '排序:required;',
+            'startTime': '开始时间:required;',
+            'endTime': '到期时间:required;',
+            'desc': '小结分析:length[2~4000]',
+            'linkUrl':'转链:length[2~60]'
+        },
+        valid: function () {
+            var me = this;
+            me.holdSubmit();
+            addPost();
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        /*data.content = cur.editor.html()*/
+        data.content = eweb.getHtml();
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+        }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        Ls.ajax({
+            url: "/collectInfo/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function goBack() {
+        content_mgr.getContentApp("/collectInfo/index?indicatorId=&pageIndex=");
+    }
+
+    function fileUpload() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+##                cur.vm.picUrl = data[0].mongoId;
+##                $("#imageLink").attr("src", '$!{fileServerPath}' + data[0].mongoId)
+                cur.vm.picUrl = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + cur.vm.picUrl)
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+            "siteId": GLOBAL_SITEID,
+            "columnId": content_mgr.node.indicatorId
+          },
+        })
+    }
+
+    function del() {
+        if (cur.vm.picUrl == null) {
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.picUrl
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.picUrl = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+
+</script>

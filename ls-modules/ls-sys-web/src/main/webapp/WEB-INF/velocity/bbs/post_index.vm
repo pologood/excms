@@ -1,0 +1,273 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12 col-lg-7">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">帖子/回复<i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="toLink('post')">帖子管理</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" onclick="toLink('reply')">回复管理</a></li>
+                        </ul>
+                    </div>
+                    <button id="btn_add" class="btn btn-default btn-add" onclick="edit('')">发 帖</button>
+                    <button class="btn btn-default btn-delete" onclick="del()">删 除</button>
+                    <button id="handle" class="btn btn-default btn-handle" onclick="handle()">办理</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn"><a href="javascript:setStatus('0','1');">批量发布</a></li>
+                            <li class="publishBtn"><a href="javascript:setStatus('0','0');">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="publishBtn"><a href="javascript:setStatus('1','1');">批量固顶</a></li>
+                            <li class="publishBtn"><a href="javascript:setStatus('1','0');">批量取消固顶</a></li>
+                            <li class="divider"></li>
+                            <li class="deleteBtn"><a href="javascript:setStatus('2','1');">批量推荐</a></li>
+                            <li class="deleteBtn"><a href="javascript:setStatus('2','0');">批量取消推荐</a></li>
+                            <li class="divider"></li>
+                            <li class="deleteBtn"><a href="javascript:setStatus('3','1');">批量锁定</a></li>
+                            <li class="deleteBtn"><a href="javascript:setStatus('3','0');">批量取消锁定</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchStatus('1')">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchStatus('0')">未发布</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-12 col-lg-5">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <input type="text" id="searchText" name="searchText" class="form-control" placeholder="标题、督办单位">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onClick="search()">搜索</button>
+                        <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false" onlyCheckSelection="true"
+             idField="postId"
+             sizeList="[15,30,45]" pageSize="15" allowCellSelect="true" multiSelect="true" allowCellWrap="true" allowHeaderWrap="true">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+                <div field="postId" width="60" headerAlign="center" align="center">ID</div>
+                <div field="" width="100%" headerAlign="center" align="left" renderer="renderTitle">标题</div>
+                <div field="" width="100" headerAlign="center" align="center" renderer="renderRead">读/复</div>
+                <div field="" width="120" headerAlign="center" align="center" renderer="renderReadUnit">督办单位</div>
+                <div width="50" headerAlign="center" align="center" allowSort="false" renderer="renderIsPublish">发布</div>
+                <div width="60" headerAlign="center" align="center" renderer="renderOpt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var cur = {
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID,
+            plateId: content_mgr.indicatorId,
+            dataFlag: 1
+        }
+    }
+
+    $(document).ready(function () {
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        cur.grid.setUrl("/bbsPost/getPage");
+        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+
+    })
+
+    function toLink(type) {
+        if (type == "post") {
+            content_mgr.getContentApp("/bbs/index?indicatorId=" + content_mgr.indicatorId)
+        } else {
+            content_mgr.getContentApp("/bbsReply/list?indicatorId=" + content_mgr.indicatorId)
+        }
+    }
+
+    // 操作列
+    function renderOpt(e) {
+        var rec = e.record;
+        var editStr = '<button class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.postId + ')">修 改</button> ';
+        return editStr;
+    }
+
+    function renderTitle(e) {
+        var rec = e.record, isTop = rec.isTop, isEssence = rec.isEssence, isLock = rec.isLock, isTimeOut = rec.isTimeOut, redCard = rec.redCard, yellowCard = rec.yellowCard;
+        var str = '<a style="text-decoration:underline;" href="javascript:edit(' + rec.postId + ')">';
+        if (yellowCard == 1) {
+            str = '<a style="color:yellow;" title="黄牌警告">(黄)</a>';
+        }
+        if (redCard == 1) {
+            str = '<a style="color:red;" title="红牌警告" >(红)</a>';
+        }
+        if (isTimeOut == 1) {
+            str = '<a style="color:gray;" title="超时警告" >(超)</a>';
+        }
+        str += '<a style="text-decoration:underline;" href="javascript:edit(' + rec.postId + ')">' + rec.title + '</a>';
+        str += (isTop == 1 ? ' <a onclick="setOneStatus(1,0,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/din.gif" border="0" title="取消固顶" ></a>' : ' <a onclick="setOneStatus(1,1,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/din_h.gif" border="0" title="固顶" ></a>');
+        str += (isEssence == 1 ? ' <a onclick="setOneStatus(2,0,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/jian.gif" border="0" title="取消推荐" ></a>' : ' <a onclick="setOneStatus(2,1,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/jian_h.gif" border="0" title="推荐" ></a>');
+        str += (isLock == 1 ? ' <a onclick="setOneStatus(3,0,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/suo.gif" border="0" title="取消锁定" ></a>' : ' <a onclick="setOneStatus(3,1,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/suo_h.gif" border="0" title="锁定" ></a>');
+
+        return str;
+    }
+
+    function renderRead(e) {
+        var rec = e.record;
+        return rec.viewCount + "/" + rec.replyCount;
+    }
+
+    function renderReadUnit(e) {
+        var rec = e.record, str = '';
+        if (rec.acceptUnitName != null && rec.acceptUnitName != '') {
+            var colorStr = rec.isAccept == 1 ? '<span style="color:blue">已办</span>' : '<span style="color:red">未办</span>';
+            str = rec.acceptUnitName + "[" + colorStr + "]"
+        }
+        return str;
+    }
+    function renderIsPublish(e) {
+        var rec = e.record, isPublish = rec.isPublish, str = "";
+        if (isPublish == '1') {
+            str = '<a onclick="setOneStatus(0,0,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/click.gif" border="0" title="取消发布" ></a>';
+        } else {
+            str = '<a onclick="setOneStatus(0,1,' + rec.postId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/noclick.gif" border="0" title="发布"></a>';
+        }
+        return str
+    }
+
+    //用户搜索
+    function search() {
+        var searchText = $("#searchText").val();
+        cur.params.searchText = searchText;
+        cur.grid.load(cur.params);
+    }
+
+    function searchStatus(status) {
+        cur.params.isPublish = status;
+        cur.grid.load(cur.params);
+    }
+
+    function searchClear() {
+        $("#searchText").val("");
+        cur.params.searchText = '';
+        cur.grid.load(cur.params);
+    }
+
+    function setOneStatus(type, status, postId) {
+        var ids = [];
+        ids.push(postId)
+        ids.join(",");
+        Ls.ajaxGet({
+            url: "/bbsPost/setStatus?postIds=" + ids,
+            data: {type: type, status: status},
+            success: function (text) {
+                Ls.tipsOk("操作成功！")
+                cur.grid.reload();
+            }
+        });
+    }
+    //启用
+    function setStatus(type, status) {
+        var ids = getPostIds();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsErr("请选择主题！")
+            return;
+        }
+        ids.join(",");
+        Ls.ajaxGet({
+            url: "/bbsPost/setStatus?postIds=" + ids,
+            data: {type: type, status: status},
+            success: function (text) {
+                Ls.tipsOk("操作成功！")
+                cur.grid.reload();
+                cur.grid.deselectAll(true);
+            }
+        });
+    }
+
+
+    //删除
+    function del() {
+        var ids = getPostIds();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsErr("请选择主题！")
+            return;
+        }
+        ids.join(",");
+        if (confirm("确认删除吗？")) {
+            Ls.ajaxGet({
+                url: "/bbsPost/delete?postIds=" + ids,
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                    cur.grid.deselectAll(true);
+                    try {
+                        removeNode(ids);
+                    } catch (e) {
+                    }
+                }
+            });
+        }
+
+    }
+
+    //修改
+    var edit = function (id) {
+        Ls.openWin("/bbsPost/edit?postId=" + id + "&plateId=" + cur.params.plateId + "&parentIds=&siteId=" + cur.params.siteId, "700px", "530px", {
+            type: 2,
+            title: id == '' ? '发帖' : '改帖',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    };
+
+    var handle = function () {
+        var rows = cur.grid.getSelecteds();
+        if (rows.length == 0 || rows.length > 1) {
+            Ls.tipsErr("请选择主题！")
+            return;
+        }
+        if (rows.length > 1) {
+            Ls.tipsErr("请选择单个主题！")
+            return;
+        }
+        var postId = rows[0].postId;
+        var replyId = rows[0].replyId;
+        replyId = (replyId == null ? '' : replyId);
+        Ls.openWin("/bbsReply/audit?postId=" + postId + "&replyId=" + replyId, "700px", "530px", {
+            type: 2,
+            title: '办理',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    }
+
+    function getPostIds() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].postId);
+        }
+        return ids;
+    }
+
+</script>

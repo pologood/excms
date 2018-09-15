@@ -1,0 +1,230 @@
+#parse("_page_layout/_header.vm")
+<style>
+    #content {
+        margin: 20px;
+    }
+
+    div.fieldset {
+        border: 1px solid #afe14c;
+        margin: 0px 0;
+        padding: 5px 0px 0px 0px;
+    }
+
+    div.fieldset span.legend {
+        position: relative;
+        background-color: #FFF;
+        padding: 3px;
+        left: 10px;
+        top: -14px;
+        font: 700 14px Arial, Helvetica, sans-serif;
+        color: #73b304;
+    }
+
+    div.flash {
+        margin: 15px 0px;
+        border-color: #D9E4FF;
+        -moz-border-radius-topleft: 5px;
+        -webkit-border-top-left-radius: 5px;
+        -moz-border-radius-topright: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -moz-border-radius-bottomleft: 5px;
+        -webkit-border-bottom-left-radius: 5px;
+        -moz-border-radius-bottomright: 5px;
+        -webkit-border-bottom-right-radius: 5px;
+    }
+
+    .progressWrapper {
+        overflow: hidden;
+    }
+
+    .progressContainer {
+        margin: 5px;
+        padding: 4px;
+        border: solid 1px #E8E8E8;
+        background-color: #F7F7F7;
+        overflow: hidden;
+    }
+
+    /* Message */
+    .message {
+        margin: 1em 0;
+        padding: 10px 20px;
+        border: solid 1px #FFDD99;
+        background-color: #FFFFCC;
+        overflow: hidden;
+    }
+
+    /* Error */
+    .red {
+        border: solid 1px #B50000;
+        background-color: #FFEBEB;
+    }
+
+    /* Current */
+    .green {
+        border: solid 1px #DDF0DD;
+        background-color: #EBFFEB;
+    }
+
+    /* Complete */
+    .blue {
+        border: solid 1px #CEE2F2;
+        background-color: #F0F5FF;
+    }
+
+    .progressName {
+        font-weight: 700;
+        color: #555;
+        width: 430px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .progressBarInProgress,
+    .progressBarComplete,
+    .progressBarError {
+        font-size: 0;
+        width: 0%;
+        height: 2px;
+        background-color: blue;
+        margin-top: 2px;
+    }
+
+    .progressBarComplete {
+        width: 100%;
+        background-color: green;
+        visibility: hidden;
+    }
+
+    .progressBarError {
+        width: 100%;
+        background-color: red;
+        visibility: hidden;
+    }
+
+    .progressBarStatus {
+        margin-top: 2px;
+        width: 430px;
+        /*font-size: 7pt;*/
+        font-family: Arial;
+        text-align: left;
+        white-space: nowrap;
+    }
+
+    a.progressCancel {
+        font-size: 0;
+        display: block;
+        height: 14px;
+        width: 14px;
+        background-image: url($!{sysStaticPath}/assets/images/cancelbutton.gif);
+        background-repeat: no-repeat;
+        background-position: -14px 0px;
+        float: right;
+    }
+
+    a.progressCancel:hover {
+        background-position: 0px 0px;
+    }
+
+    /* -- SWFUpload Object Styles ------------------------------- */
+    .swfupload {
+        vertical-align: top;
+    }
+</style>
+<body class="page-body-white">
+<div id="content">
+
+    <form id="form1" action="" method="post" enctype="multipart/form-data">
+        <div>
+            <span id="spanButtonPlaceHolder"></span>
+            <button type="button" class="btn btn-default btn-uploadfile" onclick="swfu.startUpload();">
+                <i class="fa fa-upload"></i> 上 传
+            </button>
+        #*<button id="btnCancel" type="button" class="btn btn-default readonly btn-uploadfile" onclick="swfu.cancelQueue();" disabled="disabled">
+          <i class="fa fa-upload"></i> 取消上传
+        </button>*#
+        </div>
+        <div class="mt10 hide">0 个文件已上传</div>
+        <div class="fieldset flash">
+            <span class="legend">上传信息</span>
+
+            <div id="fsUploadProgress" style="overflow: auto; height: 250px;">
+            </div>
+
+        </div>
+    </form>
+
+</div>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/swfupload/swfupload.min.js"></script>
+<script>
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            /*api.button(
+              {
+                name: '保 存',
+                callback: function () {
+                  try{
+                    W.fileUploadCallback(filePath)
+                  }catch (e){
+                    Ls.tips("回调 fileUploadCallback 有误，请检查！",{icons:"error"})
+                  }
+                },
+                focus: true
+              }
+            )*/
+        })
+
+        var swfu, upload = dialog.data("upload") || {};
+
+        var settings = Ls.extend(true, {
+            flash_url: "$!{sysStaticPath}/assets/js/plugins/swfupload/swfupload.swf",
+            upload_url: "/fileCenter/fileUpload",
+            post_params: {
+                "siteId": "$!{siteId}", "sessionId": "$!{sessionId}"
+            },
+            file_size_limit: "10 MB",
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_types_description: "Image Files",
+            file_upload_limit: "10",  //配置上传个数
+            file_queue_limit: 0,
+            //file_post_name:'file',
+            custom_settings: {
+                progressTarget: "fsUploadProgress",
+                cancelButtonId: "btnCancel"
+            },
+            debug: true,
+            // Button settings
+            button_image_url: "$!{sysStaticPath}/assets/images/btn_65x24.png",
+            button_width: "74",
+            button_height: "34",
+            button_placeholder_id: "spanButtonPlaceHolder",
+            button_text_left_padding: 12,
+            button_text_top_padding: 3,
+
+            file_queued_handler: fileQueued,
+            file_queue_error_handler: fileQueueError,
+//      file_dialog_complete_handler: fileDialogComplete,
+            upload_start_handler: uploadStart,
+            upload_progress_handler: uploadProgress,
+            upload_error_handler: uploadError,
+            upload_success_handler: uploadSuccess,
+            upload_complete_handler: uploadComplete,
+            queue_complete_handler: queueComplete
+        }, upload);
+
+        window.onload = function () {
+            swfu = new SWFUpload(settings);
+        };
+    }
+</script>
+</body>
+</html>

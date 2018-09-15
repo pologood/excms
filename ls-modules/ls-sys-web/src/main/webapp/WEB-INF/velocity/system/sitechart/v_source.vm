@@ -1,0 +1,292 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div id="" style="margin:10px 30px">
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">来源分析 - 来源分类</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-group form-inline ">
+                                    <input type="text" name="st" id="st_s" class="form-control w160"
+                                           placeholder="$TODAY" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" name="ed" id="ed_s" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <button type="button" class="btn btn-default btn-search" onclick="searchSource()">查询</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClearSource()">清除条件</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12" style="height:400px" id="v_source_pie"></div>
+                                    <div class="col-md-8 col-sm-12" id="v_source_line" style="height:400px"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        	<div class="row">
+               <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">来源分析 - 搜索引擎</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+        					 <div style="float:right;">
+        						 <div class="form-group form-inline ">
+                                    <input type="text" name="st" id="st_e" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" name="ed" id="ed_e" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+        							<button type="button" class="btn btn-default btn-search" onclick="searchEngine()">查询</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClearEngine()">清除条件</button>
+                                 </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12" style="height:400px" id="v_engine_pie"></div>
+        							<div class="col-md-8 col-sm-12" id="v_engine_line" style="height:400px"></div>
+        						</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+
+    mini.parse();
+
+    $(document).ready(function () {
+
+        Ls.parseEcharts(function () {
+            require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie',
+                'echarts/chart/funnel'
+            ], function (ec) {
+                searchClearSource();
+                searchEngine();
+            })
+        })
+
+    })
+
+    function searchClearSource() {
+        $("#st_s").val("");
+        $("#ed_s").val("");
+        searchSource();
+    }
+
+    function searchSource() {
+        var cmm = {};
+        cmm.st = $("#st_s").val();
+        cmm.ed = $("#ed_s").val();
+        Ls.ajaxGet({
+            url: "/visitSource/getSourceType",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+
+                    if (d.pieName.length > 0 && d.sourceList.length > 0) {
+                        var option_source_pie = getOptionSourcePie(d.pieName, d.sourceList, "访问来源")
+                        var chart_a1 = require('echarts').init(document.getElementById('v_source_pie'));
+                        chart_a1.setOption(option_source_pie);
+                    } else {
+                        $("#v_source_pie").html("暂无数据");
+                    }
+                    if (d.pieName.length > 0 && d.timeList.length > 0 && d.data.length > 0) {
+                        var option_source_line = getOptionSourceLine(d.pieName, d.timeList, d.data)
+                        var chart_a2 = require('echarts').init(document.getElementById('v_source_line'));
+                        chart_a2.setOption(option_source_line);
+                    } else {
+                        $("#v_source_line").html("暂无数据");
+                    }
+                }
+            }
+        });
+    }
+
+    function searchEngine() {
+        var cmm = {};
+        cmm.st = $("#st_e").val();
+        cmm.ed = $("#ed_e").val();
+        Ls.ajaxGet({
+            url: "/visitSource/getSearchEngine",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    if (d.pieName.length > 0 && d.engineList.length > 0) {
+                        var option_source_pie = getOptionSourcePie(d.pieName, d.engineList, "搜索引擎")
+                        var chart_a1 = require('echarts').init(document.getElementById('v_engine_pie'));
+                        chart_a1.setOption(option_source_pie);
+                    } else {
+                        $("#v_engine_pie").html("暂无数据");
+                    }
+                    if (d.pieName.length > 0 && d.timeList.length > 0 && d.data.length > 0) {
+                        var option_source_line = getOptionSourceLine(d.pieName, d.timeList, d.data)
+                        var chart_a2 = require('echarts').init(document.getElementById('v_engine_line'));
+                        chart_a2.setOption(option_source_line);
+                    } else {
+                        $("#v_engine_line").html("暂无数据");
+                    }
+                }
+            }
+        });
+    }
+
+    function searchClearEngine() {
+        $("#st_e").val("");
+        $("#ed_e").val("");
+        searchEngine();
+    }
+
+    function getOptionSourcePie(pieName, sourceList, text) {
+        if ($(window).width() <= 1400) {
+            var radius = "40%";
+            var len = -5;
+        } else {
+            var radius = "55%";
+            var len = 10;
+        }
+        option_source_pie = {
+            title: {
+                text: text,
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)",
+                position:function(p){   //其中p为当前鼠标的位置
+                    return [p[0] - 30, p[1] + 50];
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        //type: ['pie','funnel']
+                        type: ['pie']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data: pieName
+            },
+            series: [
+                {
+                    name: text,
+                    type: 'pie',
+                    radius: radius,
+                    center: ['60%', '70%'],
+                    selectedMode: 'single',
+                    data: sourceList,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        },
+                        normal: {
+                            /*label: {
+                                position: 'inside'
+                            },*/
+                            labelLine: {
+                                length: len
+                            }
+                        }
+                    }
+                }
+            ]
+        };
+        return option_source_pie;
+    }
+
+    function getOptionSourceLine(pieName, timeList, data) {
+        option_source_line = {
+            title: {
+                text: '',
+                x: 'bottom'
+
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: pieName
+            },
+            grid: {
+                left: '5%',
+                right: '5%',
+                bottom: '5%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['line', 'bar']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                start: 0,
+                end: 100
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: timeList
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: data,
+        };
+        return option_source_line;
+    }
+
+</script>

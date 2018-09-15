@@ -1,0 +1,251 @@
+##公开指南
+#if("$!{type}" == "2")
+<div class="xxgklistb">
+    <h1 class="newstitle">$!{resultObj.title}</h1>
+    <div class="opennesscont">
+        <div align="left">$!{resultObj.content}</div>
+    </div>
+    <div class="clear"></div>
+</div>
+#else
+	#if("$!{action}" == "list")
+	##主动公开
+		#if("$!{type}" == "4")
+        <div class="nav_dwxx">
+            <ul>
+                <li class="bt">公开单位：</li>
+                <li class="dw">$!{organ.name}</li>
+                <li class="bt">办公地址：</li>
+                <li class="dz">$!{organ.officeAddress}</li>
+                <li class="bt">联系电话：</li>
+                <li class="dh">$!{organ.officePhone}</li>
+                <div class="clear"></div>
+            </ul>
+        </div>
+        <div class="nav_tit">
+            <ul class="tit">
+                <li class="xh">序 号 </li>
+                <li class="yh">索引号</li>
+                <li class="mc">信息名称</li>
+                <li class="rq">生成日期</li>
+            </ul>
+            <div class="clear"></div>
+        </div>
+        <div class="xxgk_nav_con">
+
+			#set($xxgkData=$resultObj.data)
+			#if($xxgkData && $xxgkData.size() > 0)
+				#foreach($eo in $xxgkData)
+					#set($xh=$paramObj.pageSize*$resultObj.pageIndex+$velocityCount)
+                    <div class="xxgk_navli">
+                        <ul>
+                            <li class="xh">$!{xh}</li>
+                            <li class="yh">$!{eo.indexNum}</li>
+                            #set ($filePaths = $eo.filePath)
+                            #set ($titleClass = "")
+                            #if("$!{eo.filePath}" != "")
+                                #set ($pathArray = $filePaths.split(","))
+                                #set ($lang = $pathArray.size())
+                                #set ($titleClass = "lang"+$pathArray.size())
+                            #end
+                            <li class="mc type_$!{eo.attribute}" ><a href="$!{eo.link}" class="$!titleClass" target="_blank" onmouseover="showViewTitle('$!{eo.id}');" onMouseOut="showViewTitle('$!{eo.id}');">$!{eo.title}</a>
+                                #if("$!{eo.isInvalid}"=="2")
+                                    <span style="color:red;">废止</span>
+                                #end
+                                #if("$!{eo.filePath}" != "")
+                                    #set($catalogType = "解读")
+                                    #if("$!{eo.attribute}" == "ATTRIBUTE_READING")
+                                        #set($catalogType = "文件")
+                                    #end
+                                    #foreach($path in $!{pathArray})
+                                        <span class="split">|</span>
+                                        <a class="a" href="$!{path}" target="_blank">$!catalogType#if($lang>1)$!{velocityCount}#end</a>
+                                    #end
+                                #end
+                            </li>
+                            <li class="rq">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</li>
+                            <div class="clear"></div>
+                        </ul>
+                        <div id="lvt_$!{eo.id}" class="listviewboxt #if($velocityCount > 15) listviewup #end" style="z-index:99999999;">
+                            <div class="listviewbox clearfix">
+                                <div class="vitem">
+                                    <div class="vname">索 引 号：</div>
+                                    <p>$!{eo.indexNum}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">主题分类：</div>
+                                    <p>$!{eo.classNames}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">组配分类：</div>
+                                    <p>$!{eo.catName}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">发文日期：</div>
+                                    <p>#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">发文机构：</div>
+                                    <p>$!{organ.name}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">生成日期：</div>
+                                    <p>#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">生效时间：</div>
+                                    <p>$!{eo.effectiveDate}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">废止时间：</div>
+                                    <p>$!{eo.repealDate}</p>
+                                </div>
+                                <div class="vitem vitem2">
+                                    <div class="vname">名<span style="padding-left:20px;"></span>称：</div>
+                                    <p>$!{eo.title}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">文<span style="padding-left:20px;"></span>号：</div>
+                                    <p>$!{eo.fileNum}</p>
+                                </div>
+                                <div class="vitem">
+                                    <div class="vname">关 键 词：</div>
+                                    <p>$!{eo.keyWords}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+				#end
+			#else
+				$!{paramObj.result}
+			#end
+		##for循环结束
+        </div> ##主动公开结束
+		### 公开制度、公开年报
+		#else
+        <div class="xxgklistb">
+            <ul class="doc_list list-2657783">
+				#set($Integer=0)
+				#set($length="$!{paramObj.length}")
+				#set($length=$Integer.parseInt($length))
+				#foreach($vo in $resultObj.data)
+					#set($css="even")
+					#if($velocityCount%2 == 1)
+						#set($css="odd")
+					#end
+                    <li class="$css"><a href="$!{vo.link}" target="_blank" title="#filterHtml($!{vo.title})" class="left">#cutstr("#filterHtml($!{vo.title})",$!{length})</a>
+						#if("$!{paramObj.isDate}" == "true")
+                            <span class="right date">#date_format("$!{vo.publishDate}","$!{paramObj.dateFormat}")</span>
+						#end
+                    </li>
+				#end
+            </ul>
+        </div>
+		#end
+		#if($!{resultObj.pageCount} > 1)
+        <div id="page_public_info" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_public_info", function(pageIndex){
+				#if("$!{type}" == "4")
+					#set($organId="$!{paramObj.organId}")
+					#if("$organId" == "")
+						#set($organId="$!{context.columnId}")
+					#end
+                    Ls.ajax({
+                        dataType: "html",
+                        url: "/site/label/8888",
+                        data : {
+                            siteId : "$!{context.siteId}",
+                            pageSize : "$!{paramObj.pageSize}",
+                            pageIndex: pageIndex,
+                            action : "$!{paramObj.action}",
+                            isDate : "$!{paramObj.isDate}",
+                            dateFormat : "$!{paramObj.dateFormat}",
+                            length : "$!{paramObj.length}",
+                            organId: "$organId",
+                            type: "$!{paramObj.type}",
+                            catId: "$!{paramObj.catId}",
+                            cId : "$!{paramObj.cId}",
+                            result : "$!{paramObj.result}",
+                            labelName:'publicInfoList'
+                        }
+                    }).done(function(html) {
+                        $("#$!{paramObj.publicDivId}").html(html);
+                    });
+				#else
+                    location.href = "$!{resultObj.linkPrefix}&pageIndex=" + pageIndex;
+				#end
+            }, {
+                currPage: ($!{resultObj.pageIndex}+1),
+                pageCount:$!{resultObj.pageCount},
+                param: "pageSize=$!{paramObj.pageSize}"
+            });
+        </script>
+		#end
+    <div class="clear"></div>
+	#elseif("$!{action}" == "num")
+		#if($resultObj.size() > 0)
+        <ul>
+			#set($Integer=0)
+			#set($length="$!{paramObj.length}")
+			#set($length=$Integer.parseInt($length))
+			#foreach($vo in $resultObj)
+                #set ($filePaths = $eo.filePath)
+                #set ($titleClass = "")
+                #if("$!{eo.filePath}" != "")
+                    #set ($pathArray = $filePaths.split(","))
+                    #set ($lang = $pathArray.size())
+                    #set ($titleClass = "lang"+$pathArray.size())
+                #end
+                <li class="$titleClass"><a href="$!{vo.link}" title="#filterHtml($!{vo.title})" target="_blank">
+					#if("$!{paramObj.isOrgan}" == "true")
+                        <u>[$!{vo.organName}]</u>
+					#end
+					#cutstr("#filterHtml($!{vo.title})",$!{length})</a>
+
+                    #if("$!{eo.isInvalid}"=="2")
+                        <span style="color:red;">废止</span>
+                    #end
+                    #if("$!{eo.filePath}" != "")
+                        #set($catalogType = "解读")
+                        #if("$!{eo.attribute}" == "ATTRIBUTE_READING")
+                            #set($catalogType = "文件")
+                        #end
+                        #foreach($path in $!{pathArray})
+                            <span class="split">|</span>
+                            <a class="a" href="$!{path}" target="_blank">$!catalogType#if($lang>1)$!{velocityCount}#end</a>
+                        #end
+                    #end
+
+					#if("$!{paramObj.isDate}" == "true")
+                        <span class="right date">#date_format("$!{vo.publishDate}","$!{paramObj.dateFormat}")</span>
+					#end
+                </li>
+			#end
+        </ul>
+		#end
+	#elseif("$!{action}" == "rel")
+		#foreach($data in $resultObj.entrySet())
+        <div class="xxgkmnbox">
+            <h2>$!{data.key}</h2>
+            <div class="xxgkmnlist">
+                <ul>
+					#foreach($organ in $data.value)
+                        <li>
+                            <a href="/public/column/$!{organ.organId}?type=4&action=list" title="$!{organ.name}" class="fl name">$!{organ.name}</a>
+                            <p class="fr">
+                                <a href="/public/column/$!{organ.organId}?type=2" target="_blank">指南</a>
+                                <a href="/public/column/$!{organ.organId}?type=4&action=list" target="_blank">目录</a>
+                                <a href="/public/column/$!{organ.organId}?type=3&action=list" target="_blank">年报</a>
+                                <a href="/public/column/$!{organ.organId}?type=5" target="_blank">申请</a>
+                            </p>
+                            <div class="clear"></div>
+                        </li>
+					#end
+                    <div class="clear"></div>
+                </ul>
+            </div>
+        </div>
+		#end
+	#end
+#end

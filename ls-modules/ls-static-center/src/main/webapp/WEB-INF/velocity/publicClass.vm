@@ -1,0 +1,64 @@
+<ul id="organ_class_$!{paramObj.id}_tree" class="ztree"></ul>
+<script>
+var organ_class_$!{paramObj.id}_settings = {
+	data : {
+      simpleData : {
+			idKey : 'id',
+			pIdKey : 'parentId'
+       },
+	   key : {
+			title : "name"
+	   }
+	},
+	callback : {
+		onClick : function(event, treeId, node) {
+			##当在首页访问时，单位id没有传入，必须用标签的方式传入，在这里标签的优先级最小
+			#set($organId="$!{context.columnId}")
+			##当为内容管理时或者单位id为空时需要取参数
+			#if("$!{context.source}" == "1" || "$organId" == "")
+			#set($organId="$!{paramObj.organId}")
+			#end
+			#if("$!{paramObj.isAjax}" != "true")
+			window.open("/public/column/$organId?type=4&cId=" + node.id);
+			#else
+			## 判断是否已经点击过
+			//if (organ_class_$!{paramObj.id}_settings.nodeId == node.id){
+			//	return;
+			//}
+			//organ_class_$!{paramObj.id}_settings.nodeId = node.id;
+			## public/column/organId?type=4&catId=1&cId=1&pageIndex=1
+			// ajax加载
+			Ls.ajax({
+                dataType: "html",
+                data: {
+                    labelName:'publicClass',
+					siteId : "$!{context.siteId}",
+					pageSize : 15,
+                    pageIndex: 1,
+					isDate : "true",
+					dateFormat : "[yyyy-MM-dd]",
+					length : "37",
+                    organId: $organId,
+                    type: 4,
+                    cId: node.id,
+					result : "暂无相关信息"
+                },
+                url: "/site/label/8888"
+            }).done(function(html) {
+				$("#$!{paramObj.publicDivId}").html(html);
+            });
+			#end
+		}
+	}
+};
+var organ_class_$!{paramObj.id}_tree = jQuery.fn.zTree.init(jQuery("#organ_class_$!{paramObj.id}_tree"), organ_class_$!{paramObj.id}_settings, $!{resultObj});
+var c_$!{paramObj.id}_Id = Ls.url.get("cId");
+if(c_$!{paramObj.id}_Id && c_$!{paramObj.id}_Id > 0) {
+	var nodeCId = organ_class_$!{paramObj.id}_tree.getNodeByParam("id", c_$!{paramObj.id}_Id, null);
+	if (nodeCId) {//如果找到节点，选中，并激活tabs
+		organ_class_$!{paramObj.id}_tree.selectNode(nodeCId);
+		//调用页面的js方法选中对应标签页
+		if(typeof(activeClassTabs) == "function"){ activeClassTabs("organ_class_$!{paramObj.id}_tree"); };
+	}
+}
+</script>

@@ -1,0 +1,139 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+        position: relative;
+        padding-bottom: 26px;
+    }
+    .alert-wrapper {
+        height: 78px;
+        overflow: hidden;
+    }
+    .alert .icon {
+        width: 50px;
+        height: 26px;
+        margin-left: -25px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+    }
+    .alert .fa {
+        line-height: 28px;
+        font-size: 22px;
+    }
+    .alert .icon:hover .fa {
+        font-size: 26px;
+    }
+    .mb5 {
+        margin-bottom: 5px;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <div class="alert-wrapper">
+                        <div class="mb5"><strong>考察点：</strong>
+                            <div>
+                                1.动态、要闻、通知公告、政策文件等信息长期未更新的栏目数量；<br>
+                                2.网站中应更新但长期未更新的栏目数量；<br>
+                                3.网站中的空白栏目（有栏目无内容）数量。
+                            </div>
+                        </div>
+                        <div class="mb5"><strong>普查扣分细则：</strong>
+                            <div>
+                                1.监测时间点前2周内的动态、要闻类栏目，以及监测时间点前6个月内的通知公告、政策文件类栏目，累计超过（含）5个未更新；<br>
+                                2.网站中应更新但长期未更新的栏目数超过（含）10个；<br>
+                                3.空白栏目数量超过（含）5个。上述情况出现任意一种，即单项否决。
+                            </div>
+                        </div>
+                        <div><strong>本站监测扣分细则：</strong>
+                            <div>
+                                1.监测时间点前$!{dtywMonitoredNum}$!{dtywMonitoredTimeType}内的动态}、要闻类栏目，以及监测时间点前$!{tzzcMonitoredNum}$!{tzzcMonitoredTimeType}内的通知公告}、政策文件类栏目，累计超过（含）【<span id="standardCode">$!{dtywNum}</span>】个未更新；<br>
+                                2.网站中应更新但长期未更新的栏目数超过（含）【<span id="notUpdateNum">$!{updateNum}</span>】个；<br>
+                                3.空白栏目数量超过（含）【<span id="emptyNum">$!{balnkNum}</span>】个。上述情况出现任意一种，即单项否决。
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon text-center" onclick="toggle()"><i class="fa fa-angle-double-down"></i></div>
+                </div>
+                <div>小计：<br>
+                    （1）空白栏目<span class="red">$!{blankCount}</span>个；应更新但未更新栏目<span class="red">$!{notUpdateCount}</span>个<br>
+                    （2）监测点前2周内，动态要闻类栏目未更新：<span class="red">$!{dtywCount}</span>个<br>
+                    （3）监测点前6个月内，通知政策类栏目未更新：<span class="red">$!{tzzcCount}</span>个
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getColumnNotUpdatePage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="columnType" width="200" align="center" headerAlign="center" renderer="columnType" >栏目类型</div>
+                        <div field="columnName" width="240" align="left" headerAlign="center"  renderer="columnName" >栏目名称</div>
+                        <div field="updateCount" width="150" align="center" headerAlign="center" >更新数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({monitorId:cur.params.monitorId});
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_index': columnTypeName = '首页栏目';break;
+            case 'columnType_update': columnTypeName = '应更新栏目';break;
+            case 'columnType_DTYW': columnTypeName = '动态、要闻类栏目';break;
+            case 'columnType_TZZC': columnTypeName = '通知公告、政策文件类栏目';break;
+            case 'columnType_RSGH': columnTypeName = '人事、规划计划类栏目';break;
+            case 'columnType_BLANK': columnTypeName = '空白栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+
+        return columnTypeName;
+
+    }
+
+    function columnName(obj) {
+        var rec = obj.record;
+        var columnName = rec.columnName;
+        var columnUrl = rec.columnUrl;
+
+        return "<a target='_blank' href='"+columnUrl+"' title='"+columnName+"' >"+columnName+"</a>";
+
+    }
+
+    function toggle() {
+        var $ele = $(".alert-wrapper");
+        if($ele.hasClass("on")){
+            $ele.removeClass("on").css("height","78px");
+            $(".fa").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+        }else {
+                $ele.addClass("on").css("height","auto");
+                $(".fa").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+        }
+    }
+</script>

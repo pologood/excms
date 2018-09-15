@@ -1,0 +1,26 @@
+﻿{
+  
+  	"total":327,
+	"data":
+	  [
+		{"id":1,"acceptUserNames":"李中华,朱江东,汪长华,张方应,李国宏,孙瑞荣,龚 勤,吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"李中华,朱江东,汪长华,张方应,李国宏,孙瑞荣,龚 勤,吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":2},
+		{"id":1,"acceptUserNames":"张方应","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":3},
+		{"id":1,"acceptUserNames":"李中华,朱江东,汪长华,张方应,李国宏,孙瑞荣,龚 勤,吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":4},
+		{"id":1,"acceptUserNames":"张方应","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"张方应","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"李国宏","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"李国宏","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1},
+		{"id":1,"acceptUserNames":"吴建国","smsContent":"会议通知已发，请注意查收【合肥市信息资源管理中心-宋婷】","createTime":"2014-07-08","status":1}
+		
+		
+	  ]
+	
+}
+

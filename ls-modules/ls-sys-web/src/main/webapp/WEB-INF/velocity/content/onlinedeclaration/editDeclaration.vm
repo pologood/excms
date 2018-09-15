@@ -1,0 +1,289 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+  <div class="tabbable-line" style=" margin:12px 20px 15px;">
+      <ul class="nav nav-tabs">
+          <li class="active">
+              <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+          </li>
+          <li >
+              <a href="#tab_1_2" data-toggle="tab">回复信息</a>
+          </li>
+      </ul>
+    <div class="tab-content">
+    <div class="tab-pane active" id="tab_1_1">
+        <form role="form" id="declaForm" ms-controller="declaForm">
+            <table class="table table-bordered petition-table">
+                <tbody>
+                <tr>
+                    <th>申请人：</th>
+                    <td colspan="2" ms-text="personName">
+                    </td>
+                </tr>
+                <tr>
+                    <th>单位：</th>
+                    <td colspan="2" ms-text="unitName">
+                    </td>
+                </tr>
+                <tr>
+                    <th>事项名称：</th>
+                    <td colspan="2" ms-text="title">
+                    </td>
+                </tr>
+                    #if($recType==0)
+                    <tr>
+                        <th>受理单位：</th>
+                        <td colspan="2" ms-text="recUnitName">
+                        </td>
+                    </tr>
+                    #end
+                <tr>
+                    <th>申请表下载：</th>
+                    <td colspan="2" ms-text="downUrl">
+                    </td>
+                </tr>
+                <tr>
+                    <th>联系地址：</th>
+                    <td colspan="2" ms-text="address">
+                    </td>
+                </tr>
+                <tr>
+                    <th>联系电话：</th>
+                    <td colspan="2" ms-text="phoneNum">
+                    </td>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">事实和理由：</th>
+                    <td colspan="2" ms-text="factReason">
+                    </td>
+                </tr>
+                <tr>
+                    <th>附件：</th>
+                    <td colspan="2" ms-text="attach|html">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+  </div>
+  <div class="tab-pane" id="tab_1_2">
+      <form role="form" id="recForm" ms-controller="recForm">
+          <table class="table table-bordered petition-table">
+              <tbody>
+              <tr id="status" style="display: none">
+                  <th>当前状态：</th>
+                  <td colspan="2" ms-text="statusName">
+                  </td>
+              </tr>
+              <tr>
+                  <th>办理状态：</th>
+                  <td>
+                      #foreach($s in $statusList)
+                          <label class="radio-inline">
+                              <input type="radio" name="dealStatus" ms-duplex-string="dealStatus" value="$!{s.statusCode}"/> $!{s.statusName}
+                          </label>
+                      #end
+                  </td>
+              </tr>
+              <tr>
+                  <th style="vertical-align: top;">回复内容：</th>
+                  <td colspan="2">
+                        <textarea id="replyContent" name="replyContent" ms-duplex="replyContent" class="form-control"
+                                  style="width: 100%; visibility:visible ;height:200px"></textarea>
+                  </td>
+              </tr>
+              <tr>
+                  <th>办理日期：</th>
+                  <td>
+                      <input type="datetime" name="replyDate" ms-duplex="replyDate" class="form-control"
+                             onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+              </tr>
+              <tr>
+                  <th>办理人：</th>
+                  <td>
+                      <input name="replyUnitName" id="replyUnitName" ms-duplex="replyUnitName" class="form-control"/>
+                  </td>
+              </tr>
+              <tr>
+                  <th></th>
+                  <td colspan="2">
+                      <button class="btn btn-default btn-save" type="button" onclick="doSubmitReply()"> 保 存</button>
+                      <button class="btn btn-default btn-back" type="button" onclick="closeWin()"> 关 闭</button>
+                  </td>
+              </tr>
+              </tbody>
+          </table>
+      </form>
+  </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var curr = {
+        vm: "",
+        pageIndex: '$!{pageIndex}'
+    };
+    var setUnit = false;
+    var recType='$!{recType}';
+
+    var eweb;
+    var declarationId = "${declarationId}";
+    var parent = Ls.getWin.win;
+    var siteId = parent.GLOBAL_SITEID;
+    var curr1 = {
+        vm: {},
+    }
+
+    $(document).ready(function () {
+        eweb = Ls.editor("replyContent", {style: "Lmini",height: "200"});
+        /*editor = KindEditor.create('textarea[name="replyContent"]', {
+            resizeType: 1,
+            allowPreviewEmoticons: false,
+            allowImageUpload: false,
+            items: [
+                'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            filterMode: true
+        });*/
+
+        getVO();
+        getRecVO();
+    });
+
+    function getRecVO() {
+        var id = curr1.vm.id;
+        Ls.ajax({
+            url: "/onlineDeclaration/getReplyVO",
+            data: {declarationId: declarationId}
+        }).done(function (text) {
+            data = text;
+            curr1.$id = "recForm";
+            //初始化表单字段
+            curr1.init = Ls.initFORM(curr1.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr1.vm = avalon.vmodels[curr1.$id];
+            if (!curr1.vm) {
+                curr1.vm = avalon.define(curr1.init);
+            } else {
+                Ls.assignVM(curr1.vm, data);
+            }
+            // avalon.scan(document.body, curr.vm);
+            avalon.scan($("#recForm").get(0),curr1.vm);
+            if (text.replyContent != null) {
+                /*editor.html(text.replyContent);*/
+                eweb.setHtml(text.replyContent);
+            }
+            if (!Ls.isEmpty(text.statusName)) {
+                $("#status").show();
+            }
+        });
+    }
+
+    function closeWin(){
+        self.close();
+    }
+
+    function doSubmitReply() {
+        eweb.update();
+        $('#recForm').submit();
+    }
+
+    $('#recForm').validator({
+        fields: {
+            'dealStatus': '回复状态:required;',
+            'replyDate': '回复时间:required;',
+            'replyUnitName':'办理人:required'
+        },
+        valid: function () {
+            saveEO();
+        }
+    })
+
+    function saveEO() {
+        curr1.vm.replyContent = eweb.getHtml();
+        if ($("#replyContent").val() == '') {
+            Ls.tipsInfo("回复内容不能为空");
+            return;
+        }
+        curr1.vm.declarationId = declarationId;
+        var value = curr1.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            url: "/onlineDeclaration/saveReply",
+            data: value
+        }).done(function (text) {
+            if(!text.status){
+                Ls.tipsErr(text.data);
+                return;
+            }else{
+                Ls.tipsOk("保存成功");
+                return;
+            }
+        });
+    }
+
+
+    function getVO() {
+        var baseContentId = "${baseContentId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/onlineDeclaration/getVO",
+            data: {id: baseContentId}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(d.desc);
+                return;
+            }
+            data = d.data;
+            if(recType!=null&&recType!=''){
+                data.recUnitId = Ls.isEmpty(data.recUnitId) ? "" : data.recUnitId;
+            }
+            data.$id = "declaForm";
+            data.attach = ""
+            if (data.attachId) {
+                var url='/onlinePetition/downloadFile?attachId=' + data.attachId + '&&s=' + Math.random();
+                data.attach = '<a href='+url +'target="_blank">' + data.attachName + '</a>'
+            }
+
+            curr.vm = avalon.define(data);
+            avalon.scan($("#declaForm").get(0), curr.vm);
+
+        });
+    }
+
+    function getRecUnit() {
+        Ls.ajax({
+            type: "POST",
+            url: "/onlinePetition/getRecUnitOrPerson",
+            data: {columnId: curr.vm.columnId}
+        }).done(function (text) {
+            setUnit = true;
+            if (text != null) {
+                var data = text;
+                var length = data.length;
+                for (i = 0; i < length; i++) {
+                    if (jQuery.trim(data[i].recUnitId) == curr.vm.recUnitId) {
+                        curr.vm.recUnitId = data[i].recUnitName;
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+
+  function getOnlineDeclarationFormData(){
+      /*curr1.vm.replyContent = editor.html();*/
+      curr1.vm.replyContent = eweb.getHtml();
+      curr1.vm.declarationId = declarationId;
+      var value = curr1.vm.$model;
+      value = Ls.toJSON(value);
+      return value;
+  }
+</script>	

@@ -1,0 +1,217 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">logo信息（上传、删除保存后生效）</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="formlogo" role="form" ms-controller="formlogo" autocomplete="off">
+                        <table class="table table-bordered article-table" >
+                            <tbody>
+                            <tr>
+                                <td>系统logo：</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="thumb_layout">
+                                        <div style="border:dashed 1px #a0b9d0;background:#fbfdfd;width:155px;height:55px;padding:2px 0 0 2px">
+                                            <img id="systemImg" src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:149px;height:49px;" alt=""/>
+                                        </div>
+                                        <div class="thum-upload" id="systemImg_u" onclick="fileUpload('systemImg')"><i class="fa fa-upload"></i></div>
+                                        <div class="thum-delete" id="systemImg_d" onclick="del('systemImg')"><i class="fa fa-trash"></i></div>
+                                    </div>
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>登录logo：</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="thumb_layout">
+                                        <div style="border:dashed 1px #a0b9d0;background:#fbfdfd;width:155px;height:55px;padding:2px 0 0 2px">
+                                            <img id="loginImg" src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:149px;height:49px;" alt="" />
+                                        </div>
+                                        <div class="thum-upload" id="loginImg_u" onclick="fileUpload('loginImg')"><i class="fa fa-upload"></i></div>
+                                        <div class="thum-delete" id="loginImg_d" onclick="del('loginImg')"><i class="fa fa-trash"></i></div>
+                                    </div>
+
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>首页logo：</td>
+                            <tr>
+
+                                <td>
+                                    <div class="thumb_layout">
+                                        <div style="border:dashed 1px #a0b9d0;background:#fbfdfd;width:555px;height:335px;padding:2px 0 0 2px">
+                                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:550px;height:330px;" alt="" id="indexImg"/>
+                                        </div>
+                                        <div id="indexImg_u" style="border:solid 1px #ccc;width:24px;height:24px;position:absolute;text-align:center;cursor:pointer;left:560px;top:30px;"  onclick="fileUpload('indexImg')"><i class="fa fa-upload"></i></div>
+                                        <div id="indexImg_d" style="border:solid 1px #ccc;width:24px;height:24px;position:absolute;text-align:center;cursor:pointer;left:560px;top:0px;"   onclick="del('indexImg')"><i class="fa fa-trash"></i></div>
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                            <tr>
+
+                                <td >
+                                    <div class="form-actions noborder">
+                                        <button class="btn btn-default btn-save" type="button" onclick="save()"> 保 存</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        params: {
+            siteId: GLOBAL_SITEID
+        },
+    }
+    $(document).ready(function () {
+        getData();
+    })
+
+    function getData(){
+        Ls.ajaxGet({
+            url: "/sysLogo/getSystemLogo",
+            data: {
+
+            }
+        }).done(function (d) {
+
+            data = d.data;
+            cur.$id = "formlogo"
+            data.$id = cur.$id;
+            cur.vm = avalon.define(data)
+            avalon.scan($("#ID").get(0),cur.vm);
+            if (cur.vm.indexImg != null && cur.vm.indexImg != "") {
+                $("#indexImg").attr("src", (data.indexImg.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + data.indexImg)
+                $("#indexImg_u").hide();
+            }
+            if (cur.vm.loginImg != null && cur.vm.loginImg != "") {
+                $("#loginImg").attr("src", (data.loginImg.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + data.loginImg)
+                $("#loginImg_u").hide();
+            }
+            if (cur.vm.systemImg != null && cur.vm.systemImg != "") {
+                $("#systemImg").attr("src", (data.systemImg.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + data.systemImg)
+                $("#systemImg_u").hide();
+            }
+        })
+    }
+
+    function save() {
+        var data = Ls.toJSON(cur.vm.$model);
+        Ls.ajax({
+            url: '/sysLogo/save',
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    callback: function () {
+                        getData();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+
+    function fileUpload(t) {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                var fileName =  data[0].fileName;
+                if(t == 'indexImg'){
+                    cur.vm.indexImg = fileName;
+                }else if(t == 'loginImg'){
+                    cur.vm.loginImg = fileName;
+                }else{
+                    cur.vm.systemImg = fileName;
+                }
+                $("#"+t+"_u").hide();
+                $("#"+t+"").attr("src", (fileName.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + fileName)
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+             post_params: {
+            "type":"NotDefined"
+            }
+        })
+    }
+
+
+    function del(t) {
+        var isDel = false;
+        var mongoId = "";
+        if(t == 'indexImg'){
+            if (cur.vm.indexImg == null || cur.vm.indexImg == "") {
+                isDel = true
+            }
+            mongoId = cur.vm.indexImg;
+        }else if(t == 'loginImg'){
+            if (cur.vm.loginImg == null || cur.vm.loginImg == "") {
+                isDel = true
+            }
+            mongoId = cur.vm.loginImg;
+        }else{
+            if (cur.vm.systemImg == null || cur.vm.systemImg == "") {
+                isDel = true
+            }
+            mongoId = cur.vm.systemImg;
+        }
+        if(isDel){
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        if(confirm("确定删除此logo?")){
+            Ls.ajaxGet({
+                url: "/fileCenter/deleteByMongoId",
+                data: {
+                    mongoId: mongoId
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("删除成功！", {
+                        icons: "success", callback: function () {
+                            if(t == 'indexImg'){
+                                cur.vm.indexImg = "";
+                            }else if(t == 'loginImg'){
+                                cur.vm.loginImg = "";
+                            }else{
+                                cur.vm.systemImg = "";
+                            }
+                            $("#"+t+"_u").show();
+                            $("#"+t+"").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+    }
+
+</script>

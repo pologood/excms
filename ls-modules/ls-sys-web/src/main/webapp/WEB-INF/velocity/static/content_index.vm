@@ -1,0 +1,140 @@
+#MenuButton(121710,true)
+<div id="static_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="200" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+
+    #* <div id='Demo'>
+       <div class='content'>
+       </div>
+     </div>*#
+
+        <div class="tabbable-line">
+            <ul class="nav nav-tabs ">
+                <li class="active ml8">
+                    <a href="#tab_1" data-toggle="tab"> 内容协同 </a>
+                </li>
+                #if($_button_code_list_.contains("121710"))
+                    <li>
+                        <a href="#tab_2" data-toggle="tab"> 信息公开 </a>
+                    </li>
+                #end
+            </ul>
+            <div class="tab-content pt5">
+                <div class="tab-pane active" id="tab_1">
+                    <div style="padding: 5px;">
+                        <ul id="site_static_tree" class="ztree"></ul>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_2">
+                    <div style="padding: 5px; ">
+                        <ul id="public_static_tree" class="ztree"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="staticCtrl" ms-controller="staticCtrl">
+
+            <div class="portlet light">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-globe font-green-sharp"></i>
+                        <span class="caption-subject font-green-sharp bold uppercase">生成静态</span>
+                    </div>
+                    <div class="actions">
+                    #*<button type="button" class="btn blue-hoki" ms-if="siteBtn">
+                        <i class="fa fa-refresh"></i> 生成站点首页
+                    </button>
+                    <button type="button" class="btn blue-madison">
+                        <i class="fa fa-refresh"></i> 生成栏目页
+                    </button>
+                    <button type="button" class="btn green-meadow mr42">
+                        <i class="fa fa-refresh"></i> 生成文章页
+                    </button>*#
+                        <button type="button" class="btn red-sunglo" ms-click="funDelCompleted">
+                            <i class="fa fa-trash-o"></i> 清除已完成的任务
+                        </button>
+
+                    </div>
+                </div>
+                <div class="portlet-body">
+
+                #*<div class="alert alert-warning">
+                    <strong>温馨提示：</strong> 生成静态的速度取决于当前栏目下新闻的多少，请耐心等待！
+                </div>*#
+
+                    <div class="alert alert-block alert-warning fade in">
+                        <h4 class="alert-heading">温馨提示：</h4>
+                        <p><strong></strong> 生成静态的速度取决于当前栏目下新闻的多少，请耐心等待！</p>
+                        <p>
+                        <div class="mt15">
+                            <button type="button" class="btn blue-hoki" ms-if="siteBtn" ms-click="funPublish($event,1)">
+                                <i class="fa fa-refresh"></i> 生成 [{{columnName}}] 首页
+                            </button>
+                            <button type="button" class="btn blue-madison" ms-if="columnBtn" ms-click="funPublish($event,2)">
+                                <i class="fa fa-refresh"></i> 生成 [{{columnName}}] 栏目页
+                            </button>
+                            <button type="button" class="btn green-meadow mr42" ms-if="infoBtn" ms-click="funPublish($event,3)">
+                                <i class="fa fa-refresh"></i> 生成 [{{columnName}}] 文章页
+                            </button>
+                        </div>
+                        </p>
+                    </div>
+
+                    <div class="clearfix progress-wp" ms-repeat="list" ms-attr-id="progress_{{el.id}}" ms-class="progress-active:el.status==2">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <h4> 《{{el.title}}》 {{ el.scope == 1? '首页': el.scope == 2? '栏目页': '文章页'}} -
+                                    {{el.status==1?'等待生成':el.status==2?'正在生成':el.status==4?'任务终止':'完成生成'}}</h4>
+                                <div class="progress margin-bottom-5" ms-class="active:el.active">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="40"
+                                         aria-valuemin="0" aria-valuemax="100"
+                                         ms-attr-id="task_{{el.id}}"
+                                         ms-css-width="el.percent"
+                                         ms-class="progress-bar-danger:el.active"
+                                         ms-class="progress-bar-info:!el.active"
+                                    >
+                                        <span> {{el.percent}} </span>
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <a href="javascript:void(0)">总条数：<span>{{el.count||0}}</span></a>
+                                    <a href="javascript:void(0)">成功条数：<span>{{el.doneCount||0}}</span></a>
+                                    <a href="javascript:void(0)" ms-click="funErrList($event,el.id)">失败条数：<span class="text-danger">{{el.failCount||0}}</span></a>
+                                    <a href="javascript:void(0)" ms-if="el.status==3 || el.status==4">耗时：{{el.time|formatSeconds}}</a>
+                                    <a href="javascript:void(0)">任务创建时间：{{el.updateDate}}</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="progress-bar-btn">
+                                #*<a ms-if="el.status==4" ms-click="funRun($event,el,$index)" href="javascript:void(0);" class="btn btn-circle btn-sm blue default"
+                                   title="重新执行当前任务！">
+                                    <i class="fa fa-play"></i>
+                                </a>*#
+                                    <a ms-if="el.status==3 || el.status==4 || el.status==5" ms-click="funDel($event,el.id,el.status)" href="javascript:void(0);"
+                                       class="btn btn-circle btn-sm red default"
+                                       title="删除当前任务！">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
+                                    <a ms-if="el.status==2" ms-click="funOver($event,el,$index)" href="javascript:void(0);" class="btn btn-circle btn-sm blue default"
+                                       title="取消当前任务！">
+                                        <i class="fa fa-stop"></i>
+                                    </a>
+
+                                    <a ms-if="el.status==5" ms-click="funRun($event,el,$index)" href="javascript:void(0);" class="btn btn-circle btn-sm yellow default"
+                                       title="任务重试！">
+                                        <i class="fa fa-repeat"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- END DROPDOWNS PORTLET-->
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/statics/content_static_mgr.js"></script>

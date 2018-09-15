@@ -1,0 +1,253 @@
+#set($_title="投票调查")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="content_title">$!{surveyTheme.title}</div>
+    <div class="content_date">#date_format("$!{surveyTheme.startTime}","yyyy-MM-dd hh:ss") - #date_format("$!{surveyTheme.endTime}","yyyy-MM-dd hh:ss")</div>
+    <!-- 未开始、过期投票调查中的处理开始 -->
+    <div class="votbox" id="showResult" style="display: none">
+        <table width="100%">
+            <tbody>
+                #foreach($qu in $surveyTheme.questions)
+                    #if($!{qu.options} != 3)
+                    <tr>
+                        <th>
+                            <div class="vottit">$!{velocityCount}、$!{qu.title}</div>
+                        </th>
+                    </tr>
+                        #foreach($op in $qu.optionsList)
+                        <tr>
+                            <td>
+                                <div class="votcon">
+                                    <span class="c1 fl">$!{op.title}</span>
+                                    <span class="c2">
+                                <span class="progress-bar">
+                                    <span class="progress" style="width:实际数值"></span>
+                                </span>
+                            </span>
+                                    <span class="c3 fr"> #if($!{surveyTheme.isVisible} == 1)$!{op.votesCount} 票#end </span>
+                                </div>
+                            </td>
+                        </tr>
+                        #end
+                    #else
+                    <tr>
+                        <th>
+                            <div class="vottit">$!{velocityCount}、$!{qu.title}</div>
+                        </th>
+                    </tr>
+                        #foreach($rl in $qu.replys)
+                        <tr>
+                            <td>
+                                <div class="vottxtcon">
+                                    $!{rl.content}
+                                </div>
+                            </td>
+                        </tr>
+                        #end
+                    #end
+                #end
+            </tbody>
+            #if($!{surveyTheme.isTimeOut} == 2)
+                <input name="" type="button" onclick="back()" value="返回">
+            #end
+        </table>
+    </div>
+    <!-- 未开始、过期投票调查中的处理结束 -->
+    <!-- 正在投票调查中的处理开始 -->
+    #if($!{surveyTheme.isTimeOut} == 2)
+        <div id="showSave" class="content_body votecon">
+            <script>
+                var questionIds = [];
+                var questionType = [];
+                var velocityCounts = [];
+            </script>
+            <form>
+                #foreach($qu in $surveyTheme.questions)
+                    <script>
+                        questionIds.push("$!{qu.questionId}");
+                        questionType.push("$!{qu.options}");
+                        velocityCounts.push("$!{velocityCount}")
+                    </script>
+                    #if($!{qu.options} != 3)
+                        <div class="voteli">
+                            <h3>$!{velocityCount}、$!{qu.title}</h3>
+                            #foreach($op in $qu.optionsList)
+                                <label>
+                                    <input id="op_$!{op.optionId}" onclick="checkParams($!{qu.questionId},$!{op.optionId},$!{qu.options},'$!{qu.optionsCount}')"
+                                           name="option_$!{qu.questionId}"
+                                           value="$!{op.optionId}" #if($!{qu.options} == 1) type="radio" #else type="checkbox" #end>
+                                    $!{op.title}
+                                </label>
+                                <br>
+                            #end
+                        </div>
+                    #else
+                        <div class="voteli last">
+                            <h3>$!{velocityCount}、$!{qu.title}</h3>
+                            <textarea id="content_$!{qu.questionId}"></textarea>
+                        </div>
+                    #end
+                #end
+
+            ##                <div class="vote-code">
+            ##                    <span class="text-code">验<span class="s01"></span>证<span class="s02"></span>码：</span>
+            ##                    <input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            ##                    <img id="imgCode" class="img-code" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+            ##                </div>
+
+                <div class="vote_btn vote_btn1">
+                    <input name="" type="button" onclick="save()" value="提交">
+                    <input class="vote_ck" name="" type="button" onclick="view()" value="查看">
+                </div>
+            </form>
+        </div>
+
+        <script>
+
+            $(document).ready(function (e) {
+
+                $("#imgCode").on('click', function () {
+                    var _this = $(this);
+                    _this.attr("src", "/member/getCode?s=" + Math.random());
+                })
+
+            });
+
+            function checkParams(questionId, optionId, options, optionsCount) {
+                if (options == 2) {
+                    if ($("input[name=option_" + questionId + "]:checked").length > optionsCount) {
+                        $("#op_" + optionId).attr("checked", false);
+                        alert("最多可选" + optionsCount + "项!");
+                    }
+                }
+            }
+
+            function save() {
+                var dataParams = [];
+                for (var oi = 0; oi < questionType.length; oi++) {
+                    var dataQuestion = {
+                        themeId: '$!{surveyTheme.themeId}',
+                        questionId: '',
+                        optionType: '',
+                        optionIds: '',
+                        content: ''
+                    };
+
+                    var qt = questionType[oi];
+                    var vc = velocityCounts[oi];
+                    var qids = questionIds[oi];
+                    dataQuestion.questionId = qids;
+                    dataQuestion.optionType = qt;
+                    if (qt == '1') {
+                        var optionRadio = $("input[name=option_" + qids + "]:checked");
+                        if (optionRadio.length == 0) {
+                            alert("第" + vc + "题未选择选项");
+                            return;
+                        } else {
+                            dataQuestion.optionIds = optionRadio.val();
+                        }
+                    } else if (qt == '2') {
+                        var optioncheckBox = $("input[name=option_" + qids + "]:checked");
+                        if (optioncheckBox.length == 0) {
+                            alert("第" + vc + "题未选择选项");
+                            return;
+                        } else {
+                            var seloptionids = '';
+                            $("input[name=option_" + qids + "]:checked").each(function (i, optionObj) {
+                                seloptionids = (seloptionids == '' ? seloptionids : seloptionids + ",") + optionObj.value;
+                            });
+                            dataQuestion.optionIds = seloptionids;
+                        }
+                    } else if (qt == '3') {
+                        dataQuestion.content = $("#content_" + qids).val();
+                        if (dataQuestion.content != '' && dataQuestion.content.length > 1000) {
+                            alert("第" + vc + "题评议内容过长！");
+                            return;
+                        }
+                    }
+                    dataParams.push(dataQuestion)
+                }
+//                var checkCode = $("#checkimg").val();
+//                if (checkCode == '') {
+//                    alert("验证码不能为空！");
+//                    return;
+//                }
+
+                var data = {
+                    resultList: dataParams
+                }
+
+                try {
+                    Android.getJSONFromServiceUrlsIsLogin(JSON.stringify(data), "/content/saveMobileSurvey", "$!{conVO.getIsLoginGuest()}");
+                } catch (e) {
+                    alert("出错提示：" + e)
+                }
+
+            }
+
+            //设备回调
+            function androidDone(d) {
+                if (d.status == 1) {
+		            $("#imgCode").click();
+                    alert("提交成功");
+                    location.href = "$!{surveyTheme.linkUrl}";
+                } else {
+                    $("#imgCode").click();
+                    alert(d.desc);
+                }
+            }
+        </script>
+    #end
+    <!--              正在投票调查中的处理结束             -->
+</div>
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+    #if("1"=="2")
+    <!--  ***************此代码用于开发调试使用*************** -->
+    <script>
+        Ls.ajax({
+            url: "/content/saveSurveyWeb",
+            data: {
+                resultList: JSON.stringify(dataParams),
+                checkCode: checkCode
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("提交成功");
+                location.href = "$!{surveyTheme.linkUrl}";
+            } else {
+                $("#imgCode").click();
+                alert(d.desc);
+             }
+        }).fail(function () {
+            alert('失败!');
+        });
+    </script>
+    #end
+<script>
+
+    $(document).ready(function (e) {
+        var isTimeout = "$!{surveyTheme.isTimeOut}";
+        if (isTimeout == '1' || isTimeout == '3') {
+            $("#showResult").show();
+        } else {
+            $("#showResult").hide();
+        }
+    });
+
+    function view() {
+        $("#showResult").show();
+        $("#showSave").hide();
+    }
+
+    function back() {
+        $("#showResult").hide();
+        $("#showSave").show();
+    }
+</script>
+</body>
+</html>

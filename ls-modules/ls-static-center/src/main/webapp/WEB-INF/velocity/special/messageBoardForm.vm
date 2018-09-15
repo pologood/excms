@@ -1,0 +1,276 @@
+<div class="guestbook-form">
+    <div class="guestbook_bt"><span>我要写信</span></div>
+    <form role="form" name="guestbook_form" id="guestbook_form">
+        <div class="guestbook-table-form list-$!{resultObj.vo.columnId}">
+            <ul class="clearfix">
+                #if(" $resultObj.typeList"!="")
+                <div style="width:100%;float:left;">
+                    <li class="bt"><span>*</span>留言类型：</li>
+                    <li class="srk sel1">
+                        <select name="classCode" id="classCode">
+                            #if($size==1)
+                                #foreach($editVo in  $resultObj.typeList)
+                                    <option value="$editVo.classCode" selected="selected">$editVo.className</option>
+                                #end
+                            #else
+                                #if($!{resultObj.vo.classCode})
+                                    #foreach($editVo in  $resultObj.typeList)
+                                        #if($!{resultObj.vo.classCode}==$editVo.classCode)
+                                            <option value="$editVo.classCode" selected="selected">$editVo.className</option>
+                                        #else
+                                            <option value="$editVo.classCode">$editVo.className</option>
+                                        #end
+                                    #end
+                                #else
+                                    #foreach($editVo in$resultObj.typeList)
+                                        #if($editVo.classCode=="do_suggest")
+                                            <option value="$editVo.classCode"  selected="selected">$editVo.className</option>
+                                        #else
+                                            <option value="$editVo.classCode">$editVo.className</option>
+                                        #end
+
+                                    #end
+                                #end
+                            #end
+                        </select>
+                    </li>
+
+                #end
+
+                #if("$!{resultObj.recType}"=="0")
+                    <li class="bt"><span>*</span>受理单位：</li>
+                    <li class="srk sel2">
+                        <select name="receiveUnitId" id="receiveUnitId">
+                            <option value="" selected="selected">==请选择==</option>
+                            #foreach($vo in $resultObj.recList)
+                                #if("$!{resultObj.vo.receiveUnitId}"=="${vo.recUnitId}")
+                                    <option value="$vo.recUnitId" selected="selected">$vo.recUnitName</option>
+                                #else
+                                    <option value="$vo.recUnitId">$vo.recUnitName</option>
+                                #end
+                            #end
+                        </select>
+                    </li>
+                #end
+
+                #if("$!{resultObj.recType}"=="1")
+                    <li class="bt"><span>*</span>收信领导：</li>
+                    <li class="srk sel2">
+                        <select name="receiveUserCode" id="receiveUserCode">
+                            <option value="">==请选择==</option>
+                            #if($resultObj.recList.size()==1)
+                                <option value="$recList[0].recUserId" selected>$recList[0].recUserName</option>
+                            #else
+                                #foreach($vo in $resultObj.recList)
+                                    <option value="$vo.recUserId">$vo.recUserName</option>
+                                #end
+                            #end
+                        </select>
+                    </li>
+                #end
+            </div>
+                <li class="bt"><span>*</span>您的姓名：</li>
+                <li class="srk"><input name="personName" id="personName" value="$!{resultObj.vo.personName}" type="text" maxlength="10"></li>
+                <li class="bt"><span>*</span>联系方式：</li>
+                <li class="srk"><input name="personPhone" id="personPhone" value="$!{resultObj.vo.personPhone}" type="text" maxlength="13"></li>
+                <div class="clear"></div>
+                <li class="bt"><span>*</span>标题：</li>
+                <li class="btk"><input name="title" id="title" type="text" maxlength="150"></li>
+                <div class="clear"></div>
+                <li class="bt1"><span>*</span>内容：</li>
+                <li class="tex"><textarea name="messageBoardContent" id="messageBoardContent" rows="5"></textarea></li>
+                <div class="clear"></div>
+                <li class="bt">公开留言内容：</li>
+                <li class="gk">
+                    <label>
+                        <input class="isPublic" type="radio" name="isPublic" value="1" checked="checked"> 是
+                    </label>
+                    <label>
+                        <input class="isPublic" type="radio" name="isPublic" value="0"> 否
+                    </label>
+                </li>
+                <div class="clear"></div>
+                <li class="bt">公开个人信息：</li>
+                <li class="gk">
+                    <label>
+                        <input class="isPublicInfo" type="radio" name="isPublicInfo" value="1"> 是
+                    </label>
+                    <label>
+                        <input class="isPublicInfo" type="radio" name="isPublicInfo" value="0" checked="checked"> 否
+                    </label>
+                </li>
+                <div class="clear"></div>
+                <li class="bt"><span>*</span>验证码：</li>
+                <li class="yzm">
+                    <input class="verification" name="checkCode" id="checkCode" size="6" maxlength="4" type="text">
+                    <img id="imgCode" class="imgcode" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                </li>
+                <div class="clear"></div>
+                <li class="btn_group">
+                    <input id="btn_submit" class="btn btn-submit" type="button" accesskey="S" value="确定(S)">
+                    <input id="btn_search" class="btn btn-search" type="button" accesskey="C" value="留言查询(C)">
+                    <input type="hidden" name="columnId" value="$!{context.columnId}">
+                    <input type="hidden" name="siteId" value="$!{context.siteId}">
+                </li>
+            </ul>
+        </div>
+    </form>
+</div>
+<script id="guestbook_tips_tpl" type="text/html">
+    <div class="guestbook-tips">
+        <ul class="guestbook-text">
+            <h2 class="font_01">您的留言提交成功！</h2>
+            <div class="tishi_con">感谢您的留言，我们会及时审核并回复。<br>
+                请记录您的查询编号和密码，以便于查询您的本次留言。
+            </div>
+        </ul>
+        <ul>
+            <li>查询编号：<span><?=docNum?></span></li>
+            <li>查询密码：<span><?=randomCode?></span></li>
+        </ul>
+    </div>
+</script>
+
+<script id="guestbook_search_tpl" type="text/html">
+    <form name="guestbook_search_bar" id="guestbook_search_bar" method="post" action="" autocomplete="off">
+        <div class="guestbook-search">
+            <ul>
+                <li>查询编号：<span><input name="docNum" type="text" maxlength="20"></span></li>
+                <li>查询密码：<span><input name="randomCode" type="password" maxlength="20"></li>
+            </ul>
+        </div>
+    </form>
+</script>
+<script>
+    var recType = '$!{recType}';
+    var codeType = "$!{codeType}";
+    $(document).ready(function () {
+
+        var isOpen = Ls.url.get("isOpen");
+        //弹窗留言影响查询按扭
+        if (isOpen) {
+            $("#btn_search").hide()
+        }
+
+        using("validator", function () {
+
+            $("#guestbook_form").validator({
+                fields: {
+                    #if("$!{resultObj.recType}"!="" && "$!{resultObj.recType}"!="2")
+                        #if("$!{resultObj.recType}"=="0")
+                            receiveUnitId: "受理单位:required;",
+                        #end
+                        #if("$!{resultObj.recType}"=="1")
+                            receiveUserCode: "收信领导:required;",
+                        #end
+                    #end
+                    #if("${resultObj.typeList}"!="")
+                        classCode: "留言类型:required;",
+                    #end
+                    personName: "您的姓名:required;",
+                    personPhone: "联系方式:required;mobile|tel|shortTel;",
+                    title: "标题:required;",
+                    messageBoardContent: "内容:required;length[5~500];",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-top',
+                timely: 1
+            });
+
+            function saveData() {
+                var guestbook_form = $("#guestbook_form");
+                return Ls.ajax({
+                    url: "/frontGuestBook/saveMessageBoardVO",
+                    data: guestbook_form.getFromJSON()
+                }).done(function (d) {
+                    if (d.status == 0) {
+                        Ls.tipsErr(d.desc);
+                    } else {
+                        using("dialog", function () {
+                            Ls.openWin({
+                                title: '温馨提示',
+                                height: 212,
+                                content: Ls.template("guestbook_tips_tpl", d.data)
+                            }).show();
+                        });
+                        guestbook_form[0].reset();
+                    }
+                }).always(function () {
+                    $("#imgCode").click();
+                });
+            };
+
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#guestbook_form").trigger("validate");
+        });
+
+        $("#btn_search").on('click', function () {
+
+            function actionSearch() {
+                var guestbook_search_bar = $("#guestbook_search_bar");
+                guestbook_search_bar.validator({
+                    fields: {
+                        docNum: "查询编号:required",
+                        randomCode: "查询密码:required"
+                    },
+                    valid: function (d) {
+                        var me = d;
+                        Ls.ajax({
+                            dataType: "JSON",
+                            data: {
+                                pageSize: 1,
+                                siteId: $!{context.siteId},
+                                columnId: $!{context.columnId},
+                                action: "search",
+                                docNum: me.docNum.value,
+                                randomCode: me.randomCode.value,
+                                isJson: true
+                            },
+                            url: "/site/label/12644397"
+                        }).done(function (d) {
+                            if (Ls.isObject(d)) {
+                                var url = ("/content/article/" + d.vo.baseContentId).setUrlParam("action", "detail");
+                                guestbook_search_bar.validator('destroy').attr("action", url).submit();
+                            } else {
+                                Ls.tipsErr("查询编号或查询密码错误！");
+                            }
+                        })
+                    },
+                    msgClass: 'n-top',
+                    timely: 1
+                });
+                guestbook_search_bar.trigger("validate");
+            }
+
+            using("dialog", function () {
+                Ls.openWin({
+                    title: '留言查询',
+                    height: 160,
+                    content: Ls.template("guestbook_search_tpl"),
+                    okValue: '查询',
+                    ok: function () {
+                        actionSearch();
+                        return false;
+                    }
+                }).show();
+            });
+
+        });
+
+    });
+
+</script>

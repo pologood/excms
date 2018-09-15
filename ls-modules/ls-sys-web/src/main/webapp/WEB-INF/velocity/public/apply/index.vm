@@ -1,0 +1,127 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            #if($hasPublish)
+                                <li disabled class="publishBtn" id="publishs" onclick="publish('',0)"><a
+                                        href="javascript:;">批量发布</a></li>
+                                <li disabled class="publishBtn" id="unpublishs" onclick="publish('',1)"><a
+                                        href="javascript:;">批量取消发布</a></li>
+                            #end
+                            <li class="divider"></li>
+                            <li disabled class="editBtn" id="batchCopy" onclick="batchCopy('')"><a href="javascript:;">批量复制到</a>
+                            </li>
+                            <li disabled class="editBtn" id="batchMove" onclick="batchMove('')"><a href="javascript:;">批量移动到</a>
+                            </li>
+
+                            #if($hasEdit)
+                                <li class="divider"></li>
+                                <li disabled class="editBtn" id="deletes" onclick="deleteData('')"><a
+                                        href="javascript:;">批量删除</a></li>
+                            #end
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchByStatus(1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchByStatus(0)">未发布</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <form class="form-inline tr search-toolbar" role="form" id="searchForm">
+                        <div class="form-group">
+                            <select id="public_apply_type" type="text" name="type" class="form-control">
+                                <option value="">选择性质</option>
+                                <option value="person">公民</option>
+                                <option value="organ">法人/其他组织</option>
+                            </select>
+                            <input type="text" id="searchKey" name="key" class="form-control w160" placeholder='标题'/>
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="searchContent()">搜 索</button>
+                        <button type="button" class="btn btn-default" onclick="resetContent();">显示全部</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="public_content_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true"
+             allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/public/apply/getPage">
+            <div property="columns">
+                <div type="checkcolumn" width="50"></div>
+                <div field="code" width="70" headerAlign="center" allowSort="flase" align="center">编号</div>
+                <div field="content" width="100%" cell renderer="renderContent" headerAlign="center"
+                     allowSort="flase" align="center">内容
+                </div>
+                <div field="createDate" width="160" headerAlign="center" allowSort="flase" align="center"
+                     dateFormat="yyyy-MM-dd HH:mm:ss">创建时间
+                </div>
+                <div field="replyStatusName" width="100" headerAlign="center" allowSort="flase" align="center">
+                    回复状态
+                </div>
+                #if($hasPublish)
+                    <div width="50" headerAlign="center" allowSort="flase" align="center" renderer="IsPublish">发布
+                    </div>
+                #end
+                #if($hasEdit)
+                    <div field="" width="170" headerAlign="center" allowSort="true" renderer="renderOp"
+                         align="center">操作
+                    </div>
+                #end
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        vm: null,//模型
+        grid: null//datagrid
+    };
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_content_manage.js?v=1"></script>
+<script>
+
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.grid = mini.get("public_content_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+        //查询内容
+        searchContent("")
+    });
+
+    function renderContent(e) {
+        var str = "", title = "";
+        var rec = e.record;
+        var str = "<a href='javascript:void(0);' onclick='detailApply(" + rec.id + ")' >" + rec.content + "</a>"
+        return str
+    }
+
+    function titleDetail(e) {
+        var rec = e.record;
+        var link = rec.redirectLink;
+        if (link && link != "") {
+            return "<a target='_blank' href='" + link + "'>" + rec.title + "</a>";
+        }
+        return "<a target='_blank' href='" + GLOBAL_HTMLFILEPATH + "/public/content/" + rec.contentId + "' >" + rec.title + "</a>"
+    }
+
+    function detailApply(id) {
+        var url = '/public/apply/getPublicApplyDetail';
+        url = url.setUrlParam("id", id);
+        Ls.openWin(url, '700px', '550px', {
+            id: 'getPublicApplyDetail',
+            title: "依申请公开"
+        });
+    }
+</script>

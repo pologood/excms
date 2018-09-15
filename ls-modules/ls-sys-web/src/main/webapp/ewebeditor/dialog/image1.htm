@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var sCheckFlag = "file";
+        var bAllowUpload = ((parseFloat(config.AllowImageSize) > 0) ? true : false);
+        var sImage = ParentDialog.$("d_image").value;
+
+        var sCaption = lang["DlgImage1"];
+        document.write("<title>" + sCaption + "</title>");
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            $("d_fromurl").value = sImage;
+            if (sImage) {
+                sCheckFlag = "url";
+            }
+            if ((!bAllowUpload) && (sCheckFlag == "file")) {
+                sCheckFlag = "url";
+            }
+            RadioClick(sCheckFlag);
+
+            parent.InnerDialogLoaded(sCaption);
+
+            if (bAllowUpload && document.documentMode == 5) {
+                var b_UFDisable = (sCheckFlag == "url") ? false : true;
+                $("uploadfile").disabled = b_UFDisable;
+                $("uploadfile").disabled = !b_UFDisable;
+            }
+        }
+
+        function RadioClick(s_Flag) {
+            switch (s_Flag) {
+                case "url":
+                    $("d_checkfromurl").checked = true;
+                    $("d_fromurl").disabled = false;
+                    if (config.AllowBrowse == "1") {
+                        $("d_browse").disabled = false;
+                    }
+                    if (bAllowUpload) {
+                        $("d_checkfromfile").checked = false;
+                        $("uploadfile").disabled = true;
+                    }
+                    break;
+                case "file":
+                    $("d_checkfromurl").checked = false;
+                    $("d_fromurl").disabled = true;
+                    if (config.AllowBrowse == "1") {
+                        $("d_browse").disabled = true;
+                    }
+                    if (bAllowUpload) {
+                        $("d_checkfromfile").checked = true;
+                        $("uploadfile").disabled = false;
+                    }
+                    break;
+            }
+        }
+
+
+        function UploadError(s_Flag) {
+            AbleItems();
+            RadioClick('file');
+            DLGDoingMsg.Hide();
+            try {
+                BaseAlert($("uploadfile"), getUploadErrDesc(s_Flag, config.AllowImageExt, config.AllowImageSize));
+            }
+            catch (e) {
+            }
+        }
+
+        function UploadSaved(sOriginalFileName, sPathFileName, sPathFileName_s) {
+            EWIN.addUploadFile(sOriginalFileName, sPathFileName);
+            if (sPathFileName_s) {
+                EWIN.addUploadFile(sOriginalFileName, sPathFileName_s);
+            }
+
+            $("d_fromurl").value = sPathFileName;
+            ReturnValue();
+        }
+
+        function ReturnValue() {
+            sImage = $("d_fromurl").value;
+            ParentDialog.$("d_image").value = sImage;
+            parent.Ok();
+        }
+
+        function ok() {
+            if (config.FSPath != "" && config.FSL != "ok") {
+                alert(lang["ErrFSL"]);
+                return;
+            }
+
+            if ($("d_checkfromurl").checked) {
+                ReturnValue();
+                return;
+            }
+            if (bAllowUpload) {
+                if ($("d_checkfromfile").checked) {
+                    if (!IsExt($("uploadfile").value, config.AllowImageExt)) {
+                        UploadError("ext");
+                        return false;
+                    }
+
+                    CheckSizeAsync($("uploadfile"), config.AllowImageSize,
+                        function (s_SizeFlag) {
+                            if (s_SizeFlag == "no") {
+                                UploadError("size");
+                                return false;
+                            }
+
+                            DisableItems();
+                            DLGDoingMsg.Show();
+                            document.myuploadform.submit();
+                        }
+                    );
+                }
+            }
+        }
+
+        function DisableItems() {
+            $("d_checkfromfile").disabled = true;
+            $("d_checkfromurl").disabled = true;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = true;
+            }
+            $("d_fromurl").disabled = true;
+            $("d_ok").disabled = true;
+        }
+
+        function AbleItems() {
+            $("d_checkfromfile").disabled = false;
+            $("d_checkfromurl").disabled = false;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = false;
+            }
+            $("d_fromurl").disabled = false;
+            $("d_ok").disabled = false;
+        }
+    </script>
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend><span lang=DlgBkImgSource></span></legend>
+                            <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                <tr>
+                                    <td>
+
+                                        <table border=0 cellpadding=0 cellspacing=0 width="300px">
+                                            <tr>
+                                                <td></td>
+                                            </tr>
+                                        </table>
+                                        <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                            <script type="text/javascript">
+                                                if (bAllowUpload) {
+                                                    document.write("<tr>");
+                                                    document.write("<td noWrap width=\"20%\"><input type=radio id=\"d_checkfromfile\" value=\"1\" onclick=\"RadioClick('file')\"><label for=d_checkfromfile>" + lang["DlgFromFile"] + "</label>:</td>");
+                                                    document.write("<td noWrap width=\"80%\" colspan=2>");
+                                                    document.write(getUploadForm("image"));
+                                                    document.write("</td>");
+                                                    document.write("</tr>");
+                                                }
+                                            </script>
+                                            <tr>
+                                                <td width="20%" noWrap><input type=radio id="d_checkfromurl" onclick="RadioClick('url')"><label for=d_checkfromurl><span
+                                                    lang=DlgFromUrl></span></label>:
+                                                </td>
+                                                <td width="80%" noWrap colspan=2>
+                                                    <script type="text/javascript">
+                                                        if (config.AllowBrowse == "1") {
+                                                            document.write("<table border=0 cellpadding=0 cellspacing=0 width='100%'><tr><td width='100%'><input type=text id='d_fromurl' style='width:100%' size=30 value=''></td><td><input class='dlgBtnBrowse' type=button id='d_browse' onclick=\"SelectBrowse('image','fromurl')\" value='" + lang["DlgBtnBrowse"] + "' align=absmiddle></td></tr></table>");
+                                                        } else {
+                                                            document.write("<input type=text id='d_fromurl' style='width:100%' size=30 value=''>");
+                                                        }
+                                                    </script>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td height=5></td>
+                </tr>
+                <tr>
+                    <td noWrap align=right><input type=submit class="dlgBtnCommon dlgBtn" value='' id="d_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                             class="dlgBtnCommon dlgBtn"
+                                                                                                                                                             value=''
+                                                                                                                                                             onclick="parent.Cancel()"
+                                                                                                                                                             lang=DlgBtnCancel></td>
+                </tr>
+            </table>
+
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgComUploading"]);
+</script>
+
+</body>
+</html>

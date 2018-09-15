@@ -1,0 +1,37 @@
+<style>
+    .labelList{
+        padding-top: 10px;
+        padding-left: 15px;
+        margin: 0 auto;
+    }
+    .labelList ul li{
+        padding: 5px 10px;
+        margin-bottom: 10px;
+        margin-right: 10px;
+        cursor: pointer;
+        text-align: center;
+        border: 1px solid #999999;
+        float: left;
+        list-style: none;
+    }
+    .labelList ul li.active,
+    .labelList ul li:hover{
+        background: #fffce1;
+        border: 1px solid #f8881a;
+    }
+
+</style>
+<div class="labelList" id="attrFormLabelList">
+
+    <div class="sui-msg msg-error msg-block" v-if="noSelectLabel" style="margin-bottom: 15px; margin-right: 15px;">
+        <div class="msg-con">请选择标签</div>
+        <s class="msg-icon"></s>
+    </div>
+
+    <ul id="labelListUL" class="clearfix">
+        <li v-for="el in list" :class="{'active':el.isActive}"  v-on:click="selectLabel(el)">
+            <span class="" :data-type="el.name" >{{el.name}}</span>
+        </li>
+    </ul>
+
+</div>

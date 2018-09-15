@@ -1,0 +1,227 @@
+#parse("_page_layout/_header.vm")
+<link href="$!{sysStaticPath}/assets/js/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+<style>
+    #tagsWrap {
+        padding: 10px 29px 7px 11px;
+        height: 51px;
+        width: 100%;
+        overflow: hidden;
+        background: #FFF;
+        position: fixed;
+        z-index: 10;
+        top: 0;
+        margin-left: 15px;
+    }
+
+    #tagsWrap>span {
+        float: left;
+        margin: 9px 6px 0 0;
+        color: #6f6c6c;
+    }
+
+    #tagsWrap .form-control {
+        float: left;
+        width: 85%;
+    }
+
+    #tags2 {
+        display: none;
+    }
+
+    .tab-pane {
+        height: 440px;
+        overflow: auto;
+    }
+
+    .ui-autocomplete {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .ui-menu .ui-menu-item-wrapper {
+        display: inline-block;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ui-menu .ui-menu-item-wrapper:hover {
+        text-decoration: none;
+    }
+
+    .ztree {
+        overflow: hidden;
+    }
+</style>
+
+<body class="page-body-white" style="padding-top: 10px;">
+
+<div id="tagsWrap">
+    <span>快速查询：</span>
+    <div>
+        <input type="text" id="tags" class="form-control" placeholder="支持中文搜索">
+        <input type="text" id="tags2" class="form-control" placeholder="支持中文搜索">
+    </div>
+</div>
+<div style="margin-top: 35px;">
+    <div class="tabbable-line" style="margin:0px 20px;">
+        <ul class="nav nav-tabs" id="copy_refer_tab">
+
+            <li>
+                <a href="#tab_1_1" data-toggle="tab">内容管理</a>
+            </li>
+
+            <li>
+                <a href="#tab_1_2" data-toggle="tab">信息公开</a>
+            </li>
+
+        </ul>
+
+        <div class="tab-content pt10">
+            <div class="tab-pane" id="tab_1_1">
+                <ul class="ztree" id="column_tree">
+                    <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150"
+                                                                                       width="80">...</marquee></span>
+                </ul>
+            </div>
+
+            <div class="tab-pane" id="tab_1_2">
+                <ul class="ztree" id="public_tree">
+                    <span style="margin:auto;" class="bold font-red-mint">正在加载中<marquee scrolldelay="150"
+                                                                                        width="80">...</marquee></span>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/column_config.js"></script>
+<script>
+    mini.parse();
+    var initZtree = {};
+    var cur = {
+        W: Ls.getWin.win,
+        api: Ls.getWin.api,
+        column_tree: null,
+        public_tree: null,
+        msg_tree: null,
+        synColumnIds: "$!{synColumnIds}",
+        synOrganCatIds: "$!{synOrganCatIds}",
+        columnId: null,//当前栏目id
+        type: "$!{type}",//
+        id: null,//
+        typeId: "$!{typeId}",
+        flag: false
+    };
+    $(document).ready(function () {
+        cur.api.button(
+                {
+                    id: 'save',
+                    className: 'btn-save',
+                    focus: true,
+                    name: '确定',
+                    callback: function () {
+                        ok();
+                        return false;
+                    }
+                }, {
+                    id: 'back',
+                    className: 'btn-back',
+                    name: '取消',
+                    callback: function () {
+                        cancel();
+                        return false;
+                    }
+                }
+        );
+
+        function cancel() {
+            Ls.winClose();
+        }
+
+
+        //绑定标签事件
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            var id = e.currentTarget.hash;
+
+            if (id == '#tab_1_1') {
+                $("#tags").show().siblings().hide().end().val('');
+            } else if (id == '#tab_1_2') {
+                $("#tags2").show().siblings().hide().end().val('');
+            }
+
+            if (!initZtree[activeTab]) {
+                initZtree[activeTab] = true;
+                if (activeTab == "#tab_1_1") {
+                    cur.column_tree = copyRefer_mgr.columnInit("column_tree", cur.W.GLOBAL_SITEID, true);
+                } else if (activeTab == "#tab_1_2") {//信息公开要带上单位ID
+                    cur.public_tree = copyRefer_mgr.publicInit("public_tree", 1, cur.id, null, true);
+                }
+            }
+
+        });
+        $('#copy_refer_tab a:first').tab('show');//显示第一个标签
+        /*var height = document.body.offsetHeight - 80;
+        $(".ztree").height(height).css("overflow", "auto");*/
+    });
+
+    // 获取数据，内容管理选中、信息公开选中、信息报送选中
+    function ok() {
+
+        if (cur.column_tree) {
+            var checks = cur.column_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建内容管理选中节点
+                var ids = [], publishs = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    if (checks[i].isParent != true) {
+                        ids.push(checks[i].indicatorId);
+                    }
+                }
+                cur.synColumnIds = ids.join(",");
+            } else {
+                cur.synColumnIds = "";
+            }
+        }
+
+        if (cur.public_tree) {
+            checks = cur.public_tree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建信息公开选中节点
+                var ids = [], publishs = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    if (checks[i].isParent != true) {
+                        ids.push(checks[i].organId + "_" + checks[i].id);
+                    }
+                }
+                cur.synOrganCatIds = ids.join(",");
+            } else {
+                cur.synOrganCatIds = "";
+            }
+        }
+        Ls.ajax({
+            url: "/monitor/column/saveBindColumn",
+            type: "POST",
+            data: {
+                "typeId": cur.typeId,
+                "synOrganCatIds": cur.synOrganCatIds,
+                "synColumnIds": cur.synColumnIds
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    cur.W.cur.grid.load({"dataFlag": 1});
+                    Ls.tips("操作成功", function () {
+                        Ls.winClose();
+                    });
+                } else {
+                    Ls.tips(resp.desc, {icons: "error", times: 2});
+                }
+            }
+        });
+
+    }
+</script>

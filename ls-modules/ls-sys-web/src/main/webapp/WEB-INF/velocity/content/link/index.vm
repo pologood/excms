@@ -1,0 +1,38 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="btn-group">
+                        <button id="addButton_btn" class="btn btn-default btn-add" onclick="add()">添 加</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn" id="publishs"><a href="javascript:;">批量发布</a></li>
+                            <li class="publishBtn" id="unpublishs"><a href="javascript:;">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="editBtn" id="deletes"><a href="javascript:;">批量删除</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="link_datagrid" class="mini-datagrid  ls-mini-grid-cell" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/content/getPage?dataFlag=1">
+            <div property="columns">
+                <div type="checkcolumn" width="50"></div>
+                <div field="num" width="60" headerAlign="center" allowSort="flase" align="center">排序号</div>
+                <div field="title" width="100%" headerAlign="center" align="center" allowSort="flase" renderer="linkOp">链接名称</div>
+				#if("$!{isLogo}" == "1")
+                    <div width="110" headerAlign="center" align="center" allowSort="true" renderer="logoOp">Logo</div>
+				#end
+                <div width="50" headerAlign="center" align="center" allowSort="flase" renderer="IsPublish">发布</div>
+                <div width="115" headerAlign="center" align="center" allowSort="true" renderer="renderOp">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/link_mgr.js"></script>

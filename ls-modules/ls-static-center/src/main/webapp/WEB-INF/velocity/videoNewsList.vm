@@ -1,0 +1,41 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isHit="$!{paramObj.isHit}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css} num${velocityCount}">
+    #set($title=$!{eo.title})
+    <a href="$!{eo.link}" target="$!{paramObj.target}" title="${title}" class="left">
+        #set($style="")
+        #if("$!{eo.isBold}" == "1")
+            #set($style="font-weight:bold;")
+        #end
+        #if("$!{eo.isTilt}" == "1")
+            #set($style=$style+"font-style:italic;")
+        #end
+        #if("$!{eo.isUnderline}" == "1")
+            #set($style=$style+"text-decoration:underline;")
+        #end
+        #if("$!{eo.isNew}" == "1")
+            #set($length=$length+3)
+        #end
+        #set($title=$!{eo.title})
+        <font style='$style'>#cutstr($title,$length)</font>
+    </a>
+    #if("$!{eo.isNew}" == "1")
+        <img src="/images/news.gif">
+    #end
+    #if($isHit == "true")
+        <span class="right hit">[$!{eo.hit}]</span>
+    #end
+    #if($isDate == "true")
+        <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+    #end
+</li>
+#end

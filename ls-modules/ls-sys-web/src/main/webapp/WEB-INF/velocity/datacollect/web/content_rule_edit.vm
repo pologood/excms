@@ -1,0 +1,170 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <form id="rule_edit_form" role="form" ms-controller="rule_edit_form">
+            <div class="form-body">
+                <table class="table table-bordered article-table" style="margin-top:18px;margin-bottom: 0px;">
+                    <tr>
+                        <th>内容名称:</th>
+                        <td>
+                            <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                            <input type="text" id="name" name="name" class="form-control" data-rule="内容名称:required;" placeholder="" ms-duplex="name">
+                        </td>
+                        <td width="80">
+                            (<font color="red">*</font>必填项)
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>入库字段:</th>
+                        <td>
+                            <select type="text" id="columnName" name="columnName" class="form-control" data-rule="入库字段:required;" placeholder=""></select>
+                        </td>
+                        <td width="80">
+                            (<font color="red">*</font>必填项)
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="table table-bordered article-table">
+                    <tr>
+                        <td valign="top" align="right">开始字符:</td>
+                        <td>
+                            <textarea id="regexBegin" name="regexBegin" class="form-control" style="width: 100%;height: 80px;" data-rule="开始字符:required;" placeholder="正则采集开始字符串(唯一)，不能为空" ms-duplex="regexBegin"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" align="right">结束字符:</td>
+                        <td>
+                            <textarea id="regexEnd" name="regexEnd" class="form-control" style="width: 100%;height: 80px;" data-rule="结束字符:required;" placeholder="正则采集结束字符串(唯一)，不能为空" ms-duplex="regexEnd"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td valign="top" align="right">过滤规则:</td>
+                        <td>
+                            <textarea id="regexFilter" name="regexFilter" class="form-control" style="width: 100%;height: 80px;" data-rule="" placeholder="过滤规则，多个以逗号分隔 例如：（<div id='ivs_player'></div> 表示过滤此标签  <div id='ivs_player'>.*</div> 表示过滤匹配此规则的所有标签）" ms-duplex="regexFilter"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>默认值:</th>
+                        <td>
+                            <input id="defaultValue" type="text" name="defaultValue" class="form-control" data-rule=""  placeholder="采集为空时，入库的默认值" ms-duplex="defaultValue">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "rule_edit_form",
+        form: $('#rule_edit_form'),
+        columnName:$("#columnName"),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type"),
+        taskId:Ls.getWin.dialog.data("taskId")
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+            });
+        } else {
+            cur.model = cur.dialog.data("record");
+        }
+        setData(cur.model);
+        getColumnModel();
+    })
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function saveData() {
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/data/collect/saveContentRule"
+        } else {
+            url = "/data/collect/updateContentRule"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                taskId:cur.taskId,
+                name: cur.vm.name,
+                columnName: cur.columnName.val(),
+                regexBegin: cur.vm.regexBegin,
+                regexEnd: cur.vm.regexEnd,
+                regexFilter:cur.vm.regexFilter,
+                defaultValue: cur.vm.defaultValue
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+    function getColumnModel() {
+
+        Ls.ajaxGet({
+            url: "/data/collect/getColumns",
+            data:{
+                tableName:"CMS_HTML_COLLECT_DATA"
+            }
+        }).done(function (response) {
+            var str = '<option value=""> 选择入库字段 </option> ';
+            if (response != null) {
+                var data = response.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].columnName + '>【' + data[i].columnName + '】【'+data[i].dataType+'('+data[i].dataLength+')】【' + (isNull(data[i].comments)?"无注释":data[i].comments)  + '】</option> '
+                    }
+                }
+            }
+            cur.columnName.append(str);
+            cur.columnName.val(cur.vm.columnName);
+        });
+    }
+
+    function isNull(obj) {
+        return obj == null || obj == 'null' || obj == '' || obj == 'undefined';
+    }
+</script>

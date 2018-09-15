@@ -1,0 +1,138 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;">
+<div style="margin:10px 25px;height:302px" class="mini-fit">
+    <ul class="ztree" id="treeview"></ul>
+</div>
+<div class="form-actions" style="text-align:center;margin:10px 0px;">
+    <button type="button" class="btn22_blue h30 f14 mr15" onclick="saveCopy()">确定</button>
+    <button type="button" class="btn22_gray h30 f14" onclick="cancel()">取消</button>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+<script>
+    var siteId = GLOBAL_SITEID;//站点ID
+    var contentId =$!{id};
+    var columnType = '$!{columnType}';
+    var columnId =$!{columnId};
+    $(document).ready(function () {
+        getColumnTreeBySite();
+    })
+    var setting = {
+        isEdit: true,
+        view: {},
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'indicatorId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            //beforeCheck: zTreeBeforeCheck,
+        },
+        check: {
+            autoCheckTrigger: false,
+            enable: true,
+            chkboxType: {"Y": "ps", "N": "ps"},
+            chkStyle: "checkbox"
+        },
+    };
+
+    function zTreeBeforeCheck(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview");
+        if (treeNode.isParent) {
+
+        }
+    }
+
+
+    //获取叶子节点数
+    function getChecked() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview");
+        var nodes = zTree.getCheckedNodes(true);
+        if (nodes) {
+            for (var i = 0; i < nodes.length; i++) {
+                var nodeChildrens = nodes[i].children;
+                if (nodeChildrens) {
+                    nodes[i].nocheck = true;
+                }
+            }
+        }
+        nodes = zTree.getCheckedNodes(true);
+        return nodes;
+    }
+
+
+    /**
+     * 点击节点
+     */
+    function nodeClick(event, treeId, treeNode) {
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        } else {
+            // editNode(treeNode);
+            //阻止冒泡事件
+            //event.stopImmediatePropagation();
+            columnId = treeNode.indicatorId;
+        }
+
+        event.stopImmediatePropagation();
+    }
+
+    //初始化站点栏目树
+    function getColumnTreeBySite() {
+        if (siteId == null || siteId == "") {
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                siteId: siteId,
+                columnTypeCode: columnType,
+                columnId: columnId
+            },
+            url: "$!{rc.contextPath}/siteMain/getColumnTreeByType",
+            cache: false,
+            success: function (json) {
+                tree = jQuery.fn.zTree.init($("#treeview"), setting, json);
+                tree.expandAll(true);
+            }
+        });
+    }
+
+    var saveCopy = function () {
+        var ids = [];
+        var pIds = [];
+        var nodeArr = getChecked();
+        for (var i = 0; i < nodeArr.length; i++) {
+            ids.push(nodeArr[i].indicatorId);
+            var pid = nodeArr[i].parentId;
+            if (pid == null) pid = 0;
+            pIds.push(pid);
+        }
+        if (ids.length == 0) {
+            Ls.tipsInfo("至少选择复制到一个栏目");
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                ids: ids,
+                pIds: pIds,
+                contentId: contentId
+            },
+            url: "/contentMgr/copyTo",
+            success: function (json) {
+                if (json.status == 0) {
+                    Ls.tipsErr("设置失败");
+                } else {
+                    Ls.winClose();
+                }
+            }
+        });
+
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+</script>

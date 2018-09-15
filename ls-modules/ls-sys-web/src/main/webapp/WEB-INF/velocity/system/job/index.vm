@@ -1,0 +1,35 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <button id="addButton_btn" class="btn btn-default btn-add" onclick="add()">新 增</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="job_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/job/getPage">
+            <div property="columns">
+				<div type="indexcolumn" width="40" headerAlign="center" allowSort="flase" align="center">序号</div>
+                <div field="name" width="220" headerAlign="center" allowSort="flase" align="left">任务名称</div>
+				<div field="typeName" width="110" headerAlign="center" allowSort="flase" align="center">任务类型</div>
+                <div field="cronExpression" width="120" headerAlign="center" allowSort="flase" align="left">时间表达式</div>
+                <div field="status" width="70" headerAlign="center" allowSort="flase" align="center">状态</div>
+				<div field="clazz" width="100%" headerAlign="center" allowSort="flase" align="left">类路径</div>
+                <div width="260" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/job/job_manage.js"></script>
+<script>
+var cur = {
+	id : null,
+	rowIndex : null,
+	grid: null//datagrid
+}
+$(document).ready(function() {
+	jobManage.init();
+});
+</script>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>建议管理-铜陵市人大</title>
+    <meta name="keywords" content="铜陵人大">
+    <meta name="description" content="铜陵人大">
+    <link rel="stylesheet" type="text/css" href="/assets/css/core-min.css">
+    <script type="text/javascript" src="/assets/js/jquery-min.js"></script>
+    <script type="text/javascript" src="/assets/js/core-min.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/lonsun.css"></head>
+<body onLoad="TransFor()" style="background:#fff;">
+<div id="container">
+    <div class="mainbox">
+        <div class="content">
+            <div class="wenzhang">
+                <div class="contentbox">
+
+                    <div id="zoom" class="newscontnet minh500">
+                        <div>
+                            <table class="tb1 advicetable" width="100%">
+                                <tbody>
+                                <tr>
+                                    <th width=100>届次： </th>
+                                    <td>
+                                        #foreach($vo in $sessionList)
+                #if($!{eo.session}==$vo.code)
+                                            $vo.key
+                                        #end
+            #end
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>建议编号：</th>
+                                    <td>$!{eo.num}</td>
+                                </tr>
+                                <tr>
+                                    <th>标题：</th>
+                                    <td>$!{eo.title}</td>
+                                </tr>
+                                <tr>
+                                    <th>正文：</th>
+                                    <td>$!{eo.content}</td>
+                                </tr>
+                                <tr>
+                                    <th>领衔人：</th>
+                                    <td>$!{eo.leader}</td>
+                                </tr>
+                                <tr>
+                                    <th>主办单位：</th>
+                                    <td>$!{eo.organizer}</td>
+                                </tr>
+                                <tr>
+                                    <th>办理结果：</th>
+                                    <td>$!{eo.result}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="clear"></div>
+                    <div>  <div class="fr close01"><a href="javascript:window.print()" class="printico">打印本页</a><a title="关闭" href="javascript:window.opener=null;window.close();" class="closeico">关闭</a></div></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="clear-15"></div>
+</div>
+
+
+</body>
+</html>

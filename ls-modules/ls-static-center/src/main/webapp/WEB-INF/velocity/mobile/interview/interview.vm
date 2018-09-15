@@ -1,0 +1,252 @@
+#set($_title="在线访谈详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="fuwutit">$!{interview.title}</div>
+    <div class="content_body fuwucon ftbox">
+        #set($img = "$!{interview.picUrl}")
+        #if($img.indexOf("/") !=-1)
+            #set($filePath="")
+        #elseif($img.indexOf(".")==-1)
+            #set($filePath="$!{fileServerPath}")
+        #else
+            #set($filePath="$!{fileServerNamePath}")
+        #end
+        #if("${img}"!="")
+            <div class="ftimg"><img src="$!{filePath}$!{img}"></div>
+        #end
+        <h3>时间</h3>
+        <div class="fu_con">$!{interview.time}</div>
+        <h3>嘉宾</h3>
+        <div class="fu_con">$!{interview.userNames}</div>
+        <h3>摘要</h3>
+        <div class="fu_con">$!{interview.content}</div>
+        #if("$!{interview.desc}" != "")
+            <h3>访谈详情</h3>
+            <div class="fu_con">$!{interview.desc}</div>
+        #end
+        <h3 id="question_sl">访谈实录</h3>
+        <div id="questionPageDiv" style="display:none;" class="interview-info-list">
+            <div id="question_page">
+            </div>
+            <div id="interviewpage" class="pagination"></div>
+        </div>
+        <!-- 在线访谈开启处理开始   -->
+        #if($!{interview.isOpen} == "1")
+            <form role="form" name="interview_form" id="interview_form">
+                <a name="interview_form"></a>
+                <div class="intrevmeg">
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        <div class="tit">您的姓名：</div>
+                        <div class="con name">
+                            <input name="name" id="interview_name" type="text" size="30" maxlength="20">
+                        </div>
+                    #end
+                    <div class="tit">您的意见：</div>
+                    <div class="con opinion">
+                        <textarea name="content" id="interview_content" cols="70" rows="5" maxlength="500" placeholder="最多允许输入5~1000字符，多余的将被截去"></textarea>
+                    </div>
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        <div class="tit">验证码：</div>
+                        <div class="con poll_input">
+                            <input name="checkCode" class="verification" id="checkimg" size="6" maxlength="4" type="text">
+                            <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                        </div>
+                    #end
+                    <div class="vote_btn">
+                        <input id="btn_submit" class="btn btn-submit" name="Submit" type="button" value="确定">
+                    </div>
+                </div>
+            </form>
+        #end
+        <!-- 在线访谈开启处理处理结束   -->
+    </div>
+</div>
+<!-- 正文 -->
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+    #if("1"=="2")
+    <!--  ***************此代码用于开发调试使用*************** -->
+    <script>
+        Ls.ajax({
+            url: "/content/saveInterviewWeb",
+            data: {
+                interviewId:$!{interview.interviewId},
+                name: name,
+                content: content,
+                checkCode: checkCode
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                $("#interview_form")[0].reset();
+                alert("提交成功");
+            } else {
+                alert(d.desc);
+                $("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    </script>
+    #end
+<script type="text/javascript">
+    var currentPageIndex = 0;
+    var pageSize = 5;
+    var dateFormat = "yyyy-MM-dd HH:mm:ss";
+    var qds = '0', ps = '0';
+    var pagination = "";
+
+    setInterviewPage(currentPageIndex);
+
+    function setInterviewPage(pageIndex) {
+        Ls.ajax({
+            url: "/content/getQuestionPage",
+            data: {
+                interviewId:$!{interview.interviewId},
+                pageSize: pageSize,
+                pageIndex: (pageIndex - 1),
+                dateFormat: dateFormat
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var jsonList = d.data.data;
+                var pageCount = d.data.pageCount;
+                var pageIndex = d.data.pageIndex;
+                $("#question_sl").show()
+                if (pageCount == 0) {
+                    $("#question_page").html("暂无相关信息");
+                    $("#question_sl").hide()
+                } else {
+                    $("#questionPageDiv").show();
+                    var html = '';
+                    for (var i = 0; i < jsonList.length; i++) {
+                        var eo = jsonList[i];
+                        html += ' <div class="ft_con">';
+                        html += ' <div class="tit">[' + eo.name + ']</div>';
+                        html += '<div class="con">' + eo.content + '</div>';
+                        html += '<div class="date">[' + eo.createWebTime + ']</div>';
+                        html += '</div>';
+                        if (eo.isReply == '1') {
+                            html += '<div class="ft_con reply">';
+                            html += '   <div class="tit">[' + eo.replyName + ']</div>';
+                            html += '   <div class="con">' + eo.replyContent + '</div>';
+                            html += '   <div class="date">[' + eo.replyWebTime + ']</div>';
+                            html += '</div>';
+                        }
+                    }
+                    $("#question_page").html(html);
+                }
+
+                if (pageCount > 1) {
+                    if (!pagination) {
+                        pagination = Ls.pagination("#interviewpage", function (pageIndex) {
+                            currentPageIndex = pageIndex;
+                            currentPageCount = pageCount;
+                            setInterviewPage(pageIndex);
+                        }, {
+                            currPage: (pageIndex + 1),
+                            pageCount: pageCount,
+                            isJump: false,
+                        });
+                    } else {
+                        pagination.reload((pageIndex + 1), pageCount);
+                    }
+                } else {
+                    $("#interviewpage").hide();
+                }
+
+            } else {
+                alert(d.desc);
+            }
+        });
+    }
+
+    //定义的秒刷新一次
+    setInterval(function () {
+        setInterviewPage(currentPageIndex);
+    }, 5 * 1000)
+
+    //设备回调
+    function androidDone(d) {
+        if (d.status == 1) {
+            $("#interview_form")[0].reset();
+            $("#imgCode").click();
+            alert("提交成功！");
+        } else {
+            $("#imgCode").click();
+            alert(d.desc)
+        }
+    }
+
+    $(document).ready(function (e) {
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        })
+
+        using("validator", function () {
+
+            $("#interview_form").validator({
+                fields: {
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        name: "姓名:required;",
+                    #end
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        checkCode: "验证码:required;",
+                    #end
+                    content: "您的意见:required;length[5~1000];"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+
+                var data = {
+                    interviewId:$!{interview.interviewId},
+                    name: $("#interview_name").val(),
+                    content: $("#interview_content").val(),
+                    checkCode: $("#checkimg").val()
+                }
+
+                /*Ls.ajax({
+                    url: "/content/saveMobileInterview",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        $("#interview_form")[0].reset();
+                        alert("提交成功");
+                    } else {
+                        alert(d.desc);
+                        $("#imgCode").click();
+                    }
+                }).fail(function () {
+                    alert('失败!');
+                });*/
+
+                try {
+                    Android.getJSONFromServiceUrlsIsLogin(JSON.stringify(data), "/content/saveMobileInterview", "$!{conVO.getIsLoginGuest()}");
+                } catch (e) {
+                    alert("出错提示：" + e)
+                }
+
+            }
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#interview_form").trigger("validate");
+        })
+
+    });
+
+</script>
+</body>
+</html>

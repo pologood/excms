@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sCaption = lang["DlgAnchor"];
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function InitDocument() {
+            var s_Name = "";
+            var o_Sel;
+            if (EWEBSelection.GetType() == "Control") {
+                o_Sel = EWEBSelection.GetSelectedElement();
+            } else {
+                o_Sel = EWEBSelection.GetParentElement();
+            }
+
+            if (o_Sel.tagName.toUpperCase() == "A") {
+                s_Name = GetProtectAttribute(o_Sel, "name");
+            }
+            $("d_anchor").value = s_Name;
+
+            _GetAnchors();
+            lang.TranslatePage(document);
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+        function _GetAnchors() {
+            $("d_allanchor").options.length = 0;
+            var o_AllLinks = EWEB.EditorDocument.body.getElementsByTagName("A");
+            for (i = 0; i < o_AllLinks.length; i++) {
+                var s_Name = GetProtectAttribute(o_AllLinks[i], "name");
+                if (s_Name) {
+                    $("d_allanchor").options[$("d_allanchor").options.length] = new Option(s_Name, s_Name);
+                }
+            }
+        }
+
+        function _GetAnchorObj(s_Name) {
+            var o_AllLinks = EWEB.EditorDocument.body.getElementsByTagName("A");
+            for (i = 0; i < o_AllLinks.length; i++) {
+                var s = GetProtectAttribute(o_AllLinks[i], "name");
+                if (s == s_Name) {
+                    return o_AllLinks[i];
+                }
+            }
+            return null;
+        }
+
+        function ok() {
+            var s_Name = BaseTrim($("d_anchor").value);
+            if (s_Name == "") {
+                BaseAlert($("d_anchor"), lang["DlgAnchorNoName"]);
+                return;
+            }
+
+            var o_Sel;
+            var s_Type = EWEBSelection.GetType();
+            if (s_Type == "Control") {
+                o_Sel = EWEBSelection.GetSelectedElement();
+            } else {
+                o_Sel = EWEBSelection.GetParentElement();
+            }
+
+            var b_Modify = false;
+            if (o_Sel.tagName.toUpperCase() == "A") {
+                SetProtectAttribute(o_Sel, "name", s_Name);
+                o_Sel.name = s_Name;
+                b_Modify = true;
+            }
+            if (!b_Modify) {
+                if (s_Type == "Control") {
+                    var o_Link = EWEB.EditorDocument.createElement('A');
+                    o_Link.name = s_Name;
+                    SetProtectAttribute(o_Link, "name", s_Name);
+
+                    o_Sel.parentNode.insertBefore(o_Link, o_Sel);
+                    o_Sel.parentNode.removeChild(o_Sel);
+                    o_Link.appendChild(o_Sel);
+
+                } else {
+
+                    var s_TempUrl = 'javascript:void(0);/*' + (new Date().getTime()) + '*/';
+                    EWEB.EditorDocument.execCommand('CreateLink', false, s_TempUrl);
+                    var o_Links = EWEB.EditorDocument.links;
+                    var b_Create = false;
+                    for (i = 0; i < o_Links.length; i++) {
+                        var o_Link = o_Links[i];
+                        if (o_Link.getAttribute('href', 2) == s_TempUrl) {
+                            o_Link.name = s_Name;
+                            SetProtectAttribute(o_Link, 'name', s_Name);
+                            o_Link.removeAttribute('href', 0);
+                            if (o_Link.innerHTML == '') {
+                                o_Link.className = 'ewebeditor__anchor';
+                            } else {
+                                o_Link.className = 'ewebeditor__anchorc';
+                            }
+                            b_Create = true;
+                        }
+                    }
+                    if (!b_Create) {
+                        EWIN.insertHTML('<a name="' + s_Name + '"></a>');
+                    }
+
+                }
+
+            }
+
+            parent.Ok();
+        }
+
+        function _DoMove() {
+            var n_Index = $("d_allanchor").selectedIndex;
+            if (n_Index < 0) {
+                alert(lang["DlgAnchorNoSelected"]);
+                return;
+            }
+            var o_Anchor = _GetAnchorObj($("d_allanchor").options[n_Index].value);
+            if (o_Anchor) {
+                _MoveRangeToNode(o_Anchor);
+            }
+        }
+
+        function _DoDel() {
+            var n_Index = $("d_allanchor").selectedIndex;
+            if (n_Index < 0) {
+                alert(lang["DlgAnchorNoSelected"]);
+                return;
+            }
+            var o_Anchor = _GetAnchorObj($("d_allanchor").options[n_Index].value);
+            if (o_Anchor) {
+                EWEBTools.RemoveNode(o_Anchor, true);
+                $("d_allanchor").options[n_Index] = null;
+            }
+        }
+
+        function _MoveRangeToNode(o_Node) {
+            EWEBSelection.Release();
+            EWEBSelection.SelectNode(o_Node);
+            EWEBSelection.Save(true);
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+
+            <table cellspacing="0" cellpadding="5" border="0" align=center>
+                <tr valign="top">
+                    <td noWrap align="left">
+                        <span lang=DlgAnchorName></span>:<br>
+                        <input type=text size=20 id="d_anchor" style="width:150px;"><br>
+                        <span lang=DlgAnchorOther></span>:<br>
+                        <select id="d_allanchor" size=8 style="width:150px;" onchange="$('d_anchor').value=this.options[this.selectedIndex].value;"></select>
+                    </td>
+                    <td noWrap height="100%">
+                        <table border=0 cellpadding=0 cellspacing=0 height="100%">
+                            <tr>
+                                <td height="50%" valign=top>
+                                    <input type=button class="dlgBtnCommon dlgBtn" style="margin-top:15px" name="btnOK" onClick="ok()" value="" lang=DlgBtnOK><br>
+                                    <input type=button class="dlgBtnCommon dlgBtn" style="margin-top:5px" name="btnCancel" onClick="parent.Cancel()" value="" lang=DlgBtnCancel><br>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height="50%" valign=bottom>
+                                    <input type=button class="dlgBtnCommon dlgBtn" name="btnMove" onClick="_DoMove()" value="" lang=DlgBtnGoto><br>
+                                    <input type=button class="dlgBtnCommon dlgBtn" style="margin-top:5px" name="btnDel" onClick="_DoDel()" value="" lang=DlgBtnDel><br>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

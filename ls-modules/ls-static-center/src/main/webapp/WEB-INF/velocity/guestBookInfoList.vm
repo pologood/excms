@@ -1,0 +1,35 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isReply="$!{paramObj.isReply}")
+#set($isHeader="$!{paramObj.isHeader}")
+#set($length=$Integer.parseInt($length))
+<div class="guestbook-list list$!{paramObj.id}">
+    #if("$!{isHeader}"=="true")
+        <div class="in-head">
+            <ul>
+                <li class="h1">信件标题</li>
+                <li class="h2">办理单位</li>
+                <li class="h3">回复时间</li>
+            </ul>
+        </div>
+    #end
+    <div class="in-body">
+        #foreach($eo in $resultObj)
+            #set($title="$!{eo.title}")
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css}">
+                <li class="b1">
+                    <a href="$!{eo.link}" target="_blank" title="$!{eo.title}">
+                        #cutstr($title,$length)
+                    </a>
+                </li>
+                <li class="b2">$!{eo.receiveName}</li>
+                <li class="b3">#date_format("$!{eo.replyDate}","$!{paramObj.dateFormat}")</li>
+            </ul>
+        #end
+    </div>
+</div>
+

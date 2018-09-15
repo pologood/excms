@@ -1,0 +1,75 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="240" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="class_tree" class="ztree"></ul>
+        </div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light" style="display:none;">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject font-dark bold uppercase">目录信息</span>
+                </div>
+            </div>
+
+            <div class="portlet-body form">
+                <form id="class_form" role="form" ms-controller="class_form"  class="col-md-8" style="padding-left: 0;">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>分类名称</label>
+                            <input type="text" name="name" class="form-control" placeholder="" ms-duplex="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>排序号</label>
+                            <input type="text" name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                        </div>
+						
+						<div class="form-group">
+                            <label>是否默认选中</label>
+							<div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isSelect" value="true" ms-duplex-boolean="isSelect">是</label>
+                                <label class="radio-inline"><input type="radio" name="isSelect" value="false" ms-duplex-boolean="isSelect">否</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="description" ms-duplex="description" rows="3" placeholder="分类描述"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>标识(数据导入时,匹配历史库分类用)</label>
+                            <input class="form-control" readonly name="code" ms-duplex="code"  placeholder="标识（数据导入时），匹配历史分类用"></input>
+                        </div>
+
+                        <div class="form-actions noborder">
+                            <button type="submit" class="btn blue">保 存</button>
+                            <button type="reset" class="btn default">重 置</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        id: "class_form",
+        root_id: "0",
+        class_url: "/public/class/getClasss",//目录查询url
+        class_tree_id: "class_tree",//目录树对象
+        tree: null,//树对象
+        type: null,//类型，新增、删除
+        vm: null//模型
+    };
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/class_manage.js"></script>
+<script>
+    $(document).ready(function () {
+        classManage.init();
+    });
+</script>

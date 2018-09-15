@@ -1,0 +1,113 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="mt10" style="padding-left: 10px">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/supervise/publicinfo_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        columnIds: art.dialog.data("columnIds"),
+        cSiteIds: art.dialog.data("cSiteIds"),
+        taskType: art.dialog.data("taskType"),
+        api: Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {
+                id: 'save', className: 'btn-save', focus: true, name: '确定', callback: function () {
+                    ok();
+                    return false;
+                }
+            },
+            {
+                id: 'back', className: 'btn-back', name: '取消', callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+        info_open_tree.init();
+    })
+
+    /**
+     * 保存数据
+     */
+    function ok() {
+        var nodes = cur.treeObj.getCheckedNodes(true);
+        var columnIds = "";
+        var cSiteIds = "";
+        var publicNames = "";
+        var publicTypes = "";
+        var organIds = "";
+        var nodeNames = "";
+        if (nodes != null) {
+            for (var i = 0; i < nodes.length; i++) {
+
+                if (nodes[i].isParent || nodes[i].type == "CMS_Site" || nodes[i].type == "SUB_Site") {
+                    continue;
+                }
+
+                var parentNodes = nodes[i].getPath();
+                if (columnIds == "") {
+                    columnIds = nodes[i].id;
+                    if (parentNodes != null) {
+                        for (var j = 0; j < parentNodes.length; j++) {
+                            if (j == 0) {
+                                nodeNames = parentNodes[j].name;
+                                publicNames = parentNodes[j].name;
+                                publicTypes = parentNodes[j].type;
+                                organIds = parentNodes[j].organId;
+                            } else {
+                                nodeNames += " > " + parentNodes[j].name;
+                                publicNames += " > " + parentNodes[j].name;
+                                publicTypes += " > " + parentNodes[j].type;
+                                organIds += " > " + parentNodes[j].organId;
+                            }
+                        }
+                    }
+                } else {
+                    columnIds += "," + nodes[i].id;
+                    if (parentNodes != null) {
+                        nodeNames += "\r\n";
+                        publicNames += ",";
+                        publicTypes += ",";
+                        organIds += ",";
+                        for (var j = 0; j < parentNodes.length; j++) {
+                            if (j == 0) {
+                                nodeNames += parentNodes[j].name;
+                                publicNames += parentNodes[j].name;
+                                publicTypes += parentNodes[j].type;
+                                organIds += parentNodes[j].organId;
+                            } else {
+                                nodeNames += " > " + parentNodes[j].name;
+                                publicNames += " > " + parentNodes[j].name;
+                                publicTypes += " > " + parentNodes[j].type;
+                                organIds += " > " + parentNodes[j].organId;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        cur.win.public_callback(columnIds, cSiteIds, nodeNames, publicNames, publicTypes, organIds);
+        Ls.winClose();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

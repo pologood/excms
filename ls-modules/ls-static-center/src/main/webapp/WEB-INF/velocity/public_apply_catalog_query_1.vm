@@ -1,0 +1,171 @@
+<table class="xxgk_jstable" align="center" border="0" cellpadding="0" cellspacing="0" width="760">
+	<tbody>
+    <tr>
+      <td style="padding-top:5px;padding-left:225px;">
+		<form method="post" id="publicApplyCatalogQueryForm" onsubmit="return queryByCondition();">
+		<table align="left" border="0" cellpadding="0" cellspacing="0" width="680">
+          <tbody>
+          <tr>
+              <td align="right" height="34" width="75">关<span style="padding-right:7px;"></span>键<span style="padding-right:7px;"></span>词：</td>
+              <td colspan="2" width="219"><input name="searchWords" class="ysq_input" style="width:208px;" type="text"></td>
+              <td colspan="2" width="186"><select name="query_type" style="width:100px;height:24px;">
+                  <option value="1">名  称</option>
+                  <option value="2">文  号</option>
+                  <option value="3">索引号</option>
+               </select></td>
+          </tr>
+          <tr>
+              <td align="right" height="34" width="75">起始日期：</td>
+              <td width="240">
+                  <input id="startTime" name="startDate" readonly class="ysq_input datePicker" data-setting="{dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d %H:%m:%s\'}'}" style="width:208px;"/></td>
+              <td align="right" width="75">结束日期：</td>
+              <td width="240">
+                  <input id="endTime" name="endDate" readonly class="ysq_input datePicker" data-setting="{dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startTime\')}',maxDate:'%y-%M-%d %H:%m:%s'}" style="width:208px;""></td>
+              <td width="56"><input class="ysq_btn" value="查询" type="submit"></td>
+            </tr>
+          </tbody>
+        </table></form></td>
+    </tr>
+  </tbody>
+</table>
+<div class="xxgk_sqcon">       
+  <div class="nav_tit">
+    <ul class="tit">
+      <li class="xh">序 号</li>
+      <li class="yh">索引号</li>
+      <li class="mc">信息名称</li>
+      <li class="rq">生成日期</li>
+    </ul>
+    <div class="clear"></div>
+  </div>
+  <div class="xxgk_nav_con" id="public_apply_catalog_query_result"></div>
+  <div id="public_apply_catalog_pageination" class="pagination"></div>
+</div>
+<script id="public_apply_catalog_query_tpl" type="text/html">
+<div class="xxgk_navli">
+<? for(var i=0,l=data.length; i<l; i++){ ?>
+<? var el = data[i] ?>
+	<ul>
+      	<li class="xh"><?=i+1 ?></li>
+      	<li class="yh"><?=el.indexNum ?></li>
+      	<li class="mc"><a href="<?=el.link ?>" target="_blank" onmouseover="showViewTitle('<?=el.id ?>');" onMouseOut="showViewTitle('<?=el.id ?>');"><?=el.title?></a></li>
+      	<li class="rq"><?=Ls.dateFormat(el.publishDate,"$!{paramObj.dateFormat}") ?></li>
+      	<div class="clear"></div>
+    </ul>
+    <div id="lvt_<?=el.id ?>" class="listviewboxt <? if(i>=15){ ?>listviewup<? } ?>" style="z-index:99999999;">
+      	<div class="listviewbox clearfix">
+			<div class="vitem">
+				<div class="vname">索 引 号：</div>
+				<p><?=el.indexNum ?></p>
+			</div>
+			<div class="vitem">
+				<div class="vname">主题分类：</div>
+				<p><?=el.classNames ?></p>
+			</div>
+			#*<div class="vitem">//修改处
+				<div class="vname">组配分类：</div>
+				<p><?=el.catName ?></p>
+			</div>*#
+            <div class="vitem">
+                <div class="vname">发文日期：</div>
+				<p><?=Ls.dateFormat(el.publishDate,"$!{paramObj.dateFormat}") ?></p>
+            </div>
+			<div class="vitem">
+				<div class="vname">发文机构：</div>
+##				<p>$!{organ.name}</p>//修改处
+                <p><?=el.resources ?></p>
+			</div>
+            <div class="vitem">
+                <div class="vname">生成日期：</div>
+				<p><?=Ls.dateFormat(el.publishDate,"$!{paramObj.dateFormat}") ?></p>
+            </div>
+            <div class="vitem">
+                <div class="vname">生效时间：</div>
+				<p><?=el.effectiveDate ?></p>
+            </div>
+            <div class="vitem">
+                <div class="vname">废止时间：</div>
+				<p><?=el.repealDate ?></p>
+            </div>
+            <div class="vitem vitem2">
+                <div class="vname">名<span style="padding-left:20px;"></span>称：</div>
+				<p><?=el.title ?></p>
+            </div>
+			<div class="vitem">
+				<div class="vname">文<span style="padding-left:20px;"></span>号：</div>
+				<p><?=el.fileNum ?></p>
+			</div>
+			<div class="vitem">
+				<div class="vname">关 键 词：</div>
+				<p><?=el.keyWords ?></p>
+			</div>
+		</div>
+    </div>
+<? } ?>
+</div>
+</script>
+<script>
+function setPublicApplyPage(pageIndex){
+	var data = {
+		siteId : "$!{context.siteId}",
+        organId: "$!{context.columnId}",
+        pageSize: "$!{paramObj.pageSize}",
+        pageIndex: pageIndex
+    };
+	var fromData = $("#publicApplyCatalogQueryForm").serializeObject();
+	if(fromData.query_type == "1"){//名称
+		data.title = fromData.searchWords;
+	}else if(fromData.query_type == "2"){//文号
+		data.fileNum = fromData.searchWords;
+	}else if(fromData.query_type == "3"){//索引号
+		data.indexNum = fromData.searchWords;
+	}
+	if(fromData.startDate != ""){
+		data.startDate = fromData.startDate;
+	}
+	if(fromData.endDate != ""){
+    	data.endDate = fromData.endDate;
+	}
+  	Ls.ajax({
+        url: "/public/applyCatalogQuery",
+        data: data
+    }).done(function(d) {
+        if (d.status == 1) {
+			 var pageCount = d.data.pageCount;
+             var pageIndex = d.data.pageIndex;
+             if (pageCount == 0) {
+			      $("#public_apply_catalog_query_result").html("未查询到结果");
+				  $("#public_apply_catalog_pageination").html("");
+             } else {
+			 	  var content = Ls.template("public_apply_catalog_query_tpl", d.data);
+                  $("#public_apply_catalog_query_result").html(content);
+			      if (pageCount > 1) {
+					  $("#public_apply_catalog_pageination").show();
+                      setPagination(pageIndex, pageCount);
+                  } 
+             }
+        } else {
+            Ls.tipsErr(d.desc);
+        }
+    });
+}
+
+function setPagination(pageIndex, pageCount){
+	Ls.pagination("#public_apply_catalog_pageination", function (pageIndex) {
+        setPublicApplyPage(pageIndex-1);
+    }, {
+        currPage: (pageIndex+1),
+        pageCount : pageCount,
+        param: "pageSize=$!{paramObj.pageSize}"
+    });
+}
+
+function queryByCondition(){
+	setPublicApplyPage(0);
+	return false;
+}
+$(document).ready(function(){
+	//查询
+	setPublicApplyPage(0);
+});
+</script>

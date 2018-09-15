@@ -1,0 +1,264 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                        class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn" onclick="batchPublish()"><a href="javascript:;">批量发布</a></li>
+                                    <li class="publishBtn" onclick="batchDel()"><a href="javascript:;">批量删除</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/weibo/radio/getPagePendWeibo" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="content" width="100%" align="left" headerAlign="center" >微博内容</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="weiboType">微博类型</div>
+                        <div width="100" align="center" headerAlign="center" renderer="thumbnail">微博图片</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="status">微博状态</div>
+                        <div width="105" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key:$('#ser_key'),
+        dialog:Ls.getWin.dialog
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    })
+
+    function weiboType(obj) {
+        var record = obj.record;
+        return record.type=='Sina'?"新浪微博":"腾讯微博";
+    }
+
+    function status(obj) {
+        var record = obj.record;
+        return record.status==0?"<font color='red'>未审核</font>":"<font color='green'>已审核发布</font>";
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var pend = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="batchPublish('+record.id+')">发布</button> ';
+        var pended = '<button type="button" class="btn btn-default btn-sm btn-edit" disabled>发布</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel('+record.id+')">删除</button>';
+        if(record.status == 0) {
+            return pend + del;
+        } else {
+            return pended + del;
+        }
+    }
+
+    function batchPublish(id) {
+        var ids = [];
+
+        if(id != null && id!= "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+            }
+        }
+
+        if (confirm('确定发布?')) {
+            Ls.ajaxGet({
+                url: "/weibo/radio/batchPublish",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if(id != null && id!= "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/weibo/radio/batchDel",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function thumbnail(e) {
+        var rec = e.record;
+        var link = rec.picUrl;
+        if (!link) {
+            return;
+        }
+        var path = /\//.test(link) ? link : (GLOBAL_FILESERVERNAMEPATH + "" + link);
+        var pic = '<a href="' + path + '" target="_blank" onmouseover="tooltip.show(\'<img src=' + path + ' width=150 height=120>\')"'
+        pic += ' onmouseout="tooltip.hide();"><img src="' + path + '" height="20"></a>';
+        return pic;
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({keys: 'content', keyValue: keyValue});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+
+    // 鼠标移动上面出现提示框
+    var tooltip = function() {
+        var id = 'tt';
+        var top = 3;
+        var left = 3;
+        var maxw = 550;
+        var speed = 10;
+        var timer = 20;
+        var endalpha = 95;
+        var alpha = 0;
+        var tt, t, c, b, h;
+        var ie = document.all ? true : false;
+        return {
+            show : function(v, w) {
+                if (tt == null) {
+                    tt = document.createElement('div');
+                    tt.setAttribute('id', id);
+                    t = document.createElement('div');
+                    t.setAttribute('id', id + 'top');
+                    c = document.createElement('div');
+                    c.setAttribute('id', id + 'cont');
+                    b = document.createElement('div');
+                    b.setAttribute('id', id + 'bot');
+                    tt.appendChild(t);
+                    tt.appendChild(c);
+                    tt.appendChild(b);
+                    document.body.appendChild(tt);
+                    tt.style.opacity = 0;
+                    tt.style.filter = 'alpha(opacity=0)';
+                    document.onmousemove = this.pos;
+                }
+                tt.style.display = 'block';
+                c.innerHTML = v;
+                tt.style.position = "absolute";
+                tt.style.zIndex = 99999;
+                tt.style.width = w ? w + 'px' : 'auto';
+                if (!w && ie) {
+                    t.style.display = 'none';
+                    b.style.display = 'none';
+                    tt.style.width = tt.offsetWidth;
+                    t.style.display = 'block';
+                    b.style.display = 'block';
+                }
+                if (tt.offsetWidth > maxw) {
+                    tt.style.width = maxw + 'px'
+                }
+                h = parseInt(tt.offsetHeight) + top;
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function() {
+                    tooltip.fade(1)
+                }, timer);
+            },
+            pos : function(e) {
+                var u = ie ? event.clientY + document.documentElement.scrollTop : e.pageY;
+                var l = ie ? event.clientX + document.documentElement.scrollLeft : e.pageX;
+                tt.style.top = (u - h) + 'px';
+                tt.style.left = (l + left) + 'px';
+            },
+            fade : function(d) {
+                var a = alpha;
+                if ((a != endalpha && d == 1) || (a != 0 && d == -1)) {
+                    var i = speed;
+                    if (endalpha - a < speed && d == 1) {
+                        i = endalpha - a;
+                    } else if (alpha < speed && d == -1) {
+                        i = a;
+                    }
+                    alpha = a + (i * d);
+                    tt.style.opacity = alpha * .01;
+                    tt.style.filter = 'alpha(opacity=' + alpha + ')';
+                } else {
+                    clearInterval(tt.timer);
+                    if (d == -1) {
+                        tt.style.display = 'none'
+                    }
+                }
+            },
+            hide : function() {
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function() {
+                    tooltip.fade(-1)
+                }, timer);
+            }
+        };
+    }();
+
+</script>

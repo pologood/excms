@@ -1,0 +1,188 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">文章信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="article_form" ms-controller="article_form">
+                <table class="table table-bordered article-table">
+                    <tbody>
+                    <tr>
+                        <th>标题：</th>
+                        <td>
+
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="title" id="title" maxlength="512" class="form-control"
+                                               ms-duplex="title" ms-css-font-weight="titleBold"
+                                               ms-css-font-style="titleTilt"
+                                               ms-css-text-decoration="titleUnderline"></td>
+                                    <td class="w150 text-center">
+                                        <button type="button" id="colorpicker" class="btn btn-default btn-font"><i
+                                                class="fa fa-font"></i></button>
+                                        <input type="hidden" id="mycolor" class="colorPicker evo-cp0"/>
+                                        <button type="button" id="bold" class="btn btn-default btn-bold"
+                                                ms-click="bold"><i class="fa fa-bold"></i></button>
+                                        <button type="button" id="tilt" class="btn btn-default btn-italic"
+                                                ms-click="tilt"><i class="fa fa-italic"></i></button>
+                                        <button type="button" id="underline" class="btn btn-default btn-underline"
+                                                ms-click="underline"><i class="fa fa-underline"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                        <td class="w300" rowspan="6">
+
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"
+                                         ms-attr-src="imageLink"/>
+                                </div>
+                                <div class="thum-delete" id="delImg" ms-click="delImg"><i class="fa fa-trash"></i></div>
+                                <div class="thum-upload" id="uploadImg" ms-click="uploadImg"><i
+                                        class="fa fa-upload"></i></div>
+                                <input type="file" id="uploadfile" name="file" class="form-control hide"
+                                       accept=".jpg,.png,.gif,.jpeg" onchange="fileChange()">
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>副标题：</th>
+                        <td><input type="text" name="subTitle" id="subTitle" maxlength="512" class="form-control"
+                                   placeholder="" ms-duplex="subTitle"></td>
+                    </tr>
+                    <tr>
+                        <th>来源：</th>
+                        <td>
+                            <div class="input-group" id="resMark">
+                                <input type="text" name="resources" id="resources" class="form-control" placeholder=""
+                                       ms-duplex="resources"/>
+
+                                <div class="input-group-btn">
+                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                            onclick="showRes()">
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>属性：</th>
+                        <td>
+                            <label class="checkbox-inline">
+                                <input name="isTop" type="checkbox" class="publishBtn" value="1" ms-attr-checked="isTop"
+                                       ms-attr-disabled="topDs"> 置顶
+                            </label>
+                            <label class="checkbox-inline">
+                                <input name="isNew" type="checkbox" class="publishBtn" value="1" ms-attr-checked="isNew"
+                                       ms-attr-disabled="newDs"> 加新
+                            </label>
+                            <label class="checkbox-inline">
+                                <input name="isTitle" type="checkbox" class="publishBtn" value="1"
+                                       ms-attr-checked="isTitle" ms-attr-disabled="titleDs"> 标题新闻
+                            </label>
+                            <label id="isComment" class="checkbox-inline hide">
+                                <input name="isAllowComments" type="checkbox" class="publishBtn" value="1"
+                                       ms-attr-checked="isAllowComments" ms-attr-disabled="commentDs"> 允许评论
+                            </label>
+                            <label class="checkbox-inline">
+                                <button id="btn_extend_article" type="button"
+                                        class="btn btn-default btn-xs btn-article-extend" ms-click="extend"> 扩展信息
+                                    <i class="fa fa-angle-double-down"></i>
+                                </button>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr class="dn" ms-visible="isExtend==1">
+                        <th>作者：</th>
+                        <td>
+                            <input type="text" name="author" id="author" ms-duplex="author" class="form-control"
+                                   placeholder=""/>
+                    </tr>
+                    <tr class="dn" ms-visible="isExtend==1">
+                        <th>发布日期：</th>
+                        <td>
+                            <input type="datetime" name="publishDate" id="publishDate" ms-duplex="publishDate"
+                                   class="form-control readonly" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                   readonly/>
+                    </tr>
+                    <tr class="dn" ms-visible="isExtend==1">
+                        <th>摘要：</th>
+                        <td>
+                            <textarea class="form-control" name="remarks" id="remarks" rows="3" placeholder=""
+                                      ms-duplex="remarks"></textarea>
+                        </td>
+                    </tr>
+                    <tr class="dn" ms-visible="isExtend==1">
+                        <th>跳转URL：</th>
+                        <td>
+                            <input type="text" name="redirectLink" id="redirectLink" ms-duplex="redirectLink"
+                                   class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr class="dn" ms-visible="isExtend==1">
+                        <th>内容过滤：</th>
+                        <td>
+                            <button class="btn btn-default btn-reset" type="button" ms-click="errorWords">易错词检测</button>
+                            <button class="btn btn-default btn-reset" type="button" ms-click="senWords">敏感词检测</button>
+                            <button class="btn btn-default btn-reset" type="button" ms-click="hotWords">热词检测</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td colspan="2">
+                            <textarea name="content" id="article_content" style="width: 100%; visibility: visible;"
+                                      ms-duplex="content"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <button disabled class="btn btn-default btn-save-release" type="button"
+                                    ms-click="savePublish">保存并发布
+                            </button>
+                            <button class="btn btn-default btn-save" type="button" ms-click="save"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" ms-click="goBack"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="res" class=""
+     style="position: absolute;z-index: 10;display:none; overflow:auto; border:1px solid gray; background-color:#F7F7FB;height:120px;">
+    <table style="margin-left:10px;" id="ns_list">
+    </table>
+</div>
+</body>
+<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/article_mgr.js"></script>
+##<script src="$!{rc.contextPath}/assets/js/pages/selectEditBox/selectEditBox.js"></script>
+##<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/editHandle.js"></script>
+##<script src="$!{rc.contextPath}/assets/js/pages/content/contentCheck.js"></script>
+<script>
+    $(document).ready(function () {
+
+        article_mgr.init({
+            id: '$!{articleId}',
+            pageIndex: '$!{pageIndex}'
+        });
+
+    });
+</script>

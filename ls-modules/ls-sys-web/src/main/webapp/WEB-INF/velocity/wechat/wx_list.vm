@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>$!{_title}</title>
+    <link href="$!{sysStaticPath}/assets/js/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/pages/css/weui.css" rel="stylesheet" type="text/css" id="style_color"/>
+</head>
+<body>
+
+<div class="weui_panel weui_panel_access" id="wxCtrl" ms-controller="wxCtrl">
+    <div class="weui_panel_hd">互动列表</div>
+    <div class="weui_panel_bd">
+        <div class="weui_media_box weui_media_text" ms-repeat="list">
+            <h4 class="weui_media_title">{{title|html}}--{{id}}</h4>
+            <p class="weui_media_desc">{{note}}</p>
+            <ul class="weui_media_info">
+                <li class="weui_media_info_meta">回复日期：{{replyDate}}</li>
+            #*<li class="weui_media_info_meta">时间</li>
+            <li class="weui_media_info_meta weui_media_info_meta_extra">其它信息</li>*#
+            </ul>
+        </div>
+    </div>
+    <a href="javascript:void(0);" class="weui_panel_ft" ms-click="page">查看更多</a>
+</div>
+
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/avalon.mobile-min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/wx_mgr.js"></script>
+<script>
+    $(document).ready(function () {
+        wx_mgr.list();
+    });
+</script>
+</html>

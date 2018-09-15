@@ -1,0 +1,264 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div region="center" style="border:none; overflow: auto;">
+            <div class="portlet light" style="padding-left: 0">
+                <div class="portlet-body form">
+                    <form id="task_edit_form" role="form" ms-controller="task_edit_form">
+                        <div class="form-body">
+                            <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                <tr>
+                                    <th>任务名称:</th>
+                                    <td>
+                                        <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                                        <input type="text" id="cronId" name="cronId" style="display: none" ms-duplex="cronId">
+                                        <input type="text" id="taskName" name="taskName" class="form-control" data-rule="任务名称:required;taskName" placeholder="" ms-duplex="taskName">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>网站域名:</th>
+                                    <td>
+                                        <input type="text" id="webDomain" name="webDomain" class="form-control" data-rule="网站域名:required;webDomain" placeholder="例如：www.xxx.com" ms-duplex="webDomain">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>监管网址:</th>
+                                    <td>
+                                        <input type="text" id="webSite" name="webSite" class="form-control" data-rule="监管网址:required;webSite" placeholder="例如：http://wwww.xxx.com/xxx(非必需首页)" ms-duplex="webSite">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>网站编码:</th>
+                                    <td>
+                                        <input type="text" id="charset" name="charset" placeholder="网站编码" class="form-control" data-rule="网站编码:required;charset" placeholder="" ms-duplex="charset">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>检测深度:</th>
+                                    <td>
+                                        <input type="text" id="depth" name="depth" placeholder="检测的网站层级" class="form-control" data-rule="检测深度:required;depth" placeholder="" ms-duplex="depth">
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                <tr>
+                                    <td valign="top" align="right" width="115">过滤URL:</td>
+                                    <td>
+                                        <textarea id="filterHref" name="filterHref" class="form-control" style="width: 100%;height: 80px;" placeholder="多个以 '逗号' 隔开 例如：（http://www.xxx.con/1_.*html,http://www.xxx.con/2_.*html） .*代表模糊匹配参数" ms-duplex="filterHref"></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                <tr>
+                                    <th>触发周期:</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="timeMode" value="day" onclick="changeMode('day')" ms-duplex-string="timeMode">天</label> &nbsp;&nbsp;
+                                            <label class="radio-inline"><input type="radio" name="timeMode" value="auto" onclick="changeMode('auto')" ms-duplex-string="timeMode">自定义</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ms-visible="timeMode=='day'" class="dn">
+                                    <th>开始时间:</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <input type="datetime" id="startDate" name="startDate" ms-duplex="startDate" class="form-control readonly" placeholder="开始时间"
+                                                   onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" readonly>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr ms-visible="timeMode=='day'" class="dn">
+                                    <th ms-visible="timeMode=='day'">间隔(天):</th>
+                                    <td>
+                                        <input type="text" id="spaceOfDay" style="width:100%;" name="spaceOfDay" class="form-control" data-tip="" placeholder="" ms-duplex="spaceOfDay">
+                                    </td>
+                                </tr>
+                                <tr ms-visible="timeMode=='auto'" class="dn">
+                                    <th>选择定时:</th>
+                                    <td>
+                                        <select id="cronExpress" class="form-control" name="cronExpress">
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr style="width: 30px">
+                                    <th>提醒方式:</th>
+                                    <td>
+                                        <label><input type="checkbox" class="readonly" checked disabled>系统提醒</label> &nbsp;&nbsp;
+##                                        <label><input id="msgAlert" name="msgAlert" type="checkbox" value="checkbox" ms-duplex-radio="msgAlert"> 短信提醒<font color="red">(手机短信只提醒一次)</font></label>
+                                    </td>
+                                </tr>
+                            </table>
+
+                           #* <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                <tr>
+                                    <th>提醒频次:</th>
+                                    <td style="width: 100px">
+                                        <input type="text" id="alertFreq" name="alertFreq" class="form-control" data-rule="integer; range[1~]" data-tip="" placeholder="" ms-duplex="alertFreq">
+                                    </td>
+                                    <td>
+                                        <label class="form-control" style="border: none">分钟/次 <font color="red">(*系统提醒)</font></label>
+                                    </td>
+                                </tr>
+                            </table>*#
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "task_edit_form",
+        form: $('#task_edit_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        type:Ls.getWin.dialog.data("type"),
+        autoCron:$("#cronExpress"),
+        taskType:$("#taskType")
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        getAutoCronModel();
+    })
+
+    function autoSetModel(mode) {
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+                timeMode:'day',
+                msgAlert:false
+            });
+            setData(cur.model);
+        } else {
+            cur.model = Ls.getWin.dialog.data("record");
+            if(cur.model.msgAlert == 0) {
+                cur.model.msgAlert = false;
+            } else {
+                cur.model.msgAlert = true;
+            }
+            Ls.ajax({
+                url: "/err/href/getCronConf?dataFlag=0",
+                data: {
+                    cronId:cur.model.cronId
+                },
+                success: function (resp) {
+                    if(resp.status == 1) {
+                        var data = resp.data;
+                        cur.model.startDate = data.startDate;
+                        cur.model.spaceOfDay = data.spaceOfDay;
+                        if(mode == null) {
+                            cur.model.timeMode = data.timeMode;
+                        } else {
+                            cur.model.timeMode = mode;
+                        }
+                        cur.cronConf = data;
+                        cur.autoCron.val(data.cronExpress);
+                    }
+                    setData(cur.model);
+                }
+            });
+        }
+    }
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function saveData() {
+        if (!cur.form.isValid()) {
+            return;
+        }
+        if (cur.type == 'add') {
+            url = "/err/href/saveTask"
+        } else {
+            url = "/err/href/updateTask"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                //栏目更新任务配置
+                id: cur.vm.id,
+                cronId:cur.vm.cronId,
+                taskName: cur.vm.taskName,
+                webDomain:cur.vm.webDomain,
+                webSite:cur.vm.webSite,
+                charset:cur.vm.charset,
+                depth:cur.vm.depth,
+                filterHref:cur.vm.filterHref,
+//                msgAlert:cur.vm.msgAlert?1:0,//是否开通短信提醒
+//                alertFreq:cur.vm.alertFreq,//系统提醒频次
+                cronDesc:getCronDesc(),
+                //cron表达式配置
+                startDate:cur.vm.startDate,
+                timeMode:cur.vm.timeMode,//定时方式
+                cronExpress:cur.autoCron.val(),
+                spaceOfDay:cur.vm.spaceOfDay//定时间隔（天、周）
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getCronDesc() {
+        if(cur.vm.timeMode == "day") {
+            return "每隔" + cur.vm.spaceOfDay + "天执行";
+        } else if(cur.vm.timeMode == "auto"){
+            return cur.autoCron.find("option:selected").text();;
+        }
+    }
+
+    function changeMode(mode) {
+        cur.autoCron.val("");
+        $("#spaceOfDay").val("");
+        if(mode == cur.model.timeMode) {
+            autoSetModel(mode);
+        }
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+    function getAutoCronModel() {
+        Ls.ajaxGet({
+            url: "/column/update/getAutoCron",
+        }).done(function (response) {
+            var str = '<option value=""> 选择自定义CRON </option> ';
+            if (response != null) {
+                var data = response;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value="' + data[i].value + '">' + data[i].key + '</option> '
+                    }
+                }
+            }
+            cur.autoCron.append(str);
+            autoSetModel();
+        });
+    }
+</script>

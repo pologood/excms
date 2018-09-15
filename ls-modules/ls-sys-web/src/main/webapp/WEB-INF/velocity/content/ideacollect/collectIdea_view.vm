@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+
+    #parse("_page_layout/_header.vm")
+    <style>
+        html, html body{
+            overflow: auto !important;
+        }
+        a {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .btn {
+            color: 000000;
+            font-size: 12px;
+            border: 1px solid #CCCCCC;
+            padding: 8px 15px;
+            background: #DDDDDD;
+            border: #CCCCCC;
+        }
+
+        .fontTitle {
+            font-size: 16px;
+        }
+
+        .fontValue {
+            font-size: 16px;
+        }
+
+        #Layer1 {
+
+        }
+
+        @media print {
+            .btnClass {
+                display: none;
+            }
+        }
+    </style>
+<body class="page-body-white page-content-white" xmlns="http://www.w3.org/1999/html">
+<div id="Layer1" style="position:absolute; left:15mm; top:10mm; z-index:1">
+    <table width="600" border="1" align="center" cellpadding="4" cellspacing="0" bgcolor="#FFFFFF" bordercolordark="#FFFFFF" bordercolorlight="#333333">
+        <tr>
+            <td height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>建议人姓名</strong></td>
+            <td height="40" bgcolor="#FFFFFF" style="padding:12px">$!{collectIdea.name}</td>
+            <td height="30" align="center" bgcolor="#FFFFFF"><strong>联系电话</strong></td>
+            <td height="40" bgcolor="#FFFFFF" style="padding:12px">$!{collectIdea.phone}&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="93" height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>单位、地址</strong></td>
+            <td height="60" colspan="3" bgcolor="#FFFFFF" style="padding:12px">$!{collectIdea.address}&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="93" height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>建议事项</strong></td>
+            <td height="90" colspan="3" bgcolor="#FFFFFF" style="padding:12px">$!{collectIdea.options}&nbsp;</td>
+        </tr>
+        <tr>
+            <td width="93" height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>建议事项说明
+            </strong></td>
+            <td height="180" colspan="3" bgcolor="#FFFFFF" style="padding:12px">$!{collectIdea.content}&nbsp;</td>
+        </tr>
+    </table>
+    <br>
+</div>
+</body>
+<iframe id="word_frame" name="word_frame" style="display: none;" src="about:blank"></iframe>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script>
+
+</script>

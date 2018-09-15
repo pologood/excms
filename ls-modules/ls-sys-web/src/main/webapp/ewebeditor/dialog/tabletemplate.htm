@@ -1,0 +1,626 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+    <script type="text/javascript" src="../template/tabletemplate.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var oControl, sAttrTemplate;
+        if (EWEBSelection.GetType() == "Control") {
+            oControl = EWEBSelection.GetSelectedElement();
+            if (oControl.tagName != "TABLE") {
+                oControl = null;
+            }
+        } else {
+            oControl = EWEBSelection.GetParentElementByTags(["TABLE"]);
+        }
+
+        var sTitle = lang["DlgTabTemAllTable"];
+        if (oControl) {
+            sTitle = lang["DlgTabTemSelTable"];
+            sAttrTemplate = GetAttribute(oControl, "_ewebeditor_tabletemplate");
+        }
+
+        var sCaption = lang["DlgTabTem"] + "(" + sTitle + ")";
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function ok() {
+            if (sCurrSelectedKey == "") {
+                alert(lang["DlgTabTemNotSelect"]);
+                return;
+            }
+
+            var o_Opt = $("d_width");
+            var s_Width = o_Opt[o_Opt.selectedIndex].value;
+            o_Opt = $("d_height");
+            var s_Height = o_Opt[o_Opt.selectedIndex].value;
+            o_Opt = $("d_align");
+            var s_Align = o_Opt[o_Opt.selectedIndex].value;
+
+            if (oControl) {
+                _SetTableTemplate(oControl, s_Width, s_Height, s_Align);
+            } else {
+                var o_Tables = EWEB.EditorDocument.getElementsByTagName("TABLE");
+                for (var i = 0; i < o_Tables.length; i++) {
+                    _SetTableTemplate(o_Tables[i], s_Width, s_Height, s_Align);
+                }
+            }
+
+            parent.Ok();
+        }
+
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            _InitTemplateList();
+            if (sAttrTemplate) {
+                _ClickTemplate(sAttrTemplate);
+            } else {
+                _ClickTemplate("NONE");
+            }
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+        function _InitTemplateList() {
+            var s_Html = '<table border=0 cellpadding=3 cellspacing=5 width="100%">';
+            s_Html += '<tr>' + _GetItemTD('NONE', lang['DlgTabTemNone']);
+            var i = 2;
+            for (var s_Name in TableTemplate) {
+                var m = i % 5;
+                if (m == 1) {
+                    s_Html += '<tr>';
+                }
+
+                s_Html += _GetItemTD(s_Name, _GetExampleTable(TableTemplate[s_Name]));
+
+                if (m == 0) {
+                    s_Html += '</tr>';
+                }
+                i++;
+            }
+
+            if (m > 0) {
+                m = 5 - m;
+                for (var j = 0; j < m; j++) {
+                    s_Html += _GetItemTD('', '');
+                }
+                s_Html += '</tr>';
+            }
+
+            s_Html += '</table>';
+            $("div_templatelist").innerHTML = s_Html;
+        }
+
+        function _GetItemTD(s_Key, s_Html) {
+            if (s_Key == '') {
+                return '<td width="20%">&nbsp;</td>';
+            } else {
+                return '<td width="20%" class="item_normal" id="template_' + s_Key + '" onclick="_ClickTemplate(\'' + s_Key + '\')">' + s_Html + '</td>';
+            }
+        }
+
+        function _GetExampleTable(o) {
+            var s_Css = '';
+            var s_Html = '<table border=0 cellpadding=2 cellspacing=0 align=center><tr><td style="background-color:#ffffff">';
+            s_Html += '<table class="exampletable"';
+            if (o['TableCss']) {
+                s_Html += ' style="' + o['TableCss'] + '"';
+            }
+            if (o['TableBorder']) {
+                s_Html += ' border="' + o['TableBorder'] + '"';
+            }
+            if (o['TableBorderColor']) {
+                s_Html += ' bordercolor="' + o['TableBorderColor'] + '"';
+            }
+            if (o['TableCellSpacing']) {
+                s_Html += ' cellspacing="' + o['TableCellSpacing'] + '"';
+            }
+            if (o['TableCellPadding']) {
+                s_Html += ' cellpadding="' + o['TableCellPadding'] + '"';
+            }
+            s_Html += '>';
+
+            s_Html += '<tr>';
+            s_Css = o['FirstRowFirstColTdCss'] ? o['FirstRowFirstColTdCss'] : (o['FirstRowTdCss'] ? o['FirstRowTdCss'] : (o['OddRowFirstColTdCss'] ? o['OddRowFirstColTdCss'] : o['OddRowTdCss']));
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Css = o['FirstRowTdCss'] ? o['FirstRowTdCss'] : o['OddRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 3);
+            s_Css = o['FirstRowLastColTdCss'] ? o['FirstRowLastColTdCss'] : (o['FirstRowTdCss'] ? o['FirstRowTdCss'] : (o['OddRowLastColTdCss'] ? o['OddRowLastColTdCss'] : o['OddRowTdCss']));
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Html += '</tr>';
+
+            s_Html += '<tr>';
+            s_Css = o['EvenRowFirstColTdCss'] ? o['EvenRowFirstColTdCss'] : o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Css = o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 3);
+            s_Css = o['EvenRowLastColTdCss'] ? o['EvenRowLastColTdCss'] : o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Html += '</tr>';
+
+            s_Html += '<tr>';
+            s_Css = o['OddRowFirstColTdCss'] ? o['OddRowFirstColTdCss'] : o['OddRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Css = o['OddRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 3);
+            s_Css = o['OddRowLastColTdCss'] ? o['OddRowLastColTdCss'] : o['OddRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Html += '</tr>';
+
+            s_Html += '<tr>';
+            s_Css = o['EvenRowFirstColTdCss'] ? o['EvenRowFirstColTdCss'] : o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Css = o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 3);
+            s_Css = o['EvenRowLastColTdCss'] ? o['EvenRowLastColTdCss'] : o['EvenRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Html += '</tr>';
+
+            s_Html += '<tr>';
+            s_Css = o['LastOddRowFirstColTdCss'] ? o['LastOddRowFirstColTdCss'] : (o['LastOddRowTdCss'] ? o['LastOddRowTdCss'] : (o['OddRowFirstColTdCss'] ? o['OddRowFirstColTdCss'] : o['OddRowTdCss']));
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Css = o['LastOddRowTdCss'] ? o['LastOddRowTdCss'] : o['OddRowTdCss'];
+            s_Html += _GetExampleTd(s_Css, 3);
+            s_Css = o['LastOddRowLastColTdCss'] ? o['LastOddRowLastColTdCss'] : (o['LastOddRowTdCss'] ? o['LastOddRowTdCss'] : (o['OddRowLastColTdCss'] ? o['OddRowLastColTdCss'] : o['OddRowTdCss']));
+            s_Html += _GetExampleTd(s_Css, 1);
+            s_Html += '</tr>';
+
+            s_Html += '</table>';
+            s_Html += '</td></tr></table>';
+
+            return s_Html;
+        }
+
+        function _GetExampleTd(s_Css, n_Col) {
+            var s_Ret = '';
+            for (var i = 0; i < n_Col; i++) {
+                s_Ret += '<td style="' + s_Css + '">&nbsp;</td>';
+            }
+            return s_Ret;
+        }
+
+        var sCurrSelectedKey = '';
+
+        function _ClickTemplate(s_Key) {
+            var o_Item;
+            if (sCurrSelectedKey) {
+                o_Item = $('template_' + sCurrSelectedKey);
+                o_Item.className = 'item_normal';
+            }
+
+            o_Item = $('template_' + s_Key);
+            if (!o_Item) {
+                return;
+            }
+            o_Item.className = 'item_select';
+            sCurrSelectedKey = s_Key;
+        }
+
+        function _SetTableTemplate(o_Table, s_Width, s_Height, s_Align) {
+            var a_AllCells = new Array();
+
+            var n_RowCount = o_Table.rows.length;
+            var a_Grid = new Array();
+            for (var i = 0; i < n_RowCount; i++) {
+                a_Grid[i] = new Array();
+            }
+            var n_MaxColSpans = 0;
+
+            for (var i = 0; i < n_RowCount; i++) {
+                var o_Row = o_Table.rows[i];
+                var n_CellCount = o_Row.cells.length;
+                var n_ColIndex = 0;
+
+                for (var j = 0; j < n_CellCount; j++) {
+                    var o_Cell = o_Row.cells[j];
+                    var o_Now = new Object();
+                    o_Now.CellObj = o_Cell;
+                    o_Now.OriStyleWidth = o_Cell.style.width;
+                    o_Now.OriStyleHeight = o_Cell.style.height;
+                    o_Now.OriWidth = o_Cell.getAttribute("width", 2);
+                    o_Now.OriHeight = o_Cell.getAttribute("height", 2);
+                    o_Now.IsFirstRow = false;
+                    o_Now.IsFirstCol = false;
+                    o_Now.IsLastCol = false;
+
+                    o_Now.RowFrom = i;
+                    o_Now.RowTo = i + (o_Cell.rowSpan - 1);
+
+                    if (i == 0) {
+                        o_Now.IsFirstRow = true;
+                        if (j == 0) {
+                            o_Now.IsFirstCol = true;
+                        }
+                        if (j == (n_CellCount - 1)) {
+                            o_Now.IsLastCol = true;
+                        }
+
+                        n_MaxColSpans += o_Cell.colSpan;
+
+                        o_Now.ColFrom = n_ColIndex;
+                        o_Now.ColTo = n_ColIndex + (o_Cell.colSpan - 1);
+                        n_ColIndex = n_ColIndex + o_Cell.colSpan;
+                    } else {
+
+                        n_ColIndex = 0;
+                        for (var k = 0; k < n_MaxColSpans; k++) {
+                            if (!a_Grid[i][k]) {
+                                n_ColIndex = k;
+                                break;
+                            }
+                        }
+                        o_Now.ColFrom = n_ColIndex;
+                        o_Now.ColTo = n_ColIndex + (o_Cell.colSpan - 1);
+
+                        if (o_Now.ColFrom == 0) {
+                            o_Now.IsFirstCol = true;
+                        }
+                        if (o_Now.ColTo == (n_MaxColSpans - 1)) {
+                            o_Now.IsLastCol = true;
+                        }
+
+                    }
+
+                    for (var k = o_Now.ColFrom; k <= o_Now.ColTo; k++) {
+                        for (var m = o_Now.RowFrom; m <= o_Now.RowTo; m++) {
+                            a_Grid[m][k] = o_Cell;
+                        }
+                    }
+
+                    o_Now.IsLastRow = false;
+                    o_Now.IsOddRow = false;
+                    o_Now.IsEvenRow = false;
+                    if (o_Now.RowTo == (n_RowCount - 1)) {
+                        o_Now.IsLastRow = true;
+                    }
+                    var m = i % 2;
+                    if (m == 0) {
+                        o_Now.IsOddRow = true;
+                    }
+                    if (m == 1) {
+                        o_Now.IsEvenRow = true;
+                    }
+
+                    a_AllCells[a_AllCells.length] = o_Now;
+                }
+            }
+
+            var a_OnWidthCell = new Array();
+            for (var i = 0; i < n_MaxColSpans; i++) {
+                var o_Cell = a_Grid[0][i];
+                if (o_Cell.colSpan == 1) {
+                    a_OnWidthCell[i] = o_Cell;
+                } else {
+                    var b = false;
+                    for (var j = 1; j < n_RowCount; j++) {
+                        o_Cell = a_Grid[j][i];
+                        if (o_Cell.colSpan == 1) {
+                            a_OnWidthCell[i] = o_Cell;
+                            b = true;
+                            break;
+                        }
+                    }
+                    if (!b) {
+                        if (i == (n_MaxColSpans - 1) || i == 0) {
+                            a_OnWidthCell[i] = a_Grid[1][i];
+                        } else {
+
+                            for (var j = 1; j < n_RowCount; j++) {
+                                if (a_Grid[j][i] != a_Grid[j][i + 1]) {
+                                    a_OnWidthCell[i] = a_Grid[j][i];
+                                    b = true;
+                                    break;
+                                }
+                            }
+
+                            if (!b) {
+                                for (var j = 1; j < n_RowCount; j++) {
+                                    if (a_Grid[j][i] != a_Grid[j][i - 1]) {
+                                        a_OnWidthCell[i] = a_Grid[j][i];
+                                        b = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            var s_TableOriStyleWidth, s_TableOriStyleHeight;
+            s_TableOriStyleWidth = o_Table.style.width;
+            s_TableOriStyleHeight = o_Table.style.height;
+
+            var b_UseTemplate = (sCurrSelectedKey != "NONE");
+
+            if (b_UseTemplate) {
+                var o_Template = TableTemplate[sCurrSelectedKey];
+
+                SetAttribute(o_Table, "_ewebeditor_tabletemplate", sCurrSelectedKey);
+                SetAttribute(o_Table, "border", o_Template["TableBorder"]);
+                SetAttribute(o_Table, "bordercolor", o_Template["TableBorderColor"]);
+                SetAttribute(o_Table, "cellspacing", o_Template["TableCellSpacing"]);
+                SetAttribute(o_Table, "cellpadding", o_Template["TableCellPadding"]);
+
+                o_Table.style.cssText = o_Template["TableCss"];
+
+                for (var i = 0; i < a_AllCells.length; i++) {
+                    var o_Now = a_AllCells[i];
+                    var o_Cell = o_Now.CellObj;
+
+                    if (o_Now.IsFirstRow) {
+                        if (o_Now.IsFirstCol) {
+                            o_Cell.style.cssText = _GetFirstValidCss([o_Template["FirstRowFirstColTdCss"], o_Template["FirstRowTdCss"], o_Template["OddRowFirstColTdCss"], o_Template["OddRowTdCss"]]);
+                        } else {
+                            if (o_Now.IsLastCol) {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["FirstRowLastColTdCss"], o_Template["FirstRowTdCss"], o_Template["OddRowLastColTdCss"], o_Template["OddRowTdCss"]]);
+                            } else {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["FirstRowTdCss"], o_Template["OddRowTdCss"]]);
+                            }
+                        }
+
+                    } else if (o_Now.IsLastRow) {
+                        if (o_Now.IsOddRow) {
+                            if (o_Now.IsFirstCol) {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastOddRowFirstColTdCss"], o_Template["LastOddRowTdCss"], o_Template["OddRowFirstColTdCss"], o_Template["OddRowTdCss"]]);
+                            } else {
+                                if (o_Now.IsLastCol) {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastOddRowLastColTdCss"], o_Template["LastOddRowTdCss"], o_Template["OddRowLastColTdCss"], o_Template["OddRowTdCss"]]);
+                                } else {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastOddRowTdCss"], o_Template["OddRowTdCss"]]);
+                                }
+                            }
+                        } else {
+                            if (o_Now.IsFirstCol) {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastEvenRowFirstColTdCss"], o_Template["LastEvenRowTdCss"], o_Template["EvenRowFirstColTdCss"], o_Template["EvenRowTdCss"]]);
+                            } else {
+                                if (o_Now.IsLastCol) {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastEvenRowLastColTdCss"], o_Template["LastEvenRowTdCss"], o_Template["EvenRowLastColTdCss"], o_Template["EvenRowTdCss"]]);
+                                } else {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["LastEvenRowTdCss"], o_Template["EvenRowTdCss"]]);
+                                }
+                            }
+                        }
+
+                    } else {
+
+                        if (o_Now.IsOddRow) {
+                            if (o_Now.IsFirstCol) {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["OddRowFirstColTdCss"], o_Template["OddRowTdCss"]]);
+                            } else {
+                                if (o_Now.IsLastCol) {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["OddRowLastColTdCss"], o_Template["OddRowTdCss"]]);
+                                } else {
+                                    o_Cell.style.cssText = o_Template["OddRowTdCss"];
+                                }
+                            }
+                        } else {
+                            if (o_Now.IsFirstCol) {
+                                o_Cell.style.cssText = _GetFirstValidCss([o_Template["EvenRowFirstColTdCss"], o_Template["EvenRowTdCss"]]);
+                            } else {
+                                if (o_Now.IsLastCol) {
+                                    o_Cell.style.cssText = _GetFirstValidCss([o_Template["EvenRowLastColTdCss"], o_Template["EvenRowTdCss"]]);
+                                } else {
+                                    o_Cell.style.cssText = o_Template["EvenRowTdCss"];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            for (var i = 0; i < a_AllCells.length; i++) {
+                var o_Now = a_AllCells[i];
+                var o_Cell = o_Now.CellObj;
+
+                if (b_UseTemplate) {
+                    if (s_Width == "" || s_Width == "window_no") {
+                        if (o_Now.OriStyleWidth) {
+                            o_Cell.style.width = o_Now.OriStyleWidth;
+                        }
+                    }
+                }
+
+                if (s_Width == "content" || s_Width == "window_content" || s_Width == "window_pingjun") {
+                    o_Cell.removeAttribute("width", 0);
+                    if (!b_UseTemplate) {
+                        o_Cell.style.width = "";
+                    }
+                }
+
+                if (s_Height == "") {
+                    if (b_UseTemplate) {
+                        if (o_Now.OriStyleHeight) {
+                            o_Cell.style.height = o_Now.OriStyleHeight;
+                        }
+                    }
+                } else {
+                    o_Cell.removeAttribute("height", 0);
+                    if (!b_UseTemplate) {
+                        o_Cell.style.height = "";
+                    }
+                }
+            }
+
+
+            switch (s_Width) {
+                case "":
+                    if (b_UseTemplate) {
+                        if (s_TableOriStyleWidth) {
+                            o_Table.style.width = s_TableOriStyleWidth;
+                        }
+                    }
+                    break;
+                case "content":
+                    o_Table.removeAttribute("width", 0);
+                    if (!b_UseTemplate) {
+                        o_Table.style.width = "";
+                    }
+                    break;
+                case "window_no":
+                    o_Table.removeAttribute("width", 0);
+                    o_Table.style.width = "99%";
+                    break;
+                case "window_content":
+                    o_Table.removeAttribute("width", 0);
+                    o_Table.style.width = "99%";
+                    break;
+                case "window_pingjun":
+                    o_Table.removeAttribute("width", 0);
+                    o_Table.style.width = "99%";
+                    var n_Unit = parseInt(1000 / n_MaxColSpans) / 10;
+                    for (var i = 0; i < n_MaxColSpans; i++) {
+                        var o_Cell = a_OnWidthCell[i];
+                        if (o_Cell) {
+                            o_Cell.style.width = (n_Unit * o_Cell.colSpan) + "%";
+                        }
+                    }
+                    break;
+            }
+
+            if (s_Height == "") {
+                if (b_UseTemplate) {
+                    if (s_TableOriStyleHeight) {
+                        o_Table.style.height = s_TableOriStyleHeight;
+                    }
+                }
+            } else {
+                o_Table.removeAttribute("height", 0);
+                if (!b_UseTemplate) {
+                    o_Table.style.height = "";
+                }
+            }
+
+            if (s_Align != "") {
+                if (s_Align == "default") {
+                    o_Table.removeAttribute("align", 0);
+                } else {
+                    o_Table.align = s_Align;
+                }
+
+                var o_Parent = o_Table.parentNode;
+                if (o_Parent.tagName == "P" || o_Parent.tagName == "DIV") {
+                    o_Parent.style.textAlign = (s_Align == "default") ? "" : s_Align;
+                }
+            }
+
+        }
+
+        function _GetFirstValidCss(a_Css) {
+            for (var i = 0; i < a_Css.length; i++) {
+                if (a_Css[i]) {
+                    return a_Css[i];
+                }
+            }
+            return "";
+        }
+
+    </script>
+
+
+    <style>
+        td.item_normal {
+            border: 1px solid #808080;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td.item_select {
+            border: 1px solid #ff0000;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #ff0000;
+        }
+
+        table.exampletable td {
+            font-size: 0px;
+            height: 8px;
+            width: 12px;
+        }
+    </style>
+
+
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <table border=0 cellpadding=0 cellspacing=0 width="100%" align=center>
+                <tr>
+                    <td>
+
+                        <div id=div_templatelist style="width:600px;height:300px;overflow:auto;border:1px solid #A0B0C3;background-color:#ffffff;">
+                            <div>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend><span lang=DlgTabTemAuto></span></legend>
+                            <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                <tr>
+                                    <td>
+
+                                        <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                            <tr>
+                                                <td noWrap><span lang=DlgTabTemWidth></span>:<select id=d_width size=1>
+                                                    <option value='' lang=DlgTabTemAutoNo></option>
+                                                    <option value='content' lang=DlgTabTemWidthContent></option>
+                                                    <option value='window_no' lang=DlgTabTemWidthWindow1></option>
+                                                    <option value='window_content' lang=DlgTabTemWidthWindow2 selected></option>
+                                                    <option value='window_pingjun' lang=DlgTabTemWidthWindow3></option>
+                                                </select>
+                                                </td>
+                                                <td><span lang=DlgTabTemHeight></span>:<select id=d_height>
+                                                    <option value="" lang=DlgTabTemAutoNo></option>
+                                                    <option value="content" selected lang=DlgTabTemheightContent></option>
+                                                </select>
+                                                </td>
+                                                <td><span lang=DlgAlign></span>:<select id=d_align>
+                                                    <option value="" selected lang=DlgTabTemAutoNo></option>
+                                                    <option value="default" lang=DlgComDefault></option>
+                                                    <option value="left" lang=DlgAlignLeft></option>
+                                                    <option value="right" lang=DlgAlignRight></option>
+                                                    <option value="center" lang=DlgAlignCenter></option>
+                                                </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td height=5></td>
+                </tr>
+                <tr>
+                    <td noWrap align=right><input type=submit class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                               class="dlgBtnCommon dlgBtn"
+                                                                                                                                                               value=''
+                                                                                                                                                               onclick="parent.Cancel()"
+                                                                                                                                                               lang=DlgBtnCancel>
+                    </td>
+                </tr>
+
+                </td></tr></table>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+                <div class="alert alert-info pd10">
+                    <div>1、自定义菜单最多包括<font color="red">3</font>个一级菜单，每个一级菜单最多包含<font color="red">5</font>个二级菜单。</div>
+                    <div>2、一级菜单最多<font color="red">4</font>个汉字，二级菜单最多<font color="red">7</font>个汉字，多出来的部分将会以“...”代替。</div>
+                    <div>3、创建自定义菜单后，可能由于微信客户端缓存，需要24小时微信客户端才会展现出来。测试时可以尝试取消关注公众账号后再次关注，则可以看到创建后的效果。</div>
+                </div>
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group">
+                                <button id="deletes" class="btn btn-default btn-add" onclick="add()"> 新 增</button>
+                            </div>
+                            <div class="btn-group">
+                                <button id="adduser_btn" class="btn btn-default btn-publish" onclick="publishMenu()">菜单发布</button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="treegrid1" class="mini-treegrid" style="width:100%;height:600px;"
+                     url="/weChat/menuMgr/getMenus" showTreeIcon="true"
+                     treeColumn="name" idField="id" parentField="pId" resultAsTree="false"
+                     allowResize="true" expandOnLoad="true">
+                    <div property="columns">
+                        <div name="name" field="name" width="160" headerAlign="center">菜单名称</div>
+                        <div field="type" width="80" headerAlign="center" align="center" renderer="menuType">类型</div>
+                        <div width="100%" align="left" headerAlign="center" renderer="menuContent">菜单内容</div>
+                        <div width="115" headerAlign="center" renderer="renderOpr" align="center">操作</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        mini.parse();
+
+        var cur = {
+            vm: {}
+        };
+        var data;
+        mini.parse();
+        var grid = mini.get("treegrid1");
+        grid.load({dataFlag: 1});
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid, 120);
+
+        function menuType(e) {
+            var str = "";
+            var rec = e.record.type;
+            if (rec == "click") {
+                str = "关键词";
+            } else if (rec == "view") {
+                str = "链接";
+            } else {
+                str = "";
+            }
+            return str;
+        }
+
+        function renderOpr(e) {
+            var str = "";
+            var rec = e.record;
+            str = '<button id="" class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.id + ')">修 改</button> '
+                + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="deleteMenu(' + rec.id + ')">删 除</button>';
+            return str;
+        }
+
+        function menuContent(e) {
+            var str = "";
+            var rec = e.record;
+            if (rec.type == "click") {
+                str = rec.key;
+            } else if (rec.type == "view") {
+                str = rec.url;
+            }
+            return str;
+        }
+
+        function add() {
+            Ls.openWin("/weChat/menuMgr/menuEdit", {
+                width: '550px',
+                height: '300px',
+                lock: true,
+                title: '新增菜单',
+            });
+        }
+
+        function edit(id) {
+            Ls.openWin("/weChat/menuMgr/menuEdit?id=" + id, {
+                width: '550px',
+                height: '300px',
+                lock: true,
+                title: '修改菜单',
+            });
+        }
+
+        publishMenu = function () {
+            if (confirm("确定发布？")) {
+                Ls.ajax({
+                    url: "/weChat/menuMgr/createMenu",
+                    success: function (text) {
+                        if (text.errcode != 0) {
+                            Ls.tipsErr("发布失败:" + text.errmsg);
+                        } else {
+                            Ls.tipsOk("发布成功");
+                        }
+                    }
+                });
+            }
+        }
+
+        function deleteMenu(id) {
+            if (confirm("确定删除及其子项？")) {
+                Ls.ajaxGet({
+                    data: {
+                        id: id
+                    },
+                    url: "/weChat/menuMgr/deleteMenu",
+                    success: function (text) {
+                        if (text.status == 0) {
+                            Ls.tipsErr("删除失败");
+                        } else {
+                            grid.reload();
+                            Ls.tipsOk("删除成功");
+                        }
+                    }
+                });
+            }
+        }
+
+    </script>

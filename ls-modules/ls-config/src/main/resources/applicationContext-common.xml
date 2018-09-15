@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+      http://www.springframework.org/schema/context  
+      http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+      http://www.springframework.org/schema/mvc  
+      http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+
+	<context:annotation-config />
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<!-- 注解扫描的包 -->
+	<context:component-scan base-package="cn.lonsun" />
+	<context:property-placeholder location="classpath:*-config.properties,classpath*:conf/**/*-config.properties" ignore-unresolvable="true" />
+
+	<!-- 启动SpringMVC的注解功能，它会自动注册HandlerMapping、 HandlerAdapter、ExceptionResolver的相关实例 -->
+	<!-- 解决spring3 mvc @ResponseBody String返回值类型的中文乱码 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+				<property name="supportedMediaTypes" value="text/html;charset=UTF-8" />
+			</bean>
+			<bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+			<!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+			<bean
+				class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<!-- 这里顺序不能反，一定先写text/html,不然ie下出现下载提示 -->
+						<value>text/html;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+					</list>
+				</property>
+				<property name="features">
+					<list>
+						<value>WriteMapNullValue</value>
+						<value>QuoteFieldNames</value>
+						<value>WriteDateUseDateFormat</value>
+						<value>DisableCircularReferenceDetect</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<!-- 任务异步执行器 -->
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 线程池维护线程的最少数量 -->
+		<property name="corePoolSize" value="40" />
+		<!-- 线程池维护线程的最大数量 -->
+		<property name="maxPoolSize" value="600" />
+		<!-- 线程池所使用的缓冲队列 -->
+		<property name="queueCapacity" value="10" />
+		<!-- 线程池维护线程所允许的空闲时间-秒 -->
+		<property name="keepAliveSeconds" value="300" />
+	</bean>
+
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="url" value="${hibernate.connection.url}" />
+		<property name="username" value="${hibernate.connection.username}" />
+		<property name="password" value="${hibernate.connection.password}" />
+		<property name="maxActive" value="256" />
+		<property name="initialSize" value="16" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="16" />
+		<property name="timeBetweenEvictionRunsMillis" value="3000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- mysql 不支持 poolPreparedStatements <property name="poolPreparedStatements" 
+			value="true" /> <property name="maxPoolPreparedStatementPerConnectionSize" 
+			value="20" /> -->
+        <property name="proxyFilters" >
+            <list>
+                <bean class="cn.lonsun.core.log.SqlLogFilter" >
+                    <!--打印异常sql-->
+                    <property name="statementLogErrorEnabled" value="${sql.statementLogErrorEnabled}" />
+                    <!--打印详细-->
+                    <property name="statementLogEnabled" value="${sql.statementLogEnabled}" />
+                    <!--打印正常sql-->
+                    <property name="statementExecuteAfterLogEnable" value="${sql.statementExecuteAfterLogEnable}" />
+                    <!-- 执行耗时毫秒数，默认为0,如果大于0 则只打印执行时间大于该值的SQL-->
+                    <property name="executeTimeMillis" value="${sql.executeTimeMillis}" />
+                    <!-- 连接日志-->
+                    <property name="connectionLogErrorEnabled" value="${sql.connectionLogErrorEnabled}" />
+                    <!-- 打印结果集-->
+                    <property name="resultSetLogEnabled" value="false" />
+                    <!-- 数据源-->
+                    <property name="dataSourceLogEnabled" value="false" />
+                    <!-- 连接日志-->
+                    <property name="connectionLogEnabled" value="false" />
+                </bean>
+            </list>
+        </property>
+	</bean>
+
+	<!-- 配置hibernate SessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="namingStrategy" ref="customNamingStrategy" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.default_schema">${hibernate.default_schema}</prop>
+				<prop key="hibernate.show_sql">${hibernate.connection.show_sql}</prop>
+				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
+				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				<prop key="hiberante.format_sql">${hibernate.connection.format_sql}</prop>
+				<!-- 二级缓存EhCache配置 -->
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
+				<!-- 设置二级缓存插件EHCache的Provider类-->
+				<prop key="hibernate.cache.provider_class">${hibernate.cache.provider_class}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">${ehcache.file_resource_path}</prop>
+				<!-- 强制Hibernate以更人性化的格式将数据存入二级缓存 -->
+				<prop key="hibernate.cache.use_structured_entries">${hibernate.cache.use_structured_entries}</prop>  
+      			<!-- Hibernate将收集有助于性能调节的统计数据 -->  
+      			<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>  
+				<!-- 项目启动时初始化CurrentSessionContext，用于获取session(sessionFactory.getCurrentSession()) -->
+				<prop key="hibernate.current_session_context_class">${hibernate.current_session_context_class}</prop>
+			</props>
+		</property>
+		<property name="packagesToScan" value="cn.lonsun.**.entity" />
+	</bean>
+
+	<bean id="lonsunHibernateListenerRegister" class="cn.lonsun.core.hibernate.ListenerRegister" lazy-init="false" init-method="registerListeners">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+		<property name="listeners">
+			<map>
+				<entry key="save-update" value-ref="myHibernateSaveListener"></entry>
+				<entry key="save" value-ref="myHibernateSaveListener"></entry>
+				<entry key="update" value-ref="myHibernateSaveListener"></entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="myHibernateSaveListener" class="cn.lonsun.core.hibernate.listener.LonSonSaveOrUpdateEventListener">
+		<!--主键生成策略： hibernate（使用hibernate的主键生成策略），snowflake（使用全局基于时间戳的生成策略） -->
+		<property name="useHibernateIdGenerater" value="${useHibernateIdGenerater}" />
+	</bean>
+
+	<bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="velocityEngine" ref="velocityEngine"></property>
+	</bean>
+
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="${velocity.resourceLoaderPath}" />
+		<property name="velocityProperties">
+			<props>
+				<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+				<prop key="userdirective">${velocity.userdirective}</prop>
+				<prop key="eventhandler.referenceinsertion.class">${velocity.eventhandler.referenceinsertion.class}</prop>
+				<prop key="spring.resource.loader.cache">${velocity.cache}</prop>
+				<prop key="file.resource.loader.cache">${velocity.cache}</prop>
+				<prop key="class.resource.loader.cache">${velocity.cache}</prop>
+			</props>
+		</property>
+	</bean>
+	<bean id="_globalVars" class="cn.lonsun.GlobalConfig"></bean>
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="cache" value="${velocity.cache}" />
+		<property name="prefix" value="${velocity.prefix}" />
+		<property name="suffix" value="${velocity.suffix}" />
+		<property name="contentType" value="${velocity.contentType}" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="requestContextAttribute" value="rc" />
+		<property name="toolboxConfigLocation" value="/WEB-INF/velocityToolBox.xml" />
+		<property name="viewClass" value="cn.lonsun.shiro.support.ShiroVelocityToolboxView" />
+		<property name="attributes" ref="_globalVars" />
+		<property name="order" value="1" />
+	</bean>
+	
+	<!-- jsp视图解析器 -->  
+    <bean id="jspViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>  
+        <property name="prefix" value="${jsp.prefix}"/>
+        <property name="suffix" value="${jsp.suffix}"/>
+        <property name="order" value="2" />
+    </bean>   
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.pool.maxTotal}" />
+		<property name="maxIdle" value="${redis.pool.maxIdle}" />
+		<property name="minIdle" value="${redis.pool.minIdle}" />
+		<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}" />
+		<property name="testOnBorrow" value="${redis.pool.testOnBorrow}" />
+	</bean>
+
+	<!-- redis的连接池pool，不是必选项：timeout/password -->
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1" value="${redis.host}"  type="java.lang.String" />
+		<constructor-arg index="2" value="${redis.port}" type="int" />
+	</bean>
+
+	<!--solr服务-->
+	<bean id="solrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+		<constructor-arg name="baseURL" value="${SOLR_URL}"></constructor-arg>
+		<property name="connectionTimeout" value="5000" ></property>
+		<property name="defaultMaxConnectionsPerHost" value="5000" ></property>
+		<property name="maxRetries" value="1" ></property>
+		<property name="maxTotalConnections" value="100" ></property>
+	</bean>
+
+	<!-- 事务管理器 -->
+	<bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<tx:annotation-driven transaction-manager="txManager" />
+	<aop:config expose-proxy="true">
+		<aop:advisor advice-ref="txAdvice" pointcut="execution(* cn.lonsun..service..*(..))" />
+	</aop:config>
+
+	<bean id="uniqueTableApp" class="cn.lonsun.key.impl.HibernateUniqueTableApp">
+	</bean>
+
+	<bean class="cn.lonsun.key.SequenceFactory">
+		<property name="uniqueTableApp" ref="uniqueTableApp"></property>
+		<!--<property name="transactionTemplate" ref="transactionTemplate"></property>-->
+		<property name="cacheKeyNum" value="1"></property>
+	</bean>
+</beans>

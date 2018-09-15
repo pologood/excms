@@ -1,0 +1,255 @@
+#parse("_page_layout/_header.vm")
+<style>
+    th {
+        text-align: right;
+    }
+</style>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:5px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">留言信息</a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">留言回复</a>
+                </li>
+            </ul>
+
+            <div class="tab-content" style="overflow:auto;height:530px">
+                <div class="tab-pane active" id="tab_1_1">
+                    <table class="table table-bordered picture-table">
+                        <tbody class="w100p">
+                        <tr>
+                            <th>错误类型：</th>
+                            <td><select name="type" class="form-control" id="type">
+                                #foreach($tp in ${type})
+                                    <option value="$!tp.value">$!tp.key</option>
+                                #end
+                            </select></td>
+                        </tr>
+                        <tr>
+                            <th>错误链接：</th>
+                            <td colspan="3"><input type="text" id="link" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>留言人：</th>
+                            <td><input type="text" id="createName" ms-duplex="createName" class="form-control" placeholder=""></td>
+                            <th>联系方式：</th>
+                            <td><input type="text" id="contactWay" ms-duplex="contactWay" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>留言时间：</th>
+                            <td><input type="datetime" id="createDate" ms-duplex="createDate" class="form-control"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly></td>
+                            <th>提交IP：</th>
+                            <td><input type="text" id="ip" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>详细描述：</th>
+                            <td colspan="3">
+                                <textarea id="descs" name="descs" style="width: 100%;height:240px; visibility: visible;"></textarea>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane" id="tab_1_2">
+                    <table class="table table-bordered picture-table">
+                        <tbody>
+                        <tr>
+                            <th>回复状态：</th>
+                            <td>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="replyStatus" value="1" ms-duplex-number="replyStatus"> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="replyStatus" value="0" ms-duplex-number="replyStatus"> 否
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>发布状态：</th>
+                            <td>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isPublish" value="1" ms-duplex-number="isPublish"> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isPublish" value="0" ms-duplex-number="isPublish"> 否
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>回复时间：</th>
+                            <td><input type="datetime" id="replyDate" ms-duplex="replyDate" class="form-control" style="width:250px;"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly></td>
+                        </tr>
+                        <tr>
+                            <th>回复内容：</th>
+                            <td><textarea id="replyContent" name="replyContent" style="width: 100%;height:250px; visibility: visible;"></textarea></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+
+    var eweb1, eweb2;
+    $(document).ready(function () {
+        mini.parse();
+        eweb1 = Ls.editor("descs", {style: "Lmini", height: "200"});
+        /*editor1 = KindEditor.create('textarea[name="descs"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&columnId=",//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            items: [
+                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });
+*/
+        eweb2 = Ls.editor("descs", {style: "Lmini", height: "200"});
+        /*editor2 = KindEditor.create('textarea[name="replyContent"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&columnId=",//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            items: [
+                'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                'insertunorderedlist', '|', 'emoticons', 'image', 'link'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+    })
+
+    var cmm = {}
+
+    $(document).ready(function () {
+        cmm.id = '$!{ID}';
+        Ls.ajax({
+            data: {
+                id: cmm.id
+            },
+            url: "/correction/getCorrection",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("初始化数据失败");
+                } else {
+                    cmm = text.data;
+                    $("#type").val(cmm.type);
+                    $("#link").val(cmm.link);
+                    $("#createName").val(cmm.createName);
+                    $("#contactWay").val(cmm.contactWay);
+                    $("#createDate").val(cmm.createDate);
+                    $("#ip").val(cmm.ip);
+                    /*editor1.html(cmm.descs);*/
+                    eweb1.setHtml(cmm.descs);
+                    if (cmm.replyStatus == 1) {
+                        $("input[name=replyStatus][value=1]").attr("checked", 'checked');
+                    } else {
+                        $("input[name=replyStatus][value=0]").attr("checked", 'checked');
+                    }
+                    if (cmm.isPublish == 1) {
+                        $("input[name=isPublish][value=1]").attr("checked", 'checked');
+                    } else {
+                        $("input[name=isPublish][value=0]").attr("checked", 'checked');
+                    }
+                    if (cmm.replyDate == null) {
+                        var nowDate = '$!{nowDate}';
+                        $("#replyDate").val(nowDate);
+                    } else {
+                        $("#replyDate").val(cmm.replyDate);
+                    }
+                    /*editor2.html(cmm.replyContent);*/
+                    eweb2.setHtml(cmm.replyContent);
+                }
+
+            }
+        });
+    })
+
+    function saveEdit() {
+
+        cmm.type = $("#type").val();
+        cmm.link = $("#link").val();
+        cmm.createName = $("#createName").val();
+        cmm.contactWay = $("#contactWay").val();
+        cmm.createDate = $("#createDate").val();
+        cmm.ip = $("#ip").val();
+        cmm.replyStatus = $("input[name='replyStatus']:checked").val();
+        cmm.isPublish = $("input[name='isPublish']:checked").val();
+        cmm.replyDate = $("#replyDate").val();
+        /*cmm.descs = editor1.html();
+          cmm.replyContent = editor2.html();*/
+        cmm.descs = eweb1.getHtml();
+        cmm.replyContent = eweb2.getHtml();
+        Ls.ajax({
+            data: cmm,
+            url: "/correction/saveEdit",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败");
+                } else {
+                    Ls.tipsOk("操作成功");
+					Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+                }
+
+            }
+        });
+    }
+
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            api.button(
+                {
+                    name: '保 存',
+                    callback: function () {
+		    eweb1.update();
+                    eweb2.update();
+                        saveEdit();
+                        return false;
+                    },
+                    focus: true
+                }
+            )
+        })
+    }
+</script>

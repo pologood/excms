@@ -1,0 +1,37 @@
+#set($Integer=0)
+#set($rowsnumber="$!{paramObj.rowsnumber}")
+#set($length=$Integer.parseInt($rowsnumber))
+#foreach($eo in $resultObj)
+    #set($num=$velocityCount - 1)
+    #if($num%$length == 0)
+        <div class="danwei">
+    #end
+            <dl id="tab$velocityCount">
+                <dt><span>$!{eo.name}</span></dt>
+                <dd>
+                    <div class="danweimain">
+                        <div class="left danweicon">
+                            <ul>
+                                <li class="l1">联系电话：$!{eo.officePhone}</li>
+                                <li class="l2">联系地址：$!{eo.officeAddress}</li>
+                                <li class="l3">服务窗口电话：$!{eo.servePhone}</li>
+                                <li class="l4">服务中心地址：$!{eo.serveAddress}</li>
+                                <li class="l5">单位网址：<u><a target="_blank" href="$!{eo.organUrl}">$!{eo.organUrl}</a></u></li>
+                            </ul>
+                        </div>
+                        <div class="right danwen_link">
+                            <a class="bs" href="$!{link}?organId=$!{eo.organId}&organShow=true" target="_blank">我要办事</a><a class="xx" href="$!{paramObj.writeUrl}$!{eo.organId}" target="_blank">我要写信</a>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </dd>
+            </dl>
+    #if($velocityCount%$length == 0)
+        </div>
+    #end
+#end
+#if($!{resultObj.size()} != 0 && $!{resultObj.size()} < $length)
+    </div>
+#elseif($!{resultObj.size()}%$length != 0)
+    </div>
+#end

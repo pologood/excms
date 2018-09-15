@@ -1,0 +1,26 @@
+<meta name="SiteName" content="$!{resultObj.SiteName}">
+<meta name="SiteDomain" content="$!{resultObj.SiteDomain}">
+<meta name="SiteIDCode" content="$!{resultObj.SiteIDCode}">
+#if("$!{resultObj.ColumnName}"!="")
+<meta name="ColumnName" content="$!{resultObj.ColumnName}">
+<meta name="ColumnType" content="$!{resultObj.ColumnType}">
+<meta name="ColumnDescription" content="$!{resultObj.ColumnDescription}">
+<meta name="ColumnKeywords" content="$!{resultObj.ColumnKeywords}">
+#end
+#if("$!{resultObj.ContentInfo}" != "")
+<meta name="ArticleTitle" content="$!{resultObj.ArticleTitle}">
+<meta name="PubDate" content="#date_format("$!{resultObj.PubDate}","yyyy-MM-dd HH:mm")">
+<meta name="ContentSource" content="#if("$!{resultObj.ContentSource}" != "")$!{resultObj.ContentSource}#else$!{resultObj.SiteName}#end">
+<meta name="Keywords" content="$!{resultObj.Keywords}">
+<meta name="Author" content="$!{resultObj.Author}">
+<meta name="Description" content="$!{resultObj.Description}">
+##<meta name="Url" content="$!{resultObj.Url}">
+#elseif("$!{resultObj.PublicContentInfo}" != "")
+<meta name="ArticleTitle" content="$!{resultObj.PublicContentInfo.title}">
+<meta name="PubDate" content="#date_format("$!{resultObj.PublicContentInfo.publishDate}","yyyy-MM-dd HH:mm")">
+<meta name="ContentSource" content="#if("$!{resultObj.PublicContentInfo.resources}" !="")$!{resultObj.PublicContentInfo.resources}#else$!{resultObj.SiteName}#end">
+<meta name="Keywords" content="$!{resultObj.PublicContentInfo.keyWords}">
+<meta name="Author" content="$!{resultObj.PublicContentInfo.author}">
+<meta name="Description" content="$!{resultObj.PublicContentInfo.keyWords}">
+##<meta name="Url" content="$!{resultObj.Url}">
+#end

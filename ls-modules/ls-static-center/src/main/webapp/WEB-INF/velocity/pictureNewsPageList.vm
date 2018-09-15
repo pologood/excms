@@ -1,0 +1,70 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($isHit="$!{paramObj.isHit}")
+#set($style="$!{paramObj.listStyle}")
+#set($length=$Integer.parseInt($length))
+#set($width="$!{paramObj.width}")
+#set($height="$!{paramObj.height}")
+#if($resultObj.data.size()>0)
+<ul class="picture-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        #if($eo.imageLink.indexOf("/") ==-1)
+            #if($eo.imageLink.indexOf(".") !=-1)
+                #set($filePath="$!{fileServerNamePath}")
+            #else
+                #set($filePath="$!{fileServerPath}")
+            #end
+        #else
+            #set($filePath="")
+        #end
+        <li>
+            <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" target="_blank" title="$!{eo.title}" class="left">
+                #if("$!{eo.imageLink}"!=""&&$!{paramObj.listStyle}=="1")
+                    <img src="${filePath}$!{eo.imageLink}" width="$!{width}" height="$!{height}">
+                #else
+                    <img src="/assets/images/s.jpg" width="$!{width}" height="$!{height}">
+                #end
+                #set($style="")
+                #if("$!{eo.isBold}" == "1")
+                    #set($style="font-weight:bold;")
+                #end
+                #if("$!{eo.isTilt}" == "1")
+                    #set($style=$style+"font-style:italic;")
+                #end
+                #if("$!{eo.isUnderline}" == "1")
+                    #set($style=$style+"text-decoration:underline;")
+                #end
+            ##        #if("$!{eo.isNew}" == "1")
+            ##          #set($length=$length+3)
+            ##        #end
+                #if("$!{eo.titleColor}" != "#000000")
+                    #set($style=$style+"color:$!{eo.titleColor};")
+                #end
+                #set($title=$!{eo.title})
+                <span class="img_title" style='$!{style}'>
+                    #cutstr($title,$length)
+                </span>
+            </a>
+        ##    #if("$!{eo.isNew}" == "1")
+        ##      <img src="/images/news.gif">
+        ##    #end
+        ##    #if("$isHit"=="true")<span class="right hit">[$!{eo.hit}]</span>#end
+        ##	#if("$isDate"=="true")<span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>#end
+        </li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+#end

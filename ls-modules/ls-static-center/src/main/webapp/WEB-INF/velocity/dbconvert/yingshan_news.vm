@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>英山县新闻导入</title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+
+<body>
+    #if("$!{type}"=="0")
+        <table>
+            <tbody>
+            <tr>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+            </tr>
+            <tr>
+                <td align="left">
+                    起始日期（包含该日期）：
+
+                </td>
+                <td align="left">
+                    <input type="text" name="date" id="date" />   (格式：2017-01-01)
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+            </tr>
+            <tr>
+                <td>原栏目ID：</td>
+                <td>
+                    <div style="border:1px solid black;overflow:scroll;height:600px">
+                        <ul id="old_tree" class="ztree" style="width: 350px"></ul>
+                    </div>
+                </td>
+                <td>现栏目ID：</td>
+                <td>
+                    <div style="border: 1px solid black;overflow:scroll;height: 600px">
+                        <ul id="ex8_tree" class="ztree" style="width:350px"></ul>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" align="center">
+                    <button id="doSub" type="button" style="height: 40px; ">提交</button>
+                    <button id="doDel" type="button" style="height: 40px; ">清空数据</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    #else
+
+    #end
+<script type="text/javascript">
+    var cur = {
+        tree: null,
+        ex8_tree: null,
+        selectNode: null,
+        ex8_selectNode: null
+    }
+
+    var ztree_settings = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/yingshan/news/getOldTree"
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'pid'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.selectNode = node;
+                return false;
+            }
+        }
+    };
+
+    var ztree_settings_ex8 = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/yingshan/news/getEX8Tree"
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "indicatorId",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'indicatorId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.ex8_selectNode = node;
+                return false;
+            }
+        }
+    };
+
+
+
+    $(document).ready(function () {
+        cur.tree = $.fn.zTree.init($("#old_tree"), ztree_settings);
+        cur.ex8_tree = $.fn.zTree.init($("#ex8_tree"), ztree_settings_ex8);
+
+        $("#doSub").on('click', function () {
+
+            var a = /^(\d{4})-(\d{2})-(\d{2})$/;
+            var date = document.getElementById("date").value;
+            if (date!=null&&date!=""&&!a.test(date)) {
+                alert("日期格式不正确!")
+                return false
+            }else{
+                var _this = $(this);
+                _this.attr("disabled", true).text("数据正在导入,请耐心等待(请勿关闭浏览器)。");
+
+                Ls.ajax({
+                    type: "POST",
+                    url: "/yingshan/news/toNews",
+                    data: {
+                        oldColumnId: cur.selectNode.id,
+                        curColumdId: cur.ex8_selectNode.indicatorId,
+                        dateStr:date
+                    },
+                    success: function (text) {
+                        if (text.status == 0) {
+                            alert(text.desc);
+                        } else {
+                            alert(text.data);
+                        }
+                        _this.attr("disabled", false).text("提交");
+                    }
+                });
+            }
+
+        });
+
+        $("#doDel").on('click', function () {
+            if (cur.ex8_selectNode == null) {
+                alert("请选择EX8栏目");
+                return false;
+            }else{
+                if(confirm("确认清空该栏目数据？")){
+                    var _this = $(this);
+                    _this.attr("disabled", true).text("数据正在清空,请耐心等待(请勿关闭浏览器)。");
+
+                    Ls.ajaxGet({
+                        url: "/yingshan/news/delete",
+                        data: {
+                            curColumdId: cur.ex8_selectNode.indicatorId
+                        },
+                        success: function (text) {
+                            if (text.status == 0) {
+                                alert(text.desc);
+                            } else {
+                                alert("清空成功");
+                            }
+                            _this.attr("disabled", false).text("清空数据");
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+
+</script>
+</body>
+</html>

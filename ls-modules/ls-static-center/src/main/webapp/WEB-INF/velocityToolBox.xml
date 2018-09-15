@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolbox>
+	<!-- application start -->
+	<tool>
+		<!-- key>shiro</key --><!-- 可选默认为 shiro -->
+		<scope>application</scope>
+		<class>cn.lonsun.shiro.support.Permission</class>
+	</tool>
+	<!-- application end -->
+</toolbox>

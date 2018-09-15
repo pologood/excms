@@ -1,0 +1,44 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#if($resultObj.data.size()>0)
+<ul class="survey-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        <li>
+            #set($title=$!{eo.title})
+            <a href="#if("$!{eo.isTimeOut}"=="2")$!{eo.linkUrl}#else$!{eo.viewUrl}#end" target="#if("$!{eo.isLink}"=="0")$!{paramObj.target}#else _blank #end" title="$title" class="left">
+                #cutstr($title,$length)
+            </a>
+            #if($isDate == "true")
+                <span class="right date">$!{eo.timeStr}</span>
+            #end
+            #if($!{eo.isTimeOut} == "1")
+                <span class="nostart">未开始</span>
+            #elseif($!{eo.isTimeOut} == "2")
+                <span class="starting">进行中</span>
+            #elseif($!{eo.isTimeOut} == "3")
+                <span class="over">已结束</span>
+            #else
+            #end
+        </li>
+        #if(${isLine}==true)
+            #if($velocityCount>0 && $velocityCount%$lineCount == 0)
+                <li class="lm_line"></li>
+            #end
+        #end
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1)
+    <div id="surveyPage" class="pagination"></div>
+    <script>
+        Ls.pagination("#surveyPage", function (pageIndex) {
+            location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount}
+        })
+    </script>
+    #end
+#end

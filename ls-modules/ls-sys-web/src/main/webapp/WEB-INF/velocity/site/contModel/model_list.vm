@@ -1,0 +1,152 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" id="adduser_btn" class="btn btn-default btn-add" onclick="addEO()"> 新 增
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+
+                            <form class="form-inline tr search-toolbar" role="form" onsubmit="searchModel();return false;">
+                                <div class="form-group">
+                                    <label>搜索：</label>
+                                    <input type="text" id="name" class="form-control" placeholder="模型名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="searchModel()">查询</button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid1" class="mini-datagrid" allowResize="true"
+                     url="/contentModel/getPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                     onlyCheckSelection="true"
+                     idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;height:500px"
+                >
+                    <div property="columns">
+                        <!--<div type="indexcolumn"></div>        -->
+                    #*<div type="checkcolumn"  width="20">选项</div>*#
+                        <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                        <div field="id" width="100" visible="false" headerAlign="center" align="center">模型ID</div>
+                        <div field="name" width="100%" headerAlign="center" align="center">模型名称</div>
+                    ##            <div field="modelTypeCode" width="180"  visible="false" headerAlign="center" align="center">栏目类型</div>
+                        <div field="modelTypeName" width="180" headerAlign="center" align="center">栏目类型</div>
+                        <div field="columnTempName" width="160" headerAlign="center" align="center">二级页面模板</div>
+                        <div field="articalTempName" width="160" headerAlign="center" align="center">详细页面模板</div>
+                        #if("$!{isWap}"=="1")
+                            <div field="wapColumnTempName" width="160" headerAlign="center" align="center">wap二级页面模板</div>
+                            <div field="wapArticalTempName" width="160" headerAlign="center" align="center">wap详细页面模板</div>
+                        #end
+                    ##            <div headerAlign="center" allowSort="true" visible="false" renderer="renderTpl" align="center">关联模板</div>
+                    #* <div field="createDate" width="140" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>*#
+                        <div width="115" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END THEME GLOBAL SCRIPTS -->
+#*<script src="$!{rc.contextPath}/assets/js/pages/model_manage.js"></script>*#
+<script>
+    var siteId = GLOBAL_SITEID;
+    var isPublic = "${isPublic}";
+    $(document).ready(function () {
+        mini.parse();
+        grid = mini.get("datagrid1");
+        grid.load({isPublic: isPublic});
+
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid);
+
+    });
+
+    /**
+     * 关联模型
+     */
+    function renderTpl(e) {
+        var link = "";
+        var rec = e.record;
+        link = '<a href="#" onclick="editTpl(' + rec.id + ');">模板列表</a>';
+        return link;
+    }
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        tgBtn = '<button class="btn btn-default btn-sm btn-edit" onclick="editEO(' + rec.id + ')"> 修 改 </button> '
+        qsBtn = '<button class="btn btn-default btn-sm btn-delete" onclick="deleteEO(' + rec.id + ')">删 除</button>'
+        str += tgBtn + qsBtn;
+        return str;
+    }
+
+    function editEO(id) {
+        if (id == null) {
+            Ls.tipsInfo("请选择修改项");
+            return;
+        }
+        Ls.openWin('/contentModel/toEdit?id=' + id + '&&siteId=' + siteId + "&&isPublic=" + isPublic, '600px', '500px', {
+            id: 'edit_eo',
+            title: '编辑内容模型',
+            padding: 0,
+        });
+    }
+
+    function addEO() {
+        Ls.openWin('/contentModel/toEdit?siteId=' + siteId + "&&isPublic=" + isPublic, '600px', '500px', {
+            id: 'add_eo',
+            title: '编辑内容模型',
+            padding: 0,
+        });
+    }
+
+    function deleteEO(id) {
+        if (id == null) {
+            mini.alert("请选择删除的项");
+            return;
+        }
+        if (confirm('确定要删除吗?')) {
+            Ls.ajaxGet({
+                url: "/contentModel/delEO",
+                data: {
+                    modelId: id
+                },
+            }).done(function (data) {
+                if (!data.status) {
+                    Ls.tips(data.desc, {icons: "error"});
+                    return;
+                } else if (data.data = '1') {
+                    Ls.tipsOk("删除成功");
+                    grid = mini.get("datagrid1");
+                    grid.load({isPublic: isPublic});
+                    return;
+                }
+            });
+        }
+    }
+
+    function editTpl(id) {
+        Ls.openWin('/modelTpl/toEditTpl?modelId=' + id, '600px', '500px', {
+            id: 'edit_tpl',
+            title: '编辑内容模型',
+            padding: 0
+        });
+    }
+
+    function searchModel() {
+        var name = $("#name").val();
+        grid = mini.get("datagrid1");
+        grid.load({name: name, isPublic: isPublic});
+    }
+    function searchClear() {
+        $("#name").val('');
+        grid = mini.get("datagrid1");
+        grid.load({name: '', isPublic: isPublic});
+    }
+</script>

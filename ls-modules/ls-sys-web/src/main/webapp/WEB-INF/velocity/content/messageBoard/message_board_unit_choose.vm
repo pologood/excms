@@ -1,0 +1,175 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-fit">
+  <div class="mini-fit">
+    <ul class="ztree" id="treeview2"></ul>
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+  mini.parse();
+
+  function nodeClick(event, treeId, treeNode) {
+    var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+    if (treeNode.isParent) {
+      zTree.expandNode(treeNode);
+    }
+  }
+  var columnId = '${columnId}';
+  var receiveUnitIds = '${receiveUnitIds}';
+  var temps = '${temp}';
+  var isTurn='$!{isTurn}';
+  var setting = {
+    async: {
+      enable: false
+    },
+    isEdit: true,
+    view: {},
+    check: {
+      enable: true,
+      autoCheckTrigger: false,
+      nocheckInherit : false,
+      chkboxType: {"Y": "p", "N": "p"}
+    },
+    data: {
+      simpleData: {
+        enable: true,
+        idKey: 'recUnitId',
+        pIdKey: 'parentId',
+      },
+    key: {
+        name: "recUnitName"
+    }
+    },
+    callback: {
+    }
+  };
+  var settingTurn = {
+      async: {
+          enable: false
+      },
+      isEdit: true,
+      view: {},
+      check: {
+          enable: true,
+          autoCheckTrigger: false,
+          nocheckInherit : false,
+          chkboxType: {"Y": "p", "N": "p"}
+      },
+      data: {
+          simpleData: {
+              enable: true,
+              idKey: 'turnUnitId',
+              pIdKey: 'parentId',
+          },
+          key: {
+              name: "turnUnitName"
+          }
+      },
+      callback: {
+      }
+  };
+
+  $(document).ready(function () {
+    var dialog = art.dialog,
+      api = art.dialog.open.api;
+    if (!api) return;
+      SetData();
+  });
+
+  function SetData() {
+          Ls.ajax({
+              url: "/messageBoard/getMessageUnitTree",
+              data: {
+                  columnId: columnId,
+                  isTurn:$!{isTurn}
+              },
+          }).done(function (json) {
+              if (!json.status) {
+                  Ls.tipsErr(json.desc);
+                  return;
+              }
+              if (json.data != null) {
+                  Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+              }
+              if(!Ls.isEmpty(isTurn)&&isTurn==1){
+                  jQuery.fn.zTree.init($("#treeview2"), settingTurn, json.data);
+              }else{
+                  jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+              }
+              var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+
+              zTree.expandAll(true);
+              if (temps != null && temps != '') {
+                  var temp = temps.split(",");
+                  for (var i = 0; i < temp.length; i++) {
+                      var node=null;
+                      if(!Ls.isEmpty(isTurn)&&isTurn==1){
+                          node = zTree.getNodeByParam("turnUnitId", temp[i], null);
+                      }else{
+                          node = zTree.getNodeByParam("recUnitId", temp[i], null);
+                      }
+                      zTree.checkNode(node, true, true);
+                  }
+              }
+              if (receiveUnitIds != null && receiveUnitIds != '') {
+                  var receiveUnitId = receiveUnitIds.split(",");
+                  for (var i = 0; i < receiveUnitId.length; i++) {
+                      var node=null;
+                      if(!Ls.isEmpty(isTurn)&&isTurn==1){
+                          node = zTree.getNodeByParam("turnUnitId", receiveUnitId[i], null);
+                      }else{
+                          node = zTree.getNodeByParam("recUnitId", receiveUnitId[i], null);
+                      }
+                      zTree.checkNode(node, true, true);
+                      zTree.setChkDisabled(node, true);
+                  }
+              }
+          });
+          return;
+  }
+
+  function doOk() {
+    var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+    // var  nodes = zTree.getSelectedNodes();
+    var nodes = zTree.getCheckedNodes(true);
+    var newNodes = [];
+    var ids = "";
+    var names = "";
+    if (nodes != null && nodes != "") {
+        if(!Ls.isEmpty(isTurn)&&isTurn==1){
+            for (i = 0; i < nodes.length - 1; i++) {
+                newNodes.add(nodes[i]);
+                ids += nodes[i].turnUnitId + ",";
+                names += nodes[i].turnUnitName + ",";
+            }
+            ids += nodes[nodes.length - 1].turnUnitId;
+            names += nodes[nodes.length - 1].turnUnitName;
+        }else{
+            for (i = 0; i < nodes.length - 1; i++) {
+                newNodes.add(nodes[i]);
+                ids += nodes[i].recUnitId + ",";
+                names += nodes[i].recUnitName + ",";
+            }
+            ids += nodes[nodes.length - 1].recUnitId;
+            names += nodes[nodes.length - 1].recUnitName;
+        }
+    }
+    var arr = {"ids": ids, "names": names};
+    return arr;
+  }
+
+  function onCancel() {
+    art.dialog.close();
+  }
+  function initSlimScroll() {
+    //添加模拟滚动条
+      var ui_tree = $('#treeview2');
+      var ui_layout = $(".mini-layout-region-body");
+      ui_tree.attr("data-height", ui_layout.height() - 10)
+      App.initSlimScroll(ui_tree);
+  }
+
+</script>
+</body>

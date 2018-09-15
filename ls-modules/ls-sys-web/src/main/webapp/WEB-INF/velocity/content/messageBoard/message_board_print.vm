@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+
+    #parse("_page_layout/_header.vm")
+    <style>
+        html, html body{
+            overflow: auto !important;
+        }
+        a {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        .btn {
+            color: 000000;
+            font-size: 12px;
+            border: 1px solid #CCCCCC;
+            padding: 8px 15px;
+            background: #DDDDDD;
+            border: #CCCCCC;
+        }
+
+        .fontTitle {
+            font-size: 16px;
+        }
+
+        .fontValue {
+            font-size: 16px;
+        }
+
+        #Layer1 {
+
+        }
+
+        @media print {
+            .btnClass {
+                display: none;
+            }
+        }
+    </style>
+<body class="page-body-white page-content-white" xmlns="http://www.w3.org/1999/html">
+<div id="Layer1" style="position:absolute; left:20mm; top:20mm; z-index:1">
+    <p align="center" class="tit" style="font-size: 18px; font-weight: 700;">编号：$!{vo.docNum}</p>
+    <table width="660" border="1" align="center" cellpadding="4" cellspacing="0" bgcolor="#FFFFFF" bordercolordark="#FFFFFF" bordercolorlight="#333333">
+        <tr>
+            <td width="93" height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>标&nbsp;&nbsp;&nbsp;&nbsp;题</strong></td>
+            <td height="30" colspan="3" bgcolor="#FFFFFF" style="padding:12px">$!{vo.title}</td>
+        </tr>
+        <tr>
+            <td height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>发 件 人</strong></td>
+            <td height="30" bgcolor="#FFFFFF" style="padding:12px">$!{vo.personName}</td>
+            <td height="30" align="center" bgcolor="#FFFFFF"><strong>电&nbsp;&nbsp;&nbsp;&nbsp;话</strong></td>
+            <td height="30" bgcolor="#FFFFFF" style="padding:12px">$!{vo.personPhone}&nbsp;</td>
+        </tr>
+        <tr>
+            #if($!{vo.recType}==0)
+                <td h   eight="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>收 件 单 位</strong></td>
+                <td width="193" height="30" bgcolor="#FFFFFF" style="padding-left:10px">$!{vo.receiveUnitName}</td>
+            #end
+            #if($!{vo.recType}==1)
+                <td height="30" align="center" bgcolor="#FFFFFF" style="padding:12px"><strong>收 件 人</strong></td>
+                <td width="193" height="30" bgcolor="#FFFFFF" style="padding-left:10px">$!{vo.receiveUserName}</td>
+            #end
+            <td height="30" align="center" bgcolor="#FFFFFF"><strong>时&nbsp;&nbsp;&nbsp;&nbsp;间</strong></td>
+            <td width="200" height="30" bgcolor="#FFFFFF" id="addDate" style="padding:12px"></td>
+        </tr>
+        <tr>
+            <td height="230" colspan="4" align="left" valign="top" bgcolor="#FFFFFF" style="padding:12px;">
+                <p style="color:#34495E;font-size:20px;"><strong>留言原文:</strong></p>
+                <p style="color:#34495E;font-size:15px;">&nbsp;&nbsp;&nbsp;&nbsp;$!{vo.messageBoardContent}</p>
+        </tr>
+        <tr>
+            <td height="230" colspan="4" align="left" valign="top" bgcolor="#FFFFFF" style="padding:12px;">
+                <p style="color:#34495E;font-size:15px;">办理意见:请
+                    #if($recType==0)
+                        ${receiveUnitNames}
+                    #elseif($recType==1)
+                        ${recUserNames}
+                    #end
+                    办理</p>
+                <p style="color:#34495E;font-size:15px;">
+                    办理要求: (1)积极联系网友。事前，对接网友，了解实情；事后，</p>
+                <p style="color:#34495E;font-size:15px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过发邮件或打电话或面对面将办理结果告知网友。</p>
+                <p style="color:#34495E;font-size:15px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2)请将办理材料纸质稿（限500字以内，并留下承办人联系方式）</p>
+                <p style="color:#34495E;font-size:15px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;经主要负责人签字后传真或送至市长热线服务中心，电子稿发至邮箱。</p>
+                <p style="color:#34495E;font-size:15px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3)如涉密，请勿使用传真、邮件传送文件。</p>
+                <p style="color:#34495E;font-size:15px;">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;市政府办公室将对办理情况适时通报。</p>
+                </p>
+            </td>
+        </tr>
+    </table>
+    <br>
+    #if("${isPrint}"!="1")
+        <p align="center">
+            <a href="/messageBoard/doPrint?&id=$!{vo.id}&baseContentId=$!{vo.baseContentId}&columnId=$!{vo.columnId}&isPrint=1" class="btn">打 印</a>
+            <br>
+            <br>
+        </p>
+    #end
+</div>
+</body>
+<iframe id="word_frame" name="word_frame" style="display: none;" src="about:blank"></iframe>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script>
+    var curr = {
+        pageIndex: '$!{pageIndex}'
+    };
+    function goBack() {
+        content_mgr.getContentApp('/messageBoard/index?pageIndex=' + curr.pageIndex);
+    }
+    $(document).ready(function () {
+        #if("${isPrint}"=="1")
+            window.print();
+        #end
+    })
+
+
+</script>
+<script type="text/javascript">
+    if(!Ls.isEmpty("$!{vo.addDate}")){
+        var addDate = "$!{vo.addDate}"
+        var index = addDate.lastIndexOf(".");
+        if(index > 0) {
+            addDate = addDate.substring(0,index);
+        }
+        document.getElementById("addDate").innerHTML=addDate;
+        /*document.getElementById("addDate").innerHTML=Ls.dateFormat(addDate,'yyyy-MM-dd');*/
+    }
+
+
+</script>

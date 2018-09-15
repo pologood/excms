@@ -1,0 +1,43 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">新闻热度</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1_1">
+                        <div id="news_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/heatAnalysis/news/getNewsHeatPage">
+
+                            <div property="columns">
+                                <div type="indexcolumn" width="60" headerAlign="center" allowSort="flase" align="center">序号</div>
+                                <div field="columnName" width="300" headerAlign="center" allowSort="flase" align="left">栏目名称</div>
+                                <div field="title" width="100%" headerAlign="center" allowSort="flase" align="left">文章标题</div>
+                                <div field="hit" width="110" headerAlign="center" allowSort="flase" align="center">点击数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        grid: null//datagrid
+    }
+    $(document).ready(function () {
+        // 初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.grid = mini.get("news_datagrid");
+        cur.grid.load({
+            siteId: GLOBAL_SITEID
+        });
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid, 50);
+    });
+</script>

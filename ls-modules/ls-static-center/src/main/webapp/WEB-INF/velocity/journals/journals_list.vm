@@ -1,0 +1,76 @@
+#if($paramObj.action=="list")
+    #set($Integer=0)
+    #set($length="$!{paramObj.length}")
+    #set($length=$Integer.parseInt($length))
+    #foreach($eo in $resultObj)
+        #set($title="$!{eo.materiaName}")
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+
+    <li class="$!{css} num${velocityCount}">
+        <a href="$!{eo.filePath}" target="_blank" title="$!{eo.title}">
+            <img src="$!{eo.imageLink}" alt="$!{eo.materiaName}" />
+            <span class="title">#cutstr($title,$length)</span>
+        </a>
+    </li>
+
+    #end
+  #elseif($paramObj.action=="page")
+      #set($Integer=0)
+      #set($length="$!{paramObj.length}")
+      #set($isLine="$!{paramObj.isLine}")
+      #set($length=$Integer.parseInt($length))
+      #set($lineCount=$Integer.parseInt("$!{paramObj.lineCount}"))
+      #if($resultObj.data.size()>0)
+      <ul class="doc_list list-$!{context.columnId}">
+          #foreach($eo in $resultObj.data)
+              #set($css="even")
+              #if($velocityCount%2 == 1)
+                  #set($css="odd")
+              #end
+              <li class="$!{css}">
+                  <a href="$!{eo.filePath}" target="_blank" title="$!{eo.materiaName}" class="left">
+
+                      #set($materiaName=$!{eo.materiaName})
+                      <span style='$style'>#cutstr($materiaName,$length)$!{eo.title}</span>
+                  </a>
+                  <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+              </li>
+              #if("${isLine}"=="true")
+                  #if($velocityCount>0 && $velocityCount%$lineCount == 0)
+                      #if("$!{paramObj.isPage}"=="false")
+                          <li class="lm_line add"></li>
+                      #else
+                          <li class="lm_line"></li>
+                      #end
+                  #end
+              #end
+
+          #end
+      </ul>
+
+          <div id="page_$!{context.columnId}" class="pagination">分页</div>
+          <script>
+              Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                  location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+              }, {
+                  isTotal: true,
+                  total: $!{resultObj.total},
+                  currPage: ($!{resultObj.pageIndex}+1),
+                  pageCount:$!{resultObj.pageCount},
+                  param: "pageSize=$!{paramObj.pageSize}"
+              });
+          </script>
+
+      #end
+
+#end
+
+
+
+
+
+
+

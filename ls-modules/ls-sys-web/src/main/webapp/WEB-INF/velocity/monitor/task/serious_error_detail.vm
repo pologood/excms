@@ -1,0 +1,71 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div>小计：疑似错词<span class="red">$!{easyerr}</span>个；疑似敏感词<span class="red">$!{sensitive}</span>个</div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getSeriousErrorPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="" width="150" align="center" headerAlign="center" renderer="link">标题</div>
+                        <div field="monitorDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="word" width="100" align="center" headerAlign="center" >疑似错误</div>
+                        <div field="typeCode" width="90" align="center" headerAlign="center">类型</div>
+                        <div field="fromCode" width="90" align="center" headerAlign="center">来源</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="checkType">检测类型</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            taskId:Ls.getWin.dialog.data("taskId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.params.taskId});
+    })
+
+    function checkType(obj) {
+        var rec = obj.record;
+        var checkType = rec.checkType;
+        if(checkType == 'SENSITIVE') {
+            return '敏感词';
+        } else {
+            return '易错词';
+        }
+    }
+
+    function link(obj) {
+        var rec = obj.record;
+        var domain = rec.domain;
+        if(!domain.endWith("/")) {
+            domain += "/";
+        }
+//        domain += rec.columnId + "/" + rec.contentId + ".html";
+        domain += "content/article/" + rec.contentId;
+        return '<u><a href="' + domain +'" target="_blank">' + rec.title + '</a></u>';
+    }
+
+    String.prototype.endWith=function(endStr){
+        var d=this.length-endStr.length;
+        return (d>=0&&this.lastIndexOf(endStr)==d)
+    }
+</script>

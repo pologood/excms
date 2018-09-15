@@ -1,0 +1,29 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+    #parse("_page_layout/_footer.vm")
+    <script>
+        var content_mgr= {
+            indicatorId:'$!{indicatorId}',
+            node:$!{node}
+        }
+    </script>
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div region="center" style="border:none; overflow: auto;">
+            #parse("/content/guestbook_modify.vm")
+        </div>
+    </div>
+    <script>
+        mini.parse();
+        var cur = {
+            api:Ls.getWin.api
+        }
+        cur.api.button(
+                {id:'back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        function back() {
+            Ls.winClose();
+        }
+    </script>
+</body>
+</html>

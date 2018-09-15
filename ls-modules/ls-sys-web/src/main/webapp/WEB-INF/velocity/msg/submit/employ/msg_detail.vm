@@ -1,0 +1,182 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .title_msg {
+        color: #555;
+        font-weight: bold;
+        font-size: 25px;
+    }
+
+    .fu_title_msg td {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 24px;
+        background: #fafafa;
+    }
+</style>
+<style type="text/css">
+    table.gridtable {
+        font-family: verdana, arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #a4d3dd;
+    }
+
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+</style>
+</head>
+<!-- END HEAD -->
+
+<body class="page-body-white" style="background-color: #fdfdfd">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <table style="width: 100%">
+                    <tr>
+                        <td align="center" class="title_msg">
+                            <input type="text" id="title" style="text-align: center;font-size: 24px;border-color: #fff;" name="title" class="form-control" value="$!{eo.name}">
+                        </td>
+                    </tr>
+                    <tr class="fu_title_msg">
+                        <td height="60px" align="center">
+                            所属分类:$!{eo.classifyName} &nbsp;&nbsp;&nbsp;&nbsp;供稿人:$!{eo.provider} &nbsp;&nbsp;&nbsp;&nbsp;作者:$!{eo.author} &nbsp;&nbsp;&nbsp;&nbsp;审核人:$!{eo.reviewer} &nbsp;&nbsp;<br/>
+                            发布日期:$!date.format('yyyy-MM-dd HH:mm:ss ',$!{eo.publishDate})  &nbsp;&nbsp;&nbsp;&nbsp;来源:$!{eo.fromCode}&nbsp;&nbsp;&nbsp;&nbsp;<font color="blue">被采用$!{eo.useCount}次</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" style="line-height:23px;">
+                            <textarea id="content" name="content" style="width: 100%;height: 320px;">
+                                $!{eo.content}
+                            </textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+#*<div title="south" region="south" showSplit="false" showHeader="false" height="57" showSplitIcon="false" splitSize="2">
+    <div class="pd10 tr">
+        <button type="button" class="btn btn-default btn-reset" onclick="employ_other()">采用到其他栏目</button>
+        <button type="button" class="btn btn-default btn-reset" onclick="employ()">采 用</button>
+        <button type="button" class="btn btn-default btn-reset" onclick="cancel()">关 闭</button>
+    </div>
+</div>*#
+</div>
+    #parse("_page_layout/_footer.vm")
+<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
+<script>
+    mini.parse();
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win
+    };
+    var eweb;
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        $("#title").focus(function () {
+            $(this).css({
+                "border-color": '#c2cad8'
+            })
+        }).blur(function () {
+            $(this).css({
+                "border-color": '#fff'
+            })
+        });
+
+
+        initKindEditor();
+        cur.api.button(
+                {id:'save',className:'btn-save',focus:true,name:'采用到其他栏目',callback:function(){employ_other();return false;}},
+                {id:'employ',className:'btn-save',focus:false,name:'采用',callback:function(){eweb.update();employ();return false;}},
+                {id:'back',className:'btn-back',name:'关闭',callback:function(){cancel();return false;}}
+        );
+    })
+
+    function employ() {
+        Ls.ajax({
+            url: "/msg/employ/batchEmploy",
+            data: {
+                msgIds: getMsgId(),
+                title:$('#title').val(),
+                /*content: cur.editor.html(),*/
+                content: eweb.getHtml(),
+                type: 0  //采用到当前对应栏目
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.call_back(resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getTitle() {
+        return '${eo.name}' == null ? "" : '${eo.name}';
+    }
+
+    function getMsgId() {
+        return '${eo.id}' == null ? "" : '${eo.id}';
+    }
+
+    function employ_other() {
+        eweb.update();
+        art.dialog.data('content', eweb.getHtml());
+        art.dialog.data('msgId', getMsgId());
+        art.dialog.data('title', $('#title').val());
+
+        Ls.openWin("/msg/employ/employOther", '380px', '400px', {
+            id: 'employOther',
+            title: "采编到其他栏目"
+        });
+    }
+
+    function employ_other_callback(msg) {
+        Ls.tips(msg, {times: 2})
+        cur.win.search();
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + 0});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERPATH,
+        });*/
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>
+</body>
+</html>

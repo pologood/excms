@@ -1,0 +1,200 @@
+<style>
+    .ac {
+        align: center
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div style="margin:15px 30px">
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">一周微信互动走势</span>
+                                &nbsp;<span style="font-size:14px;color:red"></span>
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                            ##                                <div class="form-group form-inline ">
+##                                    <input type="text" name="st" id="st" class="form-control w160"
+##                                           placeholder="开始时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+##                                    <input type="text" name="ed" id="ed" class="form-control w160"
+##                                           placeholder="结束时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+##                                    <button type="button" class="btn btn-default btn-search" onclick="search()">查询</button>
+##                                    <button type="button" class="btn btn-default" onclick="searchClear()">清除条件</button>
+##                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="option_a" style="height: 480px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">单位回复排行</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                            ##                                <div class="form-group form-inline search-toolbar">
+##                                    <!--  <label>搜索：</label>-->
+##                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="访问IP" ms-duplex="key">
+##                                    <input type="text" name="st" id="st" class="form-control w160"
+##                                           placeholder="开始时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+##                                    <input type="text" name="ed" id="ed" class="form-control w160"
+##                                           placeholder="结束时间" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+##                                    <button type="button" class="btn btn-default btn-search" onclick="search()">查询</button>
+##                                    <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+##                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="doc_list_body">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    $(document).ready(function () {
+
+        //拉取数据
+        getData()
+
+        Ls.parseEcharts(function () {
+            require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie'
+            ], function (ec) {
+                getCharts();
+            })
+        })
+
+    })
+
+    function getCharts() {
+        Ls.ajaxGet({
+            url: "/weChat/msgMgr/getWeekCharts",
+            data: {},
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    var option = getOption(d.xAxis, d.series);
+                    require('echarts').init(document.getElementById('option_a')).setOption(option);
+                }
+            }
+        });
+    }
+
+    function getOption(xAxis, series) {
+        var option = {
+            title: {
+                text: ''
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['消息总数', '已回总数']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                start: 0,
+                end: 100
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxis
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: series
+        };
+        return option;
+    }
+
+    function getData() {
+        return Ls.ajaxGet({
+            url: "/weChat/msgMgr/getUnitsCount",
+            data: {}
+        }).done(function (d) {
+            var listHtml = units_count_template(d);
+            $("#doc_list_body").html(listHtml);
+        });
+    };
+
+
+    //datagrid 模板
+    var units_count_template = Ls.compile(
+        '<table class="table table-hover doc-list">' +
+        '   <thead>' +
+        '       <tr>' +
+        '           <th class="w350 tc" >单位名称</th>' +
+        '           <th class="w150 ">消息发送次数</th>' +
+        '           <th class="w150">消息回复次数</th>' +
+        '           <th class="w180">平均回复时间（小时）</th>' +
+        '           <th class="w80 tc">回复率</th>' +
+        '       </tr>' +
+        '   </thead>' +
+        '   <tbody>' +
+        '   <? for(var i=0,l=data.length; i<l; i++){ ?>' +
+        '   <? var el = data[i] ?>' +
+        '       <tr>' +
+        '           <td>' +
+        '	            <div class="tc"><?=el.name?></div>' +
+        '           </td>' +
+        '           <td>' +
+        '               <div class=""><?=el.sendCount?></div>' +
+        '           </td>' +
+        '           <td>' +
+        '	            <div><?=el.replyCount?></div>' +
+    '               </td>' +
+        '           <td>' +
+        '	            <div><?=el.replyTimeRate?></div>' +
+    '               </td>' +
+        '           <td class="tc">' +
+        '	            <div><?=el.replyRate?>%</div>' +
+        '           </td>' +
+        '       </tr>' +
+        '   <? } ?>' +
+        '   </tbody>' +
+        '</table>'
+    );
+</script>

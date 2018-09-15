@@ -1,0 +1,98 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form  role="form" ms-controller="catalog_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>标题：</label>
+                             $!{title}
+                        </div>
+                        <div class="form-group">
+                            <label>终止原因：</label>
+                            <textarea class="form-control" id="reason" name="reason"  ms-duplex="description" rows="3" placeholder="终止原因"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/goa/core/jquery.min.js"></script>
+#parse("_page_layout/_footer.vm")
+<script>
+  var cur={
+    // 为KO准备的viewModel对象
+    viewModel : {},
+    // 所有当前页面级方法的命名空间对象
+    fn:{},
+    // 所有当前页面与服务端交互的action命名空间
+    action:{
+      terminate:'/process/terminate'
+    },
+    // 所有当前获取jQuery的DOM对象的存储的命名空间对象
+    el:{},
+    // 获取当前页URL参数的命名空间对象
+    params:{
+      procInstId:'$!{procInstId}',
+      recordId :'$!{recordId}',
+      moduleCode : '$!{moduleCode}',
+      dataId : '$!{dataId}'
+
+    },
+    // 获取JS对话框窗口对象,如果不是JS组件对话框则为null
+    dg : Ls.getWin.api,
+    pWin : Ls.getWin.win
+  };
+
+  jQuery(document).ready(function(){
+    // 获取页面加载提示对象
+    cur.dg.button({
+        id: "do_submit",
+        name: "确定",
+        focus: true,
+        callback: function () {
+            cur.fn.ok();
+            return false;
+        }
+    });
+  });
+
+  cur.fn.ok = function (){
+    //提交数据
+    var reason = $("#reason").val();
+    if(Ls.isEmpty(reason)){
+        Ls.tipsErr("终止原因不能为空");
+        return;
+    }
+    var postData = {};
+    postData.moduleCode = cur.params.moduleCode;
+    postData.procInstId = cur.params.procInstId;
+    postData.recordId = cur.params.recordId;
+    postData.dataId = cur.params.dataId;
+    postData.reason = reason;
+    Ls.ajax({
+        type: "POST",
+        data: postData,
+        url: cur.action.terminate,
+        success: function (json) {
+            if(json.status == 1){
+                Ls.tipsOk("终止成功",function(){
+                    try{
+                        cur.pWin.cur.grid.reload();
+                    }catch (e){}
+                    cur.dg.close();
+                });
+            }else{
+                Ls.tipsErr(json.desc);
+            }
+
+        }
+    });
+  };
+</script>
+
+</body>
+</html>

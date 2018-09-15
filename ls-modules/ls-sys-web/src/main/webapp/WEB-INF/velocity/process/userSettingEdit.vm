@@ -1,0 +1,122 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="setting_form" ms-controller="article_form">
+                    <table class="table table-bordered article-table">
+                        <tbody>
+                        <tr>
+                            <th>活动名称：</th>
+                            <td>
+                                $!{activityName}
+
+                            </td>
+
+                        </tr>
+
+                        <tr >
+                            <th style="vertical-align: top;">办理人员：</th>
+
+                            <td colspan="2">
+                                <textarea id="userNames" ms-duplex="userNames" class="form-control"  style="height: 70px;" readonly onfocus="selectUser1()">
+
+                                </textarea>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <th></th>
+                            <td >
+                                <button class="btn btn-default btn-save" type="button" onclick="saveSettingInfo()"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var cur = {
+        vm: {
+            processId:$!{processId},
+            activityId:$!{activityId},
+            siteId:Ls.getWin.win.GLOBAL_SITEID
+        },
+        processId:$!{processId},
+        activityId:$!{activityId},
+        activityName:'$!{activityName}',
+        siteId:Ls.getWin.win.GLOBAL_SITEID
+    }
+
+//    mini.parse();
+    $(document).ready(function(){
+        getStettingInfo();
+    });
+
+    function getStettingInfo(){
+        Ls.ajaxGet({
+            url: "/process/getUserSetInfo",
+            data: {
+                processId: cur.processId,
+                activityId: cur.activityId,
+                siteId:cur.siteId
+            }
+        }).done(function (text) {
+            var data = text.data;
+            if(data!=null){
+                data.$id = "setting_form";
+                cur.vm = avalon.define(data);
+                avalon.scan($("#setting_form").get(0), cur.vm);
+
+                $("#userNames").val(data.userNames);
+            }
+        })
+    }
+
+    function saveSettingInfo(){
+        var value = cur.vm;
+        value = Ls.toJSON(value);
+        value.processId = cur.processId;
+        value.activityId = cur.activityId;
+        value.siteId = cur.siteId;
+        Ls.ajax({
+            type: "POST",
+            url: "/process/saveUserSetInfo",
+            data: value
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            } else {
+                Ls.tipsOk("保存成功");
+                goBack();
+            }
+        });
+    }
+
+    function goBack(){
+        var url = '/process/processActivityList?processId='+cur.processId;
+        location.href = url;
+    }
+
+    function selectUser1(){
+        Ls.selectUnitUser(function(arg) {
+            if(arg!=null){
+                $("#userNames").val(arg.names);
+                cur.vm.userNames = arg.names;
+                cur.vm.userIds = arg.ids;
+            }
+        });
+    }
+</script>

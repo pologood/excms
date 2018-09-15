@@ -1,0 +1,5 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($eo = $!{resultObj})
+#cutstr($!{eo.name},$length)

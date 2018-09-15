@@ -1,0 +1,33 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+<div class="leader-sidebar collapse">
+    <ul>
+        #foreach($eo in $resultObj)
+            <li class="leader-item">
+                <a href="javascript:openClild($!{eo.leaderTypeId});" class="leader-link #if($!{eo.isOpen} == 1)active#end">
+                    <i class="leader-icon"></i>
+                    <span class="group-name">$!{eo.title}</span>
+                </a>
+                <ul id="leader_$!{eo.leaderTypeId}" name="leaderInfo" class="sub-menu" style="display:#if($!{eo.isOpen} == 1)block #else none #end">
+                    #foreach($lieo in $eo.leaderInfos)
+                        <li class="nav-item">
+                            <a href="$!{lieo.linkUrl}" class="leader-link #if($!{eo.isClick} == 1)active#end">
+                                <span class="position-name">$!{lieo.positions}</span>
+                                <span class="user-name">$!{lieo.name}</span>
+                            </a>
+                        </li>
+                    #end
+                </ul>
+            </li>
+        #end
+    </ul>
+</div>
+<script>
+    function openClild(leaderTypeId) {
+        $("ul[name='leaderInfo']").each(function (i, val) {
+            $(this).hide();
+        });
+        $("#leader_" + leaderTypeId).show();
+    }
+</script>

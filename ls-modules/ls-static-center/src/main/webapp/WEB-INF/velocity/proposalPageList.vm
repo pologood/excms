@@ -1,0 +1,40 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+<div class="guestbook-table">
+    <ul class="guestbook_title">
+        <li class="t1">建议号</li>
+        <li class="t2">领衔人</li>
+        <li class="t3">标题</li>
+        <li class="t4">查看</li>
+    </ul>
+
+    #foreach($eo in $resultObj.data)
+        #set($title="$!{eo.title}")
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <ul class="$css">
+            <li class="t1">
+                $!{eo.num}
+            </li>
+            <li class="t2">$!{eo.leader}</li>
+            <li class="t3"> <a href="/delegate/getProposalById?id=$!{eo.id}" target="_blank" title="$!{eo.title}">
+                #cutstr($title,$length)
+            </a></li>
+            <li class="t4"><a href="/delegate/getProposalById?id=$!{eo.id}" target="_blank" >查看</a></li>
+        </ul>
+    #end
+</div>
+#if($!{resultObj.pageCount}>1)
+<div id="page_proposal" class="pagination">分页</div>
+<script>
+    Ls.pagination("#page_proposal", function (pageIndex) {
+        location.href = '/site/tpl/4448155?pageIndex=' + pageIndex+"&pageSize="+$!{resultObj.pageSize};
+    }, {
+        currPage: ($!{resultObj.pageIndex}+1),
+        pageCount:$!{resultObj.pageCount}
+    });
+</script>
+#end

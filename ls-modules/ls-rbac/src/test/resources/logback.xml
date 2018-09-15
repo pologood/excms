@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [IP:%mdc{IP}]-[userId:%mdc{UserID},userName:%mdc{UserName}] [%c]-[%p] %m%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <File>D:/coadeploy/pressure_test/logs/lonsun.log</File>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss} [userId:%mdc{UserID},userName:%mdc{UserName}] [%c]-[%p] - %m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <maxIndex>1</maxIndex>
+     <!--  <FileNamePattern>E:/workspace_2014/logs/lonsun.log.%i</FileNamePattern> -->
+      <FileNamePattern>D:/coadeploy/pressure_test/logs/lonsun.log.%i</FileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>500KB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+  <root level="INFO">
+    <appender-ref ref="console"/>
+    <appender-ref ref="file"/>
+  </root>
+</configuration>

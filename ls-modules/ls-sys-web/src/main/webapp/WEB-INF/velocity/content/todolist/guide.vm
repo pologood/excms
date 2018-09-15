@@ -1,0 +1,192 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+    #parse("_page_layout/_footer.vm")
+<script>
+    var content_mgr = {
+        indicatorId: '$!{indicatorId}',
+        node:$!{node}
+    }
+</script>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div style="padding-right: 20px;">
+            #parse("net/service/guide/index.vm")
+        </div>
+    </div>
+</div>
+<script>
+    var curr = {
+        api: Ls.getWin.api,
+        win: Ls.getWin.win,
+        siteId: Ls.getWin.dialog.data('siteId')
+    }
+    curr.api.button(
+        {
+            id: 'save', className: 'btn-save', name: '保存', callback: function () {
+                saveDataSearch(0);
+                return false;
+            }
+        },
+        {
+            id: 'saveAndPublish', className: 'btn-save-release', name: '保存并发布', callback: function () {
+                saveDataSearch(1);
+                return false;
+            }
+        }
+    );
+
+    /**
+     * 保存数据
+     */
+    function saveDataSearch(publish) {
+        if ($('#turnLink').prop("checked")) {
+            cur.vm.content = null;
+        } else {
+            cur.vm.linkUrl = null;
+        }
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/workGuide/saveEO"
+        } else {
+            url = "/workGuide/updateEO"
+        }
+
+        if (!cur.zx_ck.prop("checked") || cur.links.isConsole == 0) {
+            cur.vm.zxLink = "";
+        }
+
+        if (!cur.ts_ck.prop("checked") || cur.links.isComplaint == 0) {
+            cur.vm.tsLink = "";
+        }
+
+        if (!cur.sb_ck.prop("checked") || cur.links.isDeclaration == 0) {
+            cur.vm.sbLink = "";
+        }
+
+        if (!cur.xccs_ck.prop("checked") || cur.links.isVisit == 0) {
+            cur.vm.minLocalTime = "";
+        }
+
+        if (cur.editor_set_accord.getHtml() == "") {
+            Ls.tips("设定依据不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if (cur.editor_apply_condition.getHtml() == "") {
+            Ls.tips("申请条件不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if (cur.editor_handle_data.getHtml() == "") {
+            Ls.tips("办理材料不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if (cur.editor_handle_process.getHtml() == "") {
+            Ls.tips("办理流程不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if(cur.handleAddress.val() == "") {
+            Ls.tips("办理地址不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if(cur.handleDate.val() == "") {
+            Ls.tips("办理时间不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if(cur.handleLimit.val() == "") {
+            Ls.tips("办理时限不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if(cur.feeStandard.val() == "") {
+            Ls.tips("收费标准不能为空", {times: 2,icons:"error"});
+            return;
+        }
+        if(cur.phone.val() == "") {
+            Ls.tips("联系电话不能为空", {times: 2,icons:"error"});
+            return;
+        }
+
+        // 更新所有编辑器内容到 textarea
+        EWEBEDITOR.UpdateAll();
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                name: cur.vm.name,
+                linkUrl: cur.vm.linkUrl,
+                organId: cur.organId.val(),
+                joinDate: cur.vm.joinDate,
+                content: cur.editor_content.getHtml(),
+                turnLink: cur.vm.turnLink,
+                zxLink: cur.vm.zxLink,
+                tsLink: cur.vm.tsLink,
+                sbLink: cur.vm.sbLink,
+                minLocalTime:cur.vm.minLocalTime,
+                cIds: cur.vm.cIds,
+                columnId: content_mgr.indicatorId,
+                contentId: cur.vm.contentId,
+                typeCode: content_mgr.node.columnTypeCode,
+                tableIds:cur.table_select_lable.attr('value'),
+                ruleIds: cur.rule_select_lable.attr('value'),
+                setAccord: cur.editor_set_accord.getHtml(),
+                applyCondition: cur.editor_apply_condition.getHtml(),
+                handleData: cur.editor_handle_data.getHtml(),
+                handleProcess: cur.editor_handle_process.getHtml(),
+                handleAddress: cur.handleAddress.val(),
+                handleDate: cur.handleDate.val(),
+                phone: cur.phone.val(),
+                handleLimit:cur.handleLimit.val(),
+                feeStandard:cur.feeStandard.val(),
+                publish: publish == null || publish == '' ? 0 : 1
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {times: 2});
+                    if(publish == 1) {
+                        back();
+                    }
+                    curr.win.global_search.search();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    /**
+     * 编辑事项
+     */
+    function editGuideByContent() {
+        organ_select_tree.init();
+        cur.record =  $!{guide};
+        cur.model = cur.record;
+        cur.type = 'edit';
+
+        zx_link();
+        ts_link();
+        sb_link();
+        xccs_link();
+
+        //设置基本数据
+        set_base_info();
+
+        //设置分类树
+        set_classify_info();
+
+        //设置附加内容
+        set_attach_info();
+
+        set_classify();
+
+        cur.list_page.hide();
+        cur.edit_page.show();
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

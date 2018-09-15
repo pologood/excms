@@ -1,0 +1,143 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <button id="adduser_btn" class="btn btn-default btn-add" onclick="addPage()"> 新 增</button>
+                    <button id="adduser_btn" class="btn btn-default btn-delete" onclick="del()"> 删 除</button>
+                </div>
+                <div class="col-md-5">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="类别名称">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="search()">查询</button>
+                        <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" allowCellSelect="false"
+             onlyCheckSelection="true"
+             idField="id" sizeList="[20,30,50]" pageSize="20" allowCellSelect="true" multiSelect="true"
+             url="/columnType/getPage">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                <div field="typeName" width="180" headerAlign="center" align="center" allowSort="true">类别名称</div>
+                <div field="description" width="100%" headerAlign="center" align="center" allowSort="true">类别描述</div>
+                <div field="keyWords" width="300" headerAlign="center" align="center" allowSort="true">类别关键字</div>
+                <div width="120" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        grid: null
+    }
+    $(document).ready(function () {
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load({dataFlag: 1});
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+    });
+    //描述
+    function renderopt(e) {
+        var str = "";
+        var rec = e.record;
+        var editStr = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="editPage(' + rec.id + ')">修 改</button>';
+        editStr += '<button class="btn btn-default btn-sm btn-delete" onclick="deleteData(' + rec.id + ')">删除</button>'
+        return editStr;
+    }
+    // 删除
+    var del = function () {
+        var ids = [];
+        var selected = cur.grid.getSelecteds();
+        var length = selected.length;
+        if (length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        for (var i = 0; i < length; i++) {
+            console.info(selected[i]);
+            ids.push(selected[i].id);
+        }
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/columnType/delete",
+                data: {
+                    ids: ids
+                }
+            }).done(function (d) {
+                Ls.tips('删除成功!', {
+                    icons: "success"
+                });
+                cur.grid.reload();
+            });
+        }
+    }
+    function deleteData(id) {
+        var ids = [];
+        ids.push(id);
+        Ls.ajax({
+            url: "/columnType/delete",
+            data: {
+                ids: ids
+            }
+        }).done(function (text) {
+            if (text.status == 1) {
+                Ls.tipsOk("删除成功");
+                cur.grid.reload();
+            } else {
+                Ls.tipsErr(text.desc);
+            }
+        });
+    }
+    //新增服务
+    var addPage = function () {
+        Ls.openWin('/columnType/edit', '460px', '400px', {
+            id: 'coltype_button_edit',
+            title: "新增栏目类别",
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    };
+    //修改
+    var editPage = function (id) {
+        Ls.openWin('/columnType/edit?id=' + id, '460px', '400px', {
+            id: 'coltype_button_edit',
+            title: "修改栏目类别",
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    };
+    function search() {
+        var name = $("#searchKey").val()
+        cur.grid.load({title: name, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        cur.grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+</script>

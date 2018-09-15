@@ -1,0 +1,1378 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="renderer" content="webkit"/>
+    <title>龙讯-智能机器人</title>
+    <link rel="shortcut icon" href="$!{frontStaticPath}/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="$!{frontStaticPath}/assets/search/css/jqueryui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="$!{frontStaticPath}/assets/search/css/robot.min.css"/>
+    <link rel="stylesheet" type="text/css" href="$!{frontStaticPath}/assets/css/core.min.css"/>
+    <!--[if IE 8]>
+    <link rel="stylesheet" type="text/css" href="$!{frontStaticPath}/assets/js/placeholder/placeholder.min.css"/>
+    <![endif]-->
+    <style>
+        #voice {
+            width: 100%;
+            height: 38.2%;
+            min-height: 229.2px;
+            background: #fff;
+            font-size: 16px;
+            bottom: 0
+        }
+
+        #voice .voice-inner {
+            position: relative;
+            margin: -40px auto 0;
+            width: 0
+        }
+
+        #voice .speak-btn {
+            position: absolute;
+            margin: 10px auto;
+            display: block;
+            width: 61px;
+            height: 61px;
+            z-index: 5;
+            cursor: pointer;
+            background: url('/assets/search/images/voice-btn.png') center center no-repeat
+        }
+
+        #voice .box {
+            width: 36px;
+            height: 36px;
+            position: absolute;
+            z-index: 2;
+            background: #35d2ff;
+            margin: 23px 0 0 12px;
+        }
+
+        #voice .box-inner {
+            width: 100%;
+            height: 36px;
+            background: #fff
+        }
+
+        @keyframes myfirst {
+            from {
+                border: 1px solid rgba(0, 0, 255, 1);
+                width: 58px;
+                height: 58px;
+                border-radius: 100px;
+                margin: 11px 0 0 0px;
+            }
+            to {
+                border: 1px solid rgba(0, 0, 255, 0);
+                width: 120px;
+                height: 120px;
+                border-radius: 200px;
+                margin: -20px 0 0 -32px;
+            }
+        }
+
+        @-webkit-keyframes myfirst {
+            from {
+                border: 1px solid rgba(194, 224, 253, 1);
+                width: 100px;
+                height: 100px;
+                border-radius: 100px;
+                margin: 70px 0 0 -50px
+            }
+            to {
+                border: 1px solid rgba(194, 224, 253, 0);
+                width: 300px;
+                height: 300px;
+                border-radius: 300px;
+                margin: -30px 0 0 -150px
+            }
+        }
+
+        @-moz-keyframes myfirst {
+            from {
+                border: 1px solid rgba(0, 0, 255, 1);
+                width: 100px;
+                height: 100px;
+                border-radius: 100px;
+                margin: 70px 0 0 -50px
+            }
+            to {
+                border: 1px solid rgba(0, 0, 255, 0);
+                width: 200px;
+                height: 200px;
+                border-radius: 200px;
+                margin: 20px 0 0 -100px
+            }
+        }
+
+        @-o-keyframes myfirst {
+            from {
+                border: 1px solid rgba(0, 0, 255, 1);
+                width: 100px;
+                height: 100px;
+                border-radius: 100px;
+                margin: 70px 0 0 -50px
+            }
+            to {
+                border: 1px solid rgba(0, 0, 255, 0);
+                width: 200px;
+                height: 200px;
+                border-radius: 200px;
+                margin: 20px 0 0 -100px
+            }
+        }
+
+        #voice .round1, #voice .round2 {
+            z-index: 3;
+            position: absolute;
+            border: 0 solid rgba(0, 0, 255, 1);
+            border-radius: 200px;
+            width: 0;
+            height: 0;
+            line-height: 0;
+            animation: myfirst 3s linear 0s infinite;
+            -webkit-animation: myfirst 3s linear 0s infinite;
+            -moz-animation: myfirst 3s linear 0s infinite;
+            -o-animation: myfirst 3s linear 0s infinite
+        }
+
+        #voice .round2 {
+            animation-delay: 1.5s;
+            -webkit-animation-delay: 1.5s;
+            -moz-animation-delay: 1.5s;
+            -o-animation-delay: 1.5s
+        }
+
+        #voice .round3 {
+            z-index: 1;
+            position: absolute;
+            background: #c2e0fd;
+            width: 0;
+            height: 0;
+            line-height: 0;
+            border-radius: 50%;
+        }
+        .chat_conversation>.btnWrap img {
+            vertical-align: middle;
+        }
+        .chat_conversation>.btnWrap>a.match {
+            background: url(/assets/search/images/match.png) no-repeat;
+            line-height: 14px;
+            height: 18px;
+            margin-left: 20px;
+            padding-left: 26px;
+            color: #666;
+            display: none;
+        }
+        .chat_conversation>.btnWrap>a.match.checked {
+            background: url(/assets/search/images/match_2.png) no-repeat;
+        }
+        .preview-title .icon {
+            margin-top: 3px;
+        }
+        .preview-title .back {
+            margin-top: 5px;
+        }
+        .preview-content {
+            margin-top: 3px;
+        }
+        .relative-title {
+            margin-bottom: 5px;
+        }
+        .preview-content .lab {
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="robot-bg">
+<div class="mainbox">
+    <div class="header">
+        <div class="logo fl"></div>
+        <div class="nav fr">
+            <ul>
+            </ul>
+        </div>
+    </div>
+    <div class="row_fluid row-fluid">
+        <div class="main_left fl w60p">
+            <!--对话框 on-->
+            <div class="chat_conversation">
+                <ul tabindex="5000" class="conversation_list" id="content">
+                    <li class="clearfix">
+                        <div class="chat_avatar">
+                            <img src="$!{frontStaticPath}/assets/search/images/user1.png" alt="female">
+                        </div>
+                        <div class="conversation_text">
+                            <div id="step1" class="ctext_wrap no_padding" style="width: 100%">
+                                <div class="chat_index">
+                                    <p class="padding_side padding_top10 padding_bottom10 padding_right10">
+                                        #if("$!{notice}" == "")
+                                            您好！我是龙讯智能助手，为您提供智能咨询服务。您可以在本平台查询各部门办事事项、了解各项规章条例、查看信息公开的内容、获取时下热门资讯等，更多功能等待您亲自体验。
+                                        #else
+                                            $!{notice}
+                                        #end
+                                    </p>
+                                    #foreach($eo in $!{sources})
+                                        $!{eo.seqNum} : $!{eo.title} <br>
+                                    #end
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                    </li>
+                    <div class="doc-manage" id="answers_div"></div>
+                </ul>
+                <div class="btnWrap">
+                    <a href="javascript:void(0);" class="item on">
+                        <img src="$!{frontStaticPath}/assets/search/images/keyboard_new.png" class="normal" alt="" width="32">
+                        <img src="$!{frontStaticPath}/assets/search/images/keyboard_on.png" class="on" alt="" width="32">
+                    </a>
+                    <a href="javascript:void(0);" class="item voice-worker" style="display: none;">
+                        <img src="$!{frontStaticPath}/assets/search/images/voice_new.png" class="normal" alt="" width="21">
+                        <img src="$!{frontStaticPath}/assets/search/images/voice_on.png" class="on" alt="" width="21">
+                    </a>
+                    <a href="javascript:void(0);" class="match" id="matchBtn">
+                        是否模糊匹配（将对搜索词进行分词，会产生较多的搜索结果）
+                    </a>
+                </div>
+                <span class="borderLine"></span>
+            </div>
+            <!--对话框 end-->
+            <!--输入框 on-->
+            <div class="import">
+                <div id="toolbar"></div>
+                <div id="step2" class="input-area">
+                    <button type="submit" class="btn-send pull-right" onclick="sendMessage()">发送
+                        <br/>Enter
+                    </button>
+                    <div class="input-wrapper">
+                        <textarea id="inputBox" class="input-block-level enter-input" placeholder="简单输入，精准信息即刻展现~"></textarea>
+                    </div>
+                </div>
+                <div class="import-status">
+                    <!--<div id="step8" class="fl"><a href="#myModal" data-toggle="modal" title="满意度评价"-->
+                    <!--class="margin-left30"></a></div>-->
+                    <div class="remain-tip"> 还可以输入<span id="textCount" class="red-txt">00</span>字</div>
+                    <!--<div class="span6">-->
+                    <!--<div class="chat-send col20 pull-right margin-right10">-->
+                    <!--<button type="submit" class="btn btn-default send" onclick="sendMessage()">发送(Ctrl+回车)-->
+                    <!--</button>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </div>
+            <div class="import1">
+                <div class="voice-msg">
+                    <p>请说出关键字进行搜索，如：<span style="color: #2581CF;">身份证</span></p>
+                </div>
+                <div id="voice" class="voice-content clearfix">
+                    <div class="voice-inner">
+                        <span class="speak-btn" href="javascript:void(0)"></span>
+                        <div class="box">
+                            <div class="box-inner"></div>
+                        </div>
+                        <div class="round2" style="display:none;"></div>
+                        <div class="round1" style="display:none ;"></div>
+                        <div class="round3"></div>
+                    </div>
+                </div>
+            </div>
+            <!--输入框 end-->
+        </div>
+        <!--左侧 end-->
+        <div class="main_right fr w40p">
+            <div>
+                <div id="step3" class="divRight margin-top5">
+                    <div class="jericho_tab">
+                        <div class="tab_content">
+                            <div id="jerichotab_contentholder" class="content">
+                                <div style="display: none;" class="righttag">载入中...</div>
+                                <div class="curholder" id="jerichotabholder_0">
+                                    <div class="module">
+                                        <ul class="page-header">
+                                            <li class="active"><a>热门搜索</a></li>
+                                        </ul>
+                                        <ul class="list list2 serachList" id="hot_words">
+                                        </ul>
+                                    </div>
+                                    <div class="module">
+                                        <ul class="page-header no-margin-left AccTab">
+                                            <li class="active"><a data-toggle="tabX" title="常见问题" href="http://ex8yanshi.lonsun.cn/zxzx/wdzsk/index.html" target="_blank">常见问题</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            #if("$!{withPublicc}"== 'false')
+                                                <ul class="list list2 tab-pane tab-right-panel active  mylabel-list" id="zzgk"
+                                                    data-setting="{labelName:'searchPublicc', num:'16', siteId:'$!{siteId}', length:'20',target:'_blank'}">
+                                                </ul>
+                                            #else
+                                                <ul class=" list list2 tab-pane tab-right-panel active" id="zzgk">
+                                                    #foreach($eo in $publicc)
+                                                        #if($velocityCount < 6)
+                                                            <li>
+                                                            ##                                                            <em></em>
+                                                                <a href="$!{eo.redirectLink}" target="_blank" class="que"
+                                                                   title="$!{eo.title}">$!{eo.title}</a>
+
+                                                                <a href="$!{eo.redirectLink}" target="_blank" class="com"
+                                                                   title="$!{eo.title}">$!{eo.content}</a>
+
+                                                            </li>
+                                                        #end
+
+                                                    #end
+                                                </ul>
+                                            #end
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="previewPanel" class="preview-panel" style="display: none;">
+                                <div class="previewTop">
+                                </div>
+                                <div class="relative-panel">
+                                    <h3 class="relative-title">更多相关信息</h3>
+                                    <div class="relative-tab answer-tab">
+                                        <ul class="bszn" id = "another_answer_ul">
+
+                                        </ul>
+                                    </div>
+                                    <div class="relative-content" id = "another_answer_div">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--右侧 end-->
+    </div>
+##    <div class="footer" style="height:10px;"><!--安徽龙讯信息科技有限公司<span style="padding-left:1em;"></span>版权所有--></div>
+</div>
+
+<script id="hotWords_tpl" type="text/html">
+    <? for (var i = 0 ; i < hotWords.length ; i++) { var obj = hotWords[i];?>
+    <li><a href="javascript:void(0);" onclick="javascript:sendKeyWords('<?=obj.keyWords?>')" title="<?=obj.keyWords?>"><?=obj.keyWords?></a>
+    </li>
+    <? } ?>
+</script>
+
+<script id="previewPanel_tpl" type="text/html">
+    <?var titleLength = 23; var dateFormat = "yyyy-MM-dd"?>
+    <h3 class="preview-title">
+        <span class="back" onclick="handleBack()"></span>
+        <span class="icon"></span>
+        <span><?==title?></span>
+    </h3>
+    <div class="preview-content">
+        <?if (content != null) { ?>
+        <!-- 或者：内容预览 -->
+        <div>
+            <?if (content.content != null){?>
+            <div class="lab">正文预览：</div>
+            <div class="content">
+                <?==content.content?>
+            </div>
+            <a href="<?=content.uri?>" target="_blank" class="all">[全文]</a>
+            <?}else{?>
+            <div class="lab" >正文预览：<a href="<?=content.uri?>" target="_blank" class="all">[链接]</a></div>
+            <?}?>
+        </div>
+        <? } ?>
+
+        <!-- 或者：多条展示表格预览 -->
+        <?if (table != null) { ?>
+        <table class="table preview-table">
+            <thead>
+            <tr>
+                <td>站点来源</td>
+                <td class="date">日期</td>
+                <td class="operation">查看原文</td>
+            </tr>
+            </thead>
+            <tbody name="table_body">
+            <? for (var i = 0 ; i < table.length ; i++) { var obj = table[i];?>
+            <tr>
+                <td><?=Ls.cutstr(obj.resource,titleLength)?></td>
+                <td><?=Ls.dateFormat(obj.createDate,dateFormat)?></td>
+                <td><a href="<?=obj.uri?>" target="_blank" class="detail">查看详情</a></td>
+            </tr>
+            <? } ?>
+            </tbody>
+        </table>
+        <? } ?>
+    </div>
+</script>
+<script id="question" type="text/html">
+    <li class="clearfix odd animated fadeIn">
+        <div class="chat_avatar"><img src="$!{frontStaticPath}/assets/search/images/user2.png" alt="male"></div>
+        <div class="conversation_text">
+            <div class="ctext_wrap no_padding">
+                <div class="padding_side padding_top10 padding_bottom10">
+                    <p><?=inputval?></p>
+                </div>
+            </div>
+        </div>
+    </li>
+</script>
+<script id="answers" type="text/html">
+    <?var titleLength = 30;var resultCount = 9;?>
+    <?if(tabcount > 0){?>
+    <li class="clearfix result-li li-<?=count?>">
+        <div class="chat_avatar"><img src="$!{frontStaticPath}/assets/search/images/user1.png" alt="female"></div>
+
+        <div class="conversation_text answer_text">
+            <div class="ctext_wrap no_padding" style="width:100%;">
+                <div class="">
+                    <div class="padding_side padding_top10 padding_bottom10">
+                        您查找的
+                        <span style="color: #cc0000;font-size: 14px;"><?=inputval?></span>
+                        我为您在 <span style="color: #cc0000;font-size: 14px;">$!{siteName}</span> 中找到了以下内容：
+                    </div>
+
+                    <div class="padding_side padding_top10 padding_bottom10">
+                        <div class="answer-tab">
+                            <ul class="bszn AccTab">
+                                <? var c = 0; ?>
+                                <? var flag_t = true; ?>
+                                <?if(sources != '' && sources != null){?>
+                                <li class="active" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="推荐资源">推荐资源</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+
+                                <? for (var sortIndex = 0 ; sortIndex < sortList.length ; sortIndex++) { var sortKey = sortList[sortIndex];?>
+                                <? if (sortKey == 'workGuide') {?>
+                                <?if(workGuide != '' && workGuide != null && workGuide.length > 0){?>
+                                <li class="<?if(flag_t) {?> active <?}?>" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="网上办事">网上办事(<?==workGuide.length?>)</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+                                <?}?>
+
+                                <? if (sortKey == 'guestBook') {?>
+                                <?if(guestBook != '' && guestBook != null && guestBook.length > 0){?>
+                                <li class="<?if(flag_t) {?> active <?}?>" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="政民互动">政民互动(<?==guestBook.length?>)</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+                                <?}?>
+
+                                <? if (sortKey == 'public_content') {?>
+                                <?if(public_content != '' && public_content != null && public_content.length > 0){?>
+                                <li class="<?if(flag_t) {?> active <?}?>" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="信息公开">信息公开(<?==public_content.length?>)</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+                                <?}?>
+
+                                <? if (sortKey == 'news') {?>
+                                <?if(news != '' && news != null && news.length > 0){?>
+                                <li class="<?if(flag_t) {?> active <?}?>" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="相关资讯">相关资讯(<?==news.length?>)</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+                                <?}?>
+
+                                <? if (sortKey == 'knowledgeBase') {?>
+                                <?if(knowledgeBase != '' && knowledgeBase != null && knowledgeBase.length > 0){?>
+                                <li class="<?if(flag_t) {?> active <?}?>" id="<?==count?>td<?==c?>"
+                                    onMouseOver="javascript:secBoard_more('<?==count?>td','<?==count?>tr',<?==tabcount?>,<?==c++?>,'','active','','')">
+                                    <a href="#" title="常见问题">常见问题(<?==knowledgeBase.length?>)</a>
+                                </li>
+                                <? flag_t = false; ?>
+                                <?}?>
+                                <?}?>
+                                <?}?>
+                            </ul>
+                        </div>
+
+                        <div class="tab_content answerContent" style="margin-top: 8px;">
+                            <? var k = 0; ?>
+                            <? var flag_c = true; ?>
+                            <?if(sources != '' && sources != null){?>
+                            <ul class="list no-margin tab-pane active" id="<?==count?>tr<?==k++?>">
+                                <? var el = sources ?>
+                                <?==el.title?><br>
+                                <?==el.content?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+
+                            <? for (var sortIndex = 0 ; sortIndex < sortList.length ; sortIndex++) { var sortKey = sortList[sortIndex];?>
+                            <? if (sortKey == 'workGuide') {?>
+                        ##网上办事
+                            <?if(workGuide != '' && workGuide != null && workGuide.length > 0){?>
+                            <ul class="list no-margin tab-pane <?if(flag_c) {?> active <?}?>"
+                                style="<?if(!flag_c) {?> display:none; <?}?>" id="<?==count?>tr<?==k++?>">
+                                <? for(var i=0,l=workGuide.length; i<l; i++){ ?>
+                                <? var el = workGuide[i];var className = i>resultCount ? 'hideLi' : '';
+                                var num = workGuide[i].count>1 ? '<span class="gray">(' + workGuide[i].count +
+                                        '条)</span>' : '';?>
+                                <li class="col100 item <?==className?>" data-id="<?==el.id?>" onclick="handleReview(<?=el.id?>)
+"><em></em>
+                                    <a href="javascript:void(0);" target="_blank"
+                                       class="func" datatype="iframe" datalink=""><?==el.title?><?==num?></a>
+                                </li>
+                                <? } ?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+                            <?}?>
+
+                            <? if (sortKey == 'guestBook') {?>
+                        ##政民互动
+                            <?if(guestBook != '' && guestBook != null && guestBook.length > 0){?>
+                            <ul class="list no-margin tab-pane <?if(flag_c) {?> active <?}?>"
+                                style="<?if(!flag_c) {?> display:none; <?}?>" id="<?==count?>tr<?==k++?>">
+                                <? for(var i=0,l=guestBook.length; i<l; i++){ ?>
+                                <? var el = guestBook[i];var className = i>resultCount ? 'hideLi' : '';
+                                var num = guestBook[i].count>1 ? '<span class="gray">(' + guestBook[i].count +
+                                        '条)</span>' : '';?>
+                                <li class="col100 item <?==className?>" data-id="<?==el.id?>" onclick="handleReview(<?=el.id?>)
+"><em></em>
+                                    <a href="javascript:void(0);" target="_blank" class="func" datatype="iframe"
+                                       datalink=""><?==el.title?><?==num?></a>
+                                </li>
+                                <? } ?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+                            <?}?>
+
+                            <? if (sortKey == 'public_content') {?>
+                        ##信息公开
+                            <?if(public_content != '' && public_content != null && public_content.length > 0){?>
+                            <ul class="list no-margin tab-pane <?if(flag_c) {?> active <?}?>"
+                                style="<?if(!flag_c) {?> display:none; <?}?>" id="<?==count?>tr<?==k++?>">
+                                <? for(var i=0,l=public_content.length; i<l; i++){ ?>
+                                <? var el = public_content[i];var className = i>resultCount ? 'hideLi' : '';
+                                var num = public_content[i].count>1 ? '<span class="gray">(' + public_content[i].count +
+                                        '条)</span>' : '';?>
+                                <li class="col100 item <?==className?>" data-id="<?==el.id?>" onclick="handleReview(<?=el.id?>)
+"><em></em>
+                                    <a href="javascript:void(0);" target="_blank" class="func" datatype="iframe"
+                                       datalink=""><?==el.title?><?==num?></a>
+                                </li>
+                                <? } ?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+                            <?}?>
+
+                            <? if (sortKey == 'news') {?>
+                        ##新闻信息
+                            <?if(news != '' && news != null && news.length > 0){?>
+                            <ul class="list no-margin tab-pane <?if(flag_c) {?> active <?}?>"
+                                style="<?if(!flag_c) {?> display:none; <?}?>" id="<?==count?>tr<?==k++?>">
+                                <? for(var i=0,l=news.length; i<l; i++){ ?>
+                                <? var el = news[i]; var className = i>resultCount ? 'hideLi' : '';
+                                var num = news[i].count>1 ? '<span class="gray">(' + news[i].count +
+                                        '条)</span>' : '';?>
+                                <li class="col100 item <?==className?>" data-id="<?==el.id?>" onclick="handleReview(<?=el.id?>)
+"><em></em><a
+                                        href="javascript:void(0);"
+                                        target="_blank" class="func"
+                                        datatype="iframe" datalink=""><?==el.title?><?==num?></a>
+                                </li>
+                                <? } ?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+                            <?}?>
+
+                            <? if (sortKey == 'knowledgeBase') {?>
+                        ##常见问题
+                            <?if(knowledgeBase != '' && knowledgeBase != null && knowledgeBase.length > 0){?>
+                            <ul class="list no-margin tab-pane <?if(flag_c) {?> active <?}?>"
+                                style="<?if(!flag_c) {?> display:none; <?}?>" id="<?==count?>tr<?==k++?>">
+                                <? for(var i=0,l=knowledgeBase.length; i<l; i++){ ?>
+                                <? var el = knowledgeBase[i]; var className = i>resultCount ? 'hideLi' : '';
+                                var num = knowledgeBase[i].count>1 ? '<span class="gray">(' + knowledgeBase[i].count +
+                                        '条)</span>' : '';?>
+                                <li class="col100 item <?==className?>" data-id="<?==el.id?>"
+                                    onclick="handleReview(<?=el
+                                            .id?>)
+"><em></em><a
+                                        href="javascript:void(0);"
+                                        target="_blank" class="func"
+                                        datatype="iframe" datalink=""><?==el.title?><?==num?></a>
+                                </li>
+                                <? } ?>
+                            </ul>
+                            <? flag_c = false; ?>
+                            <?}?>
+                            <?}?>
+                            <?}?>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </li>
+    <?}?>
+    <?if(tabcount==0) {?>
+    <li class="clearfix">
+        <div class="chat_avatar"><img src="$!{frontStaticPath}/assets/search/images/user1.png" alt="female"></div>
+        <div class="conversation_text answer_text">
+            <div class="ctext_wrap no_padding" style="width:100%;">
+                <div class="">
+                    <div class="padding_side padding_top10 padding_bottom10">
+                        <?=matchrst?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </li>
+    <?}?>
+</script>
+<script id="ulTpl_workGuide" type="text/html">
+    <ul class="list">
+        <?var titleLength = 23; var dateFormat = "yyyy-MM-dd";?>
+        <? for(var i=0,l=workGuide.length; i<l; i++){ var el = workGuide[i];?>
+        <li class="col100">
+            <em></em>
+            <span class="date fr"><?=Ls.dateFormat(el.createDate,dateFormat)?></span>
+            <a href="<?=el.uri?>" target="_blank"
+               class="func" datatype="iframe" datalink="" title="<?=el.title?>">
+                <?==el.title?>
+            </a>
+        </li>
+        <? }?>
+    </ul>
+    <div id="page_workGuide" class="pagination"></div>
+</script>
+<script id="ulTpl_guestBook" type="text/html">
+    <ul class="list">
+        <?var titleLength = 23; var dateFormat = "yyyy-MM-dd"?>
+        <? for(var i=0,l=guestBook.length; i<l; i++){ var el = guestBook[i];?>
+        <li class="col100">
+            <em></em>
+            <span class="date fr"><?=Ls.dateFormat(el.createDate,dateFormat)?></span>
+            <a href="<?=el.uri?>" target="_blank"
+               class="func" datatype="iframe" datalink="" title="<?=el.title?>">
+                <?==el.title?>
+            </a>
+        </li>
+        <? }?>
+    </ul>
+    <div id="page_guestBook" class="pagination"></div>
+</script>
+<script id="ulTpl_public_content" type="text/html">
+    <ul class="list">
+        <?var titleLength = 23; var dateFormat = "yyyy-MM-dd"?>
+        <? for(var i=0,l=public_content.length; i<l; i++){ var el = public_content[i];?>
+        <li class="col100">
+            <em></em>
+            <span class="date fr"><?=Ls.dateFormat(el.createDate,dateFormat)?></span>
+            <a href="<?=el.uri?>" target="_blank"
+               class="func" datatype="iframe" datalink="" title="<?=el.title?>">
+                <?==el.title?>
+            </a>
+        </li>
+        <? }?>
+    </ul>
+    <div id="page_public_content" class="pagination"></div>
+</script>
+<script id="ulTpl_news" type="text/html">
+    <ul class="list">
+        <?var titleLength = 23; var dateFormat = "yyyy-MM-dd"?>
+        <? for(var i=0,l=news.length; i<l; i++){ var el = news[i];?>
+        <li class="col100">
+            <em></em>
+            <span class="date fr"><?=Ls.dateFormat(el.createDate,dateFormat)?></span>
+            <a href="<?=el.uri?>" target="_blank"
+               class="func" datatype="iframe" datalink="" title="<?=el.title?>">
+                <?==el.title?>
+            </a>
+        </li>
+        <? }?>
+    </ul>
+    <div id="page_news" class="pagination"></div>
+</script>
+<script id="ulTpl_knowledgeBase" type="text/html">
+    <ul class="list">
+        <?var titleLength = 23; var dateFormat = "yyyy-MM-dd"?>
+        <? for(var i=0,l=knowledgeBase.length; i<l; i++){ var el = knowledgeBase[i];?>
+        <li class="col100">
+            <em></em>
+            <span class="date fr"><?=Ls.dateFormat(el.createDate,dateFormat)?></span>
+            <a href="<?=el.uri?>" target="_blank"
+               class="func" datatype="iframe" datalink="" title="<?=el.title?>">
+                <?==el.title?>
+            </a>
+        </li>
+        <? }?>
+    </ul>
+    <div id="page_knowledgeBase" class="pagination"></div>
+</script>
+
+<script type="text/javascript" src="$!{frontStaticPath}/assets/js/common.min.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/search/js/xxk.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/search/js/nicescroll-min.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/search/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/search/js/recorderWorker.min.js"></script>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/search/js/voiceWorker.min.js"></script>
+<!--[if IE 8]>
+<script type="text/javascript" src="$!{frontStaticPath}/assets/js/placeholder/placeholder.min.js"></script>
+<![endif]-->
+<script type="text/javascript">
+    var cur = {
+        input: $("#inputBox"),
+        siteId: $!{siteId},
+        tableColumnId: "$!{tableColumnId}",
+        isMatch: false
+    };
+
+    var patrn = /'/gi;
+    var patrnS = /\"/gi;
+
+    var nowKeywords = null;
+    var nice = "";
+    //存放查询结果
+    var resultMap = {};
+    //存放分组结果
+    var groupMap = {};
+    //重新组织的数结果list
+    var newResult = {};
+    //存放最新一次已经查询出的id
+    var nowIds = [];
+    //存放查询次数
+    var queryCount = 0;
+    var pageSize = 10;
+    //存放分页数据
+    var pageIndexMap = {};
+    var tabs = ["news", "workGuide", "guestBook", "public_content", "knowledgeBase"];
+
+    // 输入框最大字符数
+    var maxCount = 60;
+
+    $(document).ready(function () {
+        // 输入框元素
+        cur.input = $("#inputBox");
+        // 输入框禁止右键
+        cur.input.bind("contextmenu", function () {
+            return false;
+        });
+
+        //加载热门搜索
+        Ls.ajax({
+            url: "/search/getHotWords",
+            data: {
+                siteId: cur.siteId
+            }
+        }).done(function (hotWords) {
+            $('#hot_words').append(Ls.template("hotWords_tpl", {hotWords: hotWords}));
+        });
+
+        // 输入框提示/**/
+        $("#inputBox").autocomplete({
+            source: function (request, response) {
+                $.post("/search/smart/getSearchTips", {
+                    keywords: request.term,
+                    siteId: cur.siteId,
+                    fuzzySearch:cur.isMatch//模糊查找
+                }, function (d) {
+                    d = JSON.parse(d);
+                    var dataArr = [], type = '';
+                    if (d.status == 1) {
+                        dataArr = d.data;
+                        $.each(dataArr, function (i, v) {
+                            if (v['typeCode'] == 'workGuide') {
+                                type = '<span style="color:#0033CC;">[网上办事]</span>'
+                            } else if (v['typeCode'] == 'public_content') {
+                                type = '<span style="color:#9900FF;">[信息公开]</span>'
+                            } else if (v['typeCode'] == 'guestBook') {
+                                type = '<span style="color:#CC0066;">[政民互动]</span>'
+                            } else if (v['typeCode'] == 'knowledgeBase') {
+                                type = '<span style="color:#CC9900;">[常见问题]</span>';
+                            } else {
+                                type = '<span style="color:#FF6600;">[相关资讯]</span>'
+                            }
+
+                            v.label = type + v['title'].replace(/<[^>]+>/g, "").replace(request.term, '<span style="color:red;">' + request.term + '</span>');
+                            v.value = v.title.replace(/<[^>]+>/g, "").replace(/<font color='red'>/g, "").replace(/<.?font>/g, "")
+                        })
+                        response(dataArr);
+                    }
+                });
+            },
+            position: {my: "left bottom", at: "left top-41"},
+            select: function (e, ui) {
+                //$( "#inputBox" ).val('');
+                //$( "#inputBox" ).val( ui.item.label );
+                var val = ui.item.value;
+                $( "#inputBox" ).val(val);
+                sendMessage().done(function (re) {
+                    Ls.log(re);
+                    if(re.status == 1) {
+                        var count = re.data.count;
+                        var ul = $(".li-"+count).find(".tab-pane")[0];
+                        var id = $(ul).find(".item:first-child").attr("data-id");
+                        handleReview(id);
+                    }
+
+//                    $("#inputBox").blur();
+//                    $("#inputBox").val(val);
+
+                });
+                cur.input.blur();
+                return false;
+            },
+            focus: function (event, ui) {
+//                cur.input.val(ui.item.value);
+//                $("#textCount").text(maxCount - cur.input.val().length);
+                return false;
+            }
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            return $("<li>")
+                    .append('<a href="javascript:void(0);">' + item.label + '</a>')
+                    .appendTo(ul);
+        };
+
+        $("#inputBox").focus(function () {
+            if ($(this).val()) {
+                $(this).autocomplete("search");
+            }
+        });
+
+        // 页面加载时设置字数 -start
+        var curLength = cur.input.val().length;
+        if (curLength > maxCount) {
+            var num = cur.input.val().substr(0, maxCount);
+            cur.input.val(num);
+        } else {
+            $("#textCount").text(maxCount - cur.input.val().length);
+        }
+
+        // 页面加载时设置字数 -end
+        // 响应输入框内容变化，限制字数
+        cur.input.bind("input propertychange", function () {
+            var curLength = $(this).val().length;
+            if (curLength > maxCount) {
+                var num = $(this).val().substr(0, maxCount);
+                $(this).val(num);
+            }
+            $("#textCount").text(maxCount - $(this).val().length);
+            if(curLength > 3) {
+                $("#matchBtn").css("display","inline-block");
+            }else {
+                $("#matchBtn").css("display","none");
+            }
+        });
+
+        $(window).on('resize', function () {
+            var height = $(window).height() - 100;
+            var width = $(window).width();
+            $(".main_left,.divRight,.tab_content iframe").css("height", height);
+            $("#content").css("height", height - 107 - 85);
+        }).trigger('resize');
+
+        $(document).keypress(function (e) {
+            if (e.which == 13 || e.which == 10) {
+                sendMessage();
+                cur.input.blur();
+            }
+        });
+
+        //绑定滚动条
+        nice = $('#content').niceScroll({
+            cursorcolor: "#ccc",//#CC0071 光标颜色
+            cursoropacitymax: 1, //改变不透明度非常光标处于活动状态（scrollabar"可见"状态），范围从1到0
+            touchbehavior: false, //使光标拖动滚动像在台式电脑触摸设备
+            cursorwidth: "5px", //像素光标的宽度
+            cursorborder: "0", // 	游标边框css定义
+            cursorborderradius: "5px",//以像素为光标边界半径
+            autohidemode: false //是否隐藏滚动条
+        });
+
+        $('#step3').niceScroll({
+            cursorcolor: "#ccc",//#CC0071 光标颜色
+            cursoropacitymax: 1, //改变不透明度非常光标处于活动状态（scrollabar"可见"状态），范围从1到0
+            touchbehavior: false, //使光标拖动滚动像在台式电脑触摸设备
+            cursorwidth: "5px", //像素光标的宽度
+            cursorborder: "0", // 	游标边框css定义
+            cursorborderradius: "5px",//以像素为光标边界半径
+            autohidemode: false //是否隐藏滚动条
+        });
+
+        // 键盘切换
+        $(".btnWrap>a.item").click(function () {
+            var self = $(this), index = self.index(),
+                    imgs = $(".btnWrap img");
+            if (!self.hasClass('on')) {
+                self.addClass('on').siblings().removeClass('on');
+                if (index == 0) {
+                    $(".import").show().next().hide();
+                    if(cur.input.val().length > 3) {
+                        $("#matchBtn").css("display","inline-block");
+                    }else {
+                        $("#matchBtn").css("display","none");
+                    }
+                } else {
+                    $(".import1").show().prev().hide();
+                    $('.voice-msg').html('<p>请说出关键字进行搜索，如：<span style="color: #2581CF;">身份证</span></p>');
+                    $("#matchBtn").css("display","inline-block");
+                }
+//                $.each(imgs, function(i, v){
+//                    $(v).css('display') === 'none' ? $(v).show() : $(v).hide();
+//                })
+            }
+        })
+
+        //是否模糊匹配
+        $("#matchBtn").click(function () {
+            var self = $(this);
+            if (!self.hasClass('checked')) {
+                self.addClass('checked');
+                cur.isMatch = true;
+            }else {
+                self.removeClass('checked');
+                cur.isMatch = false;
+            }
+        })
+
+        //
+        $("#zzgk>li:gt(4)").hide();
+
+//        $(document).on("click.toggle",".toggle-btn",function () {
+//            if($(this).hasClass("off")) {
+//                $(this).removeClass("off").addClass("on").parent().next().show();
+//            }else {
+//                $(this).removeClass("on").addClass("off").parent().next().hide();
+//            }
+//        })
+
+
+    });
+
+    function resetMatch() {
+        cur.isMatch = false;
+        $("#matchBtn").removeClass("checked").css("display","none");
+    }
+
+    function sendMessage() {
+        var val = cur.input.val();
+        if (Ls.isEmpty($.trim(val))) {
+            Ls.tipsInfo("请输入有效内容!");
+            return false;
+        }
+        return sendKeyWords(val);
+    }
+
+    function sendKeyWords(keywords) {
+        var hasSensitive = false;
+        //检测敏感词
+        Ls.ajax({
+            url: "/search/getCheckList",
+            async:false,
+            data: {
+                content: keywords,
+                flag:"SENSITIVE"
+            }
+        }).done(function (result) {
+            if (result.data.data != null && result.data.data.length > 0) {
+                hasSensitive = true;
+                Ls.tipsInfo("内容包含敏感词!");
+            }
+        });
+
+        if (hasSensitive) return false;
+
+        var data = {
+            inputval: keywords
+        };
+        $('#answers_div').append(Ls.template("question", data));
+        $('#content').scrollTop(1000000);
+
+        nowKeywords = keywords;
+        cur.input.val('');
+        $("#textCount").text(maxCount - cur.input.val().length);
+        return Ls.ajax({
+            url: "/search/getAnswers",
+            data: {
+                keywords: keywords,
+                siteId: cur.siteId,
+                tabs: tabs.join(","),
+                tableColumnId: cur.tableColumnId,
+                pageSize: pageSize,
+                isGroup: true,
+                fuzzySearch:cur.isMatch//模糊查找
+            },
+            success: function (resp) {
+                resetMatch();
+                cur.input.val('');
+                $("#textCount").text(maxCount - cur.input.val().length);
+
+                //查询次数加1
+                queryCount++;
+                newResult = [];
+                nowIds = [];
+                if (resp.status == 1) {
+                    //初始化resultMap
+                    var news = resp.data.news || [],
+                            workGuide = resp.data.workGuide || [],
+                            guestBook = resp.data.guestBook || [],
+                            knowledgeBase = resp.data.knowledgeBase || [],
+                            public_content = resp.data.public_content || [];
+
+                    newResult.count = resp.data.count;
+                    newResult.tabcount = resp.data.tabcount;
+                    newResult.news = [];
+                    newResult.workGuide = [];
+                    newResult.guestBook = [];
+                    newResult.public_content = [];
+                    newResult.knowledgeBase = [];
+
+                    //重新组织resultMap
+                    for (var i = 0; i < news.length; i++) {
+                        resultMap[news[i].id] = news[i];
+                        groupData(news[i], 1);
+                    }
+
+                    for (var i = 0; i < workGuide.length; i++) {
+                        resultMap[workGuide[i].id] = workGuide[i];
+                        groupData(workGuide[i], 2);
+                    }
+
+                    for (var i = 0; i < guestBook.length; i++) {
+                        resultMap[guestBook[i].id] = guestBook[i];
+                        groupData(guestBook[i], 3);
+                    }
+
+                    for (var i = 0; i < public_content.length; i++) {
+                        resultMap[public_content[i].id] = public_content[i];
+                        groupData(public_content[i], 4);
+                    }
+
+                    for (var i = 0; i < knowledgeBase.length; i++) {
+                        resultMap[knowledgeBase[i].id] = knowledgeBase[i];
+                        groupData(knowledgeBase[i], 5);
+                    }
+
+                    newResult.matchrst = resp.data.matchrst;
+
+                    //设置排序list
+                    newResult.sortList = resp.data.sortList;
+
+                    newResult.inputval = data.inputval;
+                    resp.data.inputval = data.inputval;
+
+                    $('#answers_div').append(Ls.template("answers", newResult));
+//                    var scrollBottom = $("#content").height() - $("#content").scrollTop() - 240;
+//                    $("#content").scrollTop(scrollBottom);
+                    $('#content').scrollTop(1000000);
+
+                    //加载右下角html,another_answer_ul,another_answer_div
+                    var anotherAnswerUl = "",anotherAnswerDiv = "";
+                    for (var i = 0 ; i < newResult.sortList.length ; i++) {
+                        var sortKey = newResult.sortList[i];
+                        if (sortKey == 'workGuide') {
+                            anotherAnswerUl += '<li id="moretd0"><a href="javascript:void(0);" onMouseOver="javascript:secBoard_more(\'moretd\',\'moretr\',4,0,\'\',\'active\',\'\',\'\')">网上办事</a></li>';
+                            anotherAnswerDiv += '<div class="rel_workGuide" id="moretr0"></div>';
+                        }
+                        if (sortKey == 'guestBook') {
+                            anotherAnswerUl += '<li id="moretd1"><a href="javascript:void(0);" onMouseOver="javascript:secBoard_more(\'moretd\',\'moretr\',4,1,\'\',\'active\',\'\',\'\')">政民互动</a></li>';
+                            anotherAnswerDiv += '<div class="rel_guestBook" id="moretr1" style="display: none;"></div>';
+                        }
+                        if (sortKey == 'public_content') {
+                            anotherAnswerUl += '<li id="moretd2"><a href="javascript:void(0);" onMouseOver="javascript:secBoard_more(\'moretd\',\'moretr\',4,2,\'\',\'active\',\'\',\'\')">信息公开</a></li>';
+                            anotherAnswerDiv += '<div class="rel_public_content" id="moretr2" style="display: none;"></div>';
+                        }
+                        if (sortKey == 'news') {
+                            anotherAnswerUl += '<li id="moretd3"><a href="javascript:void(0);" onMouseOver="javascript:secBoard_more(\'moretd\',\'moretr\',4,3,\'\',\'active\',\'\',\'\')">相关资讯</a></li>';
+                            anotherAnswerDiv += '<div class="rel_news" id="moretr3" style="display: none;"></div>';
+                        }
+                        if (sortKey == 'knowledgeBase') {
+                            anotherAnswerUl += '<li id="moretd4"><a href="javascript:void(0);" onMouseOver="javascript:secBoard_more(\'moretd\',\'moretr\',4,4,\'\',\'active\',\'\',\'\')">常见问题</a></li>';
+                            anotherAnswerDiv += '<div class="rel_knowledgeBase" id="moretr4" style="display: none;"></div>';
+                        }
+                    }
+                    $("#another_answer_ul").empty().append(anotherAnswerUl);
+                    $("#another_answer_div").empty().append(anotherAnswerDiv);
+
+                    //调用方法加载右下角的分页数据
+                    getPageData(null, null, true);
+                    $('.voice-msg').html('<p>请说出关键字进行搜索，如：<span style="color: #2581CF;">身份证</span></p>');
+                } else {
+                    Ls.tipsErr("加载失败!");
+                }
+
+
+            }
+        });
+    }
+
+    //组织返回的分组数据对象
+    function groupData(obj, tabCount) {
+        var key = "" + queryCount + tabCount + obj.groupIndex;
+        if (groupMap[key] == null) {
+            groupMap[key] = [];
+        }
+        groupMap[key].push(obj.id);
+        nowIds.push(obj.id);
+        //重新组织数据
+        if (tabCount == 1) {
+            if (groupMap[key].length == 1) {
+                newResult.news.push({
+                    id: key,
+                    title: obj.title,
+                    count: obj.count
+                });
+            }
+        } else if (tabCount == 2) {
+            if (groupMap[key].length == 1) {
+                newResult.workGuide.push({
+                    id: key,
+                    title: obj.title,
+                    count: obj.count
+                });
+            }
+        } else if (tabCount == 3) {
+            if (groupMap[key].length == 1) {
+                newResult.guestBook.push({
+                    id: key,
+                    title: obj.title,
+                    count: obj.count
+                });
+            }
+        } else if (tabCount == 4) {
+            if (groupMap[key].length == 1) {
+                newResult.public_content.push({
+                    id: key,
+                    title: obj.title,
+                    count: obj.count
+                });
+            }
+        } else if (tabCount == 5) {
+            if (groupMap[key].length == 1) {
+                newResult.knowledgeBase.push({
+                    id: key,
+                    title: obj.title,
+                    count: obj.count
+                });
+            }
+        }
+    }
+
+    //加载分页数据
+    function getPageData(isPageQuery, tabName, isSearch) {
+        var pageIndex = 0;
+        var pageTabs = tabs;
+        //如果不是分页查询
+        if (isPageQuery != null && isPageQuery) {
+            pageIndex = pageIndexMap[tabName];
+            pageTabs = [tabName];
+        }
+        //查询来源
+        Ls.ajax({
+            url: "/search/getAnswers",
+            data: {
+                keywords: nowKeywords,
+                siteId: cur.siteId,
+                tabs: pageTabs.join(","),
+                tableColumnId: cur.tableColumnId,
+                pageIndex: pageIndex,
+                pageSize: pageSize,
+                nowIds: nowIds.join(","),
+                fuzzySearch:cur.isMatch//模糊查找
+            }, success: function (resp) {
+                if (resp.status == 1) {
+                    //加载右侧表格
+                    var news = resp.data.news,
+                            workGuide = resp.data.workGuide,
+                            guestBook = resp.data.guestBook,
+                            knowledgeBase = resp.data.knowledgeBase,
+                            public_content = resp.data.public_content;
+                    //如果不是分页查询
+                    if (isPageQuery == null) {
+                        //重置分页参数
+                        pageIndexMap = {
+                            news: 0,
+                            workGuide: 0,
+                            guestBook: 0,
+                            public_content: 0,
+                            knowledgeBase: 0
+                        };
+                    }
+
+                    if (isSearch) {
+                        var isEmptyData = true;
+                        if (workGuide && workGuide.length == 0) {
+                            $("#moretd0").removeClass("on").hide();
+                            $(".rel_workGuide").removeClass("on").hide();
+                        } else {
+                            $("#moretd0").addClass("on").show();
+                            $(".rel_workGuide").addClass("on").show();
+                            isEmptyData = false;
+                        }
+                        if (guestBook && guestBook.length == 0) {
+                            $("#moretd1").removeClass("on").hide();
+                            $(".rel_guestBook").removeClass("on").hide();
+                        } else {
+                            $("#moretd1").addClass("on").show();
+                            $(".rel_guestBook").addClass("on").show();
+                            isEmptyData = false;
+                        }
+                        if (public_content && public_content.length == 0) {
+                            $("#moretd2").removeClass("on").hide();
+                            $(".rel_public_content").removeClass("on").hide();
+                        } else {
+                            $("#moretd2").addClass("on").show();
+                            $(".rel_public_content").addClass("on").show();
+                            isEmptyData = false;
+                        }
+                        if (news && news.length == 0) {
+                            $("#moretd3").removeClass("on").hide();
+                            $(".rel_news").removeClass("on").hide();
+                        } else {
+                            $("#moretd3").addClass("on").show();
+                            $(".rel_news").addClass("on").show();
+                            isEmptyData = false;
+                        }
+                        if (knowledgeBase && knowledgeBase.length == 0) {
+                            $("#moretd4").removeClass("on").hide();
+                            $(".rel_knowledgeBase").removeClass("on").hide();
+                        } else {
+                            $("#moretd4").addClass("on").show();
+                            $(".rel_knowledgeBase").addClass("on").show();
+                            isEmptyData = false;
+                        }
+                        $(".relative-tab .bszn li").removeClass("active");
+                        $($(".relative-tab .bszn li.on").get(0)).addClass("active").show();
+                        $(".relative-content > div").removeClass("active").hide();
+                        $($(".relative-content > div.on").get(0)).addClass("active").show();
+                        if(isEmptyData) {
+                            $(".relative-panel").hide();
+                        }else {
+                            $(".relative-panel").show();
+                        }
+                    }
+
+                    //处理分页总数
+                    var numMap = resp.data.numMap;
+                    //加载关联消息
+                    for (var tabIndex in pageTabs) {
+                        var tabName = pageTabs[tabIndex];
+                        $(".rel_" + tabName).html(Ls.template("ulTpl_" + tabName, resp.data));
+                        tabPage(numMap, tabName);
+                    }
+                } else {
+                    Ls.tipsErr("加载失败!");
+                }
+            }
+        });
+    }
+
+    //处理各个tab的分页
+    function tabPage(numMap, tabName) {
+        var num = numMap[tabName];
+        var pageCount = Math.ceil(num / pageSize);
+        if (pageCount > 1) {
+            Ls.pagination("#page_" + tabName, function (pageIndex) {
+                pageIndexMap[tabName] = pageIndex - 1;
+                getPageData(true, tabName, false);
+            }, {
+                pageCount: pageCount,
+                currPage: (pageIndexMap[tabName] + 1)
+            });
+        }
+
+    }
+
+    function handleReview(e) {
+        //通过新的id获取 原有id的集合
+        var ids = groupMap[e];
+        var obj;
+        $("#jerichotab_contentholder").hide();
+        $("#previewPanel").show();
+
+        var tplObj = {};
+        if (ids.length == 1) {
+            tplObj.table = null;
+            obj = resultMap[ids[0]];
+
+            //省略号处理
+            var con = obj.content;
+            if (con != null) {
+                con = con.replace(/<font color='red'>/g, "").replace(/<.?font>/g, "");
+                con = con.substring(0, 113) + '...';
+                obj.content = con;
+            }
+
+            //替换内容
+            tplObj.content = obj;
+            tplObj.title = obj.title;
+
+            $(".previewTop").html(Ls.template("previewPanel_tpl", tplObj));
+
+        } else {
+            tplObj.content = null;
+            //查询来源
+            Ls.ajax({
+                url: "/search/getResources",
+                data: {
+                    ids: ids.join(",")
+                }, success: function (resp) {
+                    var resourceMap = resp;
+                    tplObj.table = [];
+                    //遍历加入详细信息
+                    for (var idIndex in ids) {
+                        obj = resultMap[ids[idIndex]];
+                        tplObj.title = obj.title;
+                        tplObj.table.push({
+                            resource: resourceMap[ids[idIndex]],
+                            uri: obj.uri,
+                            createDate: obj.createDate
+                        });
+                    }
+
+                    $(".previewTop").html(Ls.template("previewPanel_tpl", tplObj));
+
+                    setTimeout(function () {
+                        var $content =
+                        $(".preview-content .content");
+                        var preHeight = $(".preview-content .content").height();
+                        if (preHeight < 80) {
+                            $(".preview-content").removeClass("dot");
+                        } else {
+                            $(".preview-content").addClass("dot");
+                        }
+                    }, 200)
+                }
+            });
+        }
+    }
+
+    //查看更多答案
+    function handleMore() {
+        $(e).parents(".list").find("li.item").removeClass("hideLi");
+        $(e).parent().hide();
+    }
+
+    //back
+    function handleBack() {
+        $("#previewPanel").hide();
+        $("#jerichotab_contentholder").show();
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,211 @@
+#set($_title="民意征集详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="content_title">$!{collectInfo.title}</div>
+    <div class="content_date">#date_format("$!{collectInfo.startTime}","yyyy-MM-dd HH:mm:ss") 至 #date_format("$!{collectInfo.endTime}","yyyy-MM-dd HH:mm:ss")</div>
+    <div class="content_body">
+        $!{collectInfo.content}
+    </div>
+    <!-- 民意征集列表开始   -->
+    <div class="reply_body fuwucon ">
+        <div id="ideaPageDiv" class="collection-theme-list">
+            <ul id="idea_page">
+            </ul>
+            <div id="collectionpage" class="pagination"></div>
+        </div>
+    </div>
+    <!-- 民意征集列表结束   -->
+    <!-- 民意征集正在征集中表单处理开始   -->
+    #if($!{collectInfo.isTimeOut} == "2")
+        <form method="post" name="collect_form" id="collect_form">
+            <div class="poll_collect fuwucon">
+                <h3 class="mytit">发表意见</h3>
+                <ul class="intrevmeg">
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        <li>
+                            <p class="tit">您的姓名：</p>
+                            <p class="con"><input name="c_title" id="c_name" type="text" maxlength="5"></p>
+                            <!--<span class="red">*</span>-->
+                        </li>
+                        <li>
+                            <p class="tit">联系方式：</p>
+                            <p class="con"><input name="c_tel" id="c_phone" type="text" maxlength="13"></p>
+                            <!--<span class="red">*</span>-->
+                        </li>
+                    #end
+                    <li class="poll_area">
+                        <p class="tit">您的意见：</p>
+                        <p class="con"><textarea name="c_contents" id="c_content" rows="5" maxlength="1000" placeholder="最多允许输入5~1000字符，多余的将被截去"></textarea></p>
+                        <!--<span class="red">*</span>-->
+                    </li>
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        <li>
+                            <p class="tit">验证码：</p>
+                            <p class="con poll_input">
+                                <input class="verification" name="checkCode" id="checkimg" size="6" maxlength="4" type="text">
+                                <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                            </p>
+                            <!--<span class="red">*</span>-->
+                        </li>
+                    #end
+                    <li class="vote_btn"><input id="btn_submit" name="submit" class="btn btn-submit" type="button" accesskey="S" value="发表意见"></li>
+                </ul>
+            </div>
+        </form>
+    #end
+    <!-- 民意征集正在征集中表单处理结束   -->
+</div>
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+    #if("1"=="2")
+    <!--  ***************此代码用于开发调试使用*************** -->
+    <script>
+        Ls.ajax({
+            url: "/content/saveCollectWeb",
+            data: {
+                collectInfoId:$!{collectInfo.collectInfoId},
+                name: name,
+                phone: phone,
+                content: content,
+                checkCode: checkCode
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                $('#collect_form')[0].reset();
+                alert("提交成功");
+            } else {
+                alert(d.desc);
+                $("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    </script>
+    #end
+<script>
+    $(document).ready(function (e) {
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        using("validator", function () {
+
+            $("#collect_form").validator({
+                fields: {
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        c_title: "您的姓名:required;",
+                        c_tel: "联系方式:required;mobile|tel_1|shortTel;",
+                    #end
+                    #if("$!{conVO.getIsLoginGuest()}"=="0")
+                        checkCode: "验证码:required;",
+                    #end
+                    c_contents: "您的意见:required;length[5~1000];"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+
+                var data = {
+                    collectInfoId:$!{collectInfo.collectInfoId},
+                    name: $("#c_name").val(),
+                    phone: $("#c_phone").val(),
+                    content: $("#c_content").val(),
+                    checkCode: $("#checkimg").val()
+                }
+
+                try {
+                    Android.getJSONFromServiceUrlsIsLogin(JSON.stringify(data), "/content/saveMobileCollect", "$!{conVO.getIsLoginGuest()}");
+                } catch (e) {
+                    alert("出错提示：" + e)
+                }
+
+            }
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#collect_form").trigger("validate");
+        })
+
+    });
+
+    //设备回调
+    function androidDone(d) {
+        if (d.status == 1) {
+            $('#collect_form')[0].reset();
+            $("#imgCode").click();
+            alert("提交成功！");
+        } else {
+            $("#imgCode").click();
+            alert(d.desc);
+        }
+    }
+
+    var currentPageIndex = 0;
+    var pageSize = 5;
+    var dateFormat = "yyyy-MM-dd HH:mm:ss";
+    setIdeaPage(currentPageIndex);
+    function setIdeaPage(pageIndex) {
+        Ls.ajax({
+            url: "/content/getIdeaPage",
+            data: {
+                collectInfoId:$!{collectInfo.collectInfoId},
+                pageSize: pageSize,
+                pageIndex: (pageIndex - 1),
+                dateFormat: dateFormat
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var jsonList = d.data.data;
+                var pageCount = d.data.pageCount;
+                var pageIndex = d.data.pageIndex;
+                $("#collectionpage").hide();
+                if (pageCount == 0) {
+                    $("#ideaPageDiv").hide();
+                } else {
+                    $("#ideaPageDiv").show();
+                    var html = '';
+                    for (var i = 0; i < jsonList.length; i++) {
+                        var eo = jsonList[i];
+                        html += '<li class="ft_con"><div class="collection-body">';
+                        html += '<div class="tit">[' + eo.name + ']</div>';
+                        html += '<div class="con">' + eo.content + '</div>';
+                        html += '<div class="date">[' + eo.createWebTime + ']</div>';
+                        html += '</div>';
+                        html += '</li>';
+                    }
+                    $("#idea_page").html(html);
+
+                    if (pageCount > 1) {
+                        $("#collectionpage").show();
+                        setPagination(pageIndex, pageCount)
+                    }
+                }
+            } else {
+                alert(d.desc);
+            }
+        })
+    }
+
+    function setPagination(pageIndex, pageCount) {
+        Ls.pagination("#collectionpage", function (pageIndex) {
+            setIdeaPage(pageIndex);
+        }, {
+            currPage: (pageIndex + 1),
+            pageCount: pageCount,
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    }
+</script>
+</body>
+</html>

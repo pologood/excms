@@ -1,0 +1,468 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .select-control {
+        /*background-color: #fff;*/
+        /*background-image: none;*/
+        border: 1px solid #c2cad8;
+        /*border-radius: 4px;*/
+        /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+        color: #4d6b8a;
+        /*display: block;*/
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;*/
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="msg_info_form" ms-controller="msg_info_form">
+                    <div class="form-body">
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>标题：</th>
+                                <td>
+                                    <input type="text" name="id" class="form-control" style="display: none"
+                                           ms-duplex="id">
+                                    <input type="text" name="title" maxlength="40" class="form-control"
+                                           data-rule="必填项:required;title" placeholder="标题名称" ms-duplex="title">
+                                </td>
+                                <td class="w300" rowspan="7">
+                                    <div class="thumb_layout">
+                                        <div id="pic_upload" class="thumb" onclick="uploadPic()"
+                                             title="缩略图只显示于网站首页或频道页中图片部分。&#10;如果要在正文中显示图片，请在“编辑文章”的编辑器中上传图片。">
+                                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt=""
+                                                 id="imageLink"/>
+                                        </div>
+                                        <div class="thum-delete" id="delImg" onclick="deletePic()" title="删除"><i
+                                                class="fa fa-trash"></i></div>
+                                        <div class="thum-upload" id="uploadImg" onclick="uploadPic()" title="上传"><i
+                                                class="fa fa-upload"></i></div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>报送人：</th>
+                                <td>
+                                    <input type="text" id="provider" maxlength="20" readonly name="provider"
+                                           class="form-control readonly"
+                                           data-rule="必填项:required;provider" placeholder="报送人" ms-duplex="provider">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>所属单位：</th>
+                                <td>
+                                    <input type="text" id="submitUnitName" maxlength="20" readonly name="submitUnitName"
+                                           class="form-control readonly"
+                                           data-rule="必填项:required;submitUnitName" placeholder="报送单位"
+                                           ms-duplex="submitUnitName">
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>作者：</th>
+                                <td>
+                                    <input type="text" id="author" name="author" maxlength="20" ms-duplex="author"
+                                           class="form-control" placeholder=""/>
+                                </td>
+                                <th>发布日期：</th>
+                                <td>
+                                    <input type="datetime" id="publishDate" ms-duplex="publishDate"
+                                           class="form-control readonly"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})"
+                                           readonly/>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>属性：</th>
+                                <td colspan="2">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="isLink" class="publishBtn"
+                                               ms-duplex-checked="isLink">是否跳转
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="isTop" class="publishBtn" ms-duplex-checked="isTop">
+                                        置顶
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="isNew" class="publishBtn" ms-duplex-checked="isNew">
+                                        加新
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="isTitle" class="publishBtn"
+                                               ms-duplex-checked="isTitle"> 标题新闻
+                                    </label>
+                                    <label id="isComment" class="checkbox-inline">
+                                        <input type="checkbox" id="isAllowComments" class="publishBtn"
+                                               ms-duplex-checked="isAllowComments"> 允许评论
+                                    </label>
+                                #*  <label class="checkbox-inline">
+                                      <input type="checkbox" id="isJob" class="publishBtn" ms-duplex-checked="isJob"> 定时发布
+                                  </label>*#
+                                </td>
+                            </tr>
+                            <tr id="OutLink" ms-visible="isLink == 1" class="dn">
+                                <th>跳转地址：</th>
+                                <td>
+                                    <input type="text" id="redirectLink" ms-duplex="redirectLink" class="form-control"
+                                           placeholder="请输入地址">
+                                </td>
+                            </tr>
+                            <tr id="TopDate" ms-visible="isTop == 1">
+                                <th>置顶有效期：</th>
+                                <td>
+                                    <input type="datetime" id="topValidDate" placeholder="定时发布时间，空值代表无需定时发布"
+                                           ms-duplex="topValidDate" class="form-control readonly publishBtn"
+                                           onClick="var date=new Date();WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:date,readOnly:true})"
+                                           readonly/>
+                                </td>
+                            </tr>
+                        #*<tr id="JobDate" ms-visible="isJob == 1">
+                            <th>定时发布：</th>
+                            <td>
+                                <input type="datetime" id="jobIssueDate" placeholder="定时发布时间，空值代表无需定时发布" ms-duplex="jobIssueDate" class="form-control readonly publishBtn"
+                                       onClick="var date=new Date();WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:date,readOnly:true})" readonly/>
+                            </td>
+                        </tr>*#
+                            <tr>
+                                <th>副标题：</th>
+                                <td>
+                                    <input type="text" name="subTitle" maxlength="40" class="form-control"
+                                           placeholder="副标题" ms-duplex="subTitle">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">发布到：</th>
+                                <td colspan="2">
+                                    <textarea id="publishTo" name="publishTo" class="form-control readonly" readonly
+                                              rows="2"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">摘要：</th>
+                                <td>
+                                    <textarea class="form-control" id="remark" rows="2" placeholder=""
+                                              ms-duplex="remark"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered article-table th80" style="margin-bottom: 0px;">
+                            <tr>
+                                <th>来源：</th>
+                                <td>
+                                    <div class="input-group" id="resMark">
+                                        <input type="text" id="sources" maxlength="20" name="sources"
+                                               class="form-control" ms-duplex="sources" placeholder=""/>
+
+                                        <div class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload"
+                                                    type="button" onclick="showRes()">
+                                                <i class="fa fa-caret-down" id="select_icon"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">编辑文章：</th>
+                                <td colspan="2">
+                                    <textarea id="content" name="content" style="width: 100%;height: 350px;"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "msg_info_form",
+        form: $('#msg_info_form'),
+        publishDate: $('#publishDate'),
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        dialog: Ls.getWin.dialog,
+        record: Ls.getWin.dialog.data("record") || {}
+    };
+    var eweb;
+
+    $(document).ready(function () {
+        initKindEditor();
+        cur.model = cur.record;
+        cur.model.isLink = 0;
+        cur.model.isTop = 0;
+        cur.model.isNew = 0;
+        cur.model.isTitle = 0;
+        cur.model.isAllowComments = 0;
+//        cur.model.isJob = 0;
+
+        cur.model.redirectLink = "";
+        cur.model.topValidDate = "";
+//        cur.model.jobIssueDate = "";
+
+        cur.model.submitUnitName = cur.win.GLOBAL_PERSON.unitName;
+        if (typeof cur.model.publishDate == 'object') {
+            cur.model.publishDate = Ls.dateFormat(cur.model.publishDate, "yyyy-MM-dd hh:mm:ss")
+        }
+        /*cur.editor.html(cur.model.content);*/
+        eweb.setHtml(cur.model.content);
+        setData(cur.model);
+        if (cur.vm.imageLink != null) {
+
+            $("#imageLink").attr("src", (cur.vm.imageLink.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + cur.vm.imageLink)
+            $("#uploadImg").hide();
+        }
+
+        cur.api.button(
+                {
+                    id: 'save', className: 'btn-save', focus: true, name: '转发到其他栏目', callback: function () {
+                    tranToColumn();
+                    return false;
+                }
+                },
+                {
+                    id: 'publish', className: 'btn-publish', focus: false, name: '发布', callback: function () {
+                    publishData();
+                    return false;
+                }
+                },
+                {
+                    id: 'back', className: 'btn-back', focus: false, name: '取消', callback: function () {
+                    cancel();
+                    return false;
+                }
+                }
+        );
+
+        //获取发布栏目列表
+        Ls.ajaxGet({
+            url: "/msg/submit/hn/getColumnPageList",
+            data: {
+                msgId: cur.record.id,
+                optCode: 'publish',
+                pageSize: 100,
+                status: 0
+            },
+            success: function (resp) {
+                if (resp) {
+                    if (resp.data) {
+                        var data = resp.data;
+                        var name = "";
+                        for (var i = 0; i < data.length; i++) {
+                            var j = i + 1;
+                            if ("" == name) {
+                                name = "【" + j + "】" + data[i].siteName + " >> " + data[i].columnName;
+                            } else {
+                                name += "\r\n" + "【" + j + "】" + data[i].siteName + " >>" + data[i].columnName;
+                            }
+                        }
+                        $('#publishTo').val(name);
+                    }
+                }
+            }
+        });
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    /**
+     * 发布信息
+     */
+    function publishData() {
+        cur.vm.status = 0;
+        if (!cur.form.isValid()) {
+            return;
+        }
+        url = "/msg/submit/hn/publish"
+
+//        console.info(cur.vm);return;
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                title: cur.vm.title,
+                provider: cur.vm.provider,
+                submitUnitName: cur.vm.submitUnitName,
+                author: cur.vm.author,
+                sources: cur.vm.sources,
+                imageLink: cur.vm.imageLink,
+                status: cur.vm.status,
+                backReason: cur.vm.backReason,
+                publishDate: cur.publishDate.val(),
+                /*content: cur.editor.html(),*/
+                content: eweb.getHtml(),
+                siteId: cur.win.GLOBAL_SITEID,
+                isLink: cur.vm.isLink ? 1 : 0,
+                isTop: cur.vm.isTop ? 1 : 0,
+                isNew: cur.vm.isNew ? 1 : 0,
+                isTitle: cur.vm.isTitle ? 1 : 0,
+                isAllowComments: cur.vm.isAllowComments ? 1 : 0,
+//                isJob:cur.vm.isNew?1:0,
+                topValidDate: cur.vm.topValidDate,//置顶有效期
+//                jobIssueDate:cur.vm.jobIssueDate,//定时发布日期
+                subTitle: cur.vm.subTitle, //副标题
+                redirectLink: cur.vm.redirectLink//跳转地址
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback_add_or_edit(resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                    cur.win.search();
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + parent.GLOBAL_SITEID + "/" + 0});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            isCompress: 1,
+            filterMode: false,
+            siteId: parent.GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH
+        });*/
+    }
+
+    /**
+     * 缩略图上传
+     */
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.vm.imageLink = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + data[0].fileName);
+                $("#uploadImg").hide();
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "type": "NotDefined"
+            }
+        })
+    }
+
+    /**
+     * 删除缩略图
+     */
+    function deletePic() {
+        if (cur.vm.imageLink == null) {
+            Ls.tipsInfo("图片不存在！");
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.imageLink
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.imageLink = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc);
+                cur.win.search();
+            }
+        })
+    }
+
+    function showRes() {
+        Ls.dropDowns('resMark', {
+            css: {
+                overflow: "auto"
+            },
+            ajax: {
+                url: "/msg/submit/msgFrom"
+            },
+            html: function (formId, d) {
+                var h = [];
+                for (var i = 0, l = d.length; i < l; i++) {
+                    h.push('<li><a href="javascript:void(0)">' + d[i].key + '</a></li>')
+                }
+                return h.join("")
+            }
+        })
+    }
+
+    function tranToColumn(msgId) {
+        var msgIds = [];
+        if (msgId != null && msgId != "") {
+            msgIds.push(msgId);
+        } else {
+            if (cur.record) {
+                msgIds.push(cur.record.id);
+            }
+        }
+
+        Ls.selectColumn(function (arg) {
+            Ls.log("返回值：", arg)
+            if (arg) {
+                Ls.ajaxGet({
+                    url: "/msg/submit/hn/batchTransmitToColumn",
+                    data: {
+                        "msgIds[]": msgIds,
+                        columnsList: JSON.stringify(arg.list)
+                    },
+                    success: function (resp) {
+                        if (resp.status == 1) {
+                            Ls.tips(resp.desc, {times: 2});
+                        } else {
+                            Ls.tips(resp.desc, {icons: 'error', times: 2});
+                        }
+                    }
+                });
+            }
+        }, {
+            data: {
+                list: []
+            }
+        });
+    }
+</script>
+</body>
+</html>

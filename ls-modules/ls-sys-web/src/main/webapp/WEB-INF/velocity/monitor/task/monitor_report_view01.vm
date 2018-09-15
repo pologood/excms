@@ -1,0 +1,2843 @@
+<style>
+    #tab_1_1 .fl {
+        float: left;
+    }
+
+    #situation .portlet-title div {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    #situation .portlet-title.title {
+        font-weight: bold;
+    }
+
+    .up-date {
+        display: none;
+        position: absolute;
+        top: 9px;
+        left: 123px;
+        width: 120px;
+    }
+
+    #situation .actions {
+        padding: 10px 0;
+        color: #1c6be4;
+    }
+
+    #situation .actions > a {
+        color: #1c6be4;
+    }
+
+    #situation .status {
+        font-weight: bold;
+        height: 36px;
+        line-height: 36px;
+        font-size: 20px;
+        margin-top: 20px;
+    }
+
+    .statusWrap {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .score-num {
+        text-align: center;
+        position: relative;
+        margin: 10px 37px 10px 0;
+    }
+
+    .score-num.f62 .iconfont {
+        font-size: 62px;
+    }
+
+    .score-num.f68 iconfont {
+        font-size: 62px;
+    }
+
+    .score-num .iconfont {
+        margin: 40px 0 30px 0;
+        line-height: 110%;
+        max-width: 42px;
+        color: #5c95ed;
+    }
+
+    .score-num .icon-shuzi1 {
+        margin-left: -20px !important;
+    }
+
+    .score-num .icon-iconfontdian {
+        max-width: 28px !important;
+        margin-left: -15px;
+    }
+
+    .score-num span {
+        position: absolute;
+        bottom: 28px;
+        font-weight: bold;
+        font-size: 26px;
+        padding-left: 25px;
+        display: inline-block;
+        color: #5c95ed;
+    }
+
+    .block, .block ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .block {
+        float: left;
+        width: 154px;
+        height: 58px;
+        border: solid 1px #dddddd;
+        position: relative;
+        border-radius: 5px;
+        background: #f3f3f3;
+        margin: 20px 0 0 20px;
+    }
+
+    .block ul li {
+        display: table-cell;
+        vertical-align: middle;
+        list-style: none;
+    }
+
+    .block li.l1 {
+        width: 91px;
+        height: 56px;
+        background: #fff;
+        overflow: hidden;
+        padding-left: 16px;
+        color: #666666;
+        font-size: 14px;
+        height: 56px;
+        border-radius: 5px 0 0 5px;
+        font-weight: 700;
+    }
+
+    .block li.l2 {
+        width: 61px;
+        height: 56px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .block .superscript {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 19px;
+        height: 19px;
+        background: url("/assets/images/err.png") center center no-repeat;
+    }
+
+    .block-normal ul li.l2 {
+        color: green;
+    }
+
+    .block-normal ul .superscript {
+        background: url("/assets/images/normal.png") center center no-repeat;
+    }
+
+    .block-warn ul .superscript {
+        background: url("/assets/images/warn.png") center center no-repeat;
+    }
+
+    .block-exception li.l2, .block-warn li.l2 {
+        color: #e65045;
+    }
+
+    .grid-table thead th {
+        font-size: 16px;
+        padding: 0 4px;
+        margin: 0;
+        background: #f1f1f1;
+        height: 38px;
+        line-height: 36px;
+        text-align: center;
+    }
+
+    .grid-table tbody td, .grid-table tfoot td {
+        font-size: 14px;
+        color: #333333;
+        line-height: 24px;
+        padding: 12px 5px;
+        background: url('/assets/images/line-bg.png') bottom center repeat-x;
+    }
+
+    .grid-table tfoot td {
+        text-align: left;
+        padding-left: 16px;
+        background: none;
+        color: #999999;
+    }
+
+    .grid-table tbody td.start-flag {
+        color: #999999;
+        font-size: 16px;
+    }
+
+    .grid-table tfoot .s1 .fa {
+        color: #999999;
+    }
+
+    .grid-table tfoot .s1 i {
+        margin-left: 6px;
+    }
+
+    .grid-table .column-name .img-icon {
+        margin-top: -15px;
+    }
+
+    .arrow-green, .green {
+        color: green;
+    }
+
+    .arrow-red, .red {
+        color: red;
+    }
+
+    .s1 > span {
+        padding-right: 30px;
+    }
+
+    .site-usability ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .site-usability .left {
+        height: 240px;
+        width: 200px;
+        float: right;
+    }
+
+    .site-usability .left .sd {
+        position: relative;
+        height: 120px;
+        margin-left: 60px;
+        margin-top: 26px;
+        background: url("/assets/images/sd.png") center center no-repeat;
+    }
+
+    .site-usability .left .sd p.s1 {
+        font-weight: 700;
+        text-align: center;
+        position: absolute;
+        font-size: 30px;
+        color: #fff;
+        top: 20px;
+        left: 35px;
+        width: 75px;
+    }
+
+    .site-usability .left .sd p.s1 i {
+        font-style: normal;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .site-usability .left .sd p.s2 {
+        text-align: center;
+        font-size: 15px;
+        color: #fff;
+        position: absolute;
+        top: 62px;
+        left: 35px;
+        font-weight: 700;
+    }
+
+    .site-usability .left .ltl {
+        position: relative;
+        font-weight: 700;
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 16px;
+        height: 100px;
+        width: 116px;
+        /*background: url("/assets/images/monitor/ltl.png") center center no-repeat;*/
+    }
+
+    .site-usability .left .ltl .ltl-text {
+        position: absolute;
+        top: 23px;
+        left: 35px;
+    }
+
+    .site-usability .fr {
+        float: right;
+        margin-left: 15px;
+        height: 300px;
+    }
+
+    .site-usability .link {
+        font-size: 16px;
+        font-weight: bold;
+        padding-top: 80px;
+    }
+
+    .site-usability .linkWrap {
+        position: absolute;
+        left: 50%;
+        margin-left: -147px;
+    }
+
+    .site-usability .s2 {
+        color: #807d7d;
+        font-size: 15px;
+        font-weight: normal;
+    }
+
+    .site-usability .linktil {
+        display: inline-block;
+        height: 36px;
+        line-height: 36px;
+    }
+
+    .site-usability .linkNum {
+        display: inline-block;
+        width: 100px;
+        height: 30px;
+        line-height: 30px;
+        background-color: #5c95ed;
+        border-radius: 63px !important;
+        color: #FFF;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    @media (max-width: 1280px) {
+        .block {
+            width: 142px;
+            margin: 20px 0 0 14px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .monitor-row .col-lg-4 {
+            width: 100%;
+        }
+        .monitor-row .col-lg-8 {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 1370px) {
+        .monitor-row .col-lg-4 {
+            width: 33.33333%;
+        }
+        .monitor-row .col-lg-8 {
+            width: 66.66667%;
+        }
+        .monitor-row .col-lg-2 {
+            width: 100%;
+        }
+        .monitor-row .col-lg-5 {
+            width: 100%;
+        }
+
+    }
+    @media (max-width: 1369px) {
+        .monitor-row .col-lg-2 {
+            width: 30%;
+        }
+        .monitor-row .col-lg-5 {
+            width: 35%;
+        }
+        .update-portlet .col-md-5 {
+            width: 40%;
+        }
+        .update-portlet .col-md-7 {
+            width: 60%;
+        }
+    }
+
+    @media (max-width: 1200px) {
+        .monitor-row .col-lg-2 {
+            width: 100%;
+            float: left;
+        }
+        .monitor-row .col-lg-5 {
+            width: 50%;
+            float: left;
+        }
+    }
+
+    .mCSB_container_wrapper {
+        margin-right: 0;
+    }
+
+    .mCSB_container_wrapper>.mCSB_container {
+        padding-right: 0;
+    }
+
+
+    /*站群监测报告*/
+    .portlet.hot-words {
+        padding: 0 0 15px;
+    }
+    .hot-words .portlet-title {
+        padding: 12px 20px 0 !important;
+    }
+    .keyword-list {
+        width: 340px;
+        height: 340px;
+        position: relative;
+        font-size: 12px;
+        color: #333;
+        margin: 0 auto;
+        text-align: center;
+    }
+    .keyword-list a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: #0287ca;
+        text-decoration: none;
+        padding: 3px 6px;
+        font-family: "Microsoft Yahei";
+        white-space: nowrap;
+    }
+    .hd {
+        overflow: hidden;
+        height: 30px;
+        padding: 0 10px;
+    }
+    .hd ul {
+        float: right;
+        overflow: hidden;
+        zoom: 1;
+        margin-top: 10px;
+        zoom: 1;
+    }
+    .hd li {
+        float: left;
+        width: 9px;
+        height: 9px;
+        overflow: hidden;
+        margin-right: 5px;
+        text-indent: -999px;
+        cursor: pointer;
+        background: #ddd !important;
+        border-radius: 100% !important;
+    }
+    .hd li.on {
+        background: #57a3f1 !important;
+    }
+    .grid-table.rank thead th,.grid-table.rank tbody td {
+        font-size: 15px;
+    }
+    .rank .num {
+        font-size: 26px;
+        font-style: italic;
+        color: #b1b1b1;
+    }
+    .rank .num1 {
+        color: #cd170a;
+    }
+    .rank .num2 {
+        color: #f25a4f;
+    }
+    .rank .num3 {
+        color: #f6928b;
+    }
+    .sites .portlet.light > .portlet-title {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 30px;
+        min-height: 30px;
+    }
+    .monitor-portlet thead .sm-txt,.monitor-portlet tbody .sm-txt {
+        font-size: 12px;
+        line-height: 14px;
+    }
+    .monitor-portlet thead .sm-txt {
+        text-align: left;
+        line-height: 18px;
+    }
+    .grid-table tbody .md-txt {
+        font-size: 15px;
+    }
+    .grid-table tbody .sm-txt {
+        font-size: 12px;
+    }
+    .monitor-portlet .monitor-site-name .err {
+        width: 10px;
+        height: 19px;
+        display: inline-block;
+        background: url(/assets/images/err_sm.png) center center no-repeat;
+    }
+    .red-txt {
+        color: #ff0000;
+    }
+    .gray-txt {
+        color: #999;
+    }
+    .blue-txt {
+        color: #1c6be4;
+    }
+    .green-txt {
+        color: #6cc140;
+    }
+    .monitor-portlet thead th,.monitor-portlet thead td {
+        padding: 10px 4px;
+    }
+    .section-title {
+        margin: 20px 0 20px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs {
+        background: #fafafa;
+        border-bottom: 1px solid #dbdbdb;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs > li > a{
+        font-size: 18px;
+        font-weight: bold;
+        color: #999;
+        padding: 18px 21px;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs > li {
+        border-bottom: none;
+        border-right: 1px solid transparent;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs > li.active {
+        background: #fff;
+        border-right: 1px solid #dbdbdb;
+        border-left: 1px solid #dbdbdb;
+        border-bottom: 1px solid transparent;
+        margin-bottom: -1px;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs > li.first.active {
+        border-left: none;
+    }
+    .grid-tabbable.tabbable-line > .nav-tabs > li.active a {
+        color: #333;
+    }
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">当前站点监测报告</a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">站群监测报告</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="row mb25 monitor-row">
+                        <div id="situation" class="col-lg-4" style="min-height: 214px;">
+                            <div class="row">
+                                <div class="col-lg-2">
+                                    <div class="portlet light bordered mb25 portlet-sm">
+                                        <div class="portlet-title">
+                                            <div class="date caption" id="monitor_date"></div>
+                                            <div class="actions">
+                                                <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                                <a href="javascript:void(0)" onclick="exportLog()">查看报告</a>
+                                            </div>
+                                        </div>
+                                        <div id="status" class="portlet-body" style="text-align: center;position: relative;">
+                                            <div class="dxfj" style="display: none">
+                                                <img src="/assets/images/test.png">
+                                            </div>
+                                            <div class="score-num f62" style="display: none">
+                                                <i id="number_bai" class="icon iconfont"></i>
+                                                <i id="number_shi" class="icon iconfont icon-shuzi0"></i>
+                                                <i id="number_ge" class="icon iconfont icon-shuzi0"></i>
+                                                <i id="number_d" class="icon iconfont icon-iconfontdian"></i>
+                                                <i id="number_fen" class="icon iconfont icon-shuzi0"></i>
+                                                <span>分</span>
+                                            </div>
+                                            <div class="health-condition status">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="portlet light bordered mb25 portlet-sm">
+                                        <div class="portlet-title ">
+                                            <div class="caption">单项否决项</div>
+                                        </div>
+                                        <div class="portlet-body" style="margin:-15px 0 0 -20px;">
+                                            <div id="veto_siteVisit_cls" class="block block">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="siteDeny()">站点<br>无法访问</a>
+                                                    </li>
+                                                    <li id="veto_siteVisit_desc" class="l2">单项否决</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="veto_siteUpdate_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="siteUpdate()">网站<br>不更新</a>
+                                                    </li>
+                                                    <li id="veto_siteUpdate_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="veto_columnUpdate_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="columnUpdate()">栏目<br>不更新</a>
+                                                    </li>
+                                                    <li id="veto_columnUpdate_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="veto_seriousError_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="error()">严重错误</a></li>
+                                                    <li id="veto_seriousError_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="veto_reply_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="reply()">互动<br>回应差</a>
+                                                    </li>
+                                                    <li id="veto_reply_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="portlet light bordered portlet-sm">
+                                        <div class="portlet-title">
+                                            <div class="caption">综合评分项</div>
+                                        </div>
+                                        <div class="portlet-body" style="margin:-15px 0 0 -20px;">
+                                            <div id="compreh_hrefUseable_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)"
+                                                                      onclick="siteUse()">网站<br>可用性</a></li>
+                                                    <li id="compreh_hrefUseable_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="compreh_baseInfo_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="infoUpdate()">信息<br>更新情况</a>
+                                                    </li>
+                                                    <li id="compreh_baseInfo_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div id="compreh_replyScope_cls" class="block block-normal">
+                                                <ul>
+                                                    <li class="l1"><a href="javascript:void(0)" onclick="replyScope()">互动<br>回应情况</a>
+                                                    </li>
+                                                    <li id="compreh_replyScope_desc" class="l2">指标正常</li>
+                                                    <div class="superscript"></div>
+                                                </ul>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-lg-8" style="min-height: 214px;" id="report">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        监测报告单
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="grid">
+                                        <table class="grid-table" width="100%">
+                                            <thead>
+                                            <th class="tl">监测指标名称</th>
+                                            <th width="120">状态</th>
+                                            <th class="tl" width="200">监测结果</th>
+                                            <th width="120" align="left">环比</th>
+                                            <th width="100">综合指数</th>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-chain-broken" aria-hidden="true"></i>
+                                                    站点无法访问
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="siteVisit_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="site_visit_desc">--</td>
+                                                <td align="center" id="site_visit_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-internet-explorer"
+                                                                    aria-hidden="true"></i> 网站不更新
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="siteUpdate_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="site_update_desc">--</td>
+                                                <td align="center" id="site_update_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-list-alt" aria-hidden="true"></i> 栏目不更新
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="columnUpdate_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="column_update_desc">--</td>
+                                                <td align="center" id="column_update_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-font" aria-hidden="true"></i> 严重错误</td>
+                                                <td align="center" class="start-flag"><i id="seriousError_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="serious_error_desc">--</td>
+                                                <td align="center" id="serious_error_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-comments-o" aria-hidden="true"></i>
+                                                    互动回应差
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="reply_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="reply_desc">--</td>
+                                                <td align="center" id="reply_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-chain" aria-hidden="true"></i> 网站可用性
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="hrefUseable_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="href_useable_desc">--</td>
+                                                <td align="center" id="href_useable_hb">--</td>
+                                                <td align="center" id="href_useable_cpi"></td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-home" aria-hidden="true"></i> 首页栏目更新情况
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="indexColumn_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="index_column_desc">--</td>
+                                                <td align="center" id="index_column_hb">--</td>
+                                                <td align="center">/</td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-file-text-o" aria-hidden="true"></i>
+                                                    基本信息栏目更新情况
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="baseInfo_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="base_info_desc">--</td>
+                                                <td align="center" id="base_info_hb">--</td>
+                                                <td align="center" id="base_info_cpi"></td>
+                                            </tr>
+                                            <tr>
+                                                <td align="left"><i class="fa fa-retweet" aria-hidden="true"></i> 互动回应情况
+                                                </td>
+                                                <td align="center" class="start-flag"><i id="replyScope_flag"
+                                                                                         class="fa fa-check-circle"
+                                                                                         aria-hidden="true"></i></td>
+                                                <td align="left" id="reply_scope_desc">--</td>
+                                                <td align="center" id="reply_scope_hb">--</td>
+                                                <td align="center" id="reply_scope_cpi"></td>
+                                            </tr>
+                                            </tbody>
+                                            <tfoot>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <span class="s1">
+                                                        <span><i class="fa fa-check-circle" aria-hidden="true"></i> 指标正常</span>
+                                                        <span><i class="fa fa-question-circle" aria-hidden="true"></i> 疑似异常</span>
+                                                        <span><i class="fa fa-info-circle" aria-hidden="true"></i> 部分结果异常</span>
+                                                        <span><i class="fa fa-minus-circle" aria-hidden="true"></i> 单项否决</span>
+                                                    </span>
+                                                    <span class="pl55">
+                                                        环比：与上一监测周期　　持平：--　　提升：<span class="red">↑</span>　　下降：<span
+                                                            class="green">↓</span>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 栏目更新情况 -->
+                    <div class="row mb25">
+                        <div class="col-md-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title portlet-title4 mt5 mb5">
+                                    <div class="caption">
+                                        栏目更新情况
+                                    </div>
+                                    <div class="actions actions2">
+                                        <div class="mt-checkbox-list">
+                                            <label class="mt-checkbox mt-checkbox-outline">
+                                                未达标栏目
+                                                <input type="checkbox" checked="checked" id="isStatard" onclick="loadColumnDetaiList()">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="portlet-body update-portlet">
+                                    <div class="col-md-5">
+                                        <div id="echart01" style="width:100%; height: 300px;"></div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <table class="grid-table" width="100%">
+                                            <thead>
+                                            <th>栏目名称</th>
+                                            <th width="150">最后更新日期</th>
+                                            <th width="110">应更新周期</th>
+                                            <th width="110">未更新天数</th>
+                                            <th width="100">是否达标</th>
+                                            </thead>
+                                        </table>
+                                        <div class="grid" id="column_detai_list_scroll"
+                                             style="height: 260px; overflow: hidden;">
+                                            <table class="grid-table" width="98%">
+                                                <colgroup>
+                                                    <col>
+                                                    <col style="width: 150px;">
+                                                    <col style="width: 110px;">
+                                                    <col style="width: 110px;">
+                                                    <col style="width: 80px;">
+                                                </colgroup>
+                                                <tbody id="column_detai_list_html">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 网站可用性情况 -->
+                    <div class="row site-usability">
+                        <div class="col-md-12">
+                            <div class="portlet light bordered">
+                                <div class="portlet-title portlet-title4 mt5 mb5">
+                                    <div class="caption">
+                                        网站可用性情况
+                                    </div>
+                                </div>
+                                <div class="portlet-body">
+                                    <div class="col-md-4 link">
+                                        <div class="linkWrap">
+                                            <div class="">
+                                                <span class="linktil">网站错误链接总数：</span><span class="linkNum"
+                                                                                            id="siteUse_hrefTotal"></span>
+                                                <div class="s2 mb25">首页错误链接<span id="siteUse_indexHref"></span>个，其他页面错误链接<span
+                                                        id="siteUse_otherHref"></span>个
+                                                </div>
+                                            </div>
+                                            <div class="">
+                                                <span class="linktil">今日首页错链总数：</span><span
+                                                    id="siteUse_dynamicHrefCount"
+                                                    class="linkNum"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8" style="border-left: 1px solid #e7ecf1 !important;">
+                                        <div class="col-md-3" style="padding-right: 0;">
+                                            <div class="left">
+                                                <div class="sd">
+                                                    <p class="s1" id="siteUse_siteVisitTotal">0<i>次</i></p>
+                                                    <p class="s2">首页总访问<br>次数</p>
+                                                </div>
+                                                <div class="ltl">
+                                                    <span class="ltl-text" id="siteUse_successVisitRate">0%<br>连通率</span>
+                                                    <div id="echart02" style="width:100%; height: 100px;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9" style="padding-left: 0;">
+                                            <div id="echart03" style="width:100%; height: 300px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                ##                    <div class="task-btn tr mb20">
+                ##                    </div>
+                ##                    <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                ##                         url="/monitor/index/manage/getSiteStatisPage?dataFlag=1" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="true"
+                ##                         idField="id" showColumnsMenu="true" style="width:100%;">
+                ##                        <div property="columns">
+                ##                            <div field="siteName" width="100%" align="center" headerAlign="center">站点名称</div>
+                ##                            <div width="70" align="center" headerAlign="center" renderer="score">得分</div>
+                ##                            <div field="siteDeny" width="80" align="center" headerAlign="center" renderer="indexStatus">站点无法访问</div>
+                ##                            <div field="siteUpdate" width="80" align="center" headerAlign="center" renderer="indexStatus">站点更新</div>
+                ##                            <div field="columnUpdate" width="80" align="center" headerAlign="center" renderer="indexStatus">栏目更新</div>
+                ##                            <div field="error" width="80" align="center" headerAlign="center" renderer="indexStatus">严重错误</div>
+                ##                            <div field="reply" width="80" align="center" headerAlign="center" renderer="indexStatus">互动回应差</div>
+                ##                            <div field="siteUse" renderer="scoreValue" width="80" align="center" headerAlign="center">网站可用性</div>
+                ##                            <div field="indexInfoUpdate" renderer="scoreValue" width="80" align="center" headerAlign="center">首页栏目更新</div>
+                ##                            <div field="infoUpdate" renderer="scoreValue" width="80" align="center" headerAlign="center">基本信息更新</div>
+                ##                            <div field="replyScope" renderer="scoreValue" width="80" align="center" headerAlign="center">互动回应</div>
+                ##                        </div>
+                ##                    </div>
+
+
+                    <!-- 站点综合排名统计 -->
+                    <div class="row sites">
+                        <div class="col-xs-12 col-md-7">
+                            <div class="portlet light bordered site-column mb25" id="site_rank">
+
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-5">
+                            <div class="portlet light bordered hot-words mb25">
+                                <div class="portlet-title">
+                                    <div class="caption">热点词云</div>
+                                </div>
+                                <div class="portlet-body" style="height:375px;">
+                                    <div class="keyword-list" id="keyword-list">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 监测结果概览 -->
+                    <div class="row sites">
+                        <div class="col-md-12">
+                            <div class="portlet light bordered mb25">
+                                <div class="portlet-title portlet-title4 mt5 mb5">
+                                    监测结果概览
+                                </div>
+                                <div class="portlet-body monitor-portlet">
+                                    <table class="grid-table" width="100%">
+                                        <thead>
+                                        <th style="min-width: 120px;">站点</th>
+                                        <th style="width: 80px;">得分</th>
+                                        <th class="sm-txt" align="left" style="width: 60px;">站点<br/>无法访问</th>
+                                        <th class="sm-txt" align="left" style="width: 60px;">网站<br/>不更新</th>
+                                        <th class="sm-txt" align="left" style="width: 60px;">栏目<br/>不更新</th>
+                                        <th class="sm-txt" align="center" style="width: 50px;">严重<br/>错误</th>
+                                        <th class="sm-txt" align="left" style="width: 60px;">互动<br/>回应差</th>
+                                        <th class="sm-txt" align="left" style="width: 60px;">网站<br/>可用性</th>
+                                        <th class="sm-txt" align="left" style="width: 80px;">首页栏目<br/>更新情况</th>
+                                        <th class="sm-txt" align="left" style="width: 85px;">基本信息栏目<br/>更新情况</th>
+                                        <th class="sm-txt" align="left" style="width: 80px;">互动回应<br/>情况</th>
+                                        </thead>
+                                    </table>
+                                    <div class="grid" id="monitor_list_scroll" style="height: 330px; overflow: hidden;">
+                                        <table class="grid-table" width="98%">
+                                            <colgroup>
+                                                <col>
+                                                <col style="width: 80px;">
+                                                <col style="width: 60px;">
+                                                <col style="width: 60px;">
+                                                <col style="width: 60px;">
+                                                <col style="width: 50px;">
+                                                <col style="width: 60px;">
+                                                <col style="width: 60px;">
+                                                <col style="width: 80px;">
+                                                <col style="width: 85px;">
+                                                <col style="width: 60px;">
+                                            </colgroup>
+                                            <tbody id="monitor_list_html">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 栏目更新、互动回应、严重错误 -->
+                    <div class="row sites">
+                        <div class="col-md-12">
+                            <div class="portlet light bordered pd0 mb25" style="padding-bottom: 25px !important;">
+                                <div class="portlet-title">
+                                    <div class="tabbable-line grid-tabbable">
+                                        <ul class="nav nav-tabs" id="column_empty_manage">
+                                            <li class="first active">
+                                                <a href="#tab_column_update" data-toggle="tab">栏目更新情况</a>
+                                            </li>
+                                            <li>
+                                                <a href="#tab_reply" data-toggle="tab">互动回应情况</a>
+                                            </li>
+                                            <li><a href="#tab_serious_err" data-toggle="tab">严重错误情况</a></li>
+                                        </ul>
+
+                                    </div>
+                                </div>
+                                <div class="portlet-body" style="padding-right: 20px;padding-left: 20px;height: 700px;">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="tab_column_update">
+                                            <div class="row">
+                                                <div class="col-xs-6 col-md-6">
+                                                    <div class="tab-section">
+                                                        <h3 class="section-title">各站点栏目<span class="red-txt">未按时更新</span>TOP5</h3>
+                                                        <table class="grid-table" width="100%">
+                                                            <thead>
+                                                            <th style="text-align:left;">站点</th>
+                                                            <th style="width:80px;">总栏目数</th>
+                                                            <th class="red-txt" style="width:80px;">未达标数</th>
+                                                            </thead>
+                                                            <tbody id="top5">
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6 col-md-6">
+                                                    <div class="tab-section">
+                                                        <h3 class="section-title">各站点栏目<span class="green-txt">按时更新</span>TOP10</h3>
+                                                        <div id="echartTop10" style="width:98%;height:320px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="tab-setion">
+                                                        <h3 class="section-title">未按时更新栏目明细</h3>
+                                                        <table class="grid-table" width="100%">
+                                                            <thead>
+                                                            <th style="width:140px;">站点</th>
+                                                            <th style="width: 120px;">栏目名称</th>
+                                                            <th align="left">栏目URL</th>
+                                                            <th style="width: 100px;">栏目类别</th>
+                                                            <th style="width: 130px;">最后更新日期</th>
+                                                            </thead>
+                                                        </table>
+                                                        <div class="grid" id="column_update_scroll" style="height: 220px; overflow: hidden;">
+                                                            <table class="grid-table" width="98%">
+                                                                <colgroup>
+                                                                    <col style="width: 140px;">
+                                                                    <col style="width: 120px;">
+                                                                    <col >
+                                                                    <col style="width: 100px;">
+                                                                    <col style="width: 110px;">
+                                                                </colgroup>
+                                                                <tbody id="column_update_html">
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="tab_reply">
+                                            <table class="grid-table" width="100%">
+                                                <thead>
+                                                <th style="width:80px;">序号</th>
+                                                <th style="width: 140px;">站点</th>
+                                                <th align="left">首页地址</th>
+                                                <th style="width: 140px;">问题数</th>
+                                                </thead>
+                                            </table>
+                                            <div class="grid" id="reply_scroll" style="height: 590px; overflow: hidden;">
+                                                <table class="grid-table" width="98%">
+                                                    <colgroup>
+                                                        <col style="width: 80px;">
+                                                        <col style="width: 140px;">
+                                                        <col >
+                                                        <col style="width: 100px;">
+                                                    </colgroup>
+                                                    <tbody id="reply_html">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="tab_serious_err">
+                                            <table class="grid-table" width="100%">
+                                                <thead>
+                                                <th style="width:80px;">序号</th>
+                                                <th style="width: 140px;">站点</th>
+                                                <th align="left" style="width: 140px;">标题</th>
+                                                <th style="width: 100px;">疑似错误</th>
+                                                <th style="width: 80px;">类型</th>
+                                                <th style="width: 80px;">来源</th>
+                                                <th style="width: 80px;">检测类型</th>
+                                                </thead>
+                                            </table>
+                                            <div class="grid" id="serious_err_scroll" style="height: 590px; overflow: hidden;">
+                                                <table class="grid-table" width="98%">
+                                                    <colgroup>
+                                                        <col style="width: 80px;">
+                                                        <col style="width: 140px;">
+                                                        <col style="width: 140px;">
+                                                        <col style="width: 100px;">
+                                                        <col style="width: 80px;">
+                                                        <col style="width: 80px;">
+                                                        <col style="width: 80px;">
+                                                    </colgroup>
+                                                    <tbody id="serious_err_html">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<iframe id="download" style="display: none"></iframe>
+
+<script src="/assets/js/plugins/superslide/jquery.superslide.min.js"></script>
+<script src="/assets/js/plugins/cloudTag/tag.min.js"></script>
+
+<script type="template" id="column_detai_list">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <? var el = data[i] ?>
+    <tr>
+        <td class="column-name" style="text-align: left; padding-left: 10px; ">
+            <span class="rel">
+                <? if(el.columnUrl!=null && el.columnUrl!=""){ ?>
+                <a href="<?=el.columnUrl?>" target="_blank"><?=el.columnName?></a><?if(el.updateCount<=0){?><img
+                    class="img-icon" src="/assets/images/err01.png"><?}?>
+                <? }else{ ?>
+                <a href="javascript:void(0)" target="_blank"><?=el.columnName?></a><?if(el.updateCount<=0){?><img
+                    class="img-icon" src="/assets/images/err01.png"><?}?>
+                <?}?>
+            </span>
+        </td>
+        <td align="center"><?=el.lastPublishDate?el.lastPublishDate:'--'?></td>
+        <? if(el.updateCycleStr!=null && el.updateCycleStr!=""){ ?>
+        <td align="center"><?=el.updateCycleStr?>(<?=el.updateCycle?>天)</td>
+        <? }else{ ?>
+        <td align="center"><?=el.updateCycle?> 天</td>
+        <?}?>
+        <td align="center"><?=el.unPublishDays?></td>
+        <td align="center"><?==el.updateCount>0?'<span>是</span>':'<span style="color: #ff0000">否<span>'?></td>
+    </tr>
+    <?}?>
+</script>
+
+<!--站点综合排名统计-->
+<script type="template" id="site_rank_tpl">
+    <div class="portlet-title">
+        <div class="caption" style="color:#333;">站点综合排名统计</div>
+        <div class="actions">
+            <div class="hd">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <div class="portlet-body" style="height: 363px;">
+        <div class="grid">
+            <div class="bd">
+                <div class="ulWrap">
+                    <? for(var i=0;i<data.length;i++){ ?>
+                    <? var el = data[i]; var className = "num";
+        if(i<4) {
+            className = "num"+(i+1);
+        }
+    ?>
+                    <?if(i%6==0){?>
+                    <table class="grid-table rank" width="100%">
+                        <thead>
+                        <th width="75">排名</th>
+                        <th align="left">单位名称</th>
+                        <th width="110">综合得分</th>
+                        </thead>
+                        <tbody>
+                        <?}?>
+
+                        <tr data-index="<?=i?>">
+                            <td align="center"><span class="num <?=className?>"><?=el.rank?></span></td>
+                            <td align="left"><?=el.unitName?></td>
+                            <td align="center"><?if(el.score<=0){?><span class="red-txt">单项否决</span><?}else{?><?=el.score?><?}?></td>
+                        </tr>
+
+                        <?if(i!=0&&(i+1)%6==0||i==data.length-1){?>
+                        </tbody>
+                    </table>
+                    <?}?>
+                    <?}?>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+</script>
+
+<!--监测结果概览-->
+<script type="template" id="monitor_statis_tpl">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <? var el = data[i] ?>
+    <tr>
+        <td class="md-txt" align="left" style="min-width:120px;">
+            <span class="monitor-site-name"><span class="txt"><?=el.unitName?></span><?if(el.isQualifed != 1){?><i class="err"></i><?}?></span>
+        </td>
+        <td class="md-txt" align="center">
+            <?if(el.isQualifed == 1) {?>
+            <span class="gray-txt">
+                    <?=el.score?>
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.siteDeny == 1 ||  el.siteDeny == null || el.siteDeny == 'null' || el.siteDeny == '') {?>
+            <span class="gray-txt">
+                    合格
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.siteUpdate == 1) {?>
+            <span class="gray-txt">
+                    合格
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.columnUpdate == 1) {?>
+            <span class="gray-txt">
+                    合格
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.error == 1) {?>
+            <span class="gray-txt">
+                    合格
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.reply == 1) {?>
+            <span class="gray-txt">
+                    合格
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    不合格
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.siteUse == 0) {?>
+            <span class="gray-txt">
+                  不扣分
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    -<?=el.siteUse?>
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.indexInfoUpdate == 0) {?>
+            <span class="gray-txt">
+                  不扣分
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    -<?=el.indexInfoUpdate?>
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.infoUpdate == 0) {?>
+            <span class="gray-txt">
+                  不扣分
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    -<?=el.infoUpdate?>
+                </span>
+            <?}?>
+        </td>
+        <td class="sm-txt" align="center">
+            <?if(el.replyScope == 0) {?>
+            <span class="gray-txt">
+                  不扣分
+                </span>
+            <?} else {?>
+            <span class="red-txt">
+                    -<?=el.replyScope?>
+                </span>
+            <?}?>
+        </td>
+    </tr>
+    <?}?>
+</script>
+
+<!--未按时更新栏目明细-->
+<script type="template" id="column_update_tpl">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <? var el = data[i] ?>
+    <tr>
+        <td align="left" class="md-txt"><?=el.siteName?></td>
+        <td align="center" class="column-name md-txt" style="padding-left: 10px; ">
+            <span class="rel">
+                <? if(el.columnUrl!=null && el.columnUrl!=""){ ?>
+                <a href="<?=el.columnUrl?>" target="_blank"><?=el.columnName?></a>
+                <? }else{ ?>
+                <a href="javascript:void(0)" target="_blank"><?=el.columnName?></a>
+                <?}?>
+            </span>
+        </td>
+        <td align="center" class="sm-txt"><a href="<?=el.columnUrl?>" target="_blank" class="blue-txt"><?=el.columnUrl?></a></td>
+        <td align="center" class="md-txt">
+            <? if(el.columnType=='columnType_index'){ ?>
+            首页栏目
+            <? }else if(el.columnType=='columnType_update'){ ?>
+            应更新栏目
+            <? }else if(el.columnType=='columnType_DTYW'){ ?>
+            动态、要闻类栏目
+            <? }else if(el.columnType=='columnType_TZZC'){ ?>
+            通知公告、政策文件类栏目
+            <? }else if(el.columnType=='columnType_RSGH'){ ?>
+            人事、规划计划类栏目
+            <? }else if(el.columnType=='columnType_BLANK'){ ?>
+            空白栏目
+            <? } ?>
+        </td>
+        <td align="center" class="md-txt"><?=el.updateDate?></td>
+    </tr>
+    <?}?>
+</script>
+
+<!-- TOP5 -->
+<script type="template" id="top5_tpl">
+    <?for(var i=0;i<data.length;i++){
+var el = data[i];?>
+    <tr>
+        <td align="left" class="md-txt"><?=el.siteName?></td>
+        <td align="left" class="md-txt"><?=el.totalCounts?></td>
+        <td align="center" class="md-txt"><span class="red-txt"><?=el.failCount?></span></td>
+    </tr>
+    <?}?>
+</script>
+
+<!-- 互动回应情况 -->
+<script type="template" id="reply_tpl">
+    <?for(var i=0;i<data.length;i++){
+var el = data[i];?>
+    <tr>
+        <td align="center" class="md-txt" style="color:#848484;"><?=i+1?></td>
+        <td align="left" class="md-txt"><?=el.siteName?></td>
+        <td align="center" class="sm-txt"><a class="blue-txt" href="<?=el.url?>" target="_blank"><?=el.url?></a></td>
+        <td align="center" class="md-txt"><?=el.totalCounts?></td>
+    </tr>
+    <?}?>
+</script>
+
+<!-- 严重错误情况 -->
+<script type="template" id="serious_error_tpl">
+    <?for(var i=0;i<data.length;i++){
+var el = data[i];?>
+    <tr>
+        <td align="center" class="md-txt" style="color:#848484;"><?=i?></td>
+        <td align="left" class="md-txt"><?=el.siteName?></td>
+        <td align="center" class="sm-txt"><a class="blue-txt" href="<?=el.link?>" target="_blank"><?=el.title?></a></td>
+        <td align="center" class="md-txt"><?=el.word?></td>
+        <td align="center" class="md-txt"><?=el.typeCode?></td>
+        <td align="center" class="md-txt"><?=el.fromCode?></td>
+        <td align="center" class="md-txt"><?=el.checkType?></td>
+    </tr>
+    <?}?>
+</script>
+
+<!-- 热点词云 -->
+<script type="template" id="hot_words_tpl">
+    <?for(var i=0;i<data.length;i++){
+var el = data[i];?>
+    <a href="<?if(!Ls.isEmpty(el.uri)){?><?=el.uri?><?}else{?>javascript:void(0);<?}?>" target="_blank"><?=el.name?></a>
+    <?}?>
+</script>
+
+
+<script>
+
+    mini.parse();
+    var common = {
+        dialog: Ls.getWin.dialog,
+        //grid: mini.get('datagrid'),
+        params: {
+            taskId:${taskId}
+        },
+        tips: {
+            normal: '指标正常',
+            vetoed: '单项否决',
+            score: '存在扣分',
+            warn: '不合格'
+        },
+        cls: {
+            normal: 'block-normal',
+            vetoed: 'block-exception',
+            warn: 'block-warn'
+        }
+    }
+
+    var cur = {
+                isInit: false
+            },
+            option01 = {
+                title: {
+                    text: '栏目更新达标情况',
+                    x: 'center',
+                    y: 'bottom'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    show: false,
+                    orient: 'vertical',
+                    left: 'left',
+                    data: ['达标数', '不达标']
+                },
+                series: [
+                    {
+                        name: '栏目更新达标情况',
+                        type: 'pie',
+                        radius: '70%',
+                        center: ['50%', '50%'],
+                        selectedMode: 'single',
+                        itemStyle: {
+                            normal: {
+                                labelLine: {
+                                    length: 5,
+                                    length2: 8,
+                                }
+                            },
+                            emphasis: {
+                                /*shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                borderColor: 'rgba(0, 0, 0, 0.5)'*/
+                            }
+                        },
+                        data: [
+                            {
+                                value: 120 - 20,
+                                name: '达标',
+                                label: {
+                                    normal: {
+                                        show: false
+                                    },
+                                    emphasis: {
+                                        show: false
+                                    }
+                                },
+                                labelLine: {
+                                    normal: {
+                                        show: false
+                                    },
+                                    emphasis: {
+                                        show: false
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        color: '#6198ed'
+                                    }
+                                }
+                            },
+                            {
+                                value: 20,
+                                name: 20 + '个不达标',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#e5e5e5'
+                                    }
+                                },
+                                labelLine: {
+                                    normal: {
+                                        smooth: true,
+                                        lineStyle: {
+                                            color: '#000000'
+                                        }
+                                    }
+                                },
+                                label: {
+                                    normal: {
+                                        color: '#000000'
+                                    }
+                                }
+
+                            },
+                        ]
+                    }
+                ]
+            },
+            option02 = {
+                series: [
+                    {
+                        type: 'pie',
+                        radius: ['75%', '85%'],
+                        avoidLabelOverlap: false,
+                        hoverAnimation: false,
+                        startAngle: 50,
+                        itemStyle: {
+                            normal: {
+                                labelLine: {
+                                    show: false
+                                }
+                            }
+                        },
+                        data: [
+                            {
+                                value: 0,
+                                name: '',
+                                itemStyle: {
+                                    normal: {
+                                        color: '#5C95ED'
+                                    }
+                                }
+
+                            },
+                            {
+                                value: 100,
+                                name: '邮件营销',
+                                label: {
+                                    normal: {
+                                        show: false
+                                    },
+                                    emphasis: {
+                                        show: false
+                                    }
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        show: false,
+                                        color: '#D6DCE5'
+                                    }
+                                }
+                            },
+                        ]
+                    }
+                ]
+            },
+            option03 = {
+                title: {
+                    text: '访问次数',
+                    textStyle: {
+                        color: '#8B8B8B',
+                        fontWeight: 'normal',
+                        fontSize: '16'
+                    },
+                    x: '55'
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['实际访问次数', '成功访问次数'],
+                    right: '25'
+                },
+                grid: {
+                    top: '12%',
+                    right: '6%',
+                    left: '6%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: ['1', '2', '3', '4', '5', '6', '7'],
+                    axisLabel: {
+                        rotate: 35,
+                        interval: 0
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        formatter: '{value}'
+                    }
+                },
+                series: [
+                    {
+                        name: '成功访问次数',
+                        type: 'line',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    },
+                    {
+                        name: '实际访问次数',
+                        type: 'line',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                    }
+                ]
+            }
+
+
+    var iconFilter = function (num) {
+        var txt = '';
+        if (num > 0) {
+            txt = '<span class="arrow-red">' + num + '% <i class="fa fa-long-arrow-up"></i></span>';
+        } else if (num < 0) {
+            num = num.toString().replace("-", "");
+            txt = '<span class="arrow-green">' + num + '% <i class="fa fa-long-arrow-down"></i></span>';
+        } else if (num == 0) {
+            txt = '0.00%--';
+        }
+        return txt;
+    }
+
+    var getHbInfo = function (b, c) {
+        var hb = "";
+        if (b == 0) {
+            hb = "--";
+        } else if (b == 1) {
+            hb = "/";
+        } else if (b == 2) {
+            hb = '<span class="arrow-red"><i class="fa fa-long-arrow-up"></i></span>';
+        } else if (b == 3) {
+            hb = '<span class="arrow-green"><i class="fa fa-long-arrow-down"></i></span>';
+        } else {
+            hb = iconFilter(c);
+        }
+        return hb;
+    }
+
+    var getCpiInfo = function (b, c) {
+        var cpi = "";
+        if (b == 0) {
+            cpi = "--";
+        } else if (b == 1) {
+            cpi = "/";
+        } else if (b == 2) {
+            cpi = '<span class="arrow-red"><i class="fa fa-long-arrow-up"></i></span>';
+        } else if (b == 3) {
+            cpi = '<span class="arrow-green"><i class="fa fa-long-arrow-down"></i></span>';
+        } else {
+            if (c > 100) {
+                cpi = '<span class="arrow-red">' + c + '% <i class="fa fa-long-arrow-up"></i></span>';
+            } else if (c == 100) {
+                cpi = '--';
+            } else {
+                cpi = '<span class="arrow-green">' + c + '% <i class="fa fa-long-arrow-down"></i></span>';
+            }
+        }
+        return cpi;
+    }
+
+    var setVetoInfo = function (a, b) {
+        $('#veto_' + a + '_cls').removeClass();
+        if (b.isOk == 1) {
+            $('#veto_' + a + '_cls').addClass("block " + common.cls.normal);
+            $('#veto_' + a + '_desc').html(common.tips.normal);
+        } else {
+            $('#veto_' + a + '_cls').addClass("block " + common.cls.vetoed);
+            $('#veto_' + a + '_desc').html(common.tips.vetoed);
+        }
+    }
+
+    var setComprehInfo = function (a, score) {
+        $('#compreh_' + a + '_cls').removeClass();
+        if (score == 0) {
+            $('#compreh_' + a + '_cls').addClass("block " + common.cls.normal);
+            $('#compreh_' + a + '_desc').html(common.tips.normal);
+        } else if (score > 40) {
+            $('#compreh_' + a + '_cls').addClass("block " + common.cls.warn);
+            $('#compreh_' + a + '_desc').html(common.tips.warn + "<br>-" + score);
+        } else {
+            $('#compreh_' + a + '_cls').addClass("block " + common.cls.warn);
+            $('#compreh_' + a + '_desc').html(common.tips.score + "<br>-" + score);
+        }
+
+    }
+
+    var getDesc = function (status, name) {
+        if (status == 0) {
+            return '未开设' + name + '栏目';
+        } else if (status == 1) {
+            return '一年内没' + name + '数据';
+        } else if (status == 2) {
+            return name + '开展活动少于规定次数';
+        } else if (status == 3) {
+            return name + '正常';
+        }
+    }
+
+    // 得分
+    var setScore = function (value) {
+        console.info("得分：" + value)
+
+        $('#number_d').hide();
+        $('#number_bai').removeClass();
+        $('#number_shi').removeClass();
+        $('#number_ge').removeClass();
+        $('#number_fen').removeClass();
+        $('#number_bai').addClass('icon iconfont');
+        $('#number_shi').addClass('icon iconfont');
+        $('#number_ge').addClass('icon iconfont');
+        $('#number_fen').addClass('icon iconfont');
+        if (parseInt(value) < 0) {
+            value = 0;
+        }
+        if (parseInt(value) == 100) {
+            $('#number_bai').addClass('icon-shuzi1');
+            $('#number_shi').addClass('icon-shuzi0');
+            $('#number_ge').addClass('icon-shuzi0');
+        } else if (parseInt(value) >= 0 && parseInt(value) < 10) {
+            value += "";
+            if (value.indexOf('.') != -1) {
+                if (parseInt(value.substr(2, 2)) > 0) {
+                    $('#number_bai').addClass('icon-shuzi' + parseInt(value));
+                    $('#number_d').show();
+                    $('#number_fen').addClass('icon-shuzi' + value.substr(2, 2));
+                }
+            } else {
+                $('#number_bai').addClass('icon-shuzi' + parseInt(value));
+            }
+        } else if (parseInt(value) >= 10) {
+            value += '';
+            $('#number_shi').addClass('icon-shuzi' + value.substr(0, 1));
+            $('#number_ge').addClass('icon-shuzi' + value.substr(1, 1));
+            if (value.indexOf('.') != -1) {
+                if (parseInt(value.substr(3, 3)) > 0) {
+                    $('#number_d').show();
+                    $('#number_fen').addClass('icon-shuzi' + value.substr(3, 3));
+                }
+            }
+        }
+    }
+
+    //减法
+    function subtr(arg1, arg2) {
+        var r1, r2, m, n;
+        try {
+            r1 = arg1.toString().split(".")[1].length
+        } catch (e) {
+            r1 = 0
+        }
+        try {
+            r2 = arg2.toString().split(".")[1].length
+        } catch (e) {
+            r2 = 0
+        }
+        m = Math.pow(10, Math.max(r1, r2));
+        n = (r1 >= r2) ? r1 : r2;
+        return ((arg1 * m - arg2 * m) / m).toFixed(n);
+    }
+
+    var totalCounts = 0;
+    var bdbCounts = 0;
+
+    // 监测报告单1
+    var getVetoTotalStatis = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getVetoTotalStatis",
+            data: {},
+            success: function (resp) {
+                //站点无法访问(0)，网站不更新(1)，栏目不更新(2)，严重错误(3)，互动回应差(4)
+                var right = '<span class="fa fa-check"></span>', wrong = '<span class="fa fa-close"></span>',
+                        text = "";
+                var arr = [wrong, wrong, wrong, wrong, wrong];
+                if (resp.status == 1) {
+                    var data = resp.data;
+                    common.reportStatus = data.reportStatus;
+                    if (data.monitorDate) {
+                        $("#monitor_date").html(data.monitorDate.substr(0, 10) + " 日数据");
+                    }
+                    common.reportId = data.reportId;
+                    var flag = true;
+                    // 站点无法访问
+                    var siteVisit = data.siteVisit;
+                    if (siteVisit) {
+                        setVetoInfo("siteVisit", siteVisit);
+                        var desc = "";
+                        $('#siteVisit_flag').removeClass();
+                        if (siteVisit.isOk == 1) {
+                            desc = "正常";
+                            $('#siteVisit_flag').addClass("fa fa-check-circle");
+                        } else {
+                            flag = false;
+                            if (null == siteVisit.failRate) {
+                                desc = "<font color='red'>没有检测结果</font>";
+                            } else {
+                                desc = "不可访问占比(" + siteVisit.failRate + "%)";
+                            }
+                            $('#siteVisit_flag').addClass("fa fa-minus-circle");
+                        }
+                        $('#site_visit_desc').html(desc);
+                        $('#site_visit_hb').html(getHbInfo(siteVisit.linkRelationStatus, siteVisit.linkRelationRate));
+                    }
+
+                    //严重错误
+                    var seriousError = data.seriousError;
+                    if (seriousError) {
+                        $('#seriousError_flag').removeClass();
+                        setVetoInfo("seriousError", seriousError);
+                        var desc = "";
+                        if (seriousError.isOk == 1) {
+                            desc = "正常";
+                            $('#seriousError_flag').addClass("fa fa-check-circle");
+                        } else {
+                            flag = false;
+                            desc = "疑似错别字：(" + seriousError.count + ")个";
+                            $('#seriousError_flag').addClass("fa fa-question-circle");
+                        }
+                        $('#serious_error_desc').html(desc);
+                        $('#serious_error_hb').html(getHbInfo(seriousError.linkRelationStatus, seriousError.linkRelationRate));
+                    }
+
+                    //网站不更新
+                    var siteUpdate = data.siteUpdate;
+                    if (siteUpdate) {
+                        setVetoInfo("siteUpdate", siteUpdate);
+                        var desc = "";
+                        $('#siteUpdate_flag').removeClass();
+                        if (siteUpdate.isOk == 1) {
+                            desc = "正常";
+                            $('#siteUpdate_flag').addClass("fa fa-check-circle");
+                        } else {
+                            flag = false;
+                            desc = "首页栏目更新量：" + siteUpdate.count;
+                            $('#siteUpdate_flag').addClass("fa fa-minus-circle");
+                        }
+                        $('#site_update_desc').html(desc);
+                        //首页栏目综合评分项的环比调用单项否决的
+                        if (siteUpdate.linkRelationRate == 0) {
+                            $('#site_update_hb').html("--");
+                            $('#index_column_hb').html("--");
+
+                        } else {
+                            $('#site_update_hb').html(iconFilter(siteUpdate.linkRelationRate));
+                            $('#index_column_hb').html(iconFilter(siteUpdate.linkRelationRate));
+                        }
+
+                    }
+
+                    //栏目不更新
+                    var columnUpdate = data.columnUpdate;
+                    if (columnUpdate) {
+                        setVetoInfo("columnUpdate", columnUpdate);
+                        var desc = "";
+                        var hb = "";
+                        $('#columnUpdate_flag').removeClass();
+                        if (columnUpdate.isOk == 1) {
+                            desc = "正常";
+                            $('#columnUpdate_flag').addClass("fa fa-check-circle");
+                        } else {
+                            flag = false;
+                            desc = "动态要闻类" + columnUpdate.dtywCounts + "个未按时更新<br>";
+                            desc += "通知政策类" + columnUpdate.tzzcCounts + "个未按时更新<br>";
+                            desc += "应更新栏目" + columnUpdate.updateCounts + "个未按时更新<br>";
+                            desc += columnUpdate.blankCounts + "个空白栏目";
+                            $('#columnUpdate_flag').addClass("fa fa-minus-circle");
+                        }
+                        $('#column_update_desc').html(desc);
+//                            if (columnUpdate.linkRelationRate == 0) {
+//                                $('#column_update_hb').html("--");
+//                            } else {
+                        hb = getHbInfo(columnUpdate.dtywLinkRelationStatus, columnUpdate.dtywLinkRelationRate) + "<br>";
+                        hb += getHbInfo(columnUpdate.tzzcLinkRelationStatus, columnUpdate.tzzcLinkRelationRate) + "<br>";
+                        hb += getHbInfo(columnUpdate.updateLinkRelationStatus, columnUpdate.updateLinkRelationRate) + "<br>";
+                        hb += getHbInfo(columnUpdate.blankLinkRelationStatus, columnUpdate.blankLinkRelationRate);
+                        $('#column_update_hb').html(hb);
+//                            }
+
+                    }
+
+                    //互动回应差
+                    var reply = data.reply;
+                    if (reply) {
+                        setVetoInfo("reply", reply);
+                        var desc = "";
+                        $('#reply_flag').removeClass();
+                        if (reply.isOk == 1) {
+                            desc = "正常";
+                            $('#reply_flag').addClass("fa fa-check-circle");
+                        } else {
+                            flag = false;
+                            desc = reply.count + "个信件超时未回复";
+                            $('#reply_flag').addClass("fa fa-minus-circle");
+                        }
+                        $('#reply_desc').html(desc);
+                        var hb = getHbInfo(reply.linkRelationStatus, reply.linkRelationRate)
+                        $('#reply_hb').html(hb);
+
+                    }
+
+                    if (flag) {
+                        $('.score-num').show();
+                        $('.dxfj').hide();
+                        $('.health-condition').html("健康状况：合格");
+                    } else {
+                        $('.dxfj').show();
+                        $('.score-num').hide();
+                        $('.health-condition').html("健康状况：不合格");
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons: 'info', times: 2});
+                }
+            }
+        });
+    }
+
+    // 监测报告单2
+    var getComprehScoreStatis = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getComprehScoreStatis",
+            data: {
+                /*registerCode: cur.registerCode,
+                siteId: cur.siteId*/
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+
+                    var data = resp.data;
+                    var score = parseInt(0);
+                    //错误链接
+                    var hrefUseable = data.hrefUseable;
+                    if (hrefUseable) {
+                        $('#hrefUseable_flag').removeClass();
+                        score = score + hrefUseable.totalScore;
+                        if (score == 0) {
+                            $('#hrefUseable_flag').addClass("fa fa-check-circle");
+                        } else {
+                            $('#hrefUseable_flag').addClass("fa fa-info-circle");
+                        }
+                        $("#hrefUseable").html(hrefUseable.indexCount + hrefUseable.otherCount);
+
+                        var desc = "首页不可访问占比：(" + hrefUseable.siteVisitFailRate + ")%<br>" +
+                                "首页错链接：(" + hrefUseable.indexCount + ")个<br>" +
+                                "其他错链接：(" + hrefUseable.otherCount + ")个";
+
+                        $('#href_useable_desc').html(desc);
+                        var hb = "<br>" +
+                                getHbInfo(hrefUseable.indexLinkRelationStatus, hrefUseable.indexLinkRelationRate) + "<br>" +
+                                getHbInfo(hrefUseable.otherLinkRelationStatus, hrefUseable.otherLinkRelationRate);
+                        $('#href_useable_hb').html(hb);
+                        $('#href_useable_cpi').html(getCpiInfo(hrefUseable.cpiStatus, hrefUseable.cpi));
+                        setComprehInfo("hrefUseable", hrefUseable.totalScore);
+                    }
+
+
+                    //首页栏目更新
+                    var indexColumn = data.indexColumn;
+                    var baseInfoScore = parseInt(0);
+                    if (indexColumn) {
+                        baseInfoScore = parseInt(indexColumn.score);
+                        score = score + parseInt(indexColumn.score);
+                        $('#indexColumn_flag').removeClass();
+                        if (score == 0) {
+                            $('#indexColumn_flag').addClass("fa fa-check-circle");
+                        } else {
+                            $('#indexColumn_flag').addClass("fa fa-info-circle");
+                        }
+                        $('#index_column_desc').html("首页栏目更新量：" + indexColumn.count);
+                        //首页栏目综合评分项的环比调用单项否决项的值
+//                            if (indexColumn.linkRelationRate == 0) {
+//                                $('#index_column_hb').html('--');
+//                            } else {
+//                                $('#index_column_hb').html(iconFilter(indexColumn.linkRelationRate));
+//                            }
+                    }
+
+                    //基本信息更新
+                    var baseInfo = data.baseInfo;
+                    if (baseInfo) {
+                        var desc = '';
+                        baseInfoScore += parseInt(baseInfo.totalScore);
+                        score = score + parseInt(baseInfo.totalScore);
+                        $('#baseInfo_flag').removeClass();
+                        if (score == 0) {
+                            $('#baseInfo_flag').addClass("fa fa-check-circle");
+                        } else {
+                            $('#baseInfo_flag').addClass("fa fa-info-circle");
+                        }
+                        desc = "动态要闻类" + baseInfo.dtywCount + "个未按时更新<br>";
+                        desc += "通知政策类" + baseInfo.tzzcCount + "个未按时更新<br>";
+                        desc += "人事规划类" + baseInfo.rsghCount + "个未按时更新";
+                        $('#base_info_desc').html(desc);
+
+                        var hb = '';
+                        hb = getHbInfo(baseInfo.dtywLinkRelationStatus, baseInfo.dtywLinkRelationRate) + "<br>";
+                        hb += getHbInfo(baseInfo.tzzcLinkRelationStatus, baseInfo.tzzcLinkRelationRate) + "<br>";
+                        hb += getHbInfo(baseInfo.rsghLinkRelationStatus, baseInfo.rsghLinkRelationRate);
+                        $('#base_info_hb').html(hb);
+//                            if (baseInfo.linkRelationRate == 0) {
+//                                $('#base_info_hb').html('--');
+//                            } else {
+//                                $('#base_info_hb').html(iconFilter(baseInfo.linkRelationRate));
+//                            }
+                        var cpi = '';
+                        cpi = getCpiInfo(baseInfo.cpiStatus, baseInfo.cpi);
+                        $('#base_info_cpi').html(cpi);
+                        console.info("基本信息扣分：" + baseInfoScore);
+                        setComprehInfo("baseInfo", baseInfoScore);
+                    }
+
+                    //互动
+                    var replyScope = data.replyScope;
+                    if (replyScope) {
+                        score = score + parseInt(replyScope.totalScore);
+                        $('#replyScope_flag').removeClass();
+                        if (score == 0) {
+                            $('#replyScope_flag').addClass("fa fa-check-circle");
+                        } else {
+                            $('#replyScope_flag').addClass("fa fa-info-circle");
+                        }
+                        $('#reply_scope_desc').html(getDesc(replyScope.zwzxStatus, '政务咨询') + "<br>" + getDesc(replyScope.dczjStatus, '调查征集') + "<br>" + getDesc(replyScope.hdftStatus, '互动访谈'));
+                        var hb = '';
+                        hb += getHbInfo(replyScope.zwzxLinkRelationStatus, replyScope.zwzxLinkRelationRate) + "<br>";
+                        hb += getHbInfo(replyScope.dczjLinkRelationStatus, replyScope.dczjLinkRelationRate) + "<br>";
+                        hb += getHbInfo(replyScope.hdftLinkRelationStatus, replyScope.hdftLinkRelationRate)
+                        $('#reply_scope_hb').html(hb);
+
+                        var cpi = '';
+                        cpi = getCpiInfo(replyScope.cpiStatus, replyScope.cpi);
+                        $('#reply_scope_cpi').html(cpi);
+                        setComprehInfo("replyScope", parseInt(replyScope.totalScore));
+                    }
+
+                    if (parseInt(score) > 40) {
+                        $('.score-num').hide();
+                        $('.dxfj').show();
+                        $('.health-condition').html("健康状况：不合格");
+                    }
+                    setScore(subtr(100, score));
+                } else {
+                    $('#hrefUseable_desc').html('');
+                    $('#hrefUseable_hb').html('');
+                    $('#indexColumn_desc').html('');
+                    $('#indexColumn_hb').html('');
+                    $('#baseInfo_desc').html('');
+                    $('#baseInfo_hb').html('');
+                    $('#replyScope_desc').html('');
+                    $('#replyScope_hb').html('');
+                    Ls.tips(resp.desc, {icons: 'info', times: 2});
+                }
+
+            }
+        });
+    }
+
+    // 监测总栏目数
+    var getColumnCounts = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getColumnCounts",
+            data: {
+
+            },
+            async: false,
+            success: function (resp) {
+                if (resp.status == 1) {
+                    var data = resp.data;
+                    totalCounts = data;
+                    console.info("总检测数：" + data);
+//                    $("#column_counts").html(data)
+                }
+            }
+        });
+    }
+
+    // 不达标栏目数
+    var getBdbColumnCounts = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getBdbColumnCounts",
+            data: {
+
+            },
+            async: false,
+            success: function (resp) {
+                if (resp.status == 1) {
+                    var data = resp.data;
+                    bdbCounts = data;
+                    console.info("不达标数：" + data);
+//                    $("#bdb_column_counts").html(data)
+                }
+            }
+        });
+    }
+
+    // 栏目更新
+    var getColumnDetaiList = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getColumnDetaiList",
+            data: {
+                isStatard: 1
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    var data = resp.data;
+                    var listObj = $("#column_detai_list_html"),
+                            scrollObj = $("#column_detai_list_scroll");
+
+                    //App.destroyScroll(scrollObj);
+                    listObj.html(Ls.template("column_detai_list", resp));
+                    App.initSlimScroll(scrollObj, {
+                        theme: "dark"
+                    })
+
+                }
+            }
+        });
+    }
+
+    // 访问性
+    var getSiteVisitStatis = function () {
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getSiteVisitStatis",
+            data: {
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    $('#siteUse_siteVisitTotal').html(resp.data.siteVisitTotal);
+                    $('#siteUse_successVisitRate').html(resp.data.successVisitRate + '%<br>连通率');
+                    $('#siteUse_hrefTotal').html(resp.data.hrefTotal);
+                    $('#siteUse_indexHref').html(resp.data.indexHref);
+                    $('#siteUse_otherHref').html(resp.data.otherHref);
+                    $('#siteUse_dynamicHrefCount').html(resp.data.dynamicHrefCount);
+
+                    var svdateStatis = resp.data.siteVisitDateStatis;
+                    if (svdateStatis) {
+                        var dateArr = [];
+                        var successArr = [];
+                        var totalArr = [];
+                        for (var i = 0; i < svdateStatis.length; i++) {
+                            dateArr.push(svdateStatis[i].mdate);
+                            successArr.push(svdateStatis[i].success);
+                            totalArr.push(svdateStatis[i].total);
+                        }
+
+                        var value1, value2, successVisitRate = resp.data.successVisitRate;
+                        if (successVisitRate == 0) {
+                            value1 = 0;
+                            value2 = 100;
+                        } else {
+                            value1 = 100;
+                            value2 = 100 - successVisitRate;
+                        }
+
+
+                        //cur.myChart02.clear();
+                        cur.myChart02.setOption({
+                            series: [
+                                {
+                                    itemStyle: {
+                                        normal: {
+                                            labelLine: {
+                                                show: false
+                                            }
+                                        }
+                                    },
+                                    data: [
+                                        {
+                                            value: value1,
+                                            name: '',
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#5C95ED'
+                                                }
+                                            }
+
+                                        },
+                                        {
+                                            value: value2,
+                                            name: '',
+                                            itemStyle: {
+                                                normal: {
+                                                    show: false,
+                                                    color: '#D6DCE5'
+                                                }
+                                            }
+                                        },
+                                    ]
+                                }
+                            ]
+                        });
+
+                        // 网站可用性情况（首页可访问性+链接可用性）
+                        cur.myChart03.clear();
+                        cur.myChart03.setOption($.extend({},option03,{
+                            xAxis: {
+                                data: dateArr,
+                                axisTick: {
+                                    alignWithLabel: true
+                                },
+                                axisLabel: {
+                                    rotate: 35,
+                                    interval: 0
+                                }
+                            },
+                            series: [
+                                {
+                                    name: '成功访问次数',
+                                    type: 'line',
+                                    data: successArr
+                                },
+                                {
+                                    name: '实际访问次数',
+                                    type: 'line',
+                                    data: totalArr
+                                }
+                            ]
+                        }))
+                    }
+                }
+            }
+        });
+    }
+
+
+    $(function () {
+
+        var t = localStorage.getItem("TAGTIMER");
+        if(t) {
+            clearInterval(t);
+        }
+
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            var id = e.currentTarget.hash;
+
+            if (id == '#tab_1_2') {
+                tabEvent.init();
+                $(".up-date").toggle();
+            } else {
+                $(".up-date").toggle();
+            }
+        });
+        // common.grid.load();
+        Ls.parseEcharts(function () {
+            require([
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar',
+                        'echarts/chart/pie',
+                        'echarts/chart/funnel'
+                    ], function (ec) {
+
+                        cur.myChart01 = ec.init(document.getElementById('echart01'));
+                        cur.myChart01.setOption(option01);
+
+                        cur.myChart02 = ec.init(document.getElementById('echart02'));
+                        cur.myChart02.setOption(option02);
+
+                        cur.myChart03 = ec.init(document.getElementById('echart03'));
+                        cur.myChart03.setOption(option03);
+                        getVetoTotalStatis()
+                                .then(getComprehScoreStatis)
+                                .then(getColumnCounts)
+                                .then(getBdbColumnCounts)
+                                .then(getColumnDetaiList)
+                                .then(getSiteVisitStatis).done(function () {
+                            //栏目更新达标情况
+                            cur.myChart01.setOption({
+                                series: [
+                                    {
+                                        data: [
+                                            {
+                                                value: totalCounts - bdbCounts,
+                                                name: totalCounts - bdbCounts + '个达标',
+                                                label: {
+                                                    normal: {
+                                                        show: false
+                                                    },
+                                                    emphasis: {
+                                                        show: false
+                                                    }
+                                                },
+                                                labelLine: {
+                                                    normal: {
+                                                        show: false
+                                                    },
+                                                    emphasis: {
+                                                        show: false
+                                                    }
+                                                },
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: '#6198ed'
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                value: bdbCounts,
+                                                name: bdbCounts + '个不达标',
+                                                itemStyle: {
+                                                    normal: {
+                                                        color: '#e5e5e5'
+                                                    }
+                                                },
+                                                labelLine: {
+                                                    normal: {
+                                                        smooth: true,
+                                                        length: 8,
+                                                        length2: 8,
+                                                        lineStyle: {
+                                                            color: '#000000'
+                                                        }
+                                                    }
+                                                },
+                                                label: {
+                                                    normal: {
+                                                        color: '#000000'
+                                                    }
+                                                }
+
+                                            },
+                                        ]
+                                    }
+                                ]
+                            });
+
+                            //高度处理
+                            if($(window).outerWidth() < 1370 && $(window).outerWidth() > 1200) {
+                                var eles = $("#situation .portlet-sm"),
+                                        maxHeight = 0;
+                                $.each(eles,function (i,v) {
+                                    var eleHeight = $(v).outerHeight();
+                                    if(eleHeight > maxHeight) {
+                                        maxHeight = eleHeight;
+                                    }
+                                })
+                                eles.height(maxHeight);
+                            }
+
+                            var reportHeight = $("#report").outerHeight(),
+                                    situationHeight = $("#situation").outerHeight();
+                            if(reportHeight < situationHeight) {
+                                $("#report").find(".portlet.bordered").height(situationHeight-29);
+                            }
+
+                        });
+                    }
+            );
+        })
+    })
+
+    var tabEvent = (function () {
+        //
+        var diaDate = function () {
+            //common.grid.load();
+            //Ls.mini_datagrid_height(common.grid, 60);
+
+            getSitesStatis();
+
+        };
+
+        var init = function () {
+            diaDate();
+        };
+
+        return {
+            init: init
+        }
+    })();
+
+    function siteDeny() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/siteVisitDetail", '800px', '390px', {
+            id:common.params.taskId + "_siteVisit",
+            title: "站点访问详情"
+        });
+    }
+
+    function error() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/seriousErrorDetail", '800px', '390px', {
+            id:common.params.taskId + "_seriousError",
+            title: "严重错误详情"
+        });
+    }
+
+    function siteUse() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/hrefUseableDetail", '800px', '390px', {
+            id:common.params.taskId + "_hrefUseable",
+            title: "错误链接详情"
+        });
+    }
+
+    function siteUpdate() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/indexNotUpdateDetail", '800px', '390px', {
+            id:common.params.taskId + "_indexNotUpdate",
+            title: "网站不更新详情"
+        });
+    }
+
+    function indexInfoUpdate() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/indexColumnDetail", '800px', '390px', {
+            id:common.params.taskId + "_indexColumn",
+            title: "首页栏目详情"
+        });
+    }
+
+    function columnUpdate() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/columnNotUpdateDetail", '800px', '390px', {
+            id:common.params.taskId + "_columnNotUpdate",
+            title: "栏目不更新详情"
+        });
+    }
+
+    function infoUpdate() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/columnBaseInfoDetail", '800px', '390px', {
+            id:common.params.taskId + "_columnBaseInfo",
+            title: "基本信息详情"
+        });
+    }
+
+    function reply() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/badInteractDetail", '800px', '390px', {
+            id:common.params.taskId + "_badInteract",
+            title: "互动回应差详情"
+        });
+    }
+
+    function replyScope() {
+        common.dialog.data("taskId", common.params.taskId);
+        Ls.openWin("/monitor/index/manage/interactInfoDetail", '800px', '390px', {
+            id:common.params.taskId + "_interactInfo",
+            title: "互动回应情况详情"
+        });
+    }
+
+    function exportLog() {
+        $("#download").attr("src", "/monitor/index/manage/exportReport?taskId=" + common.params.taskId);
+    }
+
+    function score(e) {
+        var r = e.record;
+        if(r.siteDeny == 0 || r.siteUpdate == 0 || r.columnUpdate == 0 || r.error == 0 || r.reply == 0) {
+            return "<font color='red'>不合格</font>";
+        }
+        var score =  r.score;
+        if(parseInt(score) < 60) {
+            return "<font color='red'>不合格</font>";
+        } else {
+            return score;
+        }
+    }
+
+    function indexStatus(e) {
+        if (e.value == 0)
+            return '<span style="color: red">单项否决</span>';
+        else if (e.value == 1)
+            return '<span style="color: green">合格</span>';
+        else
+            return "";
+    }
+
+    function scoreValue(e) {
+        if (e.value == 0)
+            return '<span style="color: green">0</span>';
+        else if (e.value > 0)
+            return '<span style="color: red">-' + e.value + '</span>';
+        else
+            return '<span style="color: red">' + e.value + '</span>';
+    }
+
+    //站点综合排名统计
+    var getSitesRank = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getSiteStatisPage?dataFlag=1',
+            success: function (resp) {
+                var mockData = [];
+                var mockDataList = [];
+                if(resp.data) {
+                    var data = resp.data;
+                    for(var i = 0;i < data.length;i++) {
+                        var score = data[i].isQualified == 1?data[i].score:0;
+                        mockData.push({unitName:data[i].siteName,rank:i+1,score:score});
+                        mockDataList.push({
+                            unitName:data[i].siteName,
+                            isQualified:data[i].isQualified,
+                            score:data[i].score,
+                            siteDeny:data[i].siteDeny,
+                            siteUpdate:data[i].siteUpdate,
+                            columnUpdate:data[i].columnUpdate,
+                            error:data[i].error,
+                            reply:data[i].reply,
+                            siteUse:data[i].siteUse,
+                            indexInfoUpdate:data[i].indexInfoUpdate,
+                            infoUpdate:data[i].infoUpdate,
+                            replyScope:data[i].replyScope
+                        });
+                    }
+                }
+
+                var html1 = Ls.template("site_rank_tpl", {data:mockData});
+                $("#site_rank").html(html1);
+                var scrollObj = $("#monitor_list_scroll");
+                // scrollObj.mCustomScrollbar("destroy");
+                App.initSlimScroll(scrollObj)
+
+                var html2 = Ls.template("monitor_statis_tpl", {data: mockDataList});
+                $("#monitor_list_html").html(html2);
+//                scrollObj.mCustomScrollbar({
+//                    theme: "dark",
+//                    axis: "yx"
+//                });
+            }
+        })
+    }
+
+    //未按时更新栏目明细
+    var getColumnUpdateStatis = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getSiteColumnDetaiList',
+            success: function (resp) {
+                //TODO 测试数据
+
+                var scrollObj = $("#column_update_scroll");
+
+                //scrollObj.mCustomScrollbar("destroy");
+
+                var html = Ls.template("column_update_tpl", resp);
+                $("#column_update_html").html(html);
+//                scrollObj.mCustomScrollbar({
+//                    theme: "dark",
+//                    axis: "yx"
+//                });
+                App.initSlimScroll(scrollObj,{
+                    theme: "dark",
+                    axis: "yx"
+                });
+
+
+
+
+            }
+        })
+    }
+
+
+    //top5
+    var getTop5 = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getSiteColumnInfos',
+            success: function (resp) {
+                if(resp.status == 1) {
+                    var html = Ls.template("top5_tpl", resp);
+                    $("#top5").html(html);
+
+                }else {
+                    Ls.tips(resp.desc, {icons: 'info', times: 2});
+                }
+
+
+            }
+        })
+    }
+
+
+    //top10
+    var getTop10 = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getSiteColumnStatis',
+            success: function (resp) {
+                //首页更新量
+                Ls.parseEcharts(function () {
+                    require([
+                                'echarts',
+                                'echarts/chart/line',
+                                'echarts/chart/bar'
+                            ], function (ec) {
+
+                                cur.myChartTop10 = ec.init(document.getElementById('echartTop10'));
+
+                                cur.myChartTop10.setOption({
+                                    title : {
+                                        text: '栏目数',
+                                        textStyle: {
+                                            color: '#8B8B8B',
+                                            fontWeight: 'normal',
+                                            fontSize: '16'
+                                        },
+                                        top: '-2',
+                                        left: '35'
+                                    },
+                                    tooltip : {
+                                        trigger: 'axis',
+                                        axisPointer: {
+                                            type: 'cross',
+                                            crossStyle: {
+                                                color: '#999'
+                                            }
+                                        }
+                                    },
+                                    calculable : true,
+                                    xAxis : [
+                                        {
+                                            type : 'category',
+                                            boundaryGap : 10,
+                                            data : resp.xDatas
+                                        }
+                                    ],
+                                    yAxis : [
+                                        {
+                                            type: 'value',
+                                            min: 0,
+                                            max: 250,
+                                            interval: 50,
+                                            axisLabel: {
+                                                formatter: '{value}'
+                                            }
+                                        },
+                                        {
+                                            show: false,
+                                            type: 'value',
+                                            min: 0,
+                                            max: 250,
+                                            interval: 5,
+                                            axisLabel: {
+                                                formatter: '{value}'
+                                            }
+                                        }
+                                    ],
+                                    series : [
+                                        {
+                                            name:'达标栏目',
+                                            type:'bar',
+                                            data:resp.passDatas,
+                                            itemStyle: {
+                                                normal: {
+                                                    color: '#a0ee77'
+                                                }
+                                            },
+                                            barWidth: 40,
+                                        },
+                                        {
+                                            name:'总栏目数',
+                                            type:'line',
+                                            data:resp.totalDatas,
+                                            itemStyle: {
+                                                normal: {
+                                                    lineStyle: {
+                                                        color: '#1c6be4'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                })
+
+                            }
+                    );
+                })
+
+
+
+
+            }
+        })
+    }
+
+    //互动回应情况
+    var getReplyStatis = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getSiteInteractDetaiList',
+            success: function (resp) {
+                var scrollObj = $("#reply_scroll");
+
+                // scrollObj.mCustomScrollbar("destroy");
+                var html = Ls.template("reply_tpl", resp);
+                $("#reply_html").html(html);
+
+                App.initSlimScroll(scrollObj,{
+                    theme: "dark",
+                    axis: "yx"
+                })
+
+            }
+        })
+    }
+
+    //严重错误情况
+    var getSeriousErrorStatis = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getMonitorSiteGroupErrors',
+            success: function (resp) {
+                var mockData = [];
+                if(resp.status == 1) {
+                    var data = resp.data;
+                    for(var i = 0;i < data.length;i++) {
+                        mockData.push({
+                            siteName:data[i].siteName,
+                            title:data[i].title,
+                            link:link(data[i].title,data[i].columnId,data[i].contentId,data[i].domain),
+                            word:data[i].word,
+                            typeCode:data[i].typeCode,
+                            fromCode:data[i].fromCode,
+                            checkType:data[i].checkType == 'SENSITIVE'?'敏感词':'易错词',
+                        });
+                    }
+                }
+                var scrollObj = $("#serious_err_scroll");
+                var html = Ls.template("serious_error_tpl", {data:mockData});
+                $("#serious_err_html").html(html);
+                App.initSlimScroll(scrollObj,{
+                    theme: "dark",
+                    axis: "yx"
+                })
+            }
+        })
+    }
+
+    function link(title,columnId,contentId,domain) {
+        if(!domain.endWith("/")) {
+            domain += "/";
+        }
+        domain += columnId + "/" + contentId + ".html";
+        return domain;
+    }
+
+    //热点词云
+    var getHotWords = function () {
+        return Ls.ajaxGet({
+            url: '/monitor/index/manage/getVetoTotalStatis',
+            success: function (resp) {
+                var mockData = [
+                    {name: '双百工程',url:''},
+                    {name: '四服一送',url:''},
+                    {name: '滁州',url:''},
+                    {name: '微信',url:''},
+                    {name: '大数据',url:''},
+                    {name: '两会',url:''},
+                    {name: '十九大',url:''},
+                    {name: '市长热线',url:''},
+                    {name: '中国洞都',url:''},
+                    {name: '文博会',url:''},
+                    {name: '神牛',url:''},
+                    {name: '华夏文明',url:''}
+                ];
+
+                tag.clear();
+                var html = Ls.template("hot_words_tpl",{data:mockData});
+                $("#keyword-list").html(html);
+
+                tag.init();
+            }
+        })
+    }
+
+
+    //站群监测报告
+    function getSitesStatis() {
+        getSitesRank().done(function () {
+            jQuery(".site-column").slide({
+                titCell:".hd ul",
+                mainCell:".bd .ulWrap",
+                autoPage:true,
+                effect:"leftLoop",
+                autoPlay:false,
+                vis:1
+            });
+        });
+
+        //未按时更新栏目明细
+        getColumnUpdateStatis();
+
+        //top5
+        getTop5();
+
+        getTop10();
+
+        //互动回应情况
+        getReplyStatis();
+        //严重错误情况
+        getSeriousErrorStatis();
+
+        //热点词云
+        getHotWords();
+
+
+    }
+
+    // 监测栏目
+    function loadColumnDetaiList() {
+        var isStatard = 0;
+        if ($('#isStatard').is(':checked')) {
+            isStatard = 1;//查询未达标栏目
+        }
+        return Ls.ajaxGet({
+            url: "/monitor/index/manage/getColumnDetaiList",
+            data: {
+                isStatard: isStatard
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    var data = resp.data;
+                    var listObj = $("#column_detai_list_html"),
+                            scrollObj = $("#column_detai_list_scroll");
+
+                    scrollObj.mCustomScrollbar("destroy");
+                    listObj.html(Ls.template("column_detai_list", resp));
+                    scrollObj.mCustomScrollbar({
+                        theme: "dark",
+                        axis: "yx"
+                    });
+
+                }
+            }
+        });
+    }
+
+    String.prototype.endWith=function(endStr){
+        var d=this.length-endStr.length;
+        return (d>=0&&this.lastIndexOf(endStr)==d)
+    }
+</script>

@@ -1,0 +1,32 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#if($resultObj.data.size()>0)
+<ul class="leader-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        <li>
+            #set($name=$!{eo.name})
+            <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$name" class="left">
+                #cutstr($title,$length)
+            </a>
+            #if($isDate == "true")
+                <span class="right date">#date_format("$!{eo.issuedTime}","$!{paramObj.dateFormat}")</span>
+            #end
+        </li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="leaderWinPage" class="pagination"></div>
+    <script>
+        Ls.pagination("#leaderWinPage", function (pageIndex) {
+            location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        })
+    </script>
+    #end
+#end

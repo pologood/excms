@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+
+<body>
+<form id="formDB" action="" method="post">
+    <table>
+        <tbody>
+        <tr>
+            <td align="left">
+            </td>
+            <td align="left">
+            </td>
+            <td align="left">
+            </td>
+            <td align="left">
+            ##                <input type="checkbox" name="isDeleteNewsData" value="1"/> 删除新栏目的数据
+            </td>
+        </tr>
+        <tr>
+            <td valign="top">砀山目录：</td>
+            <td valign="top">
+                <div style="padding:5px;border: 1px solid black;height: 550px; width: 300px;overflow: auto;">
+                    <ul id="ex6_tree" class="ztree"></ul>
+                </div>
+            </td>
+            <td valign="top">-> EX8目录：</td>
+            <td valign="top">
+                <div style="padding:5px; border: 1px solid black;height: 550px;width: 300px;overflow: auto;">
+                    <ul id="organ_catalog_tree" class="ztree"></ul>
+                </div>
+            </td>
+            <td valign="top">--> 操作：<br/>
+                <button onclick="selectIt()" type="button" style="height: 30px; ">新增</button>
+            </td>
+            <td valign="top">
+                <div id="params" style="padding:5px; border: 1px solid black;height: 500px;width: 300px;overflow: auto;">
+                </div>
+                <button id="doSub" type="button" style="height: 40px; ">提交</button> <button onclick="clearAll()" type="button" style="height: 40px; ">清楚所选</button>
+                <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+                <button onclick="deleteIt()" type="button" style="height: 40px; ">删除节点下文章（主动公开）</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center">
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    var cur = {
+        id: "public_content_form",
+        siteId:'3615656',
+        organId: '',
+        catId: '',
+        unitCode: '',
+        cateCode: '',
+        mgname:'',
+        name:'',
+        organ_catalog_tree_id: "organ_catalog_tree",//单位树id
+        tree: null,
+        ex6tree: null,
+        c:0
+    };
+
+    function clearAll(){
+        $("#params").html("");
+    }
+
+    function selectIt(){
+        var count = $("input[name='ids']").length;
+        if(count > 50){
+            alert("每次最多选中20条，防止Ngix服务代理异常!");
+            return;
+        }
+        if(cur.unitCode == '' || cur.cateCode == ''){
+            alert("砀山栏目id或栏目所属单位id为空!");
+            return;
+        }
+        if(cur.catId == '' || cur.organId == ''){
+            alert("Ex8栏目id或栏目所属单位id为空!");
+            return;
+        }
+        var all = cur.unitCode+"|"+ cur.cateCode+"-"+cur.organId+"|"+cur.catId;
+        console.info(all)
+        $("#params").append("<span id='"+cur.c+"_span'>"+cur.mgname+"-->"+cur.name+"<input name='ids' type='hidden' value='"+all+"'><button onclick='delThis("+cur.c+")' type='button' style='height: 20px; '>删除</button></span><br/>")
+        cur.c = cur.c+1;
+    }
+    function  delThis(a){
+        $("#"+a+"_span").remove();
+    }
+    function deleteIt(){
+        if(cur.catId == '' || cur.organId == ''){
+            alert("Ex8栏目id或栏目所属单位id为空!");
+            return;
+        }
+        var organId = cur.organId;
+        var catId = cur.catId;
+        Ls.ajax({
+            url: "/suzhou/dangshan/clear",
+            data: {organId:organId,catId:catId}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("删除成功");
+            } else {
+                alert(d.desc);
+                $("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            var params = [];
+            $("input[name='ids']").each(function(i,v){
+                if($(this).val() != ''){
+                    params.push($(this).val());
+                }
+            })
+            params = params.join(",");
+            if(params == ''){
+                alert("请选择导入数据！")
+                return;
+            }
+            if (confirm("确定导入数据？")) {
+                $("#doSub").attr("disabled", "disabled");
+                $("#doSub_msg").show();
+                return Ls.ajax({
+                    url: "/suzhou/dangshan/importData",
+                    data: {params:params}
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        alert("完成导入!");
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+                        $("#params").html("");
+                    } else {
+                        alert(d.desc);
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+
+                    }
+                }).always(function () {
+                    $("#doSub").attr("disabled", false);
+                    $("#doSub_msg").hide();
+                });
+            }
+        });
+
+
+        // ex8 tree
+        var ztree_settings_ex6 = {
+            async: {
+                enable: true,
+                url: "/suzhou/dangshan/getDangshanTree",
+                autoParam: ["id=parentId","type","unitCode"]
+            },
+            data: {
+                simpleData: {
+                    idKey: 'id',
+                    pIdKey: 'parentId'
+                },
+                key:{
+                    title:'title'
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, node) {
+                    cur.cateCode = '';
+                    cur.unitCode = '';
+                    cur.mgname = '';
+                    // 判断节点展开
+                    if (node.isParent) {
+                        cur.ex6tree.expandNode(node, !node.open, false, true, true);
+                    }else{
+                        cur.unitCode = node.unitCode;
+                        cur.cateCode = node.cateCode;
+                        cur.mgname = node.name;
+                    }
+                    return false;
+                },
+                onAsyncSuccess: function () {
+                }
+            }
+        };
+        cur.ex6tree = $.fn.zTree.init($("#ex6_tree"), ztree_settings_ex6);
+
+        // 信息公开reee
+        var ztree_settings = {
+            async: {
+                enable: true,
+                url: "/suzhou/dangshan/getOrganCatalogTree",
+                autoParam: ["id=parentId", "organId"],
+                otherParam: ["catalog", "true", "all", "false"]
+                //                dataFilter : dataFilter
+            },
+            data: {
+                simpleData: {
+                    idKey: 'id',
+                    pIdKey: 'parentId'
+                }
+            },
+            callback: {
+                onClick: function (event, treeId, node) {
+                    cur.organId = '';
+                    cur.catId = '';
+                    cur.name = '';
+                    // 判断节点展开
+                    if (node.isParent) {
+                        cur.tree.expandNode(node, !node.open, false, true, true);
+                    } else {
+                        console.info(node);
+                        cur.organId = node.organId;
+                        cur.catId = node.id;
+                        cur.name = node.name;
+                    }
+                    return false;
+                },
+                onAsyncSuccess: function () {
+                }
+            }
+        };
+
+        cur.tree = $.fn.zTree.init($("#" + cur.organ_catalog_tree_id), ztree_settings);
+    });
+
+
+</script>
+</body>
+</html>

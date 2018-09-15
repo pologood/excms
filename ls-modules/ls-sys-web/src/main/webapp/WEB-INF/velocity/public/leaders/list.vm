@@ -1,0 +1,188 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="add()">新增</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-delete" onclick="batchDel()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/public/leaders/getPage" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="leadersId" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="leadersName" width="100%" align="center" headerAlign="center">姓名</div>
+                        <div field="post" width="150" align="center" headerAlign="center">职务</div>
+                        <div field="leadersNum" width="100" align="center" headerAlign="center">编码</div>
+                        <div field="createDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">添加时间</div>
+                        <div field="updateDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">更新时间</div>
+                        <div field="sortNum" width="100" align="center" headerAlign="center">排序值</div>
+                        <div field="" width="80" align="center" headerAlign="center" renderer="renderStatus">状态</div>
+                        <div width="105" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key: $('#ser_key'),
+        dialog: Ls.getWin.dialog
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    })
+
+    /*
+    * 新增领导
+    * */
+    function add() {
+        cur.dialog.data("type", "add");
+        cur.dialog.data("leadersId", "");
+        Ls.openWin("/public/leaders/addOrEdit", '930px', '550px', {
+            title: "添加领导"
+        });
+    }
+
+    /*
+    * 修改领导
+    * */
+    function edit(leadersId) {
+        cur.dialog.data("type", "edit");
+        cur.dialog.data("leadersId", leadersId);
+        Ls.openWin("/public/leaders/addOrEdit", '930px', '550px', {
+            title: "修改领导"
+        });
+    }
+
+
+    function batchDel(id) {
+        var ids = [];
+
+        if (id != null && id != "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].leadersId);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajax({
+                url: "/public/leaders/deleteLeaders",
+                data: {
+                    leadersId: ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips("删除成功", {
+                            icons: "success"
+                        });
+                    } else {
+                        Ls.tips(resp.desc, {
+                            icons: "error"
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
+    function renderStatus(obj) {
+        var record = obj.record;
+        if (record.status == "Normal") {
+            return "启用";
+        } else if (record.status == "Removed") {
+            return "禁用";
+        }
+    }
+
+
+    function opt(obj) {
+        var record = obj.record;
+        var view = '<button id="pause_' + record.leadersId + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="view(' + record.leadersId + ')">预览</button> ';
+        var edit = '<button id="pause_' + record.leadersId + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="edit(' + record.leadersId + ')">修改</button> ';
+        var disable = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="disOrEnable(' + record.leadersId + ')">禁用</button>';
+        var enable = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="disOrEnable(' + record.leadersId + ')">启用</button>';
+        if (record.status == "Normal") {
+            return edit + disable;
+        } else {
+            return edit + enable;
+        }
+    }
+
+    function disOrEnable(leadersId) {
+        Ls.ajax({
+            url: "/public/leaders/disOrEnable",
+            data: {
+                leadersId: leadersId
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.grid.load();
+                    Ls.tips("操作成功", {
+                        icons: "success"
+                    });
+
+                } else {
+                    Ls.tips(resp.desc, {
+                        icons: "error"
+                    });
+                }
+            }
+        });
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({siteId: GLOBAL_SITEID, leadersName: keyValue});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+
+    function callback(msg) {
+        Ls.tips(msg, {times: 2});
+        search();
+    }
+</script>

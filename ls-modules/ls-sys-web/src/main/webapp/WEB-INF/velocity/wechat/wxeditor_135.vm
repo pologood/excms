@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>完整demo</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link href="$!{sysStaticPath}/assets/js/plugins/ueditor135/96619a5672.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/js/plugins/ueditor135/themes/default/css/ueditor.min.css" rel="stylesheet" type="text/css"/>
+    <script>
+        //window.UEDITOR_HOME_URL = 'http://static.135ediutor.com/js/ueditor/';
+    </script>
+    <style type="text/css">
+        div {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div style="margin: 0 auto;">
+    <script id="editor" type="text/plain" style="width:790px;height:500px;"></script>
+</div>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/ueditor135/wx.config.js" charset="utf-8"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/ueditor135/ueditor.all.min.js" charset="utf-8"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/ueditor135/lang/zh-cn/zh-cn.js" charset="utf-8"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/ueditor135/5e128919b4.js" type="text/javascript" charset="utf-8"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script type="text/javascript">
+
+    var current_editor;
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    UE.utils.domReady(function () {
+
+        if (W.editor1.getHtml()) {
+            $("#editor").html(W.editor1.getHtml())
+        }
+
+        current_editor = UE.getEditor('editor', {
+            initialFrameHeight: 600,
+            open_editor: true,
+            style_width: 360, //样式区宽度像素
+            style_url: 'http://www.135editor.com/editor_styles/open?inajax=1&appkey=$!{wxappkey}'
+        });
+
+        current_editor.ready(function () {
+            current_editor.execCommand('serverparam', function (editor) {
+                return {
+                    "siteId": "$!{siteId}",
+                    "sessionId": "$!{sessionId}"
+                };
+            })
+        });
+
+        UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
+        UE.Editor.prototype.getActionUrl = function (action) {
+            if (action == 'uploadimage') {
+                return '$!{rc.contextPath}/fileCenter/UeUpload?DataFlag=1';
+            } else {
+                return this._bkGetActionUrl.call(this, action);
+            }
+        }
+
+        api.button(
+            {
+                name: '确定',
+                callback: function () {
+                    api.close(UE.getEditor('editor').getContent())
+                    return false;
+                },
+                focus: true
+            }
+        )
+    })
+
+</script>
+</body>
+</html>

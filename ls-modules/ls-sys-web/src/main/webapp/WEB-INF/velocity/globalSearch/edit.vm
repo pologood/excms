@@ -1,0 +1,274 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" style="overflow: auto;padding: 10px 20px;">
+<form role="form" id="update_form" ms-controller="article_form">
+    <input type="hidden"  name="id" value="$!{data.id}">
+    <table class="table table-bordered article-table">
+        <tbody>
+        <tr>
+            <th>标题：</th>
+            <td>
+                <table class="w100p">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <textarea class="form-control" id="title" name="title" style="height: 55px;" placeholder="">$!{data.title}</textarea>
+                        ##                                <input type="text" name="title" id="title" ms-duplex="title" class="form-control" maxlength="200">
+                        </td>
+
+                        <td class="w150 text-center">
+                            <button type="button" id="colorpicker" class="btn btn-default btn-font"><i class="fa fa-font"></i>
+                            </button>
+                            <input type="hidden" id="mycolor" class="colorPicker evo-cp0" />
+                            <button type="button" class="btn btn-default btn-bold" onclick="cursave.fn.checkBold();" ><i class="fa fa-bold"></i></button>
+                            <button type="button" class="btn btn-default btn-italic" onclick="cursave.fn.checkTilt();" ><i class="fa fa-italic"></i>
+                            </button>
+                            <button type="button" class="btn btn-default btn-underline"  onclick="cursave.fn.checkUnderline();" >
+                                <i class="fa fa-underline"></i></button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>副标题：</th>
+            <td>
+            ##                    <input type="text" id="subTitle" ms-duplex="subTitle" class="form-control" placeholder="" maxlength="300">
+                <textarea class="form-control" id="subTitle" name="subTitle" style="height: 50px;" placeholder="">$!{data.subTitle}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <th>发布日期：</th>
+            <td>
+                <input type="datetime" id="publishDate" name="publishDate" ms-duplex="publishDate" class="form-control readonly" value="$!{data.publishDate}"
+                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+            </td>
+        </tr>
+        <tr class="article_attr_ext hide">
+            <th>摘要：</th>
+            <td>
+                <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="">$!{data.remarks}</textarea>
+            </td>
+        </tr>
+        <tr >
+            <th style="vertical-align: top;">内容：</th>
+            <td colspan="2">
+                <textarea id="article_content" name="article" style="width: 100%; visibility: visible;">$!{data.article}</textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+
+
+
+#parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+        },
+        data: ${datajson},
+        eweb:null,
+        init:function(){
+            mini.parse();
+            cursave.eweb = Ls.editor("article_content", {cusdir: "/" + GLOBAL_SITEID + "/" + 0});
+            /*cursave.editor = KindEditor.create('#article_content', {
+                uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID,// 上传文件
+                fileManagerJson: '/fileCenter/getPage',// 文件空间
+                allowImageUpload: true,
+                allowFileManager: false,
+                allowFlashUpload: false,
+                allowMediaUpload: false,
+                filterMode: false,
+                siteId: GLOBAL_SITEID,
+                columnId: 0,
+                fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+                afterCreate: function () {
+                    this.sync();
+                },
+                afterBlur: function () {
+                    this.sync();
+                },
+                resizeType: 1
+            });*/
+            cursave.eweb.setHtml(cursave.data.article);
+
+            // 取色器
+            /*var colorpicker;
+            KindEditor('#colorpicker').bind('click', function(e) {
+                e.stopPropagation();
+                if (colorpicker) {
+                    colorpicker.remove();
+                    colorpicker = null;
+                    return;
+                }
+                var colorpickerPos = KindEditor('#colorpicker').pos();
+                colorpicker = KindEditor.colorpicker({
+                    x : colorpickerPos.x,
+                    y : colorpickerPos.y + KindEditor('#colorpicker').height(),
+                    z : 19811214,
+                    selectedColor : 'default',
+                    noColor : '无颜色',
+                    click : function(color) {
+                        KindEditor('#title').css('color', color);
+                        colorpicker.remove();
+                        cursave.data.titleColor = color;
+                        colorpicker = null;
+                    }
+                });
+            });*/
+            $("#mycolor").colorpicker({
+                color: "#000",
+                hideButton: true,
+                strings: " , , 无颜色 , , , , "
+            }).on('change.color', function(evt, color){
+                $('#title').css('color', color);
+            });
+            $("#colorpicker").on("click", function (evt) {
+                evt.stopImmediatePropagation();
+                $("#mycolor").colorpicker("showPalette");
+            });
+        },
+        fn:{
+            isNull:function(value){
+                if(value == undefined || value == null || value == ""){
+                    return true;
+                }
+                return false;
+            },
+            checkBold:function () {
+                var T = $("#title");
+                if (cursave.data.isBold == 0) {
+                    T.css("font-weight", "bold");
+                    cursave.data.isBold = 1;
+                } else {
+                    T.css("font-weight", "normal");
+                    cursave.data.isBold = 0;
+                }
+            },
+            checkTilt:function () {
+                var T = $("#title");
+                if (cursave.data.isTilt == 0) {
+                    T.css("font-style", "italic");
+                    cursave.data.isTilt = 1;
+                } else {
+                    T.css("font-style", "normal");
+                    cursave.data.isTilt = 0;
+                }
+            },
+            checkUnderline:function () {
+                var T = $("#title");
+                if (cursave.data.isUnderline == 0) {
+                    T.css("text-decoration", "underline");
+                    cursave.data.isUnderline = 1;
+                } else {
+                    T.css("text-decoration", "none");
+                    cursave.data.isUnderline = 0;
+                }
+            },
+            unPublish : function (siteId, id, title){
+                if (id != null && id != '' && confirm("是否取消发布标题为【" + title + "】的记录？")) {
+                    Ls.ajaxGet({
+                        url: "/content/unPublish?id=" + id,
+                        success: function (result) {
+                            if(result.status == 1){
+//                                cur.grid.removeRow(cur.grid.getRow(parseInt(rowIndex)));
+//                                if(cur.dialog.closed == false){
+//                                    cur.dialog.close();
+//                                }
+                                Ls.tipsOk("取消发布成功！", {
+                                    times: 2, callback: function () {
+                                        Ls.winClose();
+                                    }
+                                });
+                                return false;
+                            }
+                            Ls.tipsErr("取消发布失败，错误信息：" + result.desc);
+                        }
+                    });
+                }
+            },
+            remove : function (siteId, id, title){
+                if (id != null && id != '' && confirm("是否删除标题为【" + title + "】的记录？")) {
+                    Ls.ajaxGet({
+                        url: "/content/unPublish?id=" + id,
+                        success: function (result) {
+                            if(result.status == 1){
+                                Ls.tipsOk("删除成功！", {
+                                    times: 2, callback: function () {
+                                        Ls.winClose();
+                                    }
+                                });
+//                                cur.grid.removeRow(cur.grid.getRow(parseInt(rowIndex)));
+//                                if(cur.dialog.closed == false){
+//                                    cur.dialog.close();
+//                                }
+//                                Ls.winClose("editContent");
+                                return false;
+                            }
+                            Ls.tipsErr("删除失败，错误信息：" + result.desc);
+                        }
+                    });
+                }
+            },
+            save :function () {
+                var data = $("#update_form").serializeObject();
+                if(data.id == undefined || data.id == null || data.id == ""){
+                    Ls.tipsOk("数据异常！");
+                }
+                data.isBold = cursave.data.isBold;
+                data.isTilt = cursave.data.isTilt;
+                data.isUnderline = cursave.data.isUnderline;
+                data.titleColor = cursave.data.titleColor;
+                data.publishDateStr = data.publishDate;
+                data.publishDate = null;
+                Ls.ajax({
+                    url:'/content/updateBaseInfo',
+                    type: "POST",
+                    data:data,
+                    success:function (result) {
+                        if(result.status == 1){
+                            Ls.tipsOk("数据更新成功！", {
+                                times: 2, callback: function () {
+                                    Ls.winClose();
+                                }
+                            });
+                            return false;
+                        }
+                        Ls.tipsErr("数据更新失败，错误信息：" + result.desc);
+                    }
+                });
+            }
+        }
+    };
+
+    $(function(){
+        api.button(
+            { name: '删 除',
+                callback: function (a,b,c) {
+                    cursave.fn.remove(cursave.data.siteId, cursave.data.id, cursave.data.title);
+                    return false;
+                }
+            },{ name: '取消发布',
+                callback: function () {
+                    cursave.fn.unPublish(cursave.data.siteId, cursave.data.id, cursave.data.title);
+                    return false;
+                }
+            },{ name: '保 存',
+                callback: function (data) {
+                    cursave.fn.save();
+                    return false;
+                }
+            },{ name: '关 闭',
+                callback: function () {
+                }
+            }
+        );
+        cursave.init();
+    });
+</script>

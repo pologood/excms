@@ -1,0 +1,91 @@
+<style>
+    .ui-state-highlight {
+        background: #F0F0EE;
+        border: dotted #00a2d4 1px;
+    }
+
+    .lsui-icon-move {
+        height: 20px;
+        width: 20px;
+        overflow: hidden;
+        display: inline-block;
+        background: url('/assets/design/static/css/imgs/move.png') center center no-repeat;
+    }
+
+    .ls-listtable {
+        height: 406px;
+        overflow: hidden;
+    }
+
+    .ls-listtable-inner {
+        height: 396px;
+        overflow-y: scroll;
+    }
+
+</style>
+<form id="attrForm" class="sui-form sui-validate pd10">
+    <div class="mb10">
+        <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="add">添加</a>
+        <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="associateNode">添加关联栏目</a>
+    </div>
+    <div class="ls-listtable">
+        <div class="ls-listtable-inner">
+        <table class="sui-table table-bordered" style="margin-bottom: 0; width: 760px;">
+            <thead>
+            <tr>
+                <th>排序</th>
+                <th>名称</th>
+                <th>链接</th>
+                <!-- <th>启用</th> -->
+                <!--<th>打开方式</th>-->
+                <th>操作</th>
+            </tr>
+            </thead>
+                <tbody id="attrFormTBody">
+
+                <!--<template>-->
+
+                <tr v-for="(el,index) in menus"  v-bind:id="'tr_'+ index">
+                    <td class="tc">
+                        <i class="lsui-icon-move movehandler" style="cursor:pointer" title="按下鼠标拖拽,可以改变行的顺序"></i>
+                    </td>
+                    <td>
+                        <input type="text" class="input-medium" data-rules="required" v-model="el.name">
+                    </td>
+
+                    <td>
+                        <input type="text" class="input-xlarge {'uneditable-input': el.unEdit}" data-rules="required" v-model="el.href" :disabled="el.unEdit ? true : false">
+                    </td>
+
+                    <!--<td>-->
+                        <!--<span class="sui-dropdown dropdown-bordered select">-->
+                            <!--<span class="dropdown-inner">-->
+                                <!--<a href="javascript:void(0);" role="button"  data-toggle="dropdown" class="dropdown-toggle">-->
+                                    <!--<input v-model="el.target" name="target" type="hidden"><i-->
+                                        <!--class="caret"></i><span>{{el.target|targetTxt}}</span>-->
+                                <!--</a>-->
+                                <!--<ul role="menu"  class="sui-dropdown-menu">-->
+                                    <!--<li role="presentation"><a  role="menuitem"  tabindex="-1" href="javascript:void(0);" value="_blank">新窗口</a></li>-->
+                                    <!--<li role="presentation"><a  role="menuitem" tabindex="-1" href="javascript:void(0);" value="_self">当前页</a></li>-->
+                                <!--</ul>-->
+                            <!--</span>-->
+                        <!--</span>-->
+
+
+                    <!--</td>-->
+
+                    <td style="width:60px; text-align: center; ">
+
+                        <a href="javascript:void(0);" class="sui-btn btn-bordered btn-small btn-danger"
+                           v-on:click="remove(index)">删除</a>
+
+
+                    </td>
+                </tr>
+                <!--</template>-->
+                </tbody>
+        </table>
+        </div>
+    </div>
+    <!--ls-listtable-->
+</form>

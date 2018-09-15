@@ -1,0 +1,170 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light">
+            <div class="portlet-body form">
+
+                <form id="formReviewObject" role="form" ms-controller="formReviewObject">
+                    <div class="form-body">
+
+                        <div class="form-group">
+                            <label>对象名称：</label>
+                            <input name="name" type="text" class="form-control" placeholder="对象名称不能为空" ms-duplex="name">
+                        </div>
+                        <div class="form-group organNames">
+                            <label>对象选择：</label>
+                            <textarea name="organNames" class="form-control" rows="1" placeholder="点击选择组织" ms-duplex="organNames"
+                                      ms-click="getOrgans()"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>对象描述：</label>
+                            <textarea name="content" class="form-control" rows="2" placeholder=""
+                                      ms-duplex="content"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions noborder">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        objectId: Ls.url.get("objectId"),
+        organIds: '',
+        params: {
+            siteId: Ls.url.get("siteId"),
+            columnId: Ls.url.get("columnId")
+        }
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/reviewObject/getReviewObject",
+                data: {
+                    objectId: cur.objectId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formReviewObject"
+                data.$id = cur.$id;
+                if (!(data.objectId == '' || data.objectId == null)) {
+                    $(".organNames").addClass("hide")
+                }
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#formReviewObject").get(0), cur.vm);
+
+            })
+        };
+
+        getData();
+
+    })
+
+    $('#formReviewObject').validator({
+        fields: {
+            'name': 'length[1~30]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        if (data.name == null && data.organNames == null) {
+            Ls.tipsInfo("请填写或选择评议对象")
+            return;
+        }
+        data.showTime = null;
+        var url = "/reviewObject/save";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.winClose();
+                    }
+                })
+            } else {
+                Ls.tipsOk(d.desc)
+            }
+        })
+    }
+
+
+    function fileUpload() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.vm.picUrl = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerPath}' + data[0].fileName)
+                $("#").hide();
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "type": "NotDefined"
+            },
+        })
+    }
+
+    function del() {
+        if (cur.vm.picUrl == null) {
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.picUrl
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.picUrl = '';
+                        $("#").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function getOrgans() {
+        var url = '/reviewObject/addOrgans?siteId=' + cur.params.siteId + "&organIds=" + cur.organIds;
+        Ls.openWin(url, '400px', '400px', {
+            id: 'addOrgans',
+            title: '添加组织',
+            padding: 0
+        });
+    }
+
+</script>
+</body>
+</html>

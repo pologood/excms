@@ -1,0 +1,640 @@
+#set($hasEdit=$shiro.hasColumnButton("edit"))
+#set($hasPublish=$shiro.hasColumnButton("publish"))
+<div id="doc_main" style="width: 100%; height: 100%;">
+    <style>
+        .ui-state-highlight {
+            height: 1.5em;
+            line-height: 1.2em;
+        }
+    </style>
+    <div class="portlet light">
+        <div class="portlet-body">
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="btn-group">
+                            <button type="button" disabled class="editBtn btn btn-default btn-add"
+                                    onclick="video_mgr.editVideoNews(0)"> 添 加
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作
+                                <i
+                                        class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                #if($hasPublish)
+                                    <li id="publishs"><a href="#">批量发布</a></li>
+                                    <li id="unpublishs"><a href="#">批量取消发布</a></li>
+                                #end
+                                #if($hasEdit)
+                                    <li class="divider"></li>
+                                    <li disabled class="editBtn disabled" id="deletes"><a href="#">批量删除</a></li>
+                                #end
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选
+                                <i
+                                        class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onclick="searchByType('isPublish',1)">已发布</a></li>
+                                <li><a href="#" onclick="searchByType('isPublish',0)">未发布</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" onclick="searchByType('isNew',1)">已标新</a></li>
+                                <li><a href="#" onclick="searchByType('isTop',1)">已置顶</a></li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-all-check" id="checkAll"
+                                    onclick="checkAll(this)"> 全 选
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <input type="text" id="searchKey" name="searchKey" class="form-control w160"
+                                       placeholder="关键字" maxlength="100">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="searchContent()"> 搜 索
+                            </button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div id="video_list" class="video-news pb15"></div>
+        </div>
+    </div>
+</div>
+<script id="video_list_template" type="text/html">
+    <ul class="clearfix">
+        <?
+        for(var i=0,l=data.length; i<l; i++){
+            var el = data[i],publishDate = "",titleStyle = "",imgPath = "";
+
+             publishDate = '发布日期：'+el.publishDate;
+
+            titleStyle = "color:" + el.titleColor + ";";
+            if(el.isBold==1) {
+                titleStyle += "font-weight:bold;"
+            }
+            if(el.isTilt==1) {
+                titleStyle += "font-style:italic;"
+            }
+            if(el.isUnderline==1) {
+                titleStyle += "text-decoration:underline;"
+            }
+
+            if(el.status==100){
+                css = "success"
+            } else if(el.status<100) {
+                css = "proceed"
+            } else {
+                css = "error"
+            }
+
+            if(el.imageLink==null || el.imageLink==""){
+                imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/video_bg.jpg"
+            }else{
+                 if(el.imageLink.indexOf("/") !=-1){
+                    imgPath = el.imageLink
+                 }else if(el.imageLink.indexOf(".") != -1){
+                    imgPath = GLOBAL_FILESERVERNAMEPATH + el.imageLink
+                 }else{
+                    imgPath = GLOBAL_FILESERVERPATH + el.imageLink
+                 }
+            }
+
+            var redirectLink = "";
+            if(el.redirectLink!=null&&el.redirectLink!="") {
+            if(el.redirectLink.indexOf("http")!= -1){
+            redirectLink = el.redirectLink
+            }else{
+            redirectLink = GLOBAL_HTMLFILEPATH + el.redirectLink
+            }
+
+            } else {
+            redirectLink = GLOBAL_HTMLFILEPATH + "/content/article/" + el.id
+            }
+
+            var disabledStr = Ls.publishStatus(el.isPublish);
+            moveStr = "arrow_move"
+            if(disabledStr){
+            moveStr = "";
+            }
+
+        ?>
+        <li data-id="<?= el.id ?>" data-no="<?= el.num ?>">
+            <div class="video-block">
+                <div class="thumb" data-id="<?=el.id?>">
+                    <img src="<?=imgPath?>">
+                    <? if(css=="proceed" || css=="error"){ ?>
+                    <div id="video_status_<?=el.id?>" data-id="146301" class="video-status status-<?=css?>"
+                         style="top: 0px; left: 0px; position: absolute; width: 206px; height: 153px;"></div>
+                    <? } ?>
+                </div>
+
+                <div class="title">
+                    <?if(el.workFlowStatus!=1){?>
+                    <input type="checkbox" name="check" value="<?=el.id?>">
+                    <?}?>
+                    <div>
+                        <a href="<?=redirectLink?>" style="<?=titleStyle?>" target="_blank"><?=Ls.cutstr(el.title,titleNum)?></a>
+                        <? if(disabledStr!="") {?><span
+                            class="publish-status publish-<?= el.id ?>">[生成中...]</span><? } ?>
+                        &nbsp;&nbsp;&nbsp;<?==imga?>
+                    </div>
+                    <span style="color: red;" id="video_convert_complete_<?=el.id?>"></span>
+                </div>
+                <div class="attr"><?=publishDate?></div>
+                <div class="tools">
+                    <?if(el.workFlowStatus!=1){?>
+                    #if($hasPublish)
+                        <button
+                        <?=disabledStr?> type="button" class=" btn btn-default btn-xs <?if(el.isPublish==1){?>
+                        green-meadow<?}?>" id="p_<?=el.id?>"
+                        onclick="changePublish(<?=el.id?>,<?=el.isPublish?>)">发
+                        </button>
+                        <button
+                        <?=disabledStr?> type="button" class=" btn btn-default btn-xs <?if(el.isTop==1){?>blue<?}?>"
+                        id="top_<?=el.id?>" onclick="changeTop(<?=el.id?>)">
+                        顶
+                        </button>
+                        <button type="button"
+                        <?=disabledStr?> class=" btn btn-default btn-xs <?if(el.isNew==1){?>blue<?}?>"
+                        id="new_<?=el.id?>" onclick="changeNew(<?=el.id?>)">
+                        新
+                        </button>
+                    #end
+                    <a href="javascript:;" onclick="contentSort(<?=el.id?>,<?=el.num?>,'up')"
+                       title="排序ID：<?=el.num?>"><i class="fa fa-long-arrow-up"
+                                                   style="margin-top:-3px"></i></a>
+                    <a href="javascript:;" onclick="contentSort(<?=el.id?>,<?=el.num?>,'down')"
+                       title="排序ID：<?=el.num?>"><i class="fa fa-long-arrow-down"></i></a>
+                    <?}?>
+                    <div class="input-group pull-right">
+                        <div class="btn-group">
+                            <?if(el.workFlowStatus!=1){?>
+                            #if($hasEdit)
+                                <button type="button"
+                                <?=disabledStr?> class=" btn btn-default btn-xs"
+                                onclick="video_mgr.editVideoNews(1,<?=el.id?>)">修 改</button>
+                                <button type="button"
+                                <?=disabledStr?> class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false"><span class="caret"></span> <span
+                                    class="sr-only"> 修 改 </span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li class="editBtn disabled"><a href="javascript:;" onclick="copyNews(<?=el.id?>)">
+                                        复 制 </a></li>
+                                    <li role="separator" class="divider"></li>
+                                #*<li class="editBtn disabled"><a href="javascript:;" onclick="report(<?=el.id?>)"> 报 审 </a></li>*#
+                                    <li role="separator" class="divider"></li>
+                                    <li class="editBtn disabled"><a href="javascript:;"
+                                                                    onclick="deleteById(<?=el.id?>)"> 删 除 </a></li>
+                                    <?if(el.status==-1){?>
+                                    <li role="separator" class="divider"></li>
+                                    <li class="editBtn disabled"><a href="javascript:;"
+                                                                    onclick="transferById(<?=el.id?>,<?=el.videoId?>)">
+                                        转 换 </a></li>
+                                    <?}?>
+                                </ul>
+                            #end
+                            <?}?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </li>
+        <? } ?>
+    </ul>
+    <div id="pagination" class="pagination pull-right mr22"></div>
+</script>
+<script id="video_list_template----" type="text/html">
+    <? var y = 0,css = -1; ?>
+    <table class="table video-list">
+        <tbody>
+        <tr>
+            <?
+            for(var i=0,l=data.length; i<l; i++){
+                var el = data[i],publishDate = "",titleStyle = "",imgPath = "";
+
+                 publishDate = '发布日期：'+el.publishDate;
+
+                titleStyle = "color:" + el.titleColor + ";";
+                if(el.isBold==1) {
+                    titleStyle += "font-weight:bold;"
+                }
+                if(el.isTilt==1) {
+                    titleStyle += "font-style:italic;"
+                }
+                if(el.isUnderline==1) {
+                    titleStyle += "text-decoration:underline;"
+                }
+
+                if(el.status==100){
+                    css = "success"
+                } else if(el.status<100) {
+                    css = "proceed"
+                } else {
+                    css = "error"
+                }
+
+                if(el.imageLink==null || el.imageLink==""){
+                    imgPath = (GLOBAL_CONTEXTPATH||"") + "/assets/images/video_bg.jpg"
+                }else{
+                     if(el.imageLink.indexOf("/") !=-1){
+                        imgPath = el.imageLink
+                     }else if(el.imageLink.indexOf(".") != -1){
+                        imgPath = GLOBAL_FILESERVERNAMEPATH + el.imageLink
+                     }else{
+                        imgPath = GLOBAL_FILESERVERPATH + el.imageLink
+                     }
+                }
+
+                if (y > 0 && y % cols == 0) {
+            ?>
+        </tr>
+        <tr>
+            <?
+                }
+            y++;
+            ?>
+            <td class="arrow_move">
+                <div class="video-block">
+                    <div class="thumb" data-id="<?=el.id?>">
+                        <img src="<?=imgPath?>">
+                        <? if(css=="proceed" || css=="error"){ ?>
+                        <div id="video_status_<?=el.id?>" data-id="146301" class="video-status status-<?=css?>"
+                             style="top: 0px; left: 0px; position: absolute; width: 206px; height: 153px;"></div>
+                        <? } ?>
+                    </div>
+
+                    <div class="title">
+                        <?if(el.workFlowStatus!=1){?>
+                        <input type="checkbox" name="check" value="<?=el.id?>">
+                        <?}?>
+                        <div>
+                            <a href="<?if(el.redirectLink!=null){el.redirectLink}else{GLOBAL_HTMLFILEPATH+'/content/article/'+el.id}?>"
+                               style="<?=titleStyle?>" target="_blank"><?=Ls.cutstr(el.title,titleNum)?></a></div>
+                    </div>
+                    <div class="attr"><?=publishDate?></div>
+                    <div class="tools">
+                        <?if(el.workFlowStatus!=1){?>
+                        <button type="button" disabled
+                                class="publishBtn btn btn-default btn-xs <?if(el.isPublish==1){?>green-meadow<?}?>"
+                                id="p_<?=el.id?>"
+                                onclick="changePublish(<?=el.id?>,<?=el.isPublish?>)">发
+                        </button>
+                        <button type="button" disabled
+                                class="publishBtn btn btn-default btn-xs <?if(el.isTop==1){?>blue<?}?>"
+                                id="top_<?=el.id?>" onclick="changeTop(<?=el.id?>)">
+                            顶
+                        </button>
+                        <button type="button" disabled
+                                class="publishBtn btn btn-default btn-xs <?if(el.isNew==1){?>blue<?}?>"
+                                id="new_<?=el.id?>" onclick="changeNew(<?=el.id?>)">
+                            新
+                        </button>
+                        <?}?>
+                        <div class="input-group pull-right">
+                            <div class="btn-group">
+                                <?if(el.workFlowStatus!=1){?>
+                                <button type="button" disabled class="editBtn btn btn-default btn-xs"
+                                        onclick="video_mgr.editVideoNews(1,<?=el.id?>)">修 改
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false"><span class="caret"></span> <span
+                                        class="sr-only"> 修 改 </span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li class="editBtn disabled"><a href="javascript:;" onclick="copyNews(<?=el.id?>)">
+                                        复 制 </a></li>
+                                #*<li class="editBtn disabled"><a href="javascript:;" onclick="report(<?=el.id?>)"> 报 审 </a></li>*#
+                                    <li class="editBtn disabled"><a href="javascript:;"
+                                                                    onclick="deleteById(<?=el.id?>)"> 删 除 </a></li>
+                                    <?if(el.status==-1){?>
+                                    <li class="editBtn disabled"><a href="javascript:;"
+                                                                    onclick="transferById(<?=el.id?>,<?=el.videoId?>)">
+                                        转 换 </a></li>
+                                    <?}?>
+                                </ul>
+                                <?}?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </td>
+            <? } ?>
+
+            <?
+            for(var i=0,l=cols,l=l; i<l; i++){
+                if (y % cols == 0) continue;
+            ?>
+            <td>
+                <div class="video-block"></div>
+            </td>
+            <?
+                y++;
+            }
+            ?>
+        </tr>
+    </table>
+    <div id="pagination" class="pagination pull-right mr22"></div>
+    <div class="clearfix"></div>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/videoNews_mgr.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script>
+    cur.fileServerPath = "${fileServerNamePath}";
+    cur.pageIndex = "${pageIndex}";
+    $(document).ready(function () {
+        video_mgr.init();
+    });
+
+    function checkAll(el) {
+        var el = $(el);
+        if (el.data("checked")) {
+            $("input[name='check']").prop("checked", false);
+            el.data("checked", false);
+        } else {
+            $("input[name='check']").prop("checked", true);
+            el.data("checked", true);
+        }
+    }
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        video_mgr.getData(cur.pageIndex, content_mgr.indicatorId, null, null, null)
+    }
+
+    //批量发布状态
+    function publishs(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        });
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        } else {
+            Ls.ajax({
+                type: "POST",
+                data: {ids: check, siteId: GLOBAL_SITEID, columnId: cur.columnId, type: type},
+                url: "/articleNews/publishs"
+            }).done(function (text) {
+                if (text.data) {
+                    if (type == 0) {
+                        Ls.tipsOk("取消发布完成，正在生成处理中");
+                    } else {
+                        Ls.tipsOk("批量发布完成，正在生成处理中");
+                    }
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    if (type == 0) {
+                        Ls.tipsErr("取消发布失败");
+                    } else {
+                        Ls.tipsErr("发布失败");
+                    }
+                }
+            });
+        }
+    }
+
+    //批量删除
+    function deletes() {
+        var ids = $("input[name='check']:checked").getChecked();
+        if (Ls.isEmpty(ids)) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajax({
+                type: "POST",
+                data: {ids: ids},
+                url: "/videoNews/delVideoEOs"
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                } else {
+                    Ls.tipsOk("批量删除完成，正在生成处理中");
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            });
+        }
+    }
+
+    //单删除
+    function deleteById(id) {
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajax({
+                type: "POST",
+                data: {id: id},
+                url: "/videoNews/delVideoEO"
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                } else {
+                    Ls.tipsOk("删除完成，正在生成处理中");
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            });
+        }
+    }
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish:isPublish
+            },
+            url: "/articleNews/changePublish"
+        }).done(function (text) {
+            if (text.status == 1) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            } else {
+                Ls.tipsErr(text.desc);
+            }
+        });
+    }
+
+    //改变置顶状态
+    function changeTop(id) {
+        Ls.ajax({
+            type: "POST",
+            data: {id: id},
+            url: "/articleNews/changeTop"
+        }).done(function (text) {
+            if (text.status == 1) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#top_" + id).removeClass("blue");
+                    Ls.tipsOk("取消置顶完成，正在生成处理中");
+                    video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#top_" + id).addClass("blue");
+                    Ls.tipsOk("置顶完成，正在生成处理中");
+                    video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            } else {
+                Ls.tipsErr(text.desc);
+            }
+        });
+    }
+
+    //改变标题新闻状态
+    function changeTitle(id) {
+        Ls.ajax({
+            type: "POST",
+            data: {id: id},
+            url: "/articleNews/changeTitle"
+        }).done(function (text) {
+            if (text.status == 1) {
+                var isTitle = text.data;
+                if (isTitle == 1) {
+                    $("#title_" + id).removeClass("blue");
+                    Ls.tipsOk("取消加标完成，正在生成处理中");
+                } else {
+                    $("#title_" + id).addClass("blue");
+                    Ls.tipsOk("加标完成，正在生成处理中");
+                }
+            } else {
+                Ls.tipsErr(text.desc);
+            }
+        });
+    }
+
+    //改变加新状态
+    function changeNew(id) {
+        Ls.ajax({
+            type: "POST",
+            data: {id: id},
+            url: "/articleNews/changeNew",
+        }).done(function (text) {
+            if (text.status == 1) {
+                var isNew = text.data;
+                if (isNew == 1) {
+                    $("#new_" + id).removeClass("blue");
+                    Ls.tipsOk("取消加新完成，正在生成处理中");
+                } else {
+                    $("#new_" + id).addClass("blue");
+                    Ls.tipsOk("加新完成，正在生成处理中");
+                }
+            } else {
+                Ls.tipsErr(text.desc);
+            }
+        });
+    }
+
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status)
+    }
+
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        cur.condition = "";
+        cur.status = "";
+        video_mgr.getData(0, cur.columnId, cur.key, '', '');
+    }
+
+    function searchByType(type, status) {
+        cur.condition = type;
+        cur.status = status;
+        video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+    }
+
+    function copyNews(id) {
+        Ls.ajaxGet({
+            url: "/videoNews/getStatusById",
+            data: {
+                id: id
+            }
+        }).done(function (text) {
+            if (text.data == -1) {
+                Ls.tipsErr("视频转换失败，请重新上传");
+                return;
+            } else if (text.data != 100) {
+                Ls.tipsInfo("视频正在转换，请稍后...");
+                return;
+            } else {
+                art.dialog.open("/content/copyNews?id=" + id, {
+                    width: '430px',
+                    height: '460px',
+                    lock: true,
+                    title: '新闻复制'
+                });
+            }
+        });
+    }
+
+    function report(dataId) {
+        startProcess("EX", cur.columnId, "VideoNews", dataId);
+    }
+
+    function transferById(id, videoId) {
+        Ls.ajaxGet({
+            url: "/videoNews/getStatusById",
+            data: {
+                id: id
+            }
+        }).done(function (text) {
+            if (text.status) {
+                if (text.data == -1) {
+                    Ls.ajax({
+                        type: "POST",
+                        url: "/videoNews/transferById",
+                        data: {videoId: videoId}
+                    }).done(function (text) {
+                    });
+                } else {
+                    Ls.tipsInfo("视频正在转换");
+                }
+            }
+        });
+
+    }
+
+    function contentSort(id, num, opr) {
+        var data = {
+            opr: opr,
+            oprId: id,
+            oprSort: num,
+            columnId: cur.columnId,
+            title: cur.key,
+            condition: cur.condition,
+            status: cur.status
+        };
+
+        Ls.ajaxGet({
+            data: data,
+            url: "/content/contentSort",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsInfo(text.desc);
+                } else {
+                    video_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                    Ls.tipsOk("排序完成，正在生成处理中");
+                }
+            }
+        });
+    }
+</script>

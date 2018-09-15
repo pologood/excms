@@ -1,0 +1,105 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">信息公开导入</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+                    <button class="btn btn-default" type="button" onclick="importPublicCatalog(this);">导入信息公开目录</button>
+                    <button class="btn btn-default" type="button" onclick="importContent(this);">导入信息公开内容</button>
+                    <div class="form-group">
+                        <div class="input-group" style="margin-top:10px;width: 400px;">
+                            <input type="text" class="form-control" value="" placeholder="单位id" >
+                            <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" onclick="importOrgan(this);">导入</button>
+                        </span>
+                        </div>
+                    </div>
+                    <div style="min-height: 30px;vertical-align: middle;"><span>任务id : </span><span  id="taskId" ></span></div>
+                    <div id="processContent" class="well" style="min-height: 200px;max-height: 600px;overflow: auto;">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    mini.parse();
+    function importPublicCatalog(btn) {
+        $(btn).prop("disabled", true);
+        Ls.ajax({url:"/dbimport/importCatalog"}).done(function (data) {
+            $(btn).removeProp("disabled");
+            if(data.status == 1){
+                Ls.tipsOk("导入成功");
+            }else{
+                Ls.tipsErr(data.desc);
+            }
+        });
+    }
+    function importContent(btn) {
+        $(btn).prop("disabled", true);
+        Ls.ajax({url:"/dbimport/importContent"}).done(function (data) {
+            $(btn).removeProp("disabled");
+            if(data.status == 1){
+                var taskId = data.data;
+                $("#taskId").html(taskId);
+                var errorSize = 0;
+                var emptySize = 0;
+                var interval = setInterval(function(){
+                    Ls.ajax({
+                        url:"/dbimport/getProcess",
+                        data:{
+                            taskId: taskId
+                        }
+                    }).done(function (data) {
+                        if(data.status == 1){
+                            if(data.data == null || data.data == '' || data.data.length == 0 || typeof data.data == "string"){
+                                emptySize ++;
+                                if(emptySize > 3){
+                                    $("#processContent").append("<br/>导入完成");
+                                    $('#processContent').scrollTop( $('#processContent')[0].scrollHeight);
+                                    clearInterval(interval);
+                                }
+                            }else{
+                                emptySize = 0;
+                                errorSize =  0;
+                                $("#processContent").html(data.data.join("<br/>"));
+                                $('#processContent').scrollTop( $('#processContent')[0].scrollHeight);
+                            }
+                        }else{
+                            errorSize ++;
+                            if(errorSize > 3){
+                                Ls.tipsErr(data.desc);
+                                clearInterval(interval);
+                            }
+                        }
+                    });
+                }, 1000);
+                Ls.tipsOk("导入任务创建成功");
+            }else{
+                Ls.tipsErr(data.desc);
+            }
+        });
+    }
+    function importOrgan(btn) {
+        $(btn).prop("disabled", true);
+        Ls.ajax({
+            url:"/dbimport/importOrgan",
+            data:{
+                organId: $(this).parent().parent().find('input').val()
+            }
+        }).done(function (data) {
+            $(btn).removeProp("disabled");
+            if(data.status == 1){
+                Ls.tipsOk("导入成功");
+            }else{
+                Ls.tipsErr(data.desc);
+            }
+        });
+    }
+</script>

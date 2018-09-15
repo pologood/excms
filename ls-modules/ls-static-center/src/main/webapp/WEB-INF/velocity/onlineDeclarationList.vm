@@ -1,0 +1,42 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isReply="$!{paramObj.isReply}")
+#set($isHeader="$!{paramObj.isHeader}")
+#set($isLink="$!{paramObj.isLink}")
+#set($length=$Integer.parseInt($length))
+<div class="guestbook-list">
+    #if("$!{isHeader}"=="true")
+      <div class="bsy_bjjgtit">
+        <ul>
+          <li class="b1">项目名称</li>
+          <li class="b2">受理部门</li>
+          <li class="b3">受理状态</li>
+        </ul>
+      </div>
+    #end
+  <div class="bsy_bjjglist">
+      #foreach($eo in $resultObj)
+          #set($title="$!{eo.title}")
+        <ul>
+          <li class="b1">
+          #if("$!{isHeader}"=="true")
+            <a href="$!{eo.link}" target="_blank" title="$!{eo.title}">
+                #cutstr($title,$length)
+            </a>
+          #else
+          <span>#cutstr($title,$length)</span>
+          #end
+          </li>
+          <li class="b2">$!{eo.recUnitName}</li>
+          <li class="b3">
+              #if($!{eo.statusName})
+                <span class="s1">【$!{eo.statusName}】</span>
+              #else
+                <span class="s2">【未办理】</span>
+              #end
+          </li>
+        </ul>
+      #end
+  </div>
+</div>
+

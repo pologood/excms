@@ -1,0 +1,282 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="menu_form" role="form" ms-controller="menu_form">
+                    <div class="form-body">
+                    ###菜单
+                        #if("$!{type}"=="1")
+                            <div class="form-group">
+                                <label>菜单名称</label>
+                                <input type="text" name="name" class="form-control" placeholder="" ms-duplex="name">
+                            </div>
+                            <div class="form-group">
+                                <label>URI</label>
+                                <input type="text" name="uri" class="form-control" placeholder="" ms-duplex="uri">
+                            </div>
+                            <div class="form-group">
+                                <label>权限编码</label>
+                                <input type="text" name="code" class="form-control" placeholder="" ms-duplex="code">
+                            </div>
+                            <div class="form-group">
+                                <label>排序号</label>
+                                <input type="text" name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                            </div>
+                            <div class="form-group">
+                                <label>绑定主站点</label>
+                                <select id="siteId" class="form-control" name="siteId" placeholder="请选择"
+                                        ms-duplex="siteId">
+                                </select>
+                            </div>
+                        #**<div class="form-group">
+                         <label>顶部显示</label>
+
+                         <div class="controls">
+                         <label class="radio-inline"><input type="radio" name="isTop" value="true" ms-duplex-boolean="isTop">是</label>
+                         <label class="radio-inline"><input type="radio" name="isTop" value="false" ms-duplex-boolean="isTop">否</label>
+                         </div>
+                         </div>*#
+                            <div class="form-group">
+                                <label>厂商可见</label>
+                                <div class="controls">
+                                    <label class="radio-inline"><input type="radio" name="isShown4Developer" value="true" ms-duplex-boolean="isShown4Developer">是</label>
+                                    <label class="radio-inline"><input type="radio" name="isShown4Developer" value="false" ms-duplex-boolean="isShown4Developer">否</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>超管可见</label>
+                                <div class="controls">
+                                    <label class="radio-inline"><input type="radio" name="isShown4Admin" value="true" ms-duplex-boolean="isShown4Admin">是</label>
+                                    <label class="radio-inline"><input type="radio" name="isShown4Admin" value="false" ms-duplex-boolean="isShown4Admin">否</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ms-if="super_div">
+                                <label>站点管理员可见</label>
+                                <div class="controls">
+                                    <label class="radio-inline"><input type="radio" name="isShown4SystemManager" value="true" ms-duplex-boolean="isShown4SystemManager">是</label>
+                                    <label class="radio-inline"><input type="radio" name="isShown4SystemManager" value="false" ms-duplex-boolean="isShown4SystemManager">否</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ms-if="ordinary_div">
+                                <label>普通用户可见</label>
+                                <div class="controls">
+                                    <label class="radio-inline"><input type="radio" name="isShown4ExternalUser" value="true" ms-duplex-boolean="isShown4ExternalUser">是</label>
+                                    <label class="radio-inline"><input type="radio" name="isShown4ExternalUser" value="false" ms-duplex-boolean="isShown4ExternalUser">否</label>
+                                </div>
+                            </div>
+                            <div class="form-group" ms-visible="isShown4SystemManager">
+                                <label>选择需要对其隐藏的用户</label>
+                                <button type="button" onclick="clearUsers()">清空用户</button>
+                                <textarea id="user_select_lable" class="form-control readonly" rows="2" readonly onclick="usersSelect()"
+                                          placeholder="点击选择传阅对象"></textarea>
+                            </div>
+                        ###按钮
+                        #elseif("$!{type}"=="2")
+                            <div class="form-group">
+                                <label>权限名称</label>
+                                <input type="text" name="name" class="form-control" placeholder="" ms-duplex="name">
+                            </div>
+                            <div class="form-group">
+                                <label>权限编码</label>
+                                <input type="text" name="code" class="form-control" placeholder="" ms-duplex="code">
+                            </div>
+                            <div class="form-group">
+                                <label>链接地址</label>
+                                <input type="text" name="uri" class="form-control" placeholder="" ms-duplex="uri">
+                            </div>
+                            <div class="form-group">
+                                <label>描述</label>
+                                <textarea class="form-control" name="description" rows="3" id="description" placeholder="" ms-duplex="description"></textarea>
+                            </div>
+                        #end
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "menu_form",//表单
+        vm: null,//模型
+        W: art.dialog.opener//父对象
+    };
+
+    $(document).ready(function () {
+        var node = cur.W.cur.node;
+        var update_type = cur.W.cur.update_type;
+        var entity_type = cur.W.cur.entity_type;
+
+        Ls.ajaxGet({
+            url: "/system/indicator/getIndicator",
+            data: {
+                id: update_type == 1 ? "" : cur.W.cur.id
+            }
+        }).done(function (data) {
+
+            // 判断父子关系
+            if (node.id != cur.W.cur.root_id && update_type == 1) {
+                data.parentId = node.id;
+            }
+            // 给默认序号
+            if (update_type == 1) {
+                var children = node.children;
+                if (!children || children.length == 0) {
+                    data.sortNum = 1;
+                } else {
+                    data.sortNum = parseInt(children[children.length - 1].sortNum) + 10;
+                }
+            }
+
+            data.$id = cur.id;
+            data.super_div = data.isShown4Admin;
+            data.ordinary_div = data.isShown4SystemManager;
+
+            // 如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[data.$id];
+            if (!cur.vm) {
+                // 绑定模型
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan(document.body, cur.vm);
+
+            //监控超管可见
+            cur.vm.$watch("isShown4Admin", function (a, b) {
+                cur.vm.super_div = a;
+                cur.vm.ordinary_div = false;
+                cur.vm.isShown4SystemManager = false;
+                cur.vm.isShown4ExternalUser = false;
+            });
+
+            //监控站点管理员可见
+            cur.vm.$watch("isShown4SystemManager", function (a, b) {
+                cur.vm.ordinary_div = a;
+                cur.vm.isShown4ExternalUser = false;
+            });
+
+            //拉取站点
+            loadSites(data.siteId);
+            cur.usersList = JSON.parse(data.usersList);
+            $('#user_select_lable').val(data.userNames);
+        });
+
+
+        function loadSites(siteId){
+            Ls.ajax({
+                url: "/getRootSiteList",
+                data: {}
+            }).done(function (d) {
+                if (d.status == 1) {
+                    var html = "<option value=''>无需绑定站点</option>";
+                    var data = d.data;
+                    for (i = 0; i < data.length; i++) {
+                        var selected = '';
+                        if(siteId != '' && siteId == data[i].indicatorId){
+                            selected = "selected";
+                        }
+                        html += '<option '+selected+' value=' + data[i].indicatorId + '>' + data[i].name + '</option> ';
+                    }
+                    $("#siteId").html(html);
+                } else {
+                    Ls.tips(d.desc, { icons: "error"});
+                }
+            })
+        }
+
+        //验证
+        $('#' + cur.id).validator({
+            fields: {
+                'name': '名称:required;'
+                #if("$!{type}"=="1")
+                    , 'sortNum': '排序号:required;integer'
+                #elseif("$!{type}"=="2")
+                    , 'code': '编码:required;'
+                #end
+            },
+            valid: function () {
+                var data = Ls.toJSON(cur.vm.$model);
+                // 保存的格式为菜单
+                data.type = entity_type == 1 ? "CMS_Menu" : "CMS_Button";
+                data.usersList =  JSON.stringify(cur.usersList);
+
+                // 提交
+                Ls.ajax({
+                    url: "/system/indicator/saveOrUpdate",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips('操作成功!', {
+                            icons: "success"
+                        });
+                        if (entity_type == 1) {//更新菜单
+                            var newNode = {
+                                id: d.data.indicatorId,
+                                pId: d.data.parentId,
+                                name: d.data.name,
+                                uri: d.data.uri,
+                                textIcon: d.data.textIcon,
+                                sortNum: d.data.sortNum,
+                                isEnable: d.data.isEnable ? "1" : "0"
+                            };
+
+                            if (update_type == 1) { // 新增
+                                var parentNode = cur.W.cur.tree.getNodeByParam("id", cur.W.cur.node.id, null);
+                                cur.W.cur.tree.addNodes(parentNode, newNode);
+                                cur.W.$("#delBtn_" + cur.W.cur.node.id).hide();
+                                var node = cur.W.cur.tree.getNodeByParam("id", d.data.indicatorId, null);
+                                cur.W.cur.tree.setting.callback.onClick(null, null, node);
+                            } else if (update_type == 2) { // 修改
+                                var oldnode = cur.W.cur.tree.getNodeByParam("id", d.data.indicatorId, null);
+                                oldnode.name = newNode.name;
+                                oldnode.uri = newNode.uri;
+                                oldnode.textIcon = newNode.textIcon;
+                                oldnode.sortNum = newNode.sortNum;
+                                oldnode.isEnable = newNode.isEnable;
+                                cur.W.cur.tree.updateNode(oldnode);
+                            }
+                        } else if (entity_type == 2) {
+                            cur.W.cur.grid.reload();
+                        }
+                    } else {
+                        Ls.tips(d.desc, {
+                            icons: "error"
+                        });
+                    }
+
+                    // 关闭弹框
+                    art.dialog.close();
+                });
+            }
+        });
+    });
+
+    function clearUsers() {
+        cur.usersList = [];
+        $('#user_select_lable').val("");
+    }
+
+    function usersSelect() {
+        var data = [];
+        if (cur.usersList) {
+            data = cur.usersList;
+        }
+        Ls.selectUnitUser(function (arg) {
+            Ls.log("返回值：", arg)
+            if (arg && arg.list.length > 0) {
+                $('#user_select_lable').val(arg.names);
+                cur.usersList = arg.list;
+            }
+        }, {
+            organIds: 4133640,
+            data: {
+                list: data
+            }
+        });
+    }
+</script>

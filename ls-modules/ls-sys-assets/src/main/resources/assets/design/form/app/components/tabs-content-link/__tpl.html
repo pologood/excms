@@ -1,0 +1,44 @@
+<div class="panel {{moduleId}}_panel clearfix">
+    <div class="panel-heading clearfix {{conf.isTitle | displayShow}}">
+        <div class="title">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.title}}</a>
+        </div>
+        {{ if conf.isMore }}
+        <div class="more">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.more}}</a>
+        </div>
+        {{/if}}
+    </div>
+    <div class="panel-body">
+        <div class="tab-nav">
+            <ul class="list">
+                {{each conf.tabs as el index}}
+                <li class="{{el.active | activeFilter }}">
+                    <a href="{{ if conf.toggle == 'mouse'}} {{ el.dataUrl }} {{else}} javascript:void(0) {{/if}}" id="#{{el.dataId}}" data-id="#{{el.dataId}}"
+                       data-toggle="{{conf.toggle}}"
+                       data-url="{{el.dataUrl}}">
+                        <span class="tab-title">{{el.name}}</span>
+                    </a>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <div class="panel-body-inner">
+
+            <div class="tab-content">
+                {{each conf.tabs as el index}}
+                <div class="tab-panel {{el.active | activeFilter }}" id="{{el.dataId}}">
+                    {{#mainLabelHtml}}
+                </div>
+                {{/each}}
+            </div>
+
+        </div>
+    </div>
+    {{if conf.footer.enable}}
+    <div class="panel-footer">
+        {{#footerLabelHtml}}
+    </div>
+    {{/if}}
+</div>

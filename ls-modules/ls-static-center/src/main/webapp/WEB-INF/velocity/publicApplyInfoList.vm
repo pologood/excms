@@ -1,0 +1,17 @@
+#set($xxgkData=$resultObj.data)
+#if($xxgkData && $xxgkData.size() > 0)
+	#set($Integer=0)
+    #set($length="$!{paramObj.length}")
+	#if($length ==  "")
+		#foreach($vo in $xxgkData)
+        	<li><a onclick="detailApplyInfo($!{vo.id},$!{vo.organId})" href="javascript:void()" title="$!{vo.content}">$!{vo.content}</a></li>
+		#end
+	#else
+		#set($length=$Integer.parseInt($length))
+		#foreach($vo in $xxgkData)
+        	<li><a onclick="detailApplyInfo($!{vo.id},$!{vo.organId})" href="javascript:void()" title="$!{vo.content}">#cutstr($!{vo.content},$length)</a></li>
+		#end
+	#end
+#else
+	<li><font color="red">暂无数据</font></li>
+#end

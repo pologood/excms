@@ -1,0 +1,519 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+
+            <h3 class="page-title"> 发文统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-line-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_today">0</span>
+                            </div>
+                            <div class="desc"> 今日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_yesterday">0</span>
+                            </div>
+                            <div class="desc"> 昨日发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_week">0</span>
+                            </div>
+                            <div class="desc"> 本周发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-area-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_month">0</span>
+                            </div>
+                            <div class="desc">本月发文</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-pie-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_history">0</span>
+                            </div>
+                            <div class="desc">历史发文</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <h3 class="page-title">
+                部门发文统计
+                <small></small>
+            </h3>
+            <div region="center" style="border:none; overflow: auto;">
+                <div class="portlet light">
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="btn-group">
+                                    #*<button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="exportOrganList()"> 导 出
+                                        </button>*#
+                                        <button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="detailExcel()"> 详情
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <form class="form-inline tr search-toolbar" role="form" id="searchListForOrgan_form">
+                                        <div class="form-group">
+                                            <select class="form-control" id="parentId" name="parentId">
+##                                                <option value="1270" selected>区本级信息公开统计</option>
+                                                <option value="1272" selected>市政府（政府办公室）目录</option>
+                                                <option value="2807852">财政预决算三公经费信息公开</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" name="startDate" id="startTime" class="form-control"
+                                                   placeholder="起始时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endTime\')||\'%y-%M-%d %H:%m:%s\'}',readOnly:true})"
+                                                   readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" name="endDate" id="endTime" class="form-control" placeholder="结束时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startTime\')}',maxDate:'%y-%M-%d %H:%m:%s',readOnly:true})"
+                                                   readonly>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-search" onclick="searchListForOrgan(this.form)">查询</button>
+                                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClearForOrgan(this.form)">显示全部</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    ##                        <div id="organTj_datagrid" class="mini-datagrid" allowResize="true" align="center" showPager="false"
+                    ##                             url="/public/analysis/getPublicContentStatis?parentId=1270" style="width:100%;height:500px">
+                    ##                            <div property="columns">
+                    ##                               #* <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                    ##                            ##<div field="organId" width="100" headerAlign="center" align="center">部门ID</div>
+                    ##                                <div field="organName" width="100%" headerAlign="center" align="center">部门名称</div>
+                    ##                            ##<div field="monthCount" width="120" headerAlign="center" align="center">本月发稿总数</div>
+                    ##                            ##<div field="seasonCount" width="120" headerAlign="center" align="center">本季度发稿总数</div>
+                    ##                            ##<div field="publishCount" width="120" headerAlign="center" align="center">发稿总数</div>
+                    ##                                <div field="publishCount" width="120" headerAlign="center" allowSort="flase" align="center">已发布数</div>
+                    ##                                <div field="notPublishCount" width="120" headerAlign="center" allowSort="flase" align="center">未发布数</div>
+                    ##                                <div field="total" width="120" headerAlign="center" allowSort="flase" align="center">总数</div>*#
+                    ##                            </div>
+                    ##                        </div>
+                    ##                        <div id="organTj_datagrid"></div>
+                        #*<div id="organTj_datagrid" class="mini-treegrid"  align="center" showTreeIcon="true"
+                             url="" idField="catId" parentField="parentId" treeColumn="catalogName" onbeforeload="onBeforeTreeLoad" style="width:100%;height:500px">*#
+                        <div id="organTj_datagrid" class="mini-treegrid"  align="center" showTreeIcon="true"
+                             url="" idField="CATID" parentField="PARENTID" treeColumn="catalogName" onbeforeload="onBeforeTreeLoad" style="width:100%;height:500px">
+                        #*<div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                            ##<div field="organId" width="100" headerAlign="center" align="center">部门ID</div>
+                                <div name="CATALOGNAME" field="CATALOGNAME" width="100%" headerAlign="center" align="center">目录名称</div>
+
+                                <div field="TOTALCOUNT" width="120" headerAlign="center" allowSort="flase" align="center">合计</div>
+                            </div>*#
+                        </div>
+                    </div>
+                </div>
+                <!-- END DASHBOARD STATS 1-->
+            ##            <h3 class="page-title"><i class="icon-bar-chart font-blue"></i>
+            ##                各部门发文排行TOP 10
+            ##                <small></small>
+            ##            </h3>
+            ##            <div>
+            ##                <label></label>
+            ##
+            ##                <div class="radio-group">
+            ##                    <label>
+            ##                        <input type="radio" name="chartsTime" value="today" checked="checked" onclick="changeCharts('today')"> 今日
+            ##                    </label>
+            ##                    <label>
+            ##                        <input type="radio" name="chartsTime" value="yesterday" onclick="changeCharts('yesterday')"> 昨日 </label>
+            ##                    <label>
+            ##                        <input type="radio" name="chartsTime" value="week" onclick="changeCharts('week')"> 本周 </label>
+            ##                    <label>
+            ##                        <input type="radio" name="chartsTime" value="month" onclick="changeCharts('month')"> 本月 </label>
+            ##                    <label>
+            ##                        <input type="radio" name="chartsTime" value="history" onclick="changeCharts('history')"> 历史 </label>
+            ##                </div>
+            ##            </div>
+            ##            <div class="row">
+            ##                <div class="col-md-12 col-sm-8">
+            ##                    <!-- BEGIN PORTLET-->
+            ##                    <div class="portlet light bordered mb25">
+            ##                        <div class="portlet-body">
+            ##                            <div id="statistics_a" style="height: 410px;">
+            ##
+            ##                            </div>
+            ##                        </div>
+            ##                    </div>
+            ##                    <!-- END PORTLET-->
+            ##                </div>
+            ##            </div>
+            #*   <h3 class="page-title">
+                   部门发文详细列表
+                   <small></small>
+               </h3>*#
+            ##            <div region="center" style="border:none; overflow: auto;">
+            ##                <div class="portlet light">
+            ##                    <div class="portlet-body">
+            ##                        <div class="table-toolbar">
+            ##                            <div class="row">
+            ##                                <div class="col-md-2">
+            ##                                    <div class="btn-group">
+            ##                                        <button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="exportList()"> 导 出
+            ##                                        </button>
+            ##                                    </div>
+            ##                                </div>
+            ##                                <div class="col-md-10">
+            ##                                    <form class="form-inline tr search-toolbar" role="form">
+            ##                                        <div class="form-group">
+            ##                                            <label></label>
+            ##                                            <input type="datetime" id="startDate" class="form-control"
+            ##                                                   placeholder="起始时间"
+            ##                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+            ##                                        </div>
+            ##                                        <div class="form-group">
+            ##                                            <label></label>
+            ##                                            <input type="datetime" id="endDate" class="form-control" placeholder="结束时间"
+            ##                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+            ##                                        </div>
+            ##                                        <button type="button" class="btn btn-default btn-search" onclick="searchList()">查询</button>
+            ##                                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+            ##                                    </form>
+            ##                                </div>
+            ##                            </div>
+            ##                        </div>
+            ##                        <div id="datagrid1" class="mini-datagrid" allowResize="true" align="center"
+            ##                             url="/statistics/getPublicPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+            ##                             onlyCheckSelection="true"
+            ##                             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;height:500px"
+            ##                        >
+            ##                            <div property="columns">
+            ##                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+            ##                                <div field="organId" width="100" headerAlign="center" align="center">部门ID</div>
+            ##                                <div field="organName" width="100%" headerAlign="center" align="center">部门名称</div>
+            ##                                <div field="count" width="100" headerAlign="center" align="center">新建文章</div>
+            ##                                <div header="已审发布" headerAlign="center">
+            ##                                    <div property="columns">
+            ##                                        <div field="publishCount" width="60" headerAlign="center" align="center">总发布数</div>
+            ##                                        <div field="publishCount1" width="60" headerAlign="center" align="center">公开指南</div>
+            ##                                        <div field="publishCount2" width="60" headerAlign="center" align="center">公开年报</div>
+            ##                                        <div field="publishCount3" width="60" headerAlign="center" align="center">公开制度</div>
+            ##                                        <div field="publishCount4" width="60" headerAlign="center" align="center">主动公开</div>
+            ##                                        <div field="publishCount5" width="65" headerAlign="center" align="center">依申请公开</div>
+            ##                                    </div>
+            ##                                </div>
+            ##                                <div field="unPublishCount" width="100" headerAlign="center" align="center">未发布</div>
+            ##                                <div field="rate" width="100" headerAlign="center" align="center">发布率（%）</div>
+            ##                            </div>
+            ##                        </div>
+            ##                    </div>
+            ##                </div>
+            ##            </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        mini.parse();
+        var chartsData = [];
+        var chartsUnit = [];
+        var chartsTime = 'today';
+        var chartsData1 = [];
+        var chartsData2 = [];
+        var chartsData3 = [];
+        var chartsData4 = [];
+        var chartsData5 = [];
+
+        var cur = {
+            organTj_datagrid: null,
+            parentId:$('#parentId option:selected') .val(),
+            startDate: $("#startDate").val(),
+            endDate: $("#endDate").val()
+        }
+        $(document).ready(function () {
+            mini.parse();
+
+//        cur.organTj_datagrid = new mini.TreeGrid();
+            cur.organTj_datagrid = mini.get("organTj_datagrid");
+            console.log(cur.organTj_datagrid);
+            cur.organTj_datagrid.setUrl("/public/analysis/getPublicContentStatis");
+
+//        cur.organTj_datagrid.load();
+
+            setGridColumn();
+
+        })
+
+        function setGridColumn() {
+            Ls.ajaxGet({
+                url: "/public/analysis/getOrgansBySiteId",
+                data: {}
+            }).done(function (d) {
+                var d = d;
+                /*var txt = '[{field:"catalogName",name:"catalogName",width:"120",headerAlign:"center", align:"center", header:"信息公开目录"},' +
+                        '{field:"totalCount",width:"80",headerAlign:"center", align:"center", header:"合计"}';
+                for(var index = 0, count = d.length;index < count;index ++){
+                    txt += ',{field:"c_'+d[index].organId + '",name:"c_'+d[index].organId+'", headerAlign:"center", align:"center", width:"100", header:"' + d[index].name + '"}';
+                }
+                txt += "]";*/
+                var txt = '[{field:"CATALOGNAME",name:"catalogName",width:"120",headerAlign:"center", align:"center", header:"信息公开目录"},' +
+                        '{field:"TOTALCOUNT",width:"80",headerAlign:"center", align:"center", header:"合计"}';
+                for(var index = 0, count = d.length;index < count;index ++){
+                    txt += ',{field:"C_'+d[index].organId + '",name:"C_'+d[index].organId+'", headerAlign:"center", align:"center", width:"100", header:"' + d[index].name + '"}';
+                }
+                txt += "]";
+                console.log(mini.decode(txt));
+                cur.organTj_datagrid.set({
+                    style: "width:100%;height:500px;",
+                    columns:mini.decode(txt)
+                }).render(document.getElementById("organTj_datagrid"));
+                //cur.organTj_datagrid.load({parentId:cur.parentId,startDate:cur.startDate,endDate:cur.endDate});
+            })
+        }
+
+        function doChange() {
+            // 使用
+            require(
+                    [
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar',
+                        'echarts/chart/pie'
+                    ],
+                    function (ec) {
+                        Ls.ajaxGet({
+                            url: "/statistics/getChartsList/",
+                            data: {chartsTime: chartsTime, typeCode: 'public_content', type: 'word'}
+                        }).done(function (d) {
+                            var d = d.data;
+                            chartsData = [];
+                            chartsUnit = [];
+                            if (d != null && d.length > 0) {
+                                for (var i = 0, l = d[0].length; i < l; i++) {
+                                    chartsData[i] = d[0][i].count;
+                                    chartsUnit[i] = d[0][i].organName;
+                                }
+                                for (var i = 0, l = d[1].length; i < l; i++) {
+                                    chartsData1[i] = d[1][i].count;
+                                }
+                                for (var i = 0, l = d[2].length; i < l; i++) {
+                                    chartsData2[i] = d[2][i].count;
+                                }
+                                for (var i = 0, l = d[3].length; i < l; i++) {
+                                    chartsData3[i] = d[3][i].count;
+                                }
+                                for (var i = 0, l = d[4].length; i < l; i++) {
+                                    chartsData4[i] = d[4][i].count;
+                                }
+                                for (var i = 0, l = d[5].length; i < l; i++) {
+                                    chartsData5[i] = d[5][i].count;
+                                }
+                            }
+
+                            var option_a = {
+                                tooltip: {
+                                    trigger: 'axis',
+                                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                    }
+                                },
+                                legend: {
+                                    data: ['公开指南', '公开年报', '公开制度', '主动公开', '依申请公开']
+                                },
+                                grid: {
+                                    left: '3%',
+                                    right: '4%',
+                                    bottom: '3%',
+                                    containLabel: true
+                                },
+                                xAxis: [
+                                    {
+                                        type: 'value'
+                                    }
+                                ],
+                                yAxis: [
+                                    {
+                                        type: 'category',
+                                        data: chartsUnit
+                                    }
+                                ],
+                                series: [
+                                    {
+                                        name: '公开指南',
+                                        type: 'bar',
+                                        stack: '总量',
+                                        // itemStyle : { normal: {label : {show: true, position: 'inside'}}},
+                                        data: chartsData1
+                                    },
+                                    {
+                                        name: '公开年报',
+                                        type: 'bar',
+                                        stack: '总量',
+                                        // itemStyle : { normal: {label : {show: true, position: 'inside'}}},
+                                        data: chartsData2
+                                    },
+                                    {
+                                        name: '公开制度',
+                                        type: 'bar',
+                                        stack: '总量',
+                                        //itemStyle : { normal: {label : {show: true, position: 'inside'}}},
+                                        data: chartsData3
+                                    },
+                                    {
+                                        name: '主动公开',
+                                        type: 'bar',
+                                        stack: '总量',
+                                        //itemStyle : { normal: {label : {show: true, position: 'inside'}}},
+                                        data: chartsData4
+                                    },
+                                    {
+                                        name: '依申请公开',
+                                        type: 'bar',
+                                        stack: '总量',
+                                        // itemStyle : { normal: {label : {show: true, position: 'inside'}}},
+                                        data: chartsData5
+                                    }
+                                ]
+                            };
+
+                            var chart_a = ec.init(document.getElementById('statistics_a'));
+                            chart_a.setOption(option_a);
+
+                        });
+
+                    }
+            );
+        }
+
+        var get_todoNumber = function () {
+            Ls.ajaxGet({
+                url: "/statistics/getCount/",
+                data: {typeCode: 'public_content'}
+            }).done(function (d) {
+                var d = d.data;
+                for (var i = 0, l = d.length; i < l; i++) {
+                    $("#count_" + d[i].chartsTime).text(d[i].count);
+                }
+            });
+        }()
+
+        function changeCharts(time) {
+            chartsTime = time;
+            doChange();
+        }
+
+        function searchListForOrgan(form) {
+            var json = $(form).serializeObject();
+            cur.organTj_datagrid.load(json);
+        }
+
+        function searchClearForOrgan(form) {
+            $(form)[0].reset();
+            cur.organTj_datagrid.load({parentId:cur.parentId});
+        }
+
+        var jsonToGet = function (json) {
+            var params = [];
+            for (var key in json) {
+                params.push(key + "=" + json[key]);
+            }
+            return params.join("&");
+        }
+
+        function detailExcel() {
+            var json = $("#searchListForOrgan_form").serializeObject();
+//            window.location.href="/public/analysis/catalogDetail?parentId="+cur.parentId+"&startDate="+cur.startDate+"&endDate="+cur.endDate;
+            window.open("/public/analysis/catalogDetail?parentId="+cur.parentId+"&startDate="+cur.startDate+"&endDate="+cur.endDate);
+//            Ls.openWin("/public/analysis/catalogDetail", '800px', '650px', json);
+        }
+
+        function exportOrganList() {
+            var json = $("#searchListForOrgan_form").serializeObject();
+            if (json.startDate && json.startDate != "") {
+                json.startDate += " 00:00:00";
+            }
+            if (json.endDate && json.endDate != "") {
+                json.endDate += " 23:59:59";
+            }
+            $('#download_frame').attr("src", "/public/analysis/exportOrganRanking?" + jsonToGet(json));
+        }
+
+        function searchList() {
+            var startDate = $("#startDate").val();
+            var endDate = $("#endDate").val();
+            grid = mini.get("datagrid1");
+            grid.load({typeCode: 'public_content', startDate: startDate, endDate: endDate});
+        }
+
+        function searchClear() {
+            $("#startDate").val('');
+            $("#endDate").val('');
+            grid = mini.get("datagrid1");
+            grid.load({typeCode: 'public_content'});
+        }
+
+        function exportList() {
+            var startDate = $("#startDate").val() == null ? '' : $("#startDate").val();
+            var endDate = $("#endDate").val() == null ? '' : $("#endDate").val();
+
+            var params = "startDate=" + startDate + "&endDate=" + endDate + "&typeCode=public_content";
+            $('#download_frame').attr("src", "/statistics/exportPublicList?" + params);
+        }
+
+        function onBeforeTreeLoad(e) {
+            var tree = e.sender;    //树控件
+            var node = e.node;      //当前节点
+            var params = e.params;  //参数对象
+
+            //可以传递自定义的属性
+            /*if(node.catId){
+                params.parentId= node.catId;
+            }else{
+                params.parentId= $('#parentId option:selected').val();
+            }*/
+            if(node.CATID){
+                params.parentId= node.CATID;
+            }else{
+                params.parentId= $('#parentId option:selected').val();
+            }
+            params.startDate= $("#startDate").val();
+            params.endDate= $("#endDate").val();
+        }
+
+    </script>

@@ -1,0 +1,202 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">栏目不更新</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="row">
+            <div class="col-md-15">
+                <input type="hidden" value="after" name="monitoredType">
+                <input type="hidden" value="$!{typeCode}" name="typeCode">
+                <div class="tab-content">
+                    <!-- 站点无法访问 -->
+                    <div class="tab-pane active" id="tab_1_2">
+                        <div class="portlet light">
+                            <div class="portlet-body form">
+                                <div class="note note-info">
+                                    <h4 class="block">普查考核指标</h4>
+                                    <p>
+                                        <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                    </p>
+                                    <p>&nbsp;</p>
+                                    <p><strong>扣分细则：</strong></p>
+                                    <p>1、监测时间点前2周内的动态、要闻类栏目，累计超过（含）5个未更新。</p>
+                                    <p>2、监测时间点前6个月内的通知公告、政策文件类栏目，累计超过（含）5个未更新。</p>
+                                    <p>3、网站中应更新但长期未更新的栏目数超过（含）10个。</p>
+                                    <p>4、空白栏目数量超过（含）5个。</p>
+                                    <p>上述情况出现任意一种，即单项否决。</p>
+                                </div>
+                                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                                     url="/monitor/vetoConfig/getDataPageByCode" sizeList="[5,10,20,50]" pageSize="5"
+                                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 300px"
+                                        >
+                                    <div property="columns">
+                                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                                        <div field="columnTypeCode" width="150" align="center" headerAlign="center">栏目类别编码</div>
+                                        <div field="columnTypeName" width="200" align="center" headerAlign="center">栏目类别名称</div>
+                                        <div width="150" align="center" headerAlign="center" renderer="renderMonitoredType">监测周期</div>
+                                        <div width="300" align="center" headerAlign="center" renderer="renderStandardCode">否决标准</div>
+        ##                                                    <div width="100" align="center" headerAlign="center" renderer="renderStatus">状态</div>
+                                        <div width="100" align="center" headerAlign="center" allowSort="false" renderer="opt">操作</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        typeCode: "$!{typeCode}",
+        ser_key: '',
+        dialog: Ls.getWin.dialog
+    };
+
+    function search() {
+        cur.grid.load({"dataFlag": 1, "typeCode": cur.typeCode});
+    }
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+//        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load({"dataFlag": 1, "typeCode": cur.typeCode});
+    })
+
+    function renderStandardCode(e) {
+        var record = e.record;
+        var str = "";
+        if (record.standardCode == "notUpdateColumnNum") {
+            str = str + "未更新栏目数量";
+        } else if (record.standardCode == "blankColumnNum") {
+            str = str + "空白栏目数量";
+        }
+        str = str + numDefault(record.num) + '个';
+        return str;
+    }
+
+    function numDefault(str) {
+        if (str == undefined || str == null || str == '') {
+            return 0;
+        }
+        return str;
+    }
+
+    function renderStatus(e) {
+        var record = e.record;
+        var str = "";
+        if (record.statues == 1) {
+            str = str + "启用";
+        } else if (record.statues == 0) {
+            str = str + "禁用";
+        }
+        return str;
+    }
+
+    function renderMonitoredType(e) {
+        var record = e.record;
+        if (record.monitoredNum == '' || record.monitoredNum == null) {
+            return '';
+        } else {
+            var str = '';
+            if (record.monitoredType == 'before') {
+                str = str + '开始检测之前';
+
+            } else if (record.monitoredType == 'after') {
+                str = str + '开始检测之后';
+            }
+            str = str + numDefault(record.monitoredNum);
+            if (record.monitoredTimeType == 'year') {
+                str = str + '年';
+
+            } else if (record.monitoredTimeType == 'month') {
+                str = str + '月';
+            } else if (record.monitoredTimeType == 'week') {
+                str = str + '周';
+            } else if (record.monitoredTimeType == 'day') {
+                str = str + '天';
+            }
+            return str;
+        }
+
+
+    }
+
+    function editEO(id) {
+        Ls.openWin("/monitor/vetoConfig/vetoEdit?id=" + id + "&typeCode=" + cur.typeCode, '600px', '300px', {
+            title: "编辑"
+        });
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if (id != null && id != "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tipsInfo("请选择一条记录!");
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].typeId);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/monitor/columnCon/delEOs",
+                data: {
+                    "ids[]": ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips("删除成功", {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons: "error", times: 2});
+                    }
+                    cur.grid.load({"dataFlag": 1});
+                }
+            });
+        }
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+//        var disable  = '<button id="disable_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="changeStatus('+record.id+',0)">禁用</button> ';
+//        var enable = '<button id="enable_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="changeStatus('+record.id+',1)">启用</button> ';
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editEO(' + record.id + ')">规则配置</button> ';
+//        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel(' + record.typeId + ')">删除</button>';
+
+//        if(record.status == 0) {
+//            return enable + edit + del;
+//        } else {
+//            return disable + edit + del;
+//        }
+        return edit;
+    }
+
+    function renderStatus(e) {
+        var statue = e.record.statues;
+        var str = "";
+        if (statue == 0) {
+            str = "<font style='color: red' >禁用</font>"
+        }
+        else if (statue == 1) {
+
+            str = "<font >启用 </font>"
+        }
+        return str;
+    }
+
+</script>

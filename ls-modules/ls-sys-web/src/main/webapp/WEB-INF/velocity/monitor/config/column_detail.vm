@@ -1,0 +1,88 @@
+#parse("_page_layout/_header.vm")
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/column/getColumnDetail" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="typeName" width="300" align="center" headerAlign="cneter" >类别名称</div>
+                        <div field="publicCateIdNum" width="300" align="center" headerAlign="cneter" renderer="renderPublicCateIdNum" >已绑定信息公开栏目数</div>
+                        <div field="columnIdNum" width="300" align="center" headerAlign="cneter" renderer="renderColumnIdNum" >已绑定其他栏目数</div>
+                    ##                        <div  width="150" align="center" headerAlign="left"  renderer="renderStatus">状态</div>
+                        <div width="200" align="center" headerAlign="center" allowSort="false" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key: '',
+        dialog: Ls.getWin.dialog
+    };
+
+    function search(){
+        cur.grid.load({"dataFlag":1});
+    }
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid,30);
+        cur.grid.load({"dataFlag":1});
+    })
+
+
+    function renderPublicCateIdNum (e){
+        var record = e.record;
+        Ls.ajax({
+            url: "/monitor/column/sysColumn",
+            data: {
+
+            },
+            type:"POST",
+            success: function (resp) {
+                if (resp.status == 1) {
+                    Ls.tips("状态改变成功", {times: 2});
+                } else {
+                    Ls.tips(resp.desc, {icons:"error",times: 2});
+                }
+                cur.grid.load({"dataFlag":1});
+            }
+        });
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

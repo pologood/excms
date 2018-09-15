@@ -1,0 +1,120 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+    #parse("_page_layout/_footer.vm")
+    <script>
+        var content_mgr= {
+            indicatorId:'$!{indicatorId}',
+            node:$!{node}
+        }
+    </script>
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div region="center" style="border:none; overflow: auto;">
+            #parse("/content/picturenews/pic_news_edit.vm")
+        </div>
+    </div>
+<script>
+    mini.parse();
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        siteId: Ls.getWin.dialog.data('siteId')
+    }
+
+    cur.api.button(
+        {id:'save',className:'btn-save',name:'保存',callback:function(){saveData(false);return false;}},
+        {id:'saveAndPublish',className:'btn-save-release',name:'保存并发布',callback:function(){saveAndPublish(true);return false;}},
+//        {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+    );
+
+    function saveData(flag) {
+        if (getContent() == 1) {
+            if (config.model.isSensitiveWord == 1 || config.model.isEasyWord == 1 || config.model.isHotWord == 1) {
+                var types = getTypes();
+                //var content = editor.html();
+                var content = eweb.getHtml();
+                Ls.ajax({
+                    data: {
+                        content: content,
+                        types: types
+                    },
+                    url: "/content/isCheck",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            if (text.data == 1) {
+                                checkAll();
+                            } else {
+                                save(flag);
+                            }
+                        }
+                    }
+                });
+            } else {
+                save(flag);
+            }
+        }
+    }
+
+    function saveAndPublish(flag) {
+        pic.isPublish = 1;
+        if (getContent() == 1) {
+            if (config.model.isSensitiveWord == 1 || config.model.isEasyWord == 1 || config.model.isHotWord == 1) {
+                var types = getTypes();
+                //var content = editor.html();
+                var content = eweb.getHtml();
+                Ls.ajax({
+                    data: {
+                        content: content,
+                        types: types
+                    },
+                    url: "/content/isCheck",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            if (text.data == 1) {
+                                checkAll();
+                            } else {
+                                save(flag);
+                            }
+                        }
+                    }
+                });
+            } else {
+                save(flag);
+            }
+        }
+    }
+
+    function save(flag) {
+        var tips = Ls.tips("正在提交...", {icons: "loading", autoClose: false});
+        /*pic.content = editor.html();
+        pic.articleText = editor.text();*/
+        pic.content = eweb.getHtml();
+        pic.articleText = eweb.getText();
+        pic.siteId = cur.siteId;
+        Ls.ajax({
+            data: pic,
+            url: "/pictureNews/savePictureNews",
+            success: function (text) {
+                if (text.status == 1) {
+                    tips.hide();
+                    if(pic.isPublish == 1){
+                        cur.win.callBack("正在生成处理中");
+                    }else{
+                        cur.win.callBack("保存成功!");
+                    }
+                    if(flag) {
+                        Ls.winClose();
+                    }
+                } else {
+                    tips.hide();
+                    Ls.tipsErr(text.desc);
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

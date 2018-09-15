@@ -1,0 +1,465 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>新浪微博接口</strong></a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab"><strong>腾讯微博接口</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding: 10px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="portlet-body form">
+                        <form id="sina_conf_form" role="form" ms-controller="sina_conf_form">
+                            <div class="form-body" id="sina_conf_form_content">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                    <div class="portlet-body form">
+                        <form id="tencent_conf_form" role="form" ms-controller="tencent_conf_form">
+                            <div class="form-body" id="tencent_conf_form_content">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        vm_sina_id: "sina_conf_form",
+        sina_form: $('#sina_conf_form'),
+        vm_tencent_id: "tencent_conf_form",
+        tencent_form: $('#tencent_conf_form'),
+        type: "Sina"
+    };
+
+    $(document).ready(function () {
+        sinaConf();
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                sinaConf();
+            } else if (id == '#tab_1_2') {
+                tencentConf();
+            }
+        });
+    });
+
+    function sinaConf() {
+        cur.type = "Sina";
+        load_conf_data();
+    }
+
+    function tencentConf() {
+        cur.type = "Tencent";
+        load_conf_data();
+    }
+
+    function load_conf_data() {
+        Ls.ajaxGet({
+            url: "/weibo/conf/getConfByType",
+            data: {
+                type: cur.type
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    if (cur.type == 'Sina') {
+                        $('#sina_conf_form_content').html(Ls.template("sina_weibo_conf", resp));
+                        if(null == resp.data.qrCode || "null" == resp.data.qrCode) {
+                            return;
+                        }
+                        $("#sinaImageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + resp.data.qrCode);
+                    } else if (cur.type == 'Tencent') {
+                        $('#tencent_conf_form_content').html(Ls.template("tencent_weibo_conf", resp));
+                        if(null == resp.data.qrCode || "null" == resp.data.qrCode) {
+                            return;
+                        }
+                        $("#tencentImageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + resp.data.qrCode);
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error'});
+                }
+            }
+        });
+    }
+
+    function saveData(flag) {
+
+        if (cur.type == 'Sina') {
+            cur.model = Ls.initFORM(cur.vm_sina_id, {});
+        } else if (cur.type == 'Tencent') {
+            cur.model = Ls.initFORM(cur.vm_tencent_id, {});
+        }
+        var data = {
+            id: cur.model.id,
+            url: cur.model.url,
+            name: cur.model.name,
+            account: cur.model.account,
+            qrCode: cur.model.qrCode,
+            validUrl: cur.model.validUrl,
+            appKey: cur.model.appKey,
+            appSecret: cur.model.appSecret,
+            token: cur.model.token,
+            type: cur.type
+        };
+
+        Ls.ajaxGet({
+            url: "/weibo/conf/saveEO",
+            data: data,
+            success: function (resp) {
+                if (resp.status == '1') {
+                    if(flag == 'notip') {
+                        return;
+                    }
+                    Ls.tips(resp.desc, {times: 2});
+                } else {
+                    Ls.tips(resp.desc, {times: 2});
+                }
+            }
+        });
+    }
+
+    /**
+     * 二维码上传
+     */
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                if (cur.type == 'Sina') {
+                    if(null == data[0].fileName || "null" == data[0].fileName) {
+                        return;
+                    }
+                    $('#sinaQrCode').val(data[0].fileName);
+                    $("#sinaImageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                } else if (cur.type == 'Tencent') {
+                    if(null == data[0].fileName || "null" == data[0].fileName) {
+                        return;
+                    }
+                    $('#tencentQrCode').val(data[0].fileName);
+                    $("#tencentImageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                }
+                saveData();
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+            "type":"NotDefined"
+           }
+        })
+    }
+
+    /**
+     * 二维码上传
+     */
+    function downloadPic() {
+        if (cur.type == 'Sina') {
+            $("#download_frame").attr("src", "$!{rc.contextPath}/fileCenter/download/" + $("+sinaQrCode"));
+        } else if (cur.type == 'Tencent') {
+            $("#download_frame").attr("src", "$!{rc.contextPath}/fileCenter/download/" + $("+tencentQrCode"));
+        }
+    }
+
+    /**
+     * 删除二维码
+     */
+    function deletePic() {
+        var qrCode = null;
+        if (cur.type == 'Sina') {
+            qrCode = $('#sinaQrCode').val();
+            if (qrCode == null) {
+                Ls.tipsErr("图片不存在！");
+                return;
+            }
+        } else if (cur.type == 'Tencent') {
+            qrCode = $('#tencentQrCode').val();
+            if (qrCode == null) {
+                Ls.tipsErr("图片不存在！");
+                return;
+            }
+        }
+
+        if (confirm("确定删除?")) {
+            Ls.ajaxGet({
+                url: "/fileCenter/deleteByMongoId",
+                data: {
+                    mongoId: qrCode
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("删除成功！", {
+                        icons: "success", callback: function () {
+                            if (cur.type == 'Sina') {
+                                $('#sinaQrCode').val('');
+                                $("#sinaImageLink").attr("src", '$!{sysStaticPath}/assets/images/qr-code.png');
+                            } else if (cur.type == 'Tencent') {
+                                $('#tencentQrCode').val('');
+                                $("#tencentImageLink").attr("src", '$!{sysStaticPath}/assets/images/qr-code.png');
+                            }
+                            saveData("notip");
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+            })
+        }
+    }
+
+    function getToken() {
+
+        if (cur.type == 'Sina') {
+            cur.model = Ls.initFORM(cur.vm_sina_id, {});
+        } else if (cur.type == 'Tencent') {
+            cur.model = Ls.initFORM(cur.vm_tencent_id, {});
+        }
+
+        var url = "";
+        if(cur.type == "Sina"){
+            url = "/weibo/sina/getToken";
+        } else if(cur.type == "Tencent") {
+            url = "/weibo/tencent/getToken";
+        }
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                id: cur.model.id,
+                url: cur.model.url,
+                name: cur.model.name,
+                account: cur.model.account,
+                qrCode: cur.model.qrCode,
+                validUrl: cur.model.validUrl,
+                appKey: cur.model.appKey,
+                appSecret: cur.model.appSecret,
+                token: cur.model.token,
+                type: cur.type
+            }
+        }).done(function (resp) {
+            if (resp.status == 1) {
+
+                if(resp.data != "" && resp.data != null) {
+                    var url = resp.data;
+                    window.open(url);
+                }
+                load_conf_data();
+            } else {
+                Ls.tipsErr(resp.desc);
+            }
+        })
+    }
+</script>
+
+<script type="template" id="sina_weibo_conf">
+    <? var el = data ?>
+    <table class="table table-bordered article-table">
+        <tr style="background-color: #fafafa">
+            <td>
+                <strong>账户信息</strong>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table">
+        <tr>
+            <td align="left">
+                <table class="table table-bordered article-table">
+                    <tr>
+                        <th>微博地址:</th>
+                        <td>
+                            <input type="text" name="id" value="<?=el.id?>" class="form-control" style="display: none" ms-duplex="id">
+                            <input type="text" name="type" value="<?=el.type?>" class="form-control" style="display: none" ms-duplex="type">
+                            <input type="text" name="url" value="<?=el.url?>" class="form-control" data-rule="必填项:;url" placeholder="填写微博地址" ms-duplex="url">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>微博名称:</th>
+                        <td>
+                            <input type="text" name="name" value="<?=el.name?>" class="form-control" data-rule="必填项:;name" placeholder="填写微博名称" ms-duplex="name">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>微博账号:</th>
+                        <td>
+                            <input type="text" name="account" value="<?=el.account?>" class="form-control" data-rule="必填项:;account" placeholder="填写微博账号" ms-duplex="account">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="w300" rowspan="7">
+                <div class="thumb_layout">
+                    <div class="thumb">
+                        <input type="text" id="sinaQrCode" name="qrCode" value="<?=el.qrCode?>" class="form-control" style="display: none" ms-duplex="qrCode">
+                        <img src="$!{sysStaticPath}/assets/images/qr-code.png" style="width:195px;height:150px;" alt="" id="sinaImageLink"/>
+                    </div>
+                    <div class="thum-upload" style="top:0px" id="uploadImg" onclick="uploadPic()" title="上传"><i class="fa fa-upload"></i></div>
+##                    <div class="thum-upload" style="top:30px" id="downloadImg" onclick="downloadPic()" title="下载"><i class="fa fa-download"></i></div>
+                    <div class="thum-delete" style="top:30px" id="delImg" onclick="deletePic()" title="删除"><i class="fa fa-trash"></i></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table">
+        <tr style="background-color: #fafafa">
+            <td>
+                <strong>开发者凭据</strong>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th>验证地址:</th>
+            <td>
+                <input type="text" name="validUrl" value="<?=el.validUrl?>" class="form-control" data-rule="必填项:;validUrl" placeholder="填写验证地址" ms-duplex="validUrl">
+            </td>
+        </tr>
+        <tr>
+            <th>App Key:</th>
+            <td>
+                <input type="text" name="appKey" value="<?=el.appKey?>" class="form-control" data-rule="必填项:;appKey" placeholder="填写App Key" ms-duplex="appKey">
+            </td>
+        </tr>
+        <tr>
+            <th>App Secret:</th>
+            <td>
+                <input type="text" name="appSecret" value="<?=el.appSecret?>" class="form-control" data-rule="必填项:;appSecret" placeholder="填写App Secret" ms-duplex="appSecret">
+            </td>
+        </tr>
+    </table>
+
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th>Token:</th>
+            <td>
+                <input type="text" name="token" value="<?=el.token?>" class="form-control" data-rule="" placeholder="" ms-duplex="token">
+            </td>
+            <td width="110">
+                <button type="button" class="btn btn-default btn-search" onclick="getToken()">获取Token</button>
+            </td>
+        </tr>
+    </table>
+
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th></th>
+            <td>
+                <button type="button" class="btn btn-default btn-save" onclick="saveData()">保 存</button>
+            </td>
+        </tr>
+    </table>
+</script>
+
+<script type="template" id="tencent_weibo_conf">
+    <? var el = data ?>
+    <table class="table table-bordered article-table">
+        <tr style="background-color: #fafafa">
+            <td>
+                <strong>账户信息</strong>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table">
+        <tr>
+            <td align="left">
+                <table class="table table-bordered article-table">
+                    <tr>
+                        <th>微博地址:</th>
+                        <td>
+                            <input type="text" name="id" value="<?=el.id?>" class="form-control" style="display: none" ms-duplex="id">
+                            <input type="text" name="type" value="<?=el.type?>" class="form-control" style="display: none" ms-duplex="type">
+                            <input type="text" name="url" value="<?=el.url?>" class="form-control" data-rule="必填项:;url" placeholder="填写微博地址" ms-duplex="url">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>微博名称:</th>
+                        <td>
+                            <input type="text" name="name" value="<?=el.name?>" class="form-control" data-rule="必填项:;name" placeholder="填写微博名称" ms-duplex="name">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>微博账号:</th>
+                        <td>
+                            <input type="text" name="account" value="<?=el.account?>" class="form-control" data-rule="必填项:;account" placeholder="填写微博账号" ms-duplex="account">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="w300" rowspan="7">
+                <div class="thumb_layout">
+                    <div class="thumb">
+                        <input type="text" id="tencentQrCode" name="qrCode" value="<?=el.qrCode?>" class="form-control" style="display: none" ms-duplex="qrCode">
+                        <img src="$!{sysStaticPath}/assets/images/qr-code.png" style="width:195px;height:150px;" alt="" id="tencentImageLink"/>
+                    </div>
+                    <div class="thum-upload" style="top:0px" id="uploadImg" onclick="uploadPic()" title="上传"><i class="fa fa-upload"></i></div>
+                    <div class="thum-upload" style="top:30px" id="downloadImg" onclick="downloadPic()" title="下载"><i class="fa fa-download"></i></div>
+                    <div class="thum-delete" style="top:60px" id="delImg" onclick="deletePic()" title="删除"><i class="fa fa-trash"></i></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table">
+        <tr style="background-color: #fafafa">
+            <td>
+                <strong>开发者凭据</strong>
+            </td>
+            <td>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th>验证地址:</th>
+            <td>
+                <input type="text" name="validUrl" value="<?=el.validUrl?>" class="form-control" data-rule="必填项:;validUrl" placeholder="填写验证地址" ms-duplex="validUrl">
+            </td>
+        </tr>
+        <tr>
+            <th>App Key:</th>
+            <td>
+                <input type="text" name="appKey" value="<?=el.appKey?>" class="form-control" data-rule="必填项:;appKey" placeholder="填写App Key" ms-duplex="appKey">
+            </td>
+        </tr>
+        <tr>
+            <th>App Secret:</th>
+            <td>
+                <input type="text" name="appSecret" value="<?=el.appSecret?>" class="form-control" data-rule="必填项:;appSecret" placeholder="填写App Secret" ms-duplex="appSecret">
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th>Token:</th>
+            <td>
+                <input type="text" name="token" value="<?=el.token?>" class="form-control readonly" readonly data-rule="" placeholder="" ms-duplex="token">
+            </td>
+            <td width="110">
+                <button type="button" class="btn btn-default btn-search" onclick="getToken()">获取Token</button>
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+        <tr>
+            <th></th>
+            <td>
+                <button type="button" class="btn btn-default btn-save" onclick="saveData()">保 存</button>
+            </td>
+        </tr>
+    </table>
+</script>

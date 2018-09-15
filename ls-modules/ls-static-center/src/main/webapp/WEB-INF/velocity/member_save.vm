@@ -1,0 +1,92 @@
+<div class="list-wp">
+        	<div class="nav-current">会员中心 > 资料修改</div>
+            <div class="user-info">
+                <table>
+                    <tr>
+                        <td class="label">登<span class="s01"></span>录<span class="s02"></span>名：</td>
+                        <td class="inpt td-username"><input type="text" id="uid" name="uid"  value="$!{resultObj.member.uid}" disabled /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">姓<span class="s03"></span>名：</td>
+                        <td class="inpt td-username"><input type="text" id="name" name="name" value="$!{resultObj.member.name}" maxlength="10"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">手机号码：</td>
+                        <td class="inpt td-password"><input type="text" id="phone" name="phone" value="$!{resultObj.member.phone}" maxlength="12"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">电子邮箱：</td>
+                        <td class="inpt td-password"><input type="text" id="email" name="email" value="$!{resultObj.member.email}" maxlength="30"/></td>
+                    </tr>
+					 <tr>
+                        <td class="label">地<span class="s03"></span>址：</td>
+                        <td class="inpt td-password"><input type="text" id="address" name="address" value="$!{resultObj.member.address}" maxlength="50"/></td>
+                    </tr>
+					<tr>
+            			<td class="label">验<span class="s01"></span>证<span class="s02"></span>码：</td>
+            			<td class="inpt td-code">
+            				<input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            		  <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                      </td>
+            		</tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input class="sub" type="button" onclick="saveMember()" value="保存">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+ </div>
+<script>
+var validateSite = "$!{paramObj.validateSite}";
+var siteId = "$!{resultObj.siteId}";
+$(document).ready(function(e) {
+	$("#imgCode").on('click',function(){
+		var _this = $(this);
+		_this.attr("src","/member/getCode?s="+Math.random());
+	});
+});
+function saveMember() {
+	    var name = $("#name").val();
+	    var phone = $("#phone").val();
+		var email = $("#email").val();
+	    var address = $("#address").val();
+		var checkCode = $("#checkimg").val();
+		if(name == ''){
+		   alert("姓名不能为空！");
+           return;
+		}
+		if(phone == ''){
+		   alert("手机号不能为空！");
+           return;
+		}
+		if(email == ''){
+		   alert("电子邮箱不能为空！");
+           return;
+		}
+		if(address == ''){
+		   alert("地址不能为空！");
+           return;
+		}
+		if(checkCode == ''){
+		   alert("验证码不能为空！");
+           return;
+		}
+        Ls.ajax({
+            url: "/member/saveMember",
+            data: {name:name,phone:phone,email:email,address:address,checkCode:checkCode}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("保存成功");
+                location.href = "/member/center/"+siteId+"?type=member";
+            } else {
+                alert(d.desc);
+				$("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+	
+</script>

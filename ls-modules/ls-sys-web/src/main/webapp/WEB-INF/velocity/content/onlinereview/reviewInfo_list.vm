@@ -1,0 +1,359 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12 col-lg-7">
+                    <button class="btn btn-default btn-add" onclick="edit('')">添 加</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn"><a href="javascript:issuedOpt('1');">批量发布</a></li>
+                            <li class="publishBtn"><a href="javascript:issuedOpt('0');">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="deleteBtn"><a href="javascript:deleteAll();">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchType(1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchType(0)">未发布</a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-default btn-type" onclick="reviewObject()">评议对象管理</button>
+                    <button class="btn btn-default btn-type" onclick="reviewType()">评议类型管理</button>
+
+                </div>
+                <div class="col-md-12 col-lg-5">
+
+                    <form class="form-inline tr" role="form">
+                        <div class="form-group">
+                            <label></label>
+                            <input type="text" id="searchText" name="searchText" class="form-control w140" placeholder="评议标题" maxlength="50">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onClick="search()">搜 索</button>
+                        <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" multiSelect="true"
+             idField="themeId" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" onlyCheckSelection="true"
+             url="/survey/theme/getPage" allowCellWrap="true" allowHeaderWrap="true">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+                <div width="50" headerAlign="center" align="center" allowSort="false" renderer="renderSort">排序</div>
+                <div id="fieldWidth" field="title" width="100%" headerAlign="center" align="left" cellCls="mw300" renderer="renderTitle">评议标题</div>
+                <div width="240" headerAlign="center" align="center" allowSort="false" renderer="surveyDatetime">起止日期</div>
+                <div width="75" headerAlign="center" align="center" allowSort="false" renderer="renderIsVisible">结果可见</div>
+                <div width="65" headerAlign="center" align="center" allowSort="false" renderer="renderIsPublish">发布</div>
+                <div width="190" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    var cur = {
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID,
+            typeCode: 'reviewInfo',
+            dataFlag: 1
+        }
+    }
+    $(document).ready(function () {
+
+        var width = $(window).width();
+        if (width < 1400) {
+            $("#fieldWidth").attr("width", 300);
+        }
+
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+
+    })
+
+    function renderSort(e) {
+        var rec = e.record;
+        var str = '<div class="rows text-center">',
+            up = '<a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',1)" href="javascript:;"><i class="fa fa-long-arrow-up" style="margin-top:-3px" title="' + rec.sortNum + '"></i></a>',
+            down = ' <a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',0)" href="javascript:;"><i class="fa fa-long-arrow-down" title="' + rec.sortNum + '"></i></a>';
+
+        var index = (e.rowIndex + 1) + (cur.grid.pageSize * cur.grid.pageIndex);
+        if (index == 1) {
+            str += down;
+        } else if (cur.grid.totalCount == index) {
+            str += up;
+        } else {
+            str += up + down;
+        }
+        str += '</div>';
+        return str;
+    }
+
+    function moveSort(id, sortNum, operate) {
+        var operate = operate == '1' ? "up" : "down";
+        Ls.ajaxGet({
+            url: "/content/updateSort",
+            data: {
+                id: id,
+                sortNum: sortNum,
+                operate: operate,
+                columnId: cur.params.columnId,
+                siteId: cur.params.siteId,
+                typeCode: cur.params.typeCode
+            },
+            success: function (text) {
+                Ls.tipsOk("操作成功！")
+                cur.grid.reload();
+            }
+        });
+    }
+
+    //描述
+    function renderopt(e) {
+        var rec = e.record, isLink = rec.isLink, editStr = '';
+        if (isLink == '1') {
+            editStr += '<button class="btn btn-default btn-sm btn-options" disabled >评议设置</button> '
+        } else {
+            editStr += '<button class="btn btn-default btn-sm btn-options" onclick="questionAdd(' + rec.themeId + ',' + rec.options + ')">评议设置</button> '
+        }
+        editStr += '<button class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.themeId + ')">修 改</button> ';
+        editStr += '<button class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.themeId + ',' + rec.contentId + ')">删 除</button> '
+        return editStr;
+    }
+
+    function renderIsPublish(e) {
+        var rec = e.record, isPublish = rec.isPublish, str = "";
+        if (isPublish == '1') {
+            str = '<a onclick="isLinkClick(' + rec.contentId + ',0)"><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/click.gif" border="0" title="取消发布" ></a>';
+        } else {
+            str = '<a onclick="isLinkClick(' + rec.contentId + ',1)"><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/noclick.gif" border="0" title="发布"></a>';
+        }
+        return str
+    }
+
+    function isLinkClick(contentId, isPublish) {
+        var ids = [];
+        ids.push(contentId)
+        ids = ids.join(",");
+        var str = (isPublish == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: isPublish
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    function surveyDatetime(e) {
+        var rec = e.record, isLink = rec.isLink, isTimeOut = rec.isTimeOut, str = '';
+
+        if (isLink == '1') {
+            str = '-'
+        } else {
+            if (isTimeOut == '2') {
+                str = '<span style="color:blue">'
+            } else if (isTimeOut == '3') {
+                str = '<span style="color:red">'
+            } else {
+                str = '<span style="">'
+            }
+            str += rec.startTime + " 至  " + rec.endTime;
+            str += '</span>'
+        }
+        return str;
+    }
+
+
+    function renderTitle(e) {
+        var rec = e.record, isTimeOut = rec.isTimeOut, isLink = rec.isLink, str = "";
+        str = rec.title;
+        //if (isLink != '1') {
+        //  if (isTimeOut == '1') {
+        //   str += ' <span style="color:blue">[未开始]</span>';
+        // } else if (isTimeOut == '2') {
+        //   str += ' <span style="color:blue">[进行中]</span>';
+        //  } else if (isTimeOut == '3') {
+        //   str += ' <span style="color:red">[已过期]</span>';
+        //  }
+        //  }
+        return str;
+    }
+
+
+    function renderIsVisible(e) {
+        var rec = e.record, isVisible = rec.isVisible, isLink = rec.isLink, str = "";
+        if (isLink == '1') {
+            str = '-'
+        } else {
+            if (isVisible == '1') {
+                str = '<span style="color:blue">是</span>';
+            } else {
+                str = '<span style="color:red">否</span>';
+            }
+        }
+        return str;
+    }
+
+    var deleteAll = function () {
+        var ids = getIDS();
+        var contentIds = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据！")
+            return;
+        }
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/survey/theme/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                    cur.grid.deselectAll(true);
+                }
+            });
+        }
+    }
+
+    // 删除
+    var del = function (id, contentId) {
+        var ids = [];
+        var contentIds = [];
+        ids.push(id)
+        contentIds.push(contentId)
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/survey/theme/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                    cur.grid.deselectAll(true);
+                }
+            });
+        }
+    }
+
+    var questionAdd = function (id, options) {
+        content_mgr.getContentApp("/reviewInfo/questionList?options=" + options + "&themeId=" + id)
+    }
+    //修改
+    var edit = function (id) {
+        content_mgr.getContentApp("/reviewInfo/edit?themeId=" + id)
+    };
+
+
+    var searchType = function (issued) {
+        cur.params.isPublish = issued;
+        cur.params.searchText = '';
+        cur.grid.load(cur.params);
+    }
+
+    //清除条件
+    var search = function () {
+        var searchText = $("#searchText").val();
+        cur.params.searchText = searchText;
+        cur.params.isPublish = '';
+        cur.grid.load(cur.params);
+    }
+
+    var searchClear = function () {
+        $("#searchText").val("");
+        cur.params.searchText = '';
+        cur.params.isPublish = '';
+        cur.grid.load(cur.params);
+    }
+
+    function issuedOpt(status) {
+        var ids = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据！")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    var reviewType = function () {
+        Ls.openWin("/reviewType/list?columnId=" + cur.params.columnId + "&siteId=" + cur.params.siteId, "750px", "500px", {
+            type: 2,
+            title: '评议类型',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    }
+
+    var reviewObject = function () {
+        Ls.openWin("/reviewObject/list?columnId=" + cur.params.columnId + "&siteId=" + cur.params.siteId, "800px", "500px", {
+            type: 2,
+            title: '评议对象',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    }
+
+    //循环选中的行
+    function getIDS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].themeId);
+        }
+        return ids;
+    }
+
+    function getContentIdS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].contentId);
+        }
+        return ids;
+    }
+
+</script>

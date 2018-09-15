@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+
+<body>
+<div>
+    导入特殊栏目数据：
+    <button type="button" style="height: 40px; " onclick="importMonthlyBulletin()">导入月度通报</button>
+    <button type="button" style="height: 40px; " onclick="importStepIntoAnqing()">导入走入安庆</button>
+    <button type="button" style="height: 40px; " onclick="importHdblzd()">导入政民互动办理制度</button>
+    <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+</div>
+
+<form id="formDB" action="/anqing/db/toNews" method="post">
+    #if("$!{type}"=="0")
+        <table>
+            <tbody>
+            <tr>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                ##                <input type="checkbox" name="isDeleteNewsData" value="1"/> 删除新栏目的数据
+                </td>
+            </tr>
+            <tr>
+                <td>原栏目ID：</td>
+                <td>
+                ##                <input name="oldColumnId" type="text"/>
+                    <select name="oldColumnId" size="30">
+                        #foreach($v in $list)
+                            <option value="${v.SS_ID}">
+                                $v.SS_Name - (${v.SS_ID})
+                            </option>
+                        #end
+                    </select>
+                </td>
+                <td>现栏目ID：</td>
+                <td>
+                ##                <input name="curColumdId" type="text"/>
+                    <select name="curColumdId" size="30">
+                        #foreach($v2 in $indicat)
+                            <option value="${v2.indicatorId}">${v2.name} - (${v2.indicatorId})</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" align="center">
+                    <button id="doSub" type="button" style="height: 40px; ">提交</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    #else
+
+    #end
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            var _this = $(this);
+            _this.attr("disabled", true).text("数据正在导入,请耐心等待(请勿关闭浏览器)。");
+            $("#formDB").submit();
+        });
+    });
+
+    function importMonthlyBulletin(){
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: "/anqing/db/importMonthlyBulletin",
+//            data : data,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功!");
+                    $("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+
+    function importHdblzd(){
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: "/anqing/db/importHdblzd",
+//            data : data,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功!");
+                    $("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+
+
+    function importStepIntoAnqing(){
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: "/anqing/db/importStepIntoAnqing",
+//            data : data,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功!");
+                    $("#doSub_msg").hide();
+                }
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

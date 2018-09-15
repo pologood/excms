@@ -1,0 +1,752 @@
+<div class="portlet light">
+
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-6">
+                    <button disabled class="editBtn btn btn-default btn-add hide" onclick="doAdd()">添 加</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn disabled" id="publishs"><a href="javascript:;">批量发布</a></li>
+                            <li class="publishBtn disabled" id="unpublishs"><a href="javascript:;">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="editBtn disabled" id="deletes"><a href="javascript:;">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu" id="statusList">
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" id="checkAll" onclick="checkAll()" class="btn btn-default btn-all-check">
+                            全 选
+                        </button>
+                    </div>
+                    <div class="btn-group" id="statistics" style="display: none">
+                        <button type="button" id="checkAll" onclick="exportList()"
+                                class="btn btn-default btn-search">
+                            信件统计
+                        </button>
+                    </div>
+                </div>
+
+                #*<div class="col-md-6  mt10">*#
+                <div class="col-md-6 ">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <input type="datetime" id="startDate" class="form-control w165" placeholder="开始时间"
+                                   onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endDate\')}',readOnly:true})"
+                                   readonly/>
+                            <input type="datetime" id="endDate" class="form-control w165" placeholder="结束时间"
+                                   onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startDate\')}',readOnly:true})"
+                                   readonly/>
+                            <select class="form-control" type="text" id="classCode" name="classCode">
+                            </select>
+                            <select class="form-control" type="text" id="recUnitId" name="recUnitId">
+                            </select>
+                            <select class="form-control" type="text" id="recUserId" name="recUserId">
+                            </select>
+                            <input type="text" id="searchKey" name="searchKey" class="form-control w160" placeholder="标题" maxlength="100">
+                            <button type="button" class="btn btn-default btn-search" onClick="searchContent()">搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="message_board_list_body" class="doc-manage">
+        </div>
+
+    </div>
+</div>
+
+<script id="message_board_list_template" type="text/html">
+    <table class="table guestbook-list2">
+        <tbody>
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i],resourceType = ""?>
+        <?
+       if(el.resourceType==1){
+            resourceType = "[来自微信]"
+       }else if(el.resourceType==2){
+            resourceType = "[来自微博]"
+       }else if(el.resourceType==0){
+            resourceType = "[来自网页]"
+       }
+        var disabledStr = Ls.publishStatus(el.isPublish);
+       ?>
+        <tr>
+            <th scope="row" class="w40">
+                <input type="checkbox" name="check" value="<?=el.baseContentId?>">
+                <input type="hidden" name="id" id="id" value="<?=el.id?>">
+            </th>
+            <td>
+
+                <div class="message-title">
+                    <?if(el.className!=null){?><span style="color:red;" title="留言类型">[<?=el.className?>]</span> <?}?>
+                    <?=el.title?><?if(disabledStr!=''){?><span class="publish-status">[生成中...]</span><?}?>
+                    <?if(el.isTimeOut==1){?><a href="javascript:void(0)" style="color:red;" title="超时警告">(超时)</a> <?}?>
+                    <?if(el.isTimeOut==2){?><a href="javascript:void(0)"
+                                               style="color:green;">(距离最后办理日期还剩<?=el.dealDays?>天)</a> <?}?>
+                    <?if(el.isTimeOut==3){?><a href="javascript:void(0)" style="color:green;">(今日到期))</a> <?}?>
+                </div>
+                <div class="message-attr" title="<?=resourceType?>">
+                    网友：<?=el.personName?>&nbsp;&nbsp;&nbsp;
+                    添加日期：<?=el.addDate?>&nbsp;&nbsp;&nbsp;
+                    手机号码：<?=el.personPhone?>&nbsp;&nbsp;&nbsp;
+                    <?if(el.isSuper==1){?>
+                    IP地址：<?=el.personIp?>&nbsp;&nbsp;&nbsp;
+                    <?}?>
+                    查询编号 ：<?=el.docNum?>&nbsp;&nbsp;&nbsp;
+                    查询密码：<?=el.randomCode?>
+                    <?if(el.isPublic==0){?>
+                    【不公开】
+                    <?}else{?>
+                    【公开】
+                    <?}?>
+
+                    满意度：<?=el.commentName?>&nbsp;&nbsp;&nbsp;
+                    <?if(el.isSuper==0&&!Ls.isEmpty(el.forwardAttachId)){?>
+                    <a href="javascript:void(0);" onclick="downLoad('<?=el.forwardAttachId?>')" style="color:#117CEA;">附件查看</a>
+                    <?}?>
+                    <br/>
+                    <p style="color: #0BB20C">问政单位：
+                        <?if(el.receiveUnitName){?>
+                        <?=el.receiveUnitName?>
+                        <?}else{?>
+                        无
+                        <?}?>
+                    </p>
+
+                    <?if(!Ls.isEmpty(el.knowledgeBaseId)){?>
+                        <p >常见问题分类：
+                            <?=el.categoryName?>
+                        </p>
+                    <?}?>
+                </div>
+                <div class="message-body">
+                    <?==el.messageBoardContent?>
+                </div>
+                <?if(!Ls.isEmpty(el.attachId)){?>
+                <div>
+                    <? for(var j=0,s=el.attachIdArr.length; j<s; j++){ ?>
+                    <a href="javascript:void(0);" onclick="downLoad('<?=el.attachIdArr[j]?>')" style="color:#117CEA;">附件<?=j+1?></a>&nbsp;&nbsp;
+                    <?}?>
+                </div>
+                <?}?>
+                <div class=" reply<?=el.id?>">
+                </div>
+                <div class="message-bottom">
+                    <span class="pull-right">
+                        <ol class="tools-bar">
+                          <li>
+                            <button type="button" disabled class="editBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="modify(<?=el.baseContentId?>)">修改
+                            </button>
+                          </li>
+                          <li>
+                            <button type="button" disabled
+                                    class="publishBtn btn btn-default btn-xs <? if(el.isPublish==1){?> green-meadow<?}?>  <?=disabledStr?>_1"
+                                    id="p_<?=el.baseContentId?>"
+                                    onclick="changePublish(<?=el.baseContentId?>,<?=el.isPublish?>)">发布
+                            </button>
+                          </li>
+                            <?if(el.isPublish==1){?>
+                            <li>
+                                <button type="button" disabled
+                                        class="publishBtn btn btn-default btn-xs <?=disabledStr?>_1"
+                                        id="p_<?=el.baseContentId?>"
+                                        onclick="rePublish(<?=el.baseContentId?>)">重发
+                                </button>
+                            </li>
+                            <?}?>
+                            <?if(el.recType==0||el.recType==1){?>
+                            <li>
+                            <button type="button" disabled class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="reply(<?=el.baseContentId?>,<?=el.id?>,<?=0?>)">办理
+                            </button>
+                          </li>
+                            <li>
+                                <button type="button" disabled
+                                        class="publishBtn btn btn-default btn-xs <? if(el.knowledgeBaseId != null && knowledgeBaseId != ''){?> green-meadow<?}?>  <?=disabledStr?>_1"
+                                        id="p_<?=el.id?>"
+                                        onclick="changeCommon(<?=el.baseContentId?>,<? if (el.knowledgeBaseId == null) {?>''<?} else {?>
+                                            <?=el.knowledgeBaseId?><?}?>,<?=el.id?>)">设为常见问题
+                                </button>
+                            </li>
+                            #*<?if(el.isSuper==0){?>
+                            <li>
+                            <button type="button" class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="apply(<?=el.id?>,<?=el.applyStatus?>)">申请延期
+                            </button>
+                         </li>
+                            <?}?>
+                            <?if(el.isSuper==0){?>
+                            <li>
+                            <button type="button" class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="goBack(<?=el.id?>)">退回
+                            </button>
+                         </li>
+                            <?}?>*#
+                            <?if(el.isSuper==1){?>
+                            #*<li>
+                            <button type="button" class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="reply(<?=el.baseContentId?>,<?=el.id?>,<?=1?>)">办理汇总
+                            </button>
+                          </li>*#
+                         <li>
+                            <button type="button" class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    onclick="recover(<?=el.id?>)">收回
+                            </button>
+                         </li>
+                            <?}?>
+                            <li>
+                            <button type="button" disabled class="forwardBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                <? if(el.isPublish==1){?>"<?}?> onclick="forwardById(<?=el.id?>
+                                )">转办</button>
+                          </li>
+                            <?}?>
+                            <li>
+                            <button type="button" disabled class="deleteBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                    id="p_<?=el.baseContentId?>"
+                                    onclick="deleteById(<?=el.baseContentId?>)">删除
+                            </button>
+                          </li>
+                          <li>
+                            <button type="button" disabled class="forwardBtn btn btn-default btn-xs"
+                                    onclick="record(<?=el.id?>)">转办记录
+                            </button>
+                          </li>
+                          <li>
+                               <a class="btn btn-default btn-xs" style="border:0;"
+                                  href="/messageBoard/doPrint?id=<?=el.id?>&baseContentId=<?=el.baseContentId?>&columnId=<?=el.columnId?>" target="_blank">打印受理单</a>
+                          </li>
+                        </ol>
+                    </span>
+                    <div class="clearfix"></div>
+                </div>
+
+            </td>
+        </tr>
+        <? } ?>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination pull-right"></div>
+    <div class="clearfix"></div>
+    <iframe name="download" id="download" style="display: none;"></iframe>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/message_board.js"></script>
+<script>
+    var recType = -1;
+    getRecUnitOrUser();
+    $(document).ready(function () {
+        message_board_manage.init();
+        getStatusList();
+    });
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+    }
+
+    function getRecUnitOrUser() {
+        Ls.ajax({
+            type: "POST",
+            url: "/messageBoard/getRec",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            var data = text;
+            var length = data.length;
+            if (length > 0) {
+                var str1 = '<option value=""> 留言类别 </option> ';
+                var strCode = "";
+                if (!Ls.isEmpty(data[0].recType) && data[0].recType != 2) {
+                    recType = data[0].recType;
+                    if (recType == 0) {
+                        $("#recUserId").hide();
+                        var str = '<option value=""> 受理单位 </option> ';
+                        for (i = 0; i < length; i++) {
+                            if (data[i].recUnitId != null && data[i].recUnitId != '') {
+                                str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> ';
+                            } else {
+                                strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                            }
+                        }
+                        $("#recUnitId").append(str);
+                    } else if (recType == 1) {
+                        $("#recUnitId").hide();
+                        var str = '<option value=""> 收信领导 </option> ';
+                        for (i = 0; i < length; i++) {
+                            if (data[i].recUserId != null && data[i].recUserId != '') {
+                                str += ' <option value=' + data[i].recUserId + '>' + data[i].recUserName + '</option> ';
+                            } else {
+                                strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                            }
+                        }
+                        $("#recUserId").append(str);
+                    }
+                    if (Ls.isEmpty(strCode)) {
+                        $("#classCode").hide();
+                    } else {
+                        $("#classCode").append(str1 + strCode);
+                    }
+                } else {
+                    for (i = 0; i < length; i++) {
+                        str1 += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                    }
+                    $("#classCode").append(str1);
+                    $("#recUnitId").hide();
+                    $("#recUserId").hide();
+
+                }
+            }
+
+        });
+    }
+
+    function getStatusList() {
+        Ls.ajax({
+            type: "POST",
+            url: "/messageBoard/getStatusList",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            var str = '<li><a href="javascript:;" onclick="searchByPublish(1)">已发布</a></li>' +
+                    '<li><a href="javascript:;" onclick="searchByPublish(0)">未发布</a></li>';
+            var data = text.data;
+            if (data.length > 0) {
+                str += '<li class="divider"></li>';
+                for (var i = 0; i < data.length; i++) {
+                    str += '<li><a href="javascript:;" onclick="searchByStatus(\'' + data[i].statusCode + '\')">' + data[i].statusName + '</a></li>'
+                }
+            }
+            $('#statusList').append(str);
+        });
+    }
+
+    //全选，取消全选
+    function checkAll() {
+        if (cur.c == 0) {
+            $("input[name='check'][disabled!=disabled]").prop("checked", true);
+            cur.c = 1;
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            cur.c = 0;
+            return;
+        }
+    }
+
+    //搜索
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        cur.classCode = $("#classCode").val();
+        cur.receiveUnitId = $("#recUnitId").val();
+        cur.recUserId = $("#recUserId").val();
+        cur.st = $("#startDate").val();
+        cur.ed = $("#endDate").val();
+        cur.isPublish = "";
+        cur.dealStatus = "";
+        message_board_manage.getData(0, cur.columnId, cur.key, '', '', cur.classCode, cur.receiveUnitId, cur.recUserId, cur.st, cur.ed,null);
+    }
+
+    //显示全部
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        $("#classCode").val("");
+        $("#recUnitId").val("");
+        $("#recUserId").val("");
+        $("#startDate").val("");
+        $("#endDate").val("");
+        cur.isPublish = "";
+        cur.dealStatus = "";
+        cur.classCode = '';
+        message_board_manage.getData(0, cur.columnId, cur.key, '', '', '', '', '');
+    }
+
+    //修改
+    function modify(id) {
+        var columnId = cur.columnId;
+
+        Ls.openWin('/messageBoard/modify?id=' + id + '&&columnId=' + columnId, '600px', '480px', {
+            id: 'modify',
+            title: '修改操作',
+            padding: 0,
+        });
+    }
+
+    function changeCommon(id,knowledgeBaseId,buttonId) {
+        if (knowledgeBaseId == "" || knowledgeBaseId == null) {
+            knowledgeBaseId = "";
+            Ls.openWin('/messageBoard/showCommon?id=' + id + '&&knowledgeBaseId=' + knowledgeBaseId, '800px', '500px', {
+                id: 'modify',
+                title: '常见问题分类',
+                padding: 0,
+                close: function () {
+                    message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+                }
+            });
+        }else {
+            //如果配置了知识库,直接点击就是取消
+            Ls.ajax({
+                type: "POST",
+                url: "/messageBoard/delCommon",
+                data: {
+                    id : id,
+                    knowledgeBaseId : knowledgeBaseId
+                }
+            }).done(function (d) {
+                if (d.status == 0) {
+                    Ls.tipsErr("操作失败：" + d.desc);
+                } else {
+                    Ls.tipsOk("取消常见问题成功", function () {
+                        Ls.winClose();
+                        message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+                    });
+                }
+            })
+        }
+    }
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish: isPublish
+            },
+            url: "/articleNews/changePublish",
+            success: function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+                var isSuccess = text.data;
+                if (isSuccess == 1) {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+                } else {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+                }
+
+            }
+        });
+    }
+
+    //批量发布
+    function batchPublish(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        });
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                type: type
+            },
+            url: "/messageBoard/batchPublish",
+            success: function (text) {
+                var isSuccess = text.data;
+                if (isSuccess) {
+                    if (type == 1) {
+                        Ls.tipsOk("批量发布完成，正在生成处理中");
+                    } else {
+                        Ls.tipsOk("批量取消发布完成，正在生成处理中");
+                    }
+                } else {
+                    if (type == 1) {
+                        Ls.tipsErr("批量发布失败");
+                    } else {
+                        Ls.tipsErr("批量取消发布失败");
+                    }
+                    return;
+                }
+                message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+            }
+        });
+    }
+
+    function rePublish(id){
+        var check = [];
+        check.push(id);
+        Ls.ajaxGet({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                type: 1
+            },
+            url: "/messageBoard/batchPublish",
+            success: function (text) {
+                var isSuccess = text.data;
+                if (isSuccess) {
+                    Ls.tipsOk("正在生成处理中");
+                } else {
+                    Ls.tipsErr("重新发布失败");
+                    return;
+                }
+                message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+            }
+        });
+    }
+
+    //属性筛选
+    function searchByPublish(type) {
+        cur.isPublish = type;
+        cur.dealStatus ='';
+        message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+    }
+    function searchByStatus(code) {
+        cur.dealStatus = code;
+        cur.isPublish = '';
+        message_board_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveUnitId, cur.recUserId);
+    }
+
+
+    //后台打开回复弹窗
+    function reply(id, messageBoardId, isSuper) {
+        var columnId = cur.columnId;
+        var isPublish = cur.isPublish;
+        var key = cur.key;
+        var dealStatus = cur.dealStatus;
+        var classCode = cur.classCode;
+        var pageIndex = cur.pageIndex;
+        var receiveId = cur.receiveId;
+        var recUserId = cur.recUserId;
+        /*     var messageBoardId =  $(".messageMoardId").val();*/
+
+        Ls.openWin('/messageBoard/messageBoardReply?id=' + id + '&&messageBoardId=' + messageBoardId + '&&columnId=' + columnId + '&&isSuper=' + isSuper + '&&key=' + encodeURI(key) +
+                '&&isPublish=' + isPublish + '&&dealStatus=' + dealStatus + '&&classCode=' + classCode + '&&receiveId=' + receiveId + '&&recUserId=' +
+                recUserId + '&&pageIndex=' + pageIndex, '600px', '380px', {
+            id: 'reply',
+            title: '回复留言',
+            padding: 0,
+            close: function () {
+                message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+            }
+        });
+
+    }
+
+    //后台打开收回弹窗
+    function recover(id) {
+        var columnId = cur.columnId;
+        Ls.openWin('/acceptCenter/recoverRecord?id=' + id + '&&columnId=' + columnId, '600px', '380px', {
+            id: 'recover',
+            title: '收回',
+            padding: 0,
+            close: function () {
+                message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+            }
+        });
+
+    }
+
+    //查看图片
+    function queryImage(image) {
+        Ls.openWin('/messageBoard/queryImage?image=' + image, '600px', '450px', {
+            id: 'image',
+            title: '查看图片',
+            padding: 0,
+            close: function () {
+            }
+        });
+
+    }
+
+    //后台打开审核弹窗
+    function apply(messageBoardId, applyStatus) {
+        if (applyStatus == 1) {
+            Ls.tipsInfo("您提交的申请正在处理,请耐心等待!");
+            return;
+        }
+        Ls.openWin('/messageBoard/messageBoardApply?messageBoardId=' + messageBoardId + '&&applyStatus=' + applyStatus, '600px', '380px', {
+            id: 'apply',
+            title: '申请延期',
+            padding: 0,
+            close: function () {
+                message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+            }
+        });
+
+    }
+
+    //打开转办功能窗口
+    function forwardById(id) {
+        Ls.openWin('/messageBoard/messageBoardForward?id=' + id + '&columnId=' + cur.columnId, '500px', '480px', {
+            id: 'message_button_forward',
+            title: "留言转办",
+            ok: function () {
+                message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    }
+
+
+    //单个删除
+    function deleteById(id) {
+        if (confirm("确定删除留言？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/messageBoard/delete",
+                success: function (text) {
+                    Ls.tipsOk("删除完成，正在生成处理中");
+                    message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveUnitId, cur.recUserId);
+
+                }
+            });
+        }
+    }
+
+    //修改回复内容
+    function updateReply(replyId) {
+        var columnId = cur.columnId;
+        Ls.openWin('/messageBoard/updateReply?id=' + replyId + '&&columnId=' + cur.columnId, '600px', '480px', {
+            id: 'modify',
+            title: '修改操作',
+            padding: 0,
+            close: function () {
+                message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveUnitId, cur.recUserId);
+            }
+        });
+    }
+
+    //单个回复删除
+    function deleteReply(id,replyId) {
+        if (confirm("确定删除回复内容？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    replyId: replyId
+                },
+                url: "/messageBoard/deleteReply",
+                success: function (text) {
+                    Ls.tipsOk("删除成功");
+                    message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveUnitId, cur.recUserId);
+
+                }
+            });
+        }
+    }
+
+
+    //后台打开退回弹窗
+    function goBack(id) {
+
+        Ls.openWin('/messageBoard/messageBoardGoBack?id=' + id, '600px', '280px', {
+            id: 'goBack',
+            title: '退回',
+            padding: 0,
+            close: function () {
+                message_board_manage.getData(cur.pageIndex, content_mgr.indicatorId, '', '', '', '', null, null);
+            }
+        });
+
+    }
+
+
+    //批量删除
+    function deletes() {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/messageBoard/batchDelete",
+                success: function (text) {
+                    Ls.tipsOk("删除完成，正在生成处理中");
+                    message_board_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveUnitId, cur.recUserId);
+                }
+            });
+        }
+    }
+
+    //打开转办记录窗口
+    function record(id) {
+        //alert(id)
+        Ls.openWin('/messageBoard/queryForwardRecord?id=' + id + '&columnId=' + cur.columnId, '700px', '400px', {
+            id: 'record',
+            title: '转办记录',
+            padding: 0
+
+        });
+    }
+
+    function doPrint(baseContentId, id) {
+//        Ls.openWin('/guestBook/doPrint?id=' + id, '700px', '400px', {
+//          id: 'do_print',
+//          title: '打印留言受理单',
+//          padding: 0
+//        });
+        content_mgr.getContentApp("/messageBoard/doPrint?baseContentId=" + baseContentId + "&id=" + id + '&columnId=' + cur.columnId + "&&pageIndex=" + cur.pageIndex);
+
+    }
+
+    //修改
+    var doAdd = function (id) {
+        content_mgr.getContentApp("/messageBoard/add?columnId=" + content_mgr.node.indicatorId + "&&pageIndex=" + cur.pageIndex);
+    };
+
+    //下载
+    function downLoad(attachId) {
+        /*var url = "/fileCenter/download/" + attachId;*/
+        var url = "/mongo1/" + attachId;
+        var str = attachId.substring(attachId.lastIndexOf(".")+1,attachId.length)
+        if("bmp" == str || "jpg" == str || "jpeg" == str || "gif" == str ) {
+            window.open(url);
+        }else {
+            $("#download").attr("src", url);
+        }
+    }
+
+    function exportList() {
+        $('#download').attr("src", "/messageBoard/exportMessageBoardList?&typeCode=messageBoard");
+    }
+
+</script>
+
+
+
+
+
+
+
+
+

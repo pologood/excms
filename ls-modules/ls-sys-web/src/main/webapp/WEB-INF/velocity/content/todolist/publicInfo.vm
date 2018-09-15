@@ -1,0 +1,81 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box"></div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="public_content_body"></div>
+    </div>
+</div>
+<script type="template" id="todo_nav">
+    <ul class="sidebar-nav">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <li>
+            <a href="javascript:;" data-code="<?==el.typeCode?>"> <?==el.typeName?>
+                <span id="badge_<?==el.typeCode?>" class="badge badge-info"><?==el.count?></span>
+            </a>
+        </li>
+        <?}?>
+    </ul>
+</script>
+<script>
+    mini.parse();
+
+    var cur = {
+        id: "public_content_form",
+        shows: ['DRIVING_PUBLIC', 'PUBLIC_APPLY'],
+        typeCode: '$!{typeCode}',
+        vm: null,//数据模型
+        isPublish: null,//是否发布
+        isLink: null,//是否连接
+        contentModel: null//内容模型
+    }
+
+    // 加载内容
+    var getContentApp = function (url, options) {
+        return App.getContentAjax(url, options).done(function (res) {
+            $("#public_content_body").html(res);
+        });
+    }
+
+    $(document).ready(function () {
+
+        loadTodoNum().done(function () {
+            var todoMenu = $('.sidebar-nav').on('click', 'a', function () {
+                var $this =
+                $(this);
+                var code = $this.data("code");
+                    $this.parent('li').addClass('active').siblings().removeClass('active');
+                cur.typeCode = code;
+                if (code == "DRIVING_PUBLIC") {
+                    getContentApp("/public/content/toUnPublic");
+                } else {
+                    getContentApp("/public/apply/toUnApply");
+                }
+            })
+            if (cur.typeCode) {
+                todoMenu.find('a[data-code="' + cur.typeCode + '"]').trigger('click');
+            } else {
+                todoMenu.find('a:first').trigger('click');
+            }
+        });
+    });
+
+    function loadTodoNum() {
+        return Ls.ajaxGet({
+            url: "/todolist/loadTodoList",
+            data: {
+                shows: cur.shows.join(",")
+            },
+            success: function (resp) {
+                if (resp == null) {
+                    Ls.tipsErr("加载失败!");
+                } else {
+                    $('#todo_box').html(Ls.template("todo_nav", resp));
+                }
+            }
+        });
+    }
+</script>

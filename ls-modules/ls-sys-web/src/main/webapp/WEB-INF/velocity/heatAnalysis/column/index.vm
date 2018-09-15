@@ -1,0 +1,158 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_2" data-toggle="tab">栏目热度分析图</a>
+                </li>
+                <li>
+                    <a href="#tab_1_1" data-toggle="tab">栏目热度排行</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1_2">
+                        <div id="column_report"></div>
+                    </div>
+                    <div class="tab-pane" id="tab_1_1">
+                        <div id="column_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" sizeList="[20,30,50]" pageSize="20"
+                             url="/heatAnalysis/column/getColumnHeatPage">
+                            <div property="columns">
+                                <div type="indexcolumn" width="40" headerAlign="center" allowSort="flase" align="center">序号</div>
+                                <div field="columnName" width="100%" headerAlign="center" allowSort="flase" align="left">栏目名称</div>
+                                <div field="hit" width="110" headerAlign="center" allowSort="flase" align="center">点击数</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        url: "/heatAnalysis/column/getColumnHeatPage",
+        grid: null, //datagrid
+        isLoad: false
+    }
+    $(document).ready(function () {
+        // 初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.grid = mini.get("column_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid, 50);
+        $("#column_report").height($("#column_datagrid").height());
+
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: '$!{sysStaticPath}/assets/js/plugins/echarts'
+            }
+        });
+
+        /*
+         * 解决tab切换时组建加载不全问题
+         */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1' && !cur.isLoad) {
+                cur.grid.reload();
+                cur.isLoad = true;
+            }
+        });
+
+        // 加载报表
+        Ls.ajaxGet({
+            url: cur.url
+        }).done(function (d) {
+            var data = d.data;
+            var l = data.length;
+            if (l > 10) {
+                l = 10;
+            }
+            var columnNameArr = [];
+            var columnHitArr = [];
+            for (var i = 0; i < l; i++) {
+                columnNameArr.push(data[i].columnName);
+                columnHitArr.push(data[i].hit);
+            }
+            var column_report = {
+                title: {
+                    show: false,
+                    text: '',
+                    subtext: ''
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a}:{c}次"
+                },
+                legend: {
+                    show: false,
+                    data: ['栏目热度']
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        magicType: {show: true, type: ['line', 'bar']},
+                        restore: {show: true},
+                        saveAsImage: {show: true}
+                    }
+                },
+                calculable: true,
+                xAxis: [
+                    {
+                        type: 'category',
+                        data: columnNameArr,
+                        axisLabel: {
+                            show: true,
+                            interval: 0,
+                            formatter: function (a) {
+                                a = a.replace(/\s/g, "");
+                                return a.split(">").join("\n");
+                            }
+                        }
+                    }
+                ],
+                grid: {
+                    y2: 80
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                    }
+                ],
+                series: [
+                    {
+                        name: '栏目热度',
+                        type: 'bar',
+                        data: columnHitArr,
+                        itemStyle: {
+                            normal: {
+                                label: {
+                                    show: true,
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    }
+                ],
+                color: [
+                    '#1790cf', '#1bb2d8', '#99d2dd', '#88b0bb',
+                    '#1c7099', '#038cc4', '#75abd0', '#afd6dd'
+                ]
+            }
+
+            require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie',
+                'echarts/chart/funnel'
+            ], function (ec) {
+                var chart = ec.init(document.getElementById("column_report"));
+                chart.setOption(column_report);
+            });
+        });
+    });
+</script>

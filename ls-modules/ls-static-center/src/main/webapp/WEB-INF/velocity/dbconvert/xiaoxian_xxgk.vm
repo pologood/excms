@@ -1,0 +1,373 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+<body>
+<table>
+    <tbody>
+    <tr style="margin-top:20px">
+        <td valign="top">原平台信息公开目录：
+            <div style="border:1px solid black;overflow:scroll;height:550px">
+                <ul id="public_tree" class="ztree" style="width: 350px"></ul>
+            </div>
+        </td>
+        <td valign="top">-> EX8信息公开目录：
+            <div style="border: 1px solid black;overflow:scroll;height: 550px">
+                <ul id="ex8_public_tree" class="ztree" style="width:350px"></ul>
+            </div>
+        </td>
+        <td valign="top">-> 目录对应关系：
+            <div id="catalogRelDiv" style="border: 1px solid black;overflow:scroll;height:550px;width:380px">
+                <form id="catalogRelForm">
+                    <ul id="catalogRelUL" style="list-style:none; display:block;padding:0;margin:0;"></ul>
+                </form>
+            </div>
+        </td>
+        <td valign="top" style="width:100%">
+            <div style="overflow:auto;padding-top:18px;height: 550px">
+                <button type="button" style="height: 40px;" onclick="importPublicGuide();">导入公开指南
+                </button>
+                <font color="red">*</font>
+                <br/>
+                <button type="button" style="height: 40px; margin-top: 5px" onclick="importPublicAnnualReport();">导入公开年报
+                </button>
+                <font color="red">*</font>
+                <br/>
+                <button type="button" style="height: 40px; margin-top: 5px" onclick="importPublicInstitution();">导入公开制度
+                </button>
+                <font color="red">*</font>
+                <br/>
+
+                <button type="button" style="height:40px; margin-top: 50px " onclick="doCatalogRel();">分析目录关系</button>
+                <br/>
+                <button type="button" style="height:40px;margin-top: 5px" onclick="addCatalogRel();">加入目录关系
+                </button>
+                <br/>
+                <button type="button" style="height:40px; margin-top: 5px" onclick="clearPublicInfo();">清空数据</button>
+                <br/>
+                <button type="button" style="height:40px; margin-top: 5px" onclick="resetAll();">重置</button>
+                <br/>
+                <button type="button" style="height:40px;margin-top: 5px" onclick="importDrivingPublic();">导入
+                </button>
+                <br/>
+            #*<button type="button" style="height: 40px; margin-top: 5px" onclick="importApplyPublic();">导入依申请公开
+            </button>
+            <font color="red">*</font>
+            <br/>
+            <button type="button" style="height: 40px; margin-top: 5px" onclick="importApplyPublicCatalog();">
+                导入依申请公开目录
+            </button>
+            <font color="red">*</font>
+            <br/>*#
+                <div style="margin-top:10px;">
+                    标<font color="red">*</font>操作只能选择单位
+                    <br/>
+                    <div style="margin-top:10px;">
+                        <span id="doSub_msg" style="color: red;display: none;">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+                        <span id="clear_msg" style="color: red;display: none">数据正在清空,请耐心等待(请勿关闭浏览器)。</span>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</form>
+<script type="text/javascript">
+    var cur = {
+        tree: null,
+        ex8_tree: null,
+        selectNode: null,
+        ex8_selectNode: null
+    }
+
+    var ztree_settings = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/xiaoxian/xxgk/getPublicTree",
+            autoParam: ["id=organId"]
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.selectNode = node;
+                return false;
+            }
+        }
+    };
+
+    var ztree_settings_ex8 = {
+        view: {
+            nameIsHTML: true,
+            showTitle: true,
+            selectedMulti: false,
+            dblClickExpand: false,
+            expandSpeed: "fast"
+        },
+        async: {
+            enable: true,
+            url: "/xiaoxian/xxgk/getEx8PublicTree",
+            autoParam: ["organId=organId"]
+        },
+        data: {
+            keep: {},
+            key: {
+                title: "id",
+                name: "name"
+            },
+            simpleData: {
+                idKey: 'id',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            onClick: function (event, treeId, node) {
+                cur.ex8_selectNode = node;
+                return false;
+            }
+        }
+    };
+
+    $(document).ready(function () {
+        cur.tree = $.fn.zTree.init($("#public_tree"), ztree_settings);
+        cur.ex8_tree = $.fn.zTree.init($("#ex8_public_tree"), ztree_settings_ex8);
+    });
+
+    function importPublicInfo(url) {
+        if (cur.selectNode == null || !cur.selectNode.isOrgan) {
+            alert("请选择原平台单位");
+            return false;
+        }
+        if (cur.ex8_selectNode == null || !cur.ex8_selectNode.isOrgan) {
+            alert("请选择ex8平台单位");
+            return false;
+        }
+        $("#doSub_msg").show();
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                organId: cur.selectNode.id,
+                ex8OrganId: cur.ex8_selectNode.id,
+            },
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功");
+                }
+                $("#doSub_msg").hide();
+            }
+        });
+    }
+
+    function importPublicGuide() {
+        importPublicInfo("/xiaoxian/xxgk/importPublicGuide");
+    }
+
+    function importPublicAnnualReport() {
+        importPublicInfo("/xiaoxian/xxgk/importPublicAnnualReport");
+    }
+
+    function importPublicInstitution() {
+        importPublicInfo("/xiaoxian/xxgk/importPublicInstitution");
+    }
+
+    /*function importApplyPublic() {
+        importPublicInfo("/xiaoxian/xxgk/importApplyPublic");
+    }
+
+    function importApplyPublicCatalog() {
+        importPublicInfo("/xiaoxian/xxgk/importApplyPublicCatalog");
+    }*/
+
+    function resetAll() {
+        $(".allRelFont").remove();
+        $("#catalogRelUL").empty();
+        cur.tree.expandNode(cur.selectNode, false, true, true);
+        cur.ex8_tree.expandNode(cur.ex8_selectNode, false, true, true);
+    }
+
+    function deleteLi(btn) {
+        var p = $(btn).parent();
+        $("#Font" + $("input[name='catId[]']", p).val()).remove();
+        $("#Font" + $("input[name='ex8CatId[]']", p).val()).remove();
+        p.remove();
+    }
+
+    function buildLi(node, ex8Node) {
+        var aObj = $("#" + node.tId + "_a");
+        aObj.after("<font id='Font" + node.id + "' class='allRelFont' color='red'>(" + ex8Node.id + ")</font>");
+        var ex8aObj = $("#" + ex8Node.tId + "_a");
+        ex8aObj.after("<font id='Font" + ex8Node.id + "' class='allRelFont' color='red'>    (" + node.id + ")</font>");
+        var html = "";
+        html += '<li style="width:100%;margin-top:2px;"><input name="organId[]" value="' + node.organId + '" type="hidden" />';
+        html += '<input name="ex8OrganId[]" value="' + ex8Node.organId + '" type="hidden" />';
+        html += '<input name="catId[]" value="' + node.id + '" type="hidden" />';
+        html += '<input name="ex8CatId[]" value="' + ex8Node.id + '" type="hidden" />';
+        html += '<input readonly value="' + node.name + '" style="width: 40%"/>->';
+        html += '<input readonly value="' + ex8Node.name + '" style="width: 40%"/>';
+        html += '<input type="button" value="删除" onclick="deleteLi(this)"/></li>';
+        return html;
+    }
+
+    function addCatalogRel() {
+        if (cur.selectNode == null || cur.selectNode.isOrgan) {
+            alert("请选择原平台目录");
+            return;
+        }
+        if (cur.ex8_selectNode == null || cur.ex8_selectNode.isOrgan) {
+            alert("请选择ex8平台目录");
+            return;
+        }
+        $("#catalogRelUL").append(buildLi(cur.selectNode, cur.ex8_selectNode));
+    }
+
+    function doCatalogRel() {//分析目录关系
+        $(".allRelFont").remove();
+        if (cur.selectNode == null || cur.ex8_selectNode == null) {
+            alert("请选择对应单位或者目录");
+            return;
+        }
+        if (cur.selectNode.isOrgan && !cur.selectNode.children) {
+            alert("请展开原平台单位节点");
+            return;
+        }
+        if (cur.ex8_selectNode.isOrgan && !cur.ex8_selectNode.children) {
+            alert("请展开EX8单位节点");
+            return;
+        }
+        cur.tree.expandNode(cur.selectNode, true, true, true);
+        cur.ex8_tree.expandNode(cur.ex8_selectNode, true, true, true);
+        //分析
+        var organId = null;
+        if (cur.selectNode.isOrgan) {
+            organId = cur.selectNode.id;
+        } else {
+            organId = cur.selectNode.organId;
+        }
+        var nodes = cur.tree.getNodesByParam("organId", organId, cur.selectNode);
+        if (!cur.selectNode.isParent) {
+            nodes.push(cur.selectNode);
+        }
+        var nodeMap = {};
+        for (var i in nodes) {
+            var node = nodes[i];
+            if (!node.isParent) {
+                nodeMap[node.path] = node;
+            }
+        }
+        var html = '';
+        var relul = $("#catalogRelUL");
+        var ex8OrganId = null;
+        if (cur.ex8_selectNode.isOrgan) {
+            ex8OrganId = cur.ex8_selectNode.id;
+        } else {
+            ex8OrganId = cur.ex8_selectNode.organId;
+        }
+        var ex8Nodes = cur.ex8_tree.getNodesByParam("organId", ex8OrganId, cur.ex8_selectNode);
+        if (!cur.ex8_selectNode.isParent) {
+            ex8Nodes.push(cur.ex8_selectNode);
+        }
+        for (var i in ex8Nodes) {
+            var n = ex8Nodes[i];
+            if (!n.isParent) {
+                var pathArr = [];
+                var parentName = n.getParentNode().pathName;
+                if (n.pathName == "政策与标准") {
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",政策与标准");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",财政专项支出资金管理办法");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",资金财政专项支出政策");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",资金来源（按比例或数额）");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",分配标准");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",发放标准和形式");
+                } else if (n.pathName == "分配结果") {
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",分配结果（到人或到户）");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",分配结果(到乡镇到部门）");
+                    pathArr.push("财政专项资金管理和使用情况," + parentName + ",分配结果（到乡镇到部门）");
+                } else {
+                    pathArr.push(n.path);
+                }
+                for (var j in pathArr) {
+                    if (nodeMap[pathArr[j]]) {
+                        html += buildLi(nodeMap[pathArr[j]], n);
+                    }
+                }
+            }
+        }
+        relul.html(html);
+    }
+
+    function importDrivingPublic() {
+        if ($("#catalogRelUL").is(":empty")) {
+            alert("请加入目录对应关系");
+            return;
+        }
+        var data = $("#catalogRelForm").serializeObject();
+        $("#doSub_msg").show();
+        Ls.ajax({
+            type: "POST",
+            data: data,
+            url: "/xiaoxian/xxgk/importDrivingPublic",
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("导入成功");
+                }
+                $("#doSub_msg").hide();
+            }
+        });
+    }
+
+    function clearPublicInfo() {
+        if (cur.ex8_selectNode == null) {
+            alert("请选择EX8信息公开单位或目录");
+            return false;
+        }
+        var data = {};
+        if (cur.ex8_selectNode.isOrgan) {
+            data.organId = cur.ex8_selectNode.id;
+        } else {
+            data.organId = cur.ex8_selectNode.organId;
+            data.catId = cur.ex8_selectNode.id;
+        }
+        $("#clear_msg").show();
+        Ls.ajaxGet({
+            url: "/xiaoxian/xxgk/clear",
+            data: data,
+            success: function (text) {
+                if (text.status == 0) {
+                    alert(text.desc);
+                } else {
+                    alert("清空成功");
+                }
+                $("#clear_msg").hide();
+            }
+        });
+    }
+</script>
+</body>
+</html>

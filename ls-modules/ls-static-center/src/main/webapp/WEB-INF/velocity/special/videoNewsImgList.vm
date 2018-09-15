@@ -1,0 +1,48 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isHit="$!{paramObj.isHit}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css} num${velocityCount}">
+    #set($title=$!{eo.title})
+    <a href="$!{eo.link}" target="$!{paramObj.target}" title="${title}" class="left">
+        #set($imageLink="")
+        #if("$!{eo.imageLink}"!= "")
+            #if($eo.imageLink.indexOf("/") !=-1)
+                #set($imageLink="$!{eo.imageLink}")
+            #elseif($eo.imageLink.indexOf(".") !=-1)
+                #set($imageLink="$!{fileServerNamePath}$!{eo.imageLink}")
+            #else
+                #set($imageLink="$!{fileServerPath}$!{eo.imageLink}")
+            #end
+        #else
+            #set($imageLink="/images/video_null.jpg")
+        #end
+        <img class="video-thumb" onclick="$!{eo.link}" border="0" src="${imageLink}" width="200" height="150" title="$!{eo.title}"/>
+
+        #set($style="")
+        #if("$!{eo.isBold}" == "1")
+            #set($style="font-weight:bold;")
+        #end
+        #if("$!{eo.isTilt}" == "1")
+            #set($style=$style+"font-style:italic;")
+        #end
+        #if("$!{eo.isUnderline}" == "1")
+            #set($style=$style+"text-decoration:underline;")
+        #end
+
+        #set($title=$!{eo.title})
+        <span style="$!{style}" class="title">
+            #cutstr($title,$length)
+        </span>
+        <p></p>
+    </a>
+</li>
+#end

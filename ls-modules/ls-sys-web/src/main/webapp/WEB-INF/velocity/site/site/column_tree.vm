@@ -1,0 +1,326 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="column_tree" class="ztree"></ul>
+        </div>
+    </div>
+    <div  region="center" style="border:none; overflow: auto;display: none">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a>栏目信息</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="columnForm" role="form" ms-controller="columnForm" class="col-md-8" style="padding-left: 0;">
+
+                        <div class="form-body">
+                            <div class="form-group">
+                                <label>栏目名称</label>
+                                <input type="text" name="name" readonly class="form-control readonly" ms-duplex-string="name" placeholder="" >
+                            </div>
+
+                            <div class="form-group">
+                                <label>栏目简称</label>
+                                <input type="text" name="shortName" readonly class="form-control readonly" ms-duplex-string="shortName" placeholder="" >
+                            </div>
+
+                            <div class="form-group">
+                                <label>栏目序号</label>
+                                <input type="text" name="sortNum" readonly class="form-control readonly" ms-duplex-number="sortNum" placeholder="">
+                            </div>
+
+                            <div class="form-group" id="contentModel">
+                                <label>内容模型</label>
+
+##                                <div class="input-group select2-bootstrap-append">
+##                                    <select id="contentModelCode" readonly class="form-control" name="contentModelCode" ms-duplex="contentModelCode" placeholder="请选择内容模型"
+##                                            ms-change="checkColumnType">
+##                                   </select>
+##                                  <span class="input-group-btn">
+##                                      <button class="btn btn-default" type="button" onclick="linkModel()">
+##                                          <span>内容模型</span>
+##                                      </button>
+##                                      </span>
+##                               </div>
+                          <input type="text" name="contentModelName" ms-duplex-string="contentModelName" readonly class="form-control readonly"  placeholder="" >
+                            </div>
+                            <div class="form-group" >
+                                <label>栏目类别</label>
+                                <input type="text" name="columnClassName" ms-duplex-string="columnClassName" readonly class="form-control readonly"  placeholder="" >
+                            </div>
+                          <div class="form-group linkNO">
+                            <label>绑定流程</label>
+                              <input type="text" name="processName" ms-duplex-string="processName" readonly class="form-control readonly"  placeholder="" >
+                          ##                                <input type="text" class="form-control" id="processName" name="processName"   ms-duplex="processName"/>
+                          </div>
+                            <div id="isStart" style="display: none">
+                                <div class="form-group">
+                                    <label>启用跳转地址</label>
+
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" readonly name="isStartUrl" ms-duplex-number="isStartUrl" value="1" > 是
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" readonly name="isStartUrl" ms-duplex-number="isStartUrl" value="0" > 否
+                                        </label>
+                                    </div>
+                                </div>
+                                <div id="startUrl" style="display: none">
+                                    <div class="form-group">
+                                        <label>跳转地址</label>
+                                        <input type="text" name="transUrl" readonly ms-duplex-string="transUrl" class="form-control readonly" placeholder="">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>跳转窗口</label>
+
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="transWindow" readonly ms-duplex-number="transWindow" value="0">
+                                                本窗口打开
+                                            </label>
+                                            <label class="radio-inline"><input type="radio" name="transWindow" readonly ms-duplex-number="transWindow" value="1">
+                                                新窗口打开
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="synAndGener">
+                                <div class="form-group">
+                                    <label>复制信息到栏目</label>
+                                    <textarea class="form-control readonly" name="synColumnNames" id="synColumnNames" ms-duplex-string="synColumnNames" rows="3"
+                                              placeholder=""></textarea>
+                                    <input type="hidden" name="synColumnIds" readonly id="synColumnIds" ms-duplex-string="synColumnIds">
+                                </div>
+                                <div class="form-group">
+                                    <label>引用信息到栏目</label>
+                                    <textarea class="form-control readonly" name="referColumnNames" id="referColumnNames"
+                                              ms-duplex-string="referColumnNames" rows="3" 　
+                                              placeholder=""></textarea>
+                                    <input type="hidden" name="referColumnIds" id="referColumnIds"
+                                           ms-duplex-string="referColumnIds">
+                                </div>
+                                <div class="form-group">
+                                    <label>引用信息到信息公开目录</label>
+                                    <textarea class="form-control readonly" name="referOrganCatNames" id="referOrganCatNames"
+                                              ms-duplex-string="referOrganCatNames" rows="3" 　
+                                              placeholder=""></textarea>
+                                    <input type="hidden" name="referOrganCatIds" id="referOrganCatIds"
+                                           ms-duplex-string="referOrganCatIds">
+                                </div>
+                                <div class="form-group">
+                                    <label>生成关联页面</label>
+                                    <textarea class="form-control readonly" rows="3" name="genePageNames" id="genePageNames" ms-duplex-string="genePageNames" readonly
+                                              placeholder=""></textarea>
+                                    <input type="hidden" name="genePageIds" id="genePageIds" ms-duplex-string="genePageIds">
+                                </div>
+                            </div>
+
+                            <div id="bbsUnit" class="form-group dn">
+                                <label>可受理单位列表</label>
+                                <textarea class="form-control readonly" rows="3" readonly name="unitNames" ms-duplex="unitNames"  laceholder=""></textarea>
+                            </div>
+                            <div class="form-group dn linksMgr">
+                                <label>是否为logo图片</label>
+
+                                <div class="radio-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" ms-duplex-number="isLogo" value="1" readonly> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" ms-duplex-number="isLogo" value="0" readonly> 否
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group dn linksMgrY">
+                                <label>图片宽度</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="width" placeholder="" maxlength="5">
+                            </div>
+                            <div class="form-group dn linksMgrY">
+                                <label>图片高度</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="height" placeholder="" maxlength="5">
+                            </div>
+                            <div class="form-group dn linksMgr">
+                                <label>条数</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="num" maxlength="3">
+                            </div>
+                            <div class="form-group dn linksMgr">
+                                <label>模板名称</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="linkCode" placeholder="" >
+                            </div>
+                            <div class="form-group dn linksMgr">
+                                <label>标题字数</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="titleCount" maxlength="3">
+                            </div>
+                            <div class="form-group dn linksMgr">
+                                <label>摘要字数</label>
+                                <input type="text" class="form-control readonly" readonly ms-duplex="remarksCount" maxlength="3" >
+                            </div>
+
+                            <div class="form-group">
+                                <label>栏目关键词</label>
+                                <textarea class="form-control readonly" name="keyWords" readonly ms-duplex="keyWords" rows="3" placeholder="默认为栏目类别管理中配置的内容"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>栏目描述</label>
+                                <textarea class="form-control readonly" name="description" readonly ms-duplex="description" rows="3" placeholder="默认为栏目类别管理中配置的内容"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>归档时间</label>
+                                <input type="datetime" id="toFileDate" ms-duplex="toFileDate"
+                                       class="form-control readonly"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                            </div>
+                            <div class="form-group" id="specialSub">
+                                <label>是否归档</label>
+                                <div class="radio-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isToFile" ms-duplex-number="isToFile" value="1"> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="isToFile" ms-duplex-number="isToFile" value="0"> 否
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>更新周期</label>
+                                <input type="text" name="updateCycle" class="form-control" placeholder="更新周期" ms-duplex="updateCycle" data-rule="integer">
+                            </div>
+
+                            <div class="form-group">
+                                <label>黄牌警示天数</label>
+                                <input type="text" name="yellowCardWarning" class="form-control" placeholder="黄牌警示天数" ms-duplex="yellowCardWarning" data-rule="integer">
+                            </div>
+
+                            <div class="form-group">
+                                <label>红牌警示天数</label>
+                                <input type="text" name="redCardWarning" class="form-control" placeholder="红牌警示天数" ms-duplex="redCardWarning" data-rule="integer">
+                            </div>
+                            <div class="form-group">
+                                <label>前台是否显示（预览地址：<a href="javascript:void(0)" target="_blank" ms-attr-href="previewUrl" ms-text="previewUrl">无</a>）</label>
+                                <div class="radio-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" readonly name="isShow" ms-duplex-number="isShow" value="1"> 是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" readonly name="isShow" ms-duplex-number="isShow" value="0"> 否
+                                    </label>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="siteId" ms-duplex-number="siteId" disabled/>
+                            <input type="hidden" name="parentId" ms-duplex-number="parentId" disabled/>
+                            <input type="hidden" name="indicatorId" ms-duplex-number="indicatorId" disabled/>
+                            <input type="hidden" name="isParent" ms-duplex-number="isParent" disabled/>
+                            <input type="hidden" name="columnConfigId" ms-duplex-number="columnConfigId" disabled/>
+                            <input type="hidden" name="unitIds" ms-duplex="unitIds" disabled/>
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/column_manage_new.js"></script>
+<script>
+    var cur = {
+        vm: {},
+       // contentList: {},
+       // contentModelStr: '',
+        //length: 0
+      //  isAddModel: true
+    };
+
+    $(document).ready(function () {
+       // getContentModel(GLOBAL_SITEID);
+      columnManage.classify();
+    });
+
+
+
+    function checkColumnType() {
+        contentModelCode = cur.vm.contentModelCode;
+
+        if (contentModelCode == '' && cur.vm.isStartUrl == 0) {
+            Ls.tipsInfo("请选择内容模型");
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/columnConfig/checkColumnType",
+            data: {
+                contentModelCode: contentModelCode
+            }
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tips(text.desc, {icon: "info"});
+            }
+            var columnTypeCode = text.data;
+
+            if (columnTypeCode == "articleNews") {
+                $("#isStart").show();
+                $("#synAndGener").show();
+                $(".linksMgr").hide();
+            } else {
+                $("#synAndGener").hide();
+                if (columnTypeCode == 'redirect' || columnTypeCode == 'sceneService' || columnTypeCode == 'workGuide' || columnTypeCode == "net_work" || columnTypeCode == "InteractiveVirtual") {
+                    $("#isStart").show();
+                    $(".linksMgr").hide();
+                } else {
+                    $("#isStart").hide();
+                    if (columnTypeCode == "bbs") {
+                        $("#bbsUnit").show();
+                    } else {
+                        $("#bbsUnit").hide();
+                    }
+                    if (columnTypeCode == "linksMgr") {
+                        $(".linksMgr").show();
+                        if (cur.vm.isLogo == 1) {
+                            $(".linksMgrY").show();
+                        } else {
+                            $(".linksMgrY").hide();
+                        }
+                    } else {
+                        $(".linksMgr").hide();
+                    }
+                }
+            }
+            if (cur.vm.isStartUrl == 1) {
+                $("#startUrl").show();
+            } else {
+                $("#startUrl").hide();
+            }
+            selectCode = columnTypeCode;
+        });
+    }
+
+    function changeUrl(isStartUrl) {
+        cur.vm.isStartUrl = isStartUrl;
+        if (isStartUrl == 1) {
+            $("#contentModel").hide();
+            $("#startUrl").show();
+            $("#synAndGener").hide();
+            //cur.vm.contentModelCode = '';
+        } else {
+            $("#startUrl").hide();
+            $("#contentModel").show();
+        }
+
+    }
+
+    function typeChange(type) {
+        if (type == 1) {
+            $(".linksMgrY").show();
+        } else {
+            $(".linksMgrY").hide();
+
+        }
+    }
+
+</script>

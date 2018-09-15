@@ -1,0 +1,164 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <button class="btn btn-default btn-add" onclick="add()">添 加</button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn"><a href="javascript:issuedOptAll('1');">批量发布</a></li>
+                                    <li class="publishBtn"><a href="javascript:issuedOptAll('0');">批量取消发布</a></li>
+                                    <li class="deleteBtn"><a href="javascript:deleteAll();">批量删除</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:100%;" multiSelect="true"
+                     idField="id" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" onlyCheckSelection="true"
+                     url="/survey/question/getReplyPage">
+                    <div property="columns">
+                        <div type="checkcolumn" width="40"></div>
+                        <div field="content" width="100%" headerAlign="center" align="left" allowSort="false">内容</div>
+                        <div field="ip" width="120" headerAlign="center" align="center" allowSort="false">IP地址</div>
+                        <div field="createDate" width="130" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" align="center">回复时间
+                        </div>
+                        <div field="ip" width="70" headerAlign="center" align="center" allowSort="false" renderer="renderIsIssued">发布</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+
+    var cur = {
+        params: {
+            questionId: Ls.url.get("questionId"),
+            themeId: Ls.url.get("themeId"),
+            sortField: 'optionId',
+            sortOrder: 'desc',
+            dataFlag: 1
+        }
+    }
+    $(document).ready(function () {
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid, 55);
+    })
+    function renderIsIssued(e) {
+        var rec = e.record, isIssued = rec.isIssued, str = "";
+        if (isIssued == '1') {
+            str = '<a onclick="isIssuedOpt(' + rec.replyId + ',0)"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/click.gif" border="0" title="取消发布" ></a>';
+        } else {
+            str = '<a onclick="isIssuedOpt(' + rec.replyId + ',1)"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/noclick.gif" border="0" title="发布"></a>';
+        }
+        return str
+    }
+
+    function isIssuedOpt(optionId, status) {
+        var ids = [];
+        ids.push(optionId)
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/survey/question/updateReplyStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    function issuedOptAll(status) {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据！")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/survey/question/updateReplyStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+    //循环选中的行
+    function getIDS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].replyId);
+        }
+        return ids;
+    }
+
+
+    // 删除
+    var deleteAll = function () {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据！")
+            return;
+        }
+        ids = ids.join(",");
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/survey/question/deleteReply",
+                data: {
+                    ids: ids
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+    function add() {
+        Ls.openWin("/survey/question/replyEdit?questionId=" + cur.params.questionId + "&themeId=" + cur.params.themeId, "500px", "300px", {
+            type: 2,
+            title: '添 加',
+            id: 'editText',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

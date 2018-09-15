@@ -1,0 +1,33 @@
+#set($_title="信息公开详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+	<div class="content_tab xxgk_mn">
+		<p><span class="xxgk_tt">索引号</span><span>$!{publicContentInfo.indexNum}</span></p>
+		<p><span class="xxgk_tt">信息分类</span><span>$!{publicContentInfo.catName}</span></p>
+        <p><span class="xxgk_tt">内容分类</span><span>$!{publicContentInfo.classNames}</span></p>
+		<p><span class="xxgk_tt">发文日期</span><span>#date_format("$!{publicContentInfo.publishDate}",'yyyy-MM-dd HH:mm:ss')</span></p>
+		<p><span class="xxgk_tt">发布机构</span><span>$!{publicContentInfo.organName}</span></p>
+		<p><span class="xxgk_tt">生成日期</span><span>#date_format("$!{publicContentInfo.createDate}",'yyyy-MM-dd HH:mm:ss')</span></p>
+		<p><span class="xxgk_tt">生效日期</span><span>$!{publicContentInfo.effectiveDate}</span></p>
+		<p><span class="xxgk_tt">废止日期</span><span>$!{publicContentInfo.repealDate}</span></p>
+		<p><span class="xxgk_tt">文号</span><span>$!{publicContentInfo.fileNum}</span></p>
+        <p><span class="xxgk_tt">关键词</span><span>$!{publicContentInfo.keyWords}</span></p>
+        <p><span class="xxgk_tt">名称</span><span>$!{publicContentInfo.title}</span></p>
+        #*<p><span class="xxgk_tt">内容概述</span><span>$!{publicContentInfo.summarize}</span></p>*#
+        #*<p><span class="xxgk_tt">浏览次数</span><span>$!{publicContentInfo.hit}</span></p>*#
+     </div>
+
+	 <div class="container xxgk_cont">
+		<div class="content_title xxgk_tit">$!{publicContentInfo.title}</div>
+		<div class="content_date content_ftit">#date_format("$!{publicContentInfo.publishDate}",'yyyy-MM-dd HH:mm:ss')</div>
+		<div class="content_body">
+			<p style="text-indent:2em;">$!{publicContentInfo.content}</p>
+		</div>
+	 </div>
+#parse("/mobile/parse_footer.vm")
+<!--分享 -->
+#parse("/mobile/parse_share.vm")
+</body>
+</html>

@@ -1,0 +1,133 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" ms-controller="trans_form">
+            <div class="form-body">
+                <div class="form-group unit">
+                    <span> 流转单位列表：</span>
+                    <select name="recUnitId" id="recUnitId" ms-duplex="recUnitId" class="form-control" ms-change="onChange">
+                    </select>
+                </div>
+                <div class="form-group hide">
+                    <span> 流转单位列表：</span>
+                    <input name="recUnitName" id="recUnitName" ms-duplex="recUnitName" class="form-control"/>
+                </div>
+            #*  <div class="form-group hide">
+                <span> 流转人员列表：</span>
+                <select name="recUserId" id="recUserId" ms-duplex="recUserId" class="form-control" >
+                </select>
+              </div>
+              <div class="form-group hide">
+                <span> 流转单位列表：</span>
+                <input name="recUserName" id="recUserName" ms-duplex="recUserName" class="form-control"/>
+              </div>*#
+                <div class="form-group">
+                    <label>流转备注：</label>
+          <textarea class="form-control" id="remark" ms-duplex="remark" name="remark" style="width: 100%; visibility:visible;height:100px" placeholder=""
+          ></textarea>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var columnId = "${columnId}";
+    var recType = "${recType}";
+    var petitionId = "${petitionId}";
+    var curr = {
+        vm: {},
+    }
+    var data = {
+        petitionId: petitionId,
+        recUnitId: '',
+        recUnitName: '',
+        recType: 0,
+        remark: '',
+    }
+    $(document).ready(function () {
+        var dialog = art.dialog,
+            api = art.dialog.open.api;
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'saveBtn',
+                focus: true,
+                callback: function () {
+                    doSubmit();
+                    return false;
+                }
+            }
+        );
+        init();
+        getUnitOrUser();
+    });
+
+    function init() {
+        data.$id = "trans_form";
+        curr.vm = avalon.define(data);
+        //avalon.scan();
+      avalon.scan($("#trans_form").get(0),curr.vm);
+    }
+    function doSubmit() {
+        if (Ls.isEmpty(curr.vm.recUnitId)) {
+            Ls.tipsInfo("流转单位不能为空");
+            return;
+        }
+        if (Ls.isEmpty(curr.vm.remark)) {
+            Ls.tipsInfo("流转备注不能为空");
+            return;
+        }
+        saveEO();
+    }
+
+    function saveEO() {
+        /* var id=curr.vm.recUnitId;
+         var name=curr.vm.recUnitName;
+         var remark=curr.vm.remark;*/
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            url: "/onlinePetition/transfer",
+            data: value
+        }).done(function (text) {
+           if(!text.status){
+             Ls.tipsErr(text.desc);
+           } else {
+                parent.Ls.tipsOk("转办成功");
+                Ls.winClose();
+            }
+        });
+    }
+
+    function getUnitOrUser() {
+        Ls.ajaxGet({
+            url: "/onlinePetition/getRecUnitOrPerson",
+            data: {
+                columnId: columnId
+            }
+        }).done(function (text) {
+            var str = '<option value=""> 请选择流转单位 </option> ';
+            if (text.status) {
+                var data = text.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> ';
+                    }
+                }
+            }
+            $("#recUnitId").append(str);
+        });
+    }
+    function onChange() {
+        curr.vm.recUnitName = $("#recUnitId option:selected").text()
+    }
+
+
+</script>

@@ -1,0 +1,48 @@
+#parse("_page_layout/_header.vm")
+
+<body>
+<input type="button" value="kefu" onclick="ff()">
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    function ff() {
+        var Article = {
+            "articles": [{
+                "thumb_media_id": "qI6_Ze_6PtV7svjolgs-rN6stStuHIjs9_DidOHaj0Q-mwvBelOXCFZiq2OsIU-p",
+                "author": "xxx",
+                "title": "Happy Day",
+                "content_source_url": "www.qq.com",
+                "content": "content",
+                "digest": "digest",
+                "show_cover_pic": "1"
+            }]
+        }
+
+        Ls.ajaxGet({
+            dataType: "JSONP",
+            data: Article,
+            url: "https://api.weixin.qq.com/cgi-bin/media/uploadnews?access_token=" + tk,
+            success: function (text) {
+
+            }
+        });
+    }
+
+    var tk = "pCjXeXrAh0LjY1EpYz6wksS7NF3cJFE9RNOwJbK_N4vkefNFdPfx6hlXKqwbYzc_Jeywm0b4FR8mj3E-m1wLI4bPc2aSrk0JeDTzZ7q81vQZHOeAEAUCJ";
+
+    function ff1() {
+        var Article = {
+            "kf_account": "test1@test",
+            "nickname": "客服1",
+            "password": "pswmd5",
+        }
+
+        Ls.ajaxGet({
+            dataType: "JSONP",
+            data: Article,
+            url: "https://api.weixin.qq.com/customservice/kfaccount/add?access_token=" + tk,
+            success: function (text) {
+            }
+        });
+    }
+</script>

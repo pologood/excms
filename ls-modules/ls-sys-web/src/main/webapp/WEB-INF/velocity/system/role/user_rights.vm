@@ -1,0 +1,57 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white page-content-white">
+<div class="pd10" style="overflow: hidden;">
+    <ul id="user_opt_tree" class="ztree" style="overflow:hidden;"></ul>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/user_rights.js"></script>
+<script>
+    var cur = {
+        organId:${organId},
+        userId:${userId},
+        win: Ls.getWin.win,
+        api:Ls.getWin.api
+    };
+
+    $(document).ready(function () {
+        //加载树
+        user_rights_tree.siteOpt();
+
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+    })
+
+    function saveData() {
+        var checkedNodes = cur.userOptTreeObj.getCheckedNodes(true);
+        var strJson = [];
+        for (var i = 0; i < checkedNodes.length; i++) {
+            strJson.push({organId: cur.organId, userId: cur.userId, siteId: checkedNodes[i].indicatorId});
+        }
+        var data = {};
+        data.strJson = mini.encode(strJson);
+        data.organId = cur.organId;
+        data.userId = cur.userId;
+        Ls.ajax({
+            url: "/role/site/opt/saveUserOpt",
+            data: data,
+            success: function (resp) {
+                if(resp.status==1) {
+                    Ls.tips(resp.desc, {times: 2});
+                    cur.win.reloadGrid();
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

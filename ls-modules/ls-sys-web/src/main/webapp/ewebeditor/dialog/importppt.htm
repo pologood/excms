@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var sCaption = lang["DlgPPT"]
+        document.write("<title>" + sCaption + "</title>");
+
+        var b_ShowAPI = (parseInt(config.WIAPI) < 10) ? true : false;
+        var bSYFlag = (((config.SYWZFlag == "2" || config.SYTPFlag == "2") && config.SYVLocal == "1") ? true : false);
+
+
+        function ok() {
+            if (DLGRunOne.IsRun("btn_ok")) {
+                return;
+            }
+            DLGRunOne.DisableBtn("btn_ok", true);
+
+            EWEBActiveX.AsynCallBack("isinstalled", [true],
+                function (o_Data) {
+                    if (!o_Data["Ret"]) {
+                        Do_EnableBtnOk();
+                        return;
+                    }
+                    _ok2();
+                }
+            );
+        }
+
+        function _ok2() {
+            var s_File = $("d_file").value;
+            if (!IsExt(s_File, "ppt|pptx|dps")) {
+                alert(lang["DlgPPTInvalidFile"]);
+                Do_EnableBtnOk();
+                return;
+            }
+
+            var s_ImgType = $("d_imgtype").options[$("d_imgtype").selectedIndex].value;
+
+            var s_API = "";
+            if (b_ShowAPI) {
+                if ($("d_api0").checked) {
+                    s_API = "0";
+                } else if ($("d_api1").checked) {
+                    s_API = "1";
+                } else {
+                    s_API = "2";
+                }
+            } else {
+                s_API = config.WIAPI.substr(1);
+            }
+
+
+            var s_Opt = "";
+            s_Opt += "api:" + s_API + ";";
+            s_Opt += "imgtype:" + s_ImgType + ";";
+            s_Opt += "tw:" + $("d_tw").value + ";";
+
+            DLGDoingMsg.Show();
+
+            var s_OriSendUrl = EWEB.SendUrl;
+            if (bSYFlag) {
+                if ($("d_syflag").checked) {
+                    EWEB.SendUrl += "&syflag=1";
+                    if (!EWEBBrowser.IsUseLS) {
+                        EWEBActiveX.ActiveX.SendUrl = EWEB.SendUrl;
+                    }
+                }
+            }
+
+            EWEBActiveX.AsynCallBack("importppt", [s_File, s_Opt],
+                function (o_Data) {
+                    _CheckActiveXStatus(o_Data, s_OriSendUrl);
+                }
+            );
+        }
+
+        function _CheckActiveXStatus(o_Data, s_OriSendUrl) {
+            if (s_OriSendUrl != EWEB.SendUrl) {
+                EWEB.SendUrl = s_OriSendUrl;
+            }
+
+            if (o_Data["Error"] == "cancel") {
+                parent.Cancel(true);
+                return;
+            }
+
+            if (EWEBActiveX.IsError(o_Data["Error"])) {
+                Do_EnableBtnOk();
+                return;
+            }
+
+            if (DLGRunOne.IsRun("btn_cancel")) {
+                parent.Cancel(true);
+                return;
+            }
+
+            var s_Style = "";
+            var s_Body = o_Data["Body"];
+            s_Body = s_Body.replace(/(<img\s[^>]*?src=\"[^\"]+?)(\[~~\][^\"]+?)(\"[^>]*?>)/gi, "$1$3");
+            EWIN.addUploadFiles(o_Data["OriginalFiles"], o_Data["SavedFiles"]);
+
+            if ($("d_imgefflag").checked) {
+                s_Body = '<div class="ewebeditor_doc" style="width:' + $('d_imgefwidth').value + ';height:' + $('d_imgefheight').value + '; overflow:auto;background-color:#A0A0A3;border:1px solid #D4D0C8;text-align:center;">' +
+                    s_Body.replace(/(<img)(\s[^>]*?>)/gi, '$1 style="border-width:1px 2px 2px 1px;border-color:#00000;margin:5px;"$2') +
+                    '</div>';
+            }
+
+
+            if ($("d_pos").checked) {
+                EWIN.setHTML(s_Style + s_Body, true);
+            } else {
+                EWIN.insertHTML(s_Body);
+                if (s_Style) {
+                    var s_HTML = s_Style + EWIN.getHTML();
+                    EWIN.setHTML(s_HTML, true);
+                }
+            }
+
+            DLGDoingMsg.Hide();
+
+            parent.Ok({flag: "AfterImportPPT", action: ""});
+        }
+
+
+        function Do_DisableAllChild(o_Parent, b_Disabled) {
+            Do_DisableAllChildByTag(o_Parent, b_Disabled, "INPUT");
+            Do_DisableAllChildByTag(o_Parent, b_Disabled, "SPAN");
+        }
+
+
+        function Do_DisableAllChildByTag(o_Parent, b_Disabled, s_Tag) {
+            var els = o_Parent.getElementsByTagName(s_Tag);
+            for (var j = 0; j < els.length; j++) {
+                els[j].disabled = b_Disabled;
+            }
+        }
+
+
+        function Click_ImgEfFlag() {
+            var b = $("d_imgefflag").checked;
+            Do_DisableAllChild($("group_imgef"), !b);
+        }
+
+        function Click_TwFlag() {
+            var b = $("d_twflag").checked;
+            Do_DisableAllChild($("group_tw"), !b);
+        }
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            switch (config.WIAPI) {
+                case "0":
+                case "10":
+                    DoClickAPI(0);
+                    break;
+                case "1":
+                case "11":
+                    DoClickAPI(1);
+                    break;
+                case "2":
+                case "12":
+                    DoClickAPI(2);
+                    break;
+            }
+            if (b_ShowAPI) {
+                $("d_api" + config.WIAPI).checked = true;
+            }
+
+            Click_TwFlag();
+            Click_ImgEfFlag();
+
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+        function DoClickAPI(n_Flag) {
+//	if (n_Flag==1){
+//		$("sp_modeimg").style.display="";
+//	}else{
+//		doClickMode(1);
+//		$("d_modehtml").checked=true;
+//		$("sp_modeimg").style.display="none";		
+//	}
+        }
+
+        function DoBrowse() {
+            EWEBActiveX.AsynCallBack("isinstalled", [true],
+                function (o_Data) {
+                    if (!o_Data["Ret"]) {
+                        return;
+                    }
+
+                    EWEBActiveX.AsynCallBack("dialogopen", [1, 0, lang["DlgPPTFile"] + "(*.ppt,*.pptx,*.dps)|*.ppt;*.pptx;*.dps", 1],
+                        function (o_Data) {
+                            var s_File = o_Data["Ret"];
+                            if (s_File) {
+                                $("d_file").value = s_File;
+                            }
+                        }
+                    );
+                }
+            );
+        }
+
+        function DoCancel() {
+            if (DLGRunOne.IsRun("btn_ok")) {
+                if (DLGRunOne.IsRun("btn_cancel")) {
+                    return;
+                }
+                DLGRunOne.DisableBtn("btn_cancel", true);
+                DLGDoingMsg.ChangeCancelMsg(true);
+                EWEBActiveX.AsynCallBack("cancel", []);
+            } else {
+                parent.Cancel(true);
+            }
+        }
+
+        function Do_EnableBtnOk() {
+            DLGDoingMsg.Hide();
+            DLGRunOne.DisableBtn("btn_ok", false);
+            if (DLGRunOne.IsRun("btn_cancel")) {
+                DLGDoingMsg.ChangeCancelMsg(false);
+                DLGRunOne.DisableBtn("btn_cancel", false);
+            }
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+
+
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend><span lang=DlgPPTLegend></span>:</legend>
+                            <table border=0 cellpadding=5 cellspacing=0 width='100%'>
+                                <tr>
+                                    <td>
+                                        <table border=0 cellpadding=0 cellspacing=2 width='100%'>
+                                            <tr>
+                                                <td noWrap><span lang=DlgPPTFile></span>:</td>
+                                                <td noWrap width='100%'><input type=text id='d_file' size=30 style='width:255px'> <input type=button class='dlgBtnCommon dlgBtn'
+                                                                                                                                         lang=DlgBtnBrowse onclick='DoBrowse()'>
+                                                </td>
+                                            </tr>
+                                            <script type="text/javascript">
+                                                if (b_ShowAPI) {
+                                                    document.write("		<tr>");
+                                                    document.write("			<td noWrap><span lang=DlgPPTAPI></span>:</td>");
+                                                    document.write("			<td noWrap><input type=radio name=d_api id=d_api0 onclick='DoClickAPI(0)' checked><label for=d_api0>" + lang["DlgPPTAPI0"] + "</label>&nbsp; <input type=radio name=d_api id=d_api1 onclick='DoClickAPI(1)' checked><label for=d_api1>" + lang["DlgPPTAPI1"] + "</label>&nbsp; <input type=radio name=d_api id=d_api2 onclick='DoClickAPI(2)'><label for=d_api2>" + lang["DlgPPTAPI2"] + "</label></td>");
+                                                    document.write("		</tr>");
+                                                }
+                                            </script>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td height=5></td>
+                </tr>
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend><span lang=DlgPPTOptimize></span>:</legend>
+                            <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                <tr>
+                                    <td valign=top>
+
+                                        <table border=0 cellpadding=0 cellspacing=3>
+                                            <tr>
+                                                <td noWrap width="20%"><span lang=DlgWordImgType></span>:</td>
+                                                <td noWrap width="29%">
+                                                    <select id=d_imgtype size=1 style="width:80px">
+                                                        <option value='jpg'>JPG</option>
+                                                        <option value='png' selected>PNG</option>
+                                                    </select>
+                                                </td>
+                                                <td width="2%">&nbsp;</td>
+                                                <td noWrap width="20%"></td>
+                                                <td noWrap width="29%"></td>
+                                            </tr>
+
+                                            <script type="text/javascript">
+                                                if (bSYFlag) {
+                                                    document.write("<tr><td><span lang=DlgImgSYFlag></span>:</td><td colspan=4><input type=checkbox id=d_syflag value='1'></td></tr>");
+                                                }
+                                            </script>
+                                            <tr>
+                                                <td colspan=5><input type=checkbox id=d_twflag value='1' onclick='Click_TwFlag()' checked><label for=d_twflag><span
+                                                    lang=DlgPPTtwFlag></span>:</label> <span id=group_tw><span lang=DlgPPTtw></span><input type=text size=5 id=d_tw
+                                                                                                                                           style='width:50px' value='600'
+                                                                                                                                           onkeydown="OnDigitFieldKeyDown(event);">&nbsp;<span
+                                                    lang=DlgPPTth></span></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan=5><input type=checkbox id=d_imgefflag value='1' onclick='Click_ImgEfFlag()' checked><label for=d_imgefflag><span
+                                                    lang=DlgWordImgEfFlag></span>:</label> <span id=group_imgef><span lang=DlgWordImgEfWidth></span><input type=text size=5
+                                                                                                                                                           id=d_imgefwidth
+                                                                                                                                                           style='width:50px'
+                                                                                                                                                           value='100%'>&nbsp;<span
+                                                    lang=DlgWordImgEfHeight></span><input type=text size=5 id=d_imgefheight style='width:50px' value=''></span></td>
+                                            </tr>
+
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td height=5></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <table border=0 cellpadding=0 cellspacing=0 width="100%">
+                            <tr>
+                                <td noWrap><input type=checkbox id=d_pos checked><label for=d_pos><span lang=DlgComInsertReplace></span></label></td>
+                                <td noWrap align=right><input type=submit class="dlgBtnCommon dlgBtn" value="" id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input
+                                    type=button class="dlgBtnCommon dlgBtn" value="" id="btn_cancel" onclick="DoCancel()" lang=DlgBtnCancel>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgPPTImporting"]);
+</script>
+
+</body>
+</html>

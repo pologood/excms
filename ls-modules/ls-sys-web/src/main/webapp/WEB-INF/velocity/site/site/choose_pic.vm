@@ -1,0 +1,55 @@
+#set($_title="选取图片")
+#parse("_page_layout/_header.vm")
+<body>
+<div class="mini-fit">
+    <form id="form" enctype="multipart/form-data">
+        <div style="padding:5px;">
+            <table style="table-layout:fixed;">
+                <tr>
+                    <td>
+                        <input type="file" name="file" id="file1" accept=".png,.gif,.jpg,.wmv"/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+    <a class="mini-button" style="width:60px;" onclick="onOk()">确定</a>
+    <span style="display:inline-block;width:25px;"></span>
+    <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/plugins/ajaxfileupload.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var data1 = null;
+    mini.parse();
+    function CloseWindow(action) {
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();
+    }
+    function onOk() {
+        jQuery.ajaxFileUpload({
+            url: '$!{rc.contextPath}/siteConfig/uploadPic',//服务器端程序
+            secureuri: false,
+            fileElementId: 'file1',//input框的ID
+            dataType: 'json',//返回数据类型
+            beforeSend: function () {//上传前需要处理的工作，如显示Loading...
+            },
+            success: function (data, status) {
+                data1 = data;
+                CloseWindow("ok");
+            },
+            error: function (data, status, e) {
+            }
+        });
+    }
+    function GetData() {
+        return data1;
+    }
+    function onCancel() {
+        CloseWindow("cancel");
+    }
+</script>

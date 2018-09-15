@@ -1,0 +1,16 @@
+<xmp>
+    $!{htmlBegin}
+</xmp>
+<a id="$!{hrefId}" href="$!{href}" target="_blank" style="background-color: #ffdaf8">$!{realHref}</a><br><br><br><br><br>
+<xmp>
+    $!{htmlEnd}
+</xmp>
+<script>
+    var hrefId = $!{hrefId};
+    var errCode = $!{errCode};
+    var errDesc = $!{errDesc};
+</script>
+<link rel="stylesheet" href="$!{rc.contextPath}/assets/css/artdialog-min.css">
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/dialog/dialog6.min.js"></script>
+<script defer="defer" type="text/javascript" charset="utf-8" src="$!{rc.contextPath}/assets/js/pages/checkHref.js"></script>

@@ -1,0 +1,104 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" ms-controller="tpl_form">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="vrtpl_edit_form" role="form" ms-controller="vrtpl_edit_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                        </div>
+                        <div class="form-group">
+                            <label>模板名称</label>
+                            <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                            <input type="text" id="name" name="name" class="form-control" data-rule="必填项:required;name" placeholder="填写模板名称" ms-duplex="name">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "vrtpl_edit_form",
+        form: $('#vrtpl_edit_form'),
+        type: art.dialog.data("type"),
+        win: Ls.getWin.win,
+        api:Ls.getWin.api,
+        dialog: Ls.getWin.dialog
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {});
+        } else {
+            cur.model = cur.dialog.data("node");
+        }
+        setData(cur.model);
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    /**
+     * 保存数据
+     */
+    function saveData() {
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/tpl/save";
+        } else {
+            url = "/tpl/update";
+        }
+
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                name: cur.vm.name,
+                type: "Virtual",
+                pid: "-1"
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.cur.node_edit = resp.data;
+                    cur.win.callback_editTpl();
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

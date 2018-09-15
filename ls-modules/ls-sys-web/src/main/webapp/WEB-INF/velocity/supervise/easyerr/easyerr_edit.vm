@@ -1,0 +1,123 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="easyerr_form" role="form" ms-controller="easyerr_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                        </div>
+                        <div class="form-group">
+                            <label>易错词</label>
+                            <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                            <input type="text" id="words" name="words" class="form-control" data-rule="必填项:required;words" placeholder="填写易错词" ms-duplex="words">
+                        </div>
+                        <div class="form-group">
+                            <label>替换词</label>
+                            <input type="text" id="replaceWords" name="replaceWords" class="form-control" data-rule="必填项:required;replaceWords" placeholder="填写替换词"
+                                   ms-duplex="replaceWords">
+                        </div>
+                        #if($!{superAdmin})
+                            <div class="form-group">
+                                <label class="checkbox inline" style="padding-left: 25px">
+                                    <input id="qj" type="checkbox"> 全局
+                                </label>
+                            </div>
+                        #end
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        vm_id: 'easyerr_form',
+        win: Ls.getWin.win,
+        type:art.dialog.data("type"),
+        api:Ls.getWin.api,
+        dialog: Ls.getWin.dialog,
+        superAdmin:$!{superAdmin},
+        qj:$('#qj')
+    }
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){addOrEdit();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {});
+        } else {
+            cur.model = cur.dialog.data("node");
+            if(cur.superAdmin) {
+                if(cur.model.siteId == -1) {
+                    cur.qj.attr("checked", "checked");
+                }
+            }
+        }
+        setData(cur.model);
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function addOrEdit() {
+
+        if (!$('#easyerr_form').isValid()) {
+            return;
+        }
+
+        var url = "";
+
+        if (cur.type == 'add') {
+            url = "/words/easyerr/save";
+        } else {
+            url = "/words/easyerr/update";
+        }
+
+        var siteId = '';
+        if(cur.superAdmin) {
+            siteId = cur.qj.is(':checked')?-1:'';
+        }
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                words: cur.vm.words,
+                replaceWords: cur.vm.replaceWords,
+                siteId: siteId
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.success_save_callback('easyerr',resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error'});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

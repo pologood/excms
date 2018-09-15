@@ -1,0 +1,160 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding:5px; overflow: hidden;">
+            <div id="ui_tree" class="ztree"></div>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div id="div_a" class="portlet light" style="display: none">
+            <div class="portlet-body form">
+                <form id="classify_form_a" role="form" ms-controller="classify_form_a">
+                    <div class="form-body">
+                        <div id="container">
+                            <div class="form-group">
+                                <label>标题名称</label>
+                                <input type="text" name="name" class="form-control" data-rule="标题名称:required;name" placeholder="填写标题名称" ms-duplex="name">
+                            </div>
+                            <div class="form-group">
+                                <label>序号</label>
+                                <input id="sort_p" type="number" name="sort" min="1" class="form-control" placeholder="填写序号" ms-duplex="sort">
+                            </div>
+                            <div class="form-actions noborder">
+                                <button type="button" class="btn btn-default btn-save" ms-click="saveData">保 存</button>
+                                <button type="button" class="btn btn-default btn-reset" ms-click="resetForm">重 置</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="div_b" class="portlet light" style="display: none">
+            <div class="portlet-body form">
+                <form id="classify_form_b" role="form" ms-controller="classify_form_b">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>上层分类</label>
+                            <input type="text" name="pname" disabled class="form-control readonly" data-rule="上层分类:required;pname" ms-duplex="pname">
+                        </div>
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input type="text" name="name" class="form-control" data-rule="名称:required;name" placeholder="填写名称" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>外链</label>
+                            <input type="text" name="link" class="form-control" data-rule="外链:required;link" placeholder="填写外链" ms-duplex="link">
+                        </div>
+                        <div class="form-group">
+                            <label>序号</label>
+                            <input id="sort" type="number" name="sort" min="1" class="form-control" placeholder="填写序号" ms-duplex="sort">
+                        </div>
+
+                        <div class="form-actions noborder">
+                            <button type="button" class="btn btn-default btn-save" ms-click="saveData">保 存</button>
+                            <button type="button" class="btn btn-default btn-reset" ms-click="resetForm">重 置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/net_classify.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        $id_a:'classify_form_a',
+        $id_b:'classify_form_b',
+        div_a:$('#div_a'),
+        div_b:$('#div_b')
+    };
+    $(document).ready(function () {
+        net_classify.init();
+        cur.model = {id:'',pid:'',name:'',link:'',sort:'',pname:'',isParent:''};
+        getData_a(cur.model);
+        getData_b(cur.model);
+    })
+
+    function saveData() {
+
+        if(!cur.active_form.isValid()) {
+            return;
+        }
+
+        if(cur.type == 'add') {
+            url = "/netClassify/save"
+        } else {
+            url = "/netClassify/update"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id:cur.active_vm.id,
+                pid:cur.active_vm.pid,
+                name:cur.active_vm.name,
+                link:cur.active_vm.link,
+                sort:cur.active_vm.sort,
+                flag:cur.select_node.isParent
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc,{times:2});
+                    syn2tree(resp.data);
+                } else {
+                    Ls.tips(resp.desc,{icons:'error',times:2});
+                }
+            }
+        });
+
+    }
+
+    function resetForm() {
+        cur.vm_a.name = null;
+        cur.vm_b.name = null;
+        cur.vm_b.link = null;
+        cur.vm_b.sort = null;
+    }
+
+    function syn2tree(node) {
+        if(node == null) return;
+        if(cur.type == 'edit') {
+            cur.select_node.name = node.name;
+            cur.select_node.link = node.link;
+            cur.select_node.sort = node.sort;
+            cur.treeObj.updateNode(cur.select_node,true);
+        } else {
+            if(cur.select_node.isParent) {
+                var nodes = [node];
+                cur.treeObj.addNodes(cur.select_node,nodes);
+            } else {
+                var pnode = cur.treeObj.getNodeByParam("id", node.pid, null);
+                var ppnode = cur.treeObj.getNodeByParam("id", pnode.pid, null);
+                cur.treeObj.reAsyncChildNodes(ppnode, "refresh");
+            }
+        }
+    }
+
+    function getData_a(obj) {
+        //所有数据格式遵循EOA的标准,或看data1.txt
+        var data = obj;
+        //定义唯一ID，和页面上的 ms-controller 相同
+        data.$id = cur.$id_a;
+        //绑定模型
+        cur.vm_a = avalon.define(data);
+    }
+
+    function getData_b(obj) {
+        //所有数据格式遵循EOA的标准,或看data1.txt
+        var data = obj;
+        //定义唯一ID，和页面上的 ms-controller 相同
+        data.$id = cur.$id_b;
+
+        //绑定模型
+        cur.vm_b = avalon.define(data);
+    }
+
+</script>

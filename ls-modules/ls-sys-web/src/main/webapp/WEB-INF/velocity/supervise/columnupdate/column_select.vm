@@ -1,0 +1,138 @@
+#parse("_page_layout/_header.vm")
+<link href="$!{sysStaticPath}/assets/js/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" type="text/css"/>
+<style>
+    #tagsWrap {
+        padding: 10px 29px 7px 15px;
+        position: fixed;
+        height: 51px;
+        width: 100%;
+        overflow: hidden;
+        background: #FFF;
+        z-index: 10;
+    }
+
+    #tagsWrap>span {
+        float: left;
+        margin: 9px 6px 0 0;
+        color: #6f6c6c;
+    }
+
+    #tagsWrap>#tags {
+        width: 85%;
+        float: left;
+    }
+
+    .ui-autocomplete {
+        max-height: 400px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .ui-menu .ui-menu-item-wrapper {
+        display: inline-block;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Microsoft Yahei';
+    }
+
+    .ui-menu .ui-menu-item-wrapper:hover {
+        text-decoration: none;
+    }
+
+    .ztree {
+        overflow: hidden;
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="tagsWrap">
+            <span>快速查询：</span>
+            <input type="text" id="tags" class="form-control" placeholder="支持中文搜索">
+        </div>
+        <div class="" style="padding-left: 10px;margin-top: 55px;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/supervise/column_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        columnIds: art.dialog.data("columnIds"),
+        cSiteIds: art.dialog.data("cSiteIds"),
+        taskType: art.dialog.data("taskType"),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){ok();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        column_tree.init();
+    })
+
+    /**
+     * 保存数据
+     */
+    function ok() {
+        var nodes = cur.treeObj.getCheckedNodes(true);
+        var columnIds = "";
+        var cSiteIds = "";
+        var nodeNames = "";
+        if(nodes != null) {
+            for(var i = 0;i < nodes.length ; i++) {
+
+                if(nodes[i].isParent || nodes[i].type=="CMS_Site" || nodes[i].type=="SUB_Site") {
+                   continue;
+                }
+
+                var parentNodes = nodes[i].getPath();
+                if(columnIds == "") {
+                    columnIds = nodes[i].indicatorId;
+                    cSiteIds = nodes[i].siteId;
+                    if(parentNodes != null) {
+                        for(var j = 0;j < parentNodes.length ; j++) {
+                            if(j == 0) {
+                                nodeNames = parentNodes[j].name;
+                            } else {
+                                nodeNames += " > " + parentNodes[j].name;
+                            }
+                        }
+                    }
+                } else {
+                    columnIds += "," + nodes[i].indicatorId;
+                    cSiteIds += "," + nodes[i].siteId;
+                    if(parentNodes != null) {
+                        nodeNames += "\r\n";
+                        for(var j = 0;j < parentNodes.length ; j++) {
+                            if(j == 0) {
+                                nodeNames += parentNodes[j].name;
+                            } else {
+                                nodeNames += " > " + parentNodes[j].name;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        cur.win.column_callback(columnIds,cSiteIds,nodeNames);
+        Ls.winClose();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" ms-controller="sensitive_form">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="sensitive_form" role="form">
+                    <div class="form-body">
+                        <div class="form-group">
+                        </div>
+                        <div class="form-group" align="center">
+                            <input type="file" name="file" id="file" accept=".xls,.xlsx"/>
+                        </div>
+                        <div class="form-group" align="center">
+                            <label>开始行：</label><input id="sp_row" width="60px" changeOnMousewheel="true" class="mini-spinner"  minValue="1" maxValue="9999"/>
+                            <label>开始列：</label><input id="sp_cell" width="60px" changeOnMousewheel="true" class="mini-spinner"  minValue="1" maxValue="9999"/>
+                        </div>
+                        <div class="form-group" align="center">
+                            <label><span style="color: red">支持格式：xls、xlsx <br> 样式：第一列【敏感词】，第二列【替换词】</span></label>
+                            <img src="$!{sysStaticPath}/assets/images/sensitive_example.png" align="center"/>
+                        </div>
+                        <div class="form-group" align="center">
+                            #if($!{superAdmin})
+                            <label class="checkbox inline" style="padding-right: 50px">
+                                <input id="qj" type="checkbox" checked="checked"> 全局(<font style="color: red">不选中仅对当前站点有效</font>)
+                            </label>
+                            #end
+                            <label class="checkbox inline">
+                                <input id="ck" type="checkbox" checked> 覆盖
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/ajaxfileupload.min.js"></script>
+<script>
+    var cur = {
+        $id:'sensitive_form',
+        win:Ls.getWin.win,
+        api:Ls.getWin.api,
+        qj:$('#qj'),
+        superAdmin:$!{superAdmin}
+    };
+
+    $(document).ready(function () {
+        mini.parse();
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        cur.node = Ls.initFORM(cur.$id, {
+            openType: "0"
+        });
+        getData(cur.node);
+    })
+    //拉取数据
+    function getData(data) {
+        //所有数据格式遵循EOA的标准,或看data1.txt
+        data = data;
+        //定义唯一ID，和页面上的 ms-controller 相同
+        data.$id = cur.$id;
+
+        //绑定模型
+        cur.vm = avalon.define(data);
+
+        //扫描模型
+        avalon.scan();
+
+    }
+
+    function saveData() {
+        var tips = Ls.tips("上传中",{icons:'loading',autoClose:false});
+        var rowFirst = mini.get('sp_row').getValue();//默认
+        var cellFirst = mini.get('sp_cell').getValue();//默认
+        var rpl = $('#ck').is(':checked');
+        var qj = false;
+        if(cur.superAdmin) {
+            qj = $('#qj').is(':checked');
+        }
+        jQuery.ajaxFileUpload({
+            url: '$!{rc.contextPath}/words/sensitive/upload?rowFirst=' + rowFirst + "&cellFirst=" + cellFirst + "&rpl=" + rpl + "&qj=" + qj,//服务器端程序
+            secureuri: false,
+            fileElementId: 'file',//input框的ID
+            dataType: 'json',//返回数据类型
+            beforeSend: function () {//上传前需要处理的工作，如显示Loading...
+            },
+            success: function (data, status) {
+                tips.hide();
+                if (data.status == '1') {
+                    cur.win.cur.excelgrid.load();
+                    cur.win.upload_success();
+                    Ls.winClose();
+                } else {
+                    cur.win.upload_error(data.desc);
+                    Ls.winClose();
+                }
+            },
+            error: function (data, status, e) {
+                cur.win.upload_error(data.desc);
+                Ls.winClose();
+            }
+        });
+
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

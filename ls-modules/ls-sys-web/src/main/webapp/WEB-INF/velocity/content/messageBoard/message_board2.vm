@@ -1,0 +1,849 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12 col-lg-12">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <select class="form-control" type="text" id="classCode" name="classCode">
+                            </select>
+                            <select class="form-control" type="text" id="recUnitId" name="recUnitId">
+                            </select>
+                            <select class="form-control" type="text" id="recUserId" name="recUserId">
+                            </select>
+                            <input type="text" id="username" name="username" class="form-control w160"
+                                   placeholder="来信人" maxlength="100">
+                            <input type="text" id="searchKey" name="searchKey" class="form-control w160"
+                                   placeholder="标题" maxlength="100">
+                            <button type="button" class="btn btn-default btn-search"
+                                    onClick="searchContent()">搜
+                                索
+                            </button>
+                            <button type="button" class="btn btn-default btn-show-all"
+                                    onClick="searchClear()">
+                                显示全部
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            <div class="row mt10">
+                <div class="col-md-12 col-lg-12">
+                    <button disabled class="addBtn btn btn-default btn-add" onclick="doAdd()">添 加</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                                <li class="publishBtn" style="display: none"><a href="javascript:issuedOpt('1');">批量发布</a></li>
+                                <li class="publishBtn" style="display: none"><a href="javascript:issuedOpt('0');">批量取消发布</a></li>
+                                <li class="divider screenBtn" style="display: none"></li>
+                                <li class="deleteBtn" id="deletes" style="display: none"><a href="javascript:deleteAll();">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu" id="statusList">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;" onPageChanged="onPageChanged"
+             collapseGroupOnLoad="false"
+             allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             url="/messageBoard/getPage" allowCellWrap="true" allowHeaderWrap="true"
+             sizeList="[10,20,30,50]" pageSize="15"
+             idField="id" multiSelect="true">
+            <div property="columns">
+                <div type="checkcolumn" name="check"></div>
+                <div type="indexcolumn" width="30" headerAlign="center" align="center">序号</div>
+                <div field="className" width="70" headerAlign="center" align="center">类型</div>
+                <div field="messageColumnName" width="70" headerAlign="center" align="center">受理信箱</div>
+                <div field="" width="100%" headerAlign="center" align="left" renderer="getLink">来信标题</div>
+                <div field="createDate" width="80" headerAlign="center" align="center"
+                     dateFormat="yyyy-MM-dd">来信时间
+                </div>
+                <div field="replyDate" width="80" headerAlign="center" align="center"
+                     dateFormat="yyyy-MM-dd">回复时间
+                </div>
+                <div field="isForward" width="60" headerAlign="center" align="center" renderer="isForward">
+                    是否转办
+                </div>
+                <div width="60" headerAlign="center" align="center" renderer="isCommentCode">
+                    满意度
+                </div>
+                <div  width="60" headerAlign="center" align="center" renderer="dealStatus">
+                    办理状态
+                </div>
+                <div width="60" headerAlign="center" align="center" renderer="isDeal">
+                    办结
+                </div>
+                <div field="" width="380" headerAlign="center" renderer="renderOpt" align="center">操作
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <iframe name="download" id="download" style="display: none;"></iframe>
+</div>
+<div id="messageBoardContent"
+     style="position:absolute;display:none;border:1px solid silver;background:#FFFFFF; padding: 5px; line-height: 180%; width: 500px;">
+    <script>
+
+        var cur = {
+            params: {
+                columnId: content_mgr.indicatorId,
+                siteId: GLOBAL_SITEID,
+                typeCode: 'messageBoard',
+                dataFlag: 1,
+                opt: []
+            },
+            edit: 0,
+            deal: 0,
+            publish: 0,
+            forward: 0,
+            count: 0,
+            delete: 0,
+            add: 0,
+            recover: 0,
+            apply: 0,
+            screen: 0
+
+        }
+
+
+        var recType = -1;
+
+        getRecUnitOrUser();
+
+        $(document).ready(function () {
+            mini.parse();
+            cur.grid = mini.get("datagrid1");
+            cur.grid.load(cur.params);
+            //重置 datagrid 高度
+            Ls.mini_datagrid_height(cur.grid);
+            getStatusList();
+        });
+
+        //发布状态
+        function publishStatus(e) {
+            var rec = e.record;
+            var str = '';
+            if (rec.isPublish == 0) {
+                str = "<div style='color:red;' onclick='changePublish(" + rec.baseContentId + ","+rec.isPublish+")'>未发布</div>";
+            } else {
+                str = "<div onclick='changePublish(" + rec.baseContentId + ","+rec.isPublish+")'>已发布</div>";
+            }
+            return str;
+        }
+
+        //办理状态
+        function dealStatus(e) {
+            var rec = e.record;
+            var str = '';
+            if (rec.dealStatus == 'handling') {
+                str = "已办理";
+            } else {
+                str = "<div style='color:red;'>待办理</div>";
+            }
+            return str;
+        }
+
+        //办结状态
+        function isDeal(e) {
+            var rec = e.record;
+            var str = '';
+            if (rec.dealStatus == 'replyed') {
+                str = '<div class="btn btn-default btn-sm green-meadow"><a onclick="changDeal('+rec.id+',\''+"handing"+'\')">已办结</div>';
+            } else {
+                str = '<div><a onclick="changDeal('+rec.id+',\''+"replyed"+'\')">未办结</div>';
+            }
+            return str;
+        }
+
+        function isForward(e){
+            var rec = e.record;
+            var str='';
+            if(rec.isForward ==1){
+                str = '已转办';
+            }else{
+                str = '未转办';
+            }
+            return str;
+        }
+
+        function isCommentCode(e){
+            var rec = e.record;
+            var str='';
+            if(rec.commentCode == ''||rec.commentCode == null){
+                str = '未评价';
+            }else if(rec.commentCode == 'unsatisfactory'){
+                str = '不满意';
+            }else if(rec.commentCode == 'commonlySatisfactory'){
+                str = '一般满意';
+            }else if(rec.commentCode == 'basicSatisfactory'){
+                str = '基本满意';
+            }else if(rec.commentCode == 'satisfactory'){
+                str = '满意';
+            }else if(rec.commentCode == 'goodSatisfactory'){
+                str = '很满意';
+            }
+            return str;
+        }
+
+
+        function getLink(e) {
+            var rec = e.record;
+            var str = '';
+            str += '<div style="color: #0000cc" onMouseOver="javascript:show(this,' + rec.baseContentId + ');" onMouseOut="hide(this)">';
+            str += rec.title + '</a>';
+            if(rec.isForward==1||rec.dealStatus=='handling'||rec.dealStatus=='replyed') {
+                return str;
+            }else{
+                var end = rec.dueDate;
+                var start = new Date();
+                var m = Math.round ((end - start) / 1000);
+                var day = parseInt (m / 24 / 3600);
+                var hours = parseInt ((m % (3600 * 24)) / 3600);
+                var minutes = parseInt ((m % 3600) / 60);
+                var seconds = m % 60;
+                if (m < 0){
+                    var m = Math.round ((start - end) / 1000);
+                    var day = parseInt (m / 24 / 3600);
+                    var hours = parseInt ((m % (3600 * 24)) / 3600);
+                    var minutes = parseInt ((m % 3600) / 60);
+                    var seconds = m % 60;
+                    str += '     <span style="color:red">已超时' + day + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒</span>';
+                }else{
+                    str += '    <span style="color:green">还剩' + day + '天' + hours + '小时' + minutes + '分钟' + seconds + '秒</span>';
+                }
+                return str;
+            }
+        }
+
+        function renderOpt(e) {
+            //操作
+            var rec = e.record;
+            var str = "";
+                str += '<button id="_p"  class=" btn btn-default btn-sm" onclick="modify(' + rec.baseContentId + ')">修 改</button> ';
+
+            if (rec.isPublish == 0) {
+                str += '<button id="_p"   class="btn btn-default btn-sm" style="color: red" onclick="changePublish(' + rec.baseContentId + ','+rec.isPublish+')">发 布</button> ';
+            } else {
+                str += '<button id="_p"  class=" btn btn-default btn-sm green-meadow" onclick="changePublish(' + rec.baseContentId + ','+rec.isPublish+')">发布</button> ';
+            }
+
+                str += '<button id="_p"  class="dealBtn btn btn-default btn-sm " onclick="reply(' + rec.baseContentId + ',' + rec.id + ',' + 0 + ')">办 理</button> ';
+                if (rec.unitLevel==1||rec.unitLevel==2){
+                    str += '<button id="_p" class="forwardBtn btn btn-default btn-sm " onclick="forwardById(' + rec.id + ',' +rec.messageColumnId + ')">转 办</button> ';
+                }else{
+                    str += '<button id="_p" disabled class="forwardBtn btn btn-default btn-sm " onclick="forwardById(' + rec.id + ',' +rec.messageColumnId + ')">转 办</button> ';
+                }
+                str += '<button id="_p" class="deleteBtn btn btn-default btn-sm " onclick="deleteById(' + rec.baseContentId + ')">删 除</button> ';
+                str += '<button id="_p" class="forwardBtn btn btn-default btn-sm " onclick="recover(' + rec.baseContentId + ')">打印受理单</button> ';
+            return str;
+        }
+
+
+        function issuedOpt(status) {
+            var ids = getBaseContentIdS();
+            if (ids == null || ids.length <= 0) {
+                Ls.tipsInfo("请选择数据！")
+                return;
+            }
+            var str = (status == '1' ? '发布' : '取消发布');
+            if (confirm("您确定" + str + "？")) {
+                Ls.ajaxGet({
+                    url: "/messageBoard/batchPublish",
+                    data: {
+                        ids: ids,
+                        siteId: GLOBAL_SITEID,
+                        columnId: cur.params.columnId,
+                        type: status
+                    },
+                    success: function (text) {
+                        Ls.tipsOk("操作成功！")
+                        cur.grid.reload();
+                    }
+                });
+            }
+        }
+
+        function isTopOpt(status) {
+            var ids = getBaseContentIdS();
+            if (ids == null || ids.length <= 0) {
+                Ls.tipsInfo("请选择数据！")
+                return;
+            }
+            var str = (status == '1' ? '置顶' : '取消置顶');
+            if (confirm("您确定" + str + "？")) {
+                Ls.ajaxGet({
+                    url: "/messageBoard/batchTop",
+                    data: {
+                        ids: ids,
+                        type: status
+                    },
+                    success: function (text) {
+                        Ls.tipsOk("操作成功！")
+                        cur.grid.reload();
+                    }
+                });
+            }
+        }
+
+
+
+        //改变办结状态
+        function changDeal(id,dealStatus) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    dealStatus:dealStatus
+                },
+                url: "/messageBoard/changDeal",
+                success: function (text) {
+                    if (!text.status) {
+                        Ls.tipsErr(text.desc);
+                        return;
+                    }
+                    var isSuccess = text.data;
+                    if (isSuccess == 'replyed') {
+                        Ls.tipsOk("办结成功");
+                        cur.grid.reload();
+                    } else {
+                        Ls.tipsOk("取消办结成功");
+                        cur.grid.reload();
+                    }
+                }
+            });
+        }
+
+        //循环选中的行
+        function getIDS() {
+            var rows = cur.grid.getSelecteds();
+            var ids = [];
+            for (i = 0; i < rows.length; i++) {
+                ids.push(rows[i].id);
+            }
+            return ids;
+        }
+
+        function getBaseContentIdS() {
+            var rows = cur.grid.getSelecteds();
+            var ids = [];
+            for (i = 0; i < rows.length; i++) {
+                ids.push(rows[i].baseContentId);
+            }
+            return ids;
+        }
+
+        function getIdS() {
+            var rows = cur.grid.getSelecteds();
+            var ids = [];
+            for (i = 0; i < rows.length; i++) {
+                ids.push(rows[i].id);
+            }
+            return ids;
+        }
+
+
+        var deleteAll = function () {
+            var contentIds = getBaseContentIdS();
+            if (contentIds == null || contentIds.length <= 0) {
+                Ls.tipsInfo("请选择数据！")
+                return;
+            }
+            if (confirm("您确定删除嘛")) {
+                Ls.ajaxGet({
+                    url: "/messageBoard/batchDelete",
+                    data: {
+                        ids: contentIds
+                    },
+                    success: function (text) {
+                        Ls.tipsOk("删除成功！")
+                        cur.grid.reload();
+                    }
+                });
+
+            }
+
+        }
+
+
+        function getRecUnitOrUser() {
+            Ls.ajax({
+                type: "POST",
+                url: "/messageBoard/getRec",
+                data: {columnId: content_mgr.node.indicatorId}
+            }).done(function (text) {
+                var data = text;
+                var length = data.length;
+                if (length > 0) {
+                    var str1 = '<option value=""> 留言类别 </option> ';
+                    var strCode = "";
+                    if (!Ls.isEmpty(data[0].recType) && data[0].recType != 2) {
+                        recType = data[0].recType;
+                        if (recType == 0) {
+                            $("#recUserId").hide();
+                            var str = '<option value=""> 受理单位 </option> ';
+                            for (i = 0; i < length; i++) {
+                                if (data[i].recUnitId != null && data[i].recUnitId != '') {
+                                    str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> ';
+                                } else {
+                                    strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                                }
+                            }
+                            $("#recUnitId").append(str);
+                        } else if (recType == 1) {
+                            $("#recUnitId").hide();
+                            var str = '<option value=""> 收信领导 </option> ';
+                            for (i = 0; i < length; i++) {
+                                if (data[i].recUserId != null && data[i].recUserId != '') {
+                                    str += ' <option value=' + data[i].recUserId + '>' + data[i].recUserName + '</option> ';
+                                } else {
+                                    strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                                }
+                            }
+                            $("#recUserId").append(str);
+                        }
+                        if (Ls.isEmpty(strCode)) {
+                            $("#classCode").hide();
+                        } else {
+                            $("#classCode").append(str1 + strCode);
+                        }
+                    } else {
+                        for (i = 0; i < length; i++) {
+                            str1 += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                        }
+                        $("#classCode").append(str1);
+                        $("#recUnitId").hide();
+                        $("#recUserId").hide();
+
+                    }
+                }
+
+            });
+        }
+
+
+        function getStatusList() {
+            Ls.ajax({
+                type: "POST",
+                url: "/messageBoard/getStatusList",
+                data: {columnId: content_mgr.node.indicatorId}
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+                var str = '<li><a href="javascript:;" onclick="searchByPublish(1)">已发布</a></li>' +
+                        '<li><a href="javascript:;" onclick="searchByPublish(0)">未发布</a></li>';
+                str += '<li class="divider"></li>';
+                str += '<li><a href="javascript:;" onclick="searchByPublic(1)">已公开</a></li>' +
+                        '<li><a href="javascript:;" onclick="searchByPublic(0)">不公开</a></li>';
+                var data = text.data;
+                if (data.length > 0) {
+                    str += '<li class="divider"></li>';
+                    for (var i = 0; i < data.length; i++) {
+                        str += '<li><a href="javascript:;" onclick="searchByStatus(\'' + data[i].statusCode + '\')">' + data[i].statusName + '</a></li>'
+                    }
+                }
+                $('#statusList').append(str);
+            });
+        }
+
+        //全选，取消全选
+        function checkAll() {
+            if (cur.c == 0) {
+                $("input[name='check']").prop("checked", true);
+                cur.c = 1;
+                return;
+            } else {
+                $("input[name='check']").prop("checked", false);
+                cur.c = 0;
+                return;
+            }
+        }
+
+        //搜索
+        function searchContent() {
+            cur.params.st = $("#startDate").val();
+            cur.params.ed = $("#endDate").val();
+            cur.params.title = $("#searchKey").val();
+            cur.params.username = $("#username").val();
+            cur.params.classCode = $("#classCode").val();
+            cur.params.receiveUnitId = $("#recUnitId").val();
+            cur.grid.load(cur.params);
+        }
+
+        //显示全部
+        function searchClear() {
+            $("#searchKey").val("");
+            $("#username").val("");
+            $("#classCode").val("");
+            $("#recUnitId").val("");
+            $("#startDate").val("");
+            $("#endDate").val("");
+            $("#endDate").val("");
+            $("#recUnitId").val("");
+            cur.params.receiveUnitId = '';
+            cur.params.classCode = '';
+            cur.params.title = '';
+            cur.params.st = '';
+            cur.params.ed = '';
+            cur.params.username = '';
+            cur.params.isScreen = '';
+            cur.params.isPublish = '';
+            cur.params.isPublic = '';
+            cur.params.dealStatus = '';
+            cur.grid.load(cur.params);
+        }
+
+
+        //修改
+        function modify(id) {
+            var columnId = cur.params.columnId;
+
+            Ls.openWin('/messageBoard/modify?id=' + id + '&&columnId=' + columnId, '600px', '480px', {
+                id: 'modify',
+                title: '修改操作',
+                padding: 0
+            });
+        }
+
+        function show(obj, id) {
+            Ls.log(obj)
+            var obj = $(obj),
+                    objDiv = $("#messageBoardContent");
+            objDiv.show().css({
+                left: obj.offset().left - 550,
+                top: obj.offset().top - 30
+            })
+
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/messageBoard/getLinkContent",
+                success: function (text) {
+                    if (!text.status) {
+                        Ls.tipsErr(text.desc);
+                        return;
+                    }
+                    $(objDiv).html(text.data.messageBoardContent);
+                }
+            });
+
+        }
+
+        function hide(obj) {
+            var objDiv = $("#messageBoardContent");
+            $(objDiv).css("display", "none");
+        }
+
+
+        //改变发布状态
+        function changePublish(id,isPublish) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    isPublish:isPublish
+                },
+                url: "/articleNews/changePublish",
+                success: function (text) {
+                    if (!text.status) {
+                        Ls.tipsErr(text.desc);
+                        return;
+                    }
+                    var isSuccess = text.data;
+                    if (isSuccess == 1) {
+                        $("#p_" + id).addClass("green-meadow");
+                        Ls.tipsOk("取消发布成功");
+                        searchContent();
+                    } else {
+                        $("#p_" + id).removeClass("green-meadow");
+                        Ls.tipsOk("发布成功");
+                        searchContent();
+                    }
+
+                }
+            });
+        }
+
+        //批量发布
+        function batchPublish(type) {
+            var check = [];
+            $("input[name='check']:checked").each(function (i, val) {
+                check.push(val.value);
+            });
+            if (check.length <= 0) {
+                Ls.tipsInfo("至少选择一项");
+                return;
+            }
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    siteId: GLOBAL_SITEID,
+                    columnId: cur.columnId,
+                    type: type
+                },
+                url: "/messageBoard/batchPublish",
+                success: function (text) {
+                    var isSuccess = text.data;
+                    if (isSuccess) {
+                        if (type == 1) {
+                            Ls.tipsOk("批量发布成功");
+                        } else {
+                            Ls.tipsOk("批量取消发布成功");
+                        }
+                    } else {
+                        if (type == 1) {
+                            Ls.tipsErr("批量发布失败");
+                        } else {
+                            Ls.tipsErr("批量取消发布失败");
+                        }
+                        return;
+                    }
+                    searchContent();
+                }
+            });
+        }
+
+        //发布属性筛选
+        function searchByPublish(type) {
+            cur.params.isPublish = type;
+            cur.grid.load(cur.params);
+        }
+
+        //公开属性筛选
+        function searchByPublic(type) {
+            cur.params.isPublic = type;
+            cur.grid.load(cur.params);
+        }
+        function searchByStatus(code) {
+            cur.params.dealStatus = code;
+            cur.grid.load(cur.params);
+        }
+        function searchByScreen(isScreen) {
+            cur.params.isScreen = isScreen;
+            cur.grid.load(cur.params);
+        }
+
+
+        //后台打开回复弹窗
+        function reply(id, messageBoardId, isSuper) {
+            var columnId = cur.params.columnId;
+            var isPublish = cur.params.isPublish;
+            var key = cur.params.key;
+            var dealStatus = cur.params.dealStatus;
+            var classCode = cur.params.classCode;
+            var pageIndex = cur.params.pageIndex;
+            var receiveId = cur.params.receiveId;
+            var recUserId = cur.params.recUserId;
+
+            Ls.openWin('/messageBoard/messageBoardReply?id=' + id + '&&messageBoardId=' + messageBoardId + '&&columnId=' + columnId + '&&isSuper=' + isSuper + '&&key=' + encodeURI(key) +
+                    '&&isPublish=' + isPublish + '&&dealStatus=' + dealStatus + '&&classCode=' + classCode + '&&receiveId=' + receiveId + '&&recUserId=' +
+                    recUserId + '&&pageIndex=' + pageIndex, '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0
+            });
+
+        }
+
+        //后台打开收回弹窗
+        function recover(id) {
+            var columnId = cur.params.columnId;
+            Ls.openWin('/acceptCenter/recoverRecord?id=' + id + '&&columnId=' + columnId, '600px', '380px', {
+                id: 'recover',
+                title: '收回',
+                padding: 0
+
+            });
+
+        }
+
+        //查看图片
+        function queryImage(image) {
+            Ls.openWin('/messageBoard/queryImage?image=' + image, '600px', '450px', {
+                id: 'image',
+                title: '查看图片',
+                padding: 0,
+                close: function () {
+                }
+            });
+
+        }
+
+        //后台打开审核弹窗
+        function apply(messageBoardId, applyStatus) {
+            if (applyStatus == 1) {
+                Ls.tipsInfo("您提交的申请正在处理,请耐心等待!");
+                return;
+            }
+            Ls.openWin('/messageBoard/messageBoardApply?messageBoardId=' + messageBoardId + '&&applyStatus=' + applyStatus, '600px', '380px', {
+                id: 'apply',
+                title: '申请延期',
+                padding: 0
+            });
+
+        }
+
+        //打开转办功能窗口
+        function forwardById(id,messageColumnId) {
+            Ls.openWin('/messageBoard/messageBoardForward?id=' + id + '&columnId=' + cur.params.columnId+'&messageColumnId=' +messageColumnId, '500px', '480px', {
+                id: 'message_button_forward',
+                title: "留言转办",
+                ok: function () {
+                    var iframe = this.iframe.contentWindow;
+                    if (!iframe.document.body) {
+                        return false;
+                    }
+                    iframe.$("#" + iframe.cur.id).submit();
+                    return false;
+                }
+            });
+        }
+
+
+        //单个删除
+        function deleteById(id) {
+            if (confirm("确定删除留言？")) {
+                Ls.ajaxGet({
+                    data: {
+                        id: id
+                    },
+                    url: "/messageBoard/delete",
+                    success: function (text) {
+                        Ls.tipsOk("删除成功");
+                        searchContent();
+
+                    }
+                });
+            }
+        }
+
+        //单个回复删除
+        function deleteReply(id, replyId) {
+            if (confirm("确定删除回复内容？")) {
+                Ls.ajaxGet({
+                    data: {
+                        id: id,
+                        replyId: replyId
+                    },
+                    url: "/messageBoard/deleteReply",
+                    success: function (text) {
+                        Ls.tipsOk("删除成功");
+                        searchContent();
+
+                    }
+                });
+            }
+        }
+
+
+        //修改回复内容
+        function updateReply(id, replyId) {
+            var columnId = cur.params.columnId;
+
+            Ls.openWin('/messageBoard/replyModify?id=' + id + '&&replyId=' + replyId, '600px', '480px', {
+                id: 'modify',
+                title: '修改操作',
+                padding: 0
+            });
+        }
+
+        //后台打开退回弹窗
+        function goBack(id) {
+
+            Ls.openWin('/messageBoard/messageBoardGoBack?id=' + id, '600px', '280px', {
+                id: 'goBack',
+                title: '退回',
+                padding: 0
+            });
+
+        }
+
+
+        //批量删除
+        function deletes() {
+            var check = [];
+            $("input[name='check']:checked").each(function (i, val) {
+                check.push(val.value);
+            })
+            if (check.length <= 0) {
+                Ls.tipsInfo("至少选择一项");
+                return;
+            }
+            if (confirm("确定删除选中记录？")) {
+                Ls.ajaxGet({
+                    data: {
+                        ids: check
+                    },
+                    url: "/messageBoard/batchDelete",
+                    success: function (text) {
+                        Ls.tipsOk("批量删除成功");
+                        searchContent();
+                    }
+                });
+            }
+        }
+
+        //打开转办记录窗口
+        function record(id) {
+            Ls.openWin('/messageBoard/queryForwardRecord?id=' + id + '&columnId=' + cur.params.columnId, '700px', '400px', {
+                id: 'record',
+                title: '转办记录',
+                padding: 0
+            });
+        }
+
+        function doPrint(baseContentId, id) {
+//        Ls.openWin('/guestBook/doPrint?id=' + id, '700px', '400px', {
+//          id: 'do_print',
+//          title: '打印留言受理单',
+//          padding: 0
+//        });
+            content_mgr.getContentApp("/messageBoard/doPrint?baseContentId=" + baseContentId + "&id=" + id + '&columnId=' + cur.params.columnId + "&&pageIndex=" + cur.params.pageIndex);
+
+        }
+
+        //修改
+        var doAdd = function (id) {
+            content_mgr.getContentApp("/messageBoard/add?columnId=" + content_mgr.node.indicatorId + "&&pageIndex=" + cur.params.pageIndex);
+        };
+
+
+        //详情页面
+        function messageBoardInfo(baseContentId) {
+            Ls.openWin("/messageBoard/messageBoardInfo?id=" + baseContentId + "&columnId=" + content_mgr.node.indicatorId + "&deal=" + cur.deal
+                    + "&forward=" + cur.forward + "&publish=" + cur.publish + "&edit=" + cur.edit + "&apply=" + cur.apply
+                    + "&recover=" + cur.recover, '1000px', '680px', {
+                id: 'messageBoardInfo',
+                title: '详情页面',
+                padding: 0,
+                close: function () {
+                    searchContent();
+                }
+
+            });
+
+        }
+
+        //下载
+        function downLoad(attachId) {
+            var url = "/fileCenter/download/" + attachId;
+            $("#download").attr("src", url);
+        }
+
+    </script>
+
+
+</div>

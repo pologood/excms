@@ -1,0 +1,56 @@
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10" style="padding-top: 10px;">
+
+
+
+
+
+    <fieldset>
+        <legend>头部背景</legend>
+        <sui-control-group title="上传图片">
+            <a id="addImageBtn" href="javascript:void(0);" class="sui-btn btn-xlarge">添加图片</a>
+        </sui-control-group>
+
+        <sui-control-group title="图片地址">
+            <sui-input size="xlarge" v-model="src" rules="required" errmsg="请输入图片地址"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group>
+            <div class="sui-row-fluid">
+                <div class="span11">
+                    <img :src="headerbgUrl" alt="">
+                </div>
+            </div>
+        </sui-control-group>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>头部banner背景</legend>
+        <sui-control-group title="上传图片">
+            <a id="addPageBgBtn" href="javascript:void(0);" class="sui-btn btn-xlarge">添加图片</a>
+        </sui-control-group>
+
+        <sui-control-group title="图片地址">
+            <sui-input size="xlarge" v-model="pageBgSrc" rules="required" errmsg="请输入图片地址"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group>
+            <div class="sui-row-fluid">
+                <div class="span11">
+                    <img :src="headerPageBgSrc" alt="">
+                </div>
+            </div>
+        </sui-control-group>
+    </fieldset>
+
+
+
+
+
+
+</form>
+
+
+
+
+

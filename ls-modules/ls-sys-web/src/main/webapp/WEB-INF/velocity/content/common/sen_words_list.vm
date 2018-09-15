@@ -1,0 +1,125 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;page-body-white" class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <button id="adduser_btn" class="btn btn-default btn-replace" onclick="replaces()">批量替换
+                            </button>
+                            <button id="adduser_btn" class="btn btn-default btn-neglect" onclick="neglectAll()"> 忽略
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false"
+                     onlyCheckSelection="true" allowResize="true"
+                     sizeList="[20,30,50]" pageSize="10" showPager="false"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <!--<div type="indexcolumn"></div> -->
+                        <div type="checkcolumn" width="50"></div>
+                        <div field="words" width="50%" headerAlign="center" allowSort="false">敏感词</div>
+                        <div width="50%" headerAlign="center" allowSort="false" renderer="repWord">替换词</div>
+                        <div width="115" headerAlign="center" allowSort="false" renderer="renderOp" align="center">操作
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+    var content = Ls.getWin.win.eweb.getHtml();
+    var title = Ls.getWin.win.$("#title").val() || "";
+    var subTitle = Ls.getWin.win.$("#subTitle").val() || "";
+    var remarks = Ls.getWin.win.$("#remarks").val() || "";
+    var author = Ls.getWin.win.$("#author").val() || "";
+    var resources = Ls.getWin.win.$("#resources").val() || "";
+    var grid = mini.get("datagrid1");
+
+    grid.load({dataFlag: 1, flag: "SENSITIVE", content: content + title + subTitle + remarks});
+
+    grid.setUrl("/content/getCheckList");
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid, 60);
+    $(document).ready(function () {
+
+    })
+
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        tgBtn = '<button class="btn btn-sm btn-default btn-edit"  onclick="replaceOpr(' + rec._uid + ',' + rec.id + ',\'' + rec.words + '\')">替 换</button> '
+        qsBtn = '<button class="btn btn-sm btn-default btn-delete" onclick="deleteOpr(' + rec._uid + ')">忽 略</button>'
+        str += tgBtn + qsBtn;
+        return str;
+    }
+
+    function repWord(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<input id="' + rec.id + '" value="' + rec.replaceWords + '" class="form-control" style="height:18px"></input>';
+        return str;
+    }
+
+    function deleteOpr(uid) {
+        var row = grid.getRowByUID(uid);
+        grid.removeRow(row);
+    }
+
+    function replaceOpr(uid, id, words) {
+        var replaceWords = $("#" + id).val();
+        content = content.replaceAll(words, replaceWords);
+        title = title.replaceAll(words, replaceWords);
+        subTitle = subTitle.replaceAll(words, replaceWords);
+        remarks = remarks.replaceAll(words, replaceWords);
+        author = author.replaceAll(words, replaceWords);
+        resources = resources.replaceAll(words, replaceWords);
+        Ls.getWin.win.eweb.setHtml(content);
+        Ls.getWin.win.$("#title").val(title);
+        Ls.getWin.win.$("#subTitle").val(subTitle);
+        Ls.getWin.win.$("#remarks").val(remarks);
+        Ls.getWin.win.$("#author").val(author);
+        Ls.getWin.win.$("#resources").val(resources);
+        var row = grid.getRowByUID(uid);
+        grid.removeRow(row);
+    }
+
+    function replaces() {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            for (var i = 0; i < rows.length; i++) {
+                var replaceWords = $("#" + rows[i].id).val();
+                content = content.replaceAll(rows[i].words, rows[i].replaceWords);
+                title = title.replaceAll(rows[i].words, rows[i].replaceWords);
+                subTitle = subTitle.replaceAll(rows[i].words, rows[i].replaceWords);
+                remarks = remarks.replaceAll(rows[i].words, rows[i].replaceWords);
+                author = author.replaceAll(words, replaceWords);
+                resources = resources.replaceAll(words, replaceWords);
+                var row = grid.getRowByUID(rows[i].uid);
+                grid.removeRow(rows[i]);
+            }
+            Ls.getWin.win.eweb.setHtml(content);
+            Ls.getWin.win.$("#title").val(title);
+            Ls.getWin.win.$("#subTitle").val(subTitle);
+            Ls.getWin.win.$("#remarks").val(remarks);
+            Ls.getWin.win.$("#author").val(author);
+            Ls.getWin.win.$("#resources").val(resources);
+        }
+    }
+
+    function neglectAll() {
+        Ls.winClose();
+    }
+</script> 

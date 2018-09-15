@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<!-- 配置connectionFactory -->
+	<bean id="messageJmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		destroy-method="stop">
+		<property name="connectionFactory">
+			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL" value="failover://(${jms.broker.url})?initialReconnectDelay=100" />
+				<property name="useAsyncSend" value="true" />
+			</bean>
+		</property>
+		<property name="maxConnections" value="${jms.maxConnections}"></property>
+	</bean>
+
+	<!-- 发送消息的目的地（一个队列） -->
+	<bean id="messageDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<!-- 设置消息队列的名字 -->
+		<constructor-arg index="0" value="${jms.queue.destination}" />
+	</bean>
+
+	<!-- Spring JMS Template -->
+	<bean name="messageJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="messageJmsFactory" />
+		<property name="defaultDestination" ref="messageDestination" />
+		<!-- 区别它采用的模式为false是p2p为true是订阅 -->
+		<property name="pubSubDomain" value="false" />
+	</bean>
+</beans>

@@ -1,0 +1,130 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form  role="form" ms-controller="catalog_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>当前办理人：</label>
+                            $!{oldAssigneeName}
+                        </div>
+                        <div class="form-group">
+                            <label>标题：</label>
+                              <span>$!{title}</span>
+                        </div>
+                        <div class="form-group">
+                            <label>移交原因：</label>
+                            <textarea class="form-control" id="reason" name="reason"  ms-duplex="description" rows="3" placeholder="移交原因"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>办理人：</label>
+                            <button class="btn btn-default" type="button" onClick="CUR.fn.selectUser()">选择办理人</button>
+                            <div style="margin:5px;"><textarea class="form-control" id="assigneePersonName" name="assigneePersonName"  rows="3" placeholder="办理人"></textarea></div>
+                        </div>
+                    </div>
+                    <input id="doSubmit" type="button" style="display:none;" onclick="" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/goa/core/jquery.min.js"></script>
+#parse("_page_layout/_footer.vm")
+<script>
+  var CUR={
+    // 为KO准备的viewModel对象
+    viewModel : {},
+    // 所有当前页面级方法的命名空间对象
+    fn:{},
+    // 所有当前页面与服务端交互的action命名空间
+    action:{
+
+    },
+    // 所有当前获取jQuery的DOM对象的存储的命名空间对象
+    el:{},
+    // 获取当前页URL参数的命名空间对象
+    params:{
+      taskId : '$!{taskId}',
+      recordId : '$!{recordId}',
+      moduleCode : '$!{moduleCode}',
+      oldAssigneeName : '!${oldAssigneeName}',
+      oldAssigneeId : '$!{oldAssigneeId}'
+    },
+    dg : Ls.getWin.api,
+    pWin : Ls.getWin.win,
+    page:{
+    },
+    assignee : {}
+  };
+
+  jQuery(document).ready(function(){
+    CUR.assigneePersonName = $("#assigneePersonName");
+    CUR.dg.button({
+        id: "do_submit",
+        name: "确定",
+        focus: true,
+        callback: function () {
+            CUR.fn.ok();
+            return false;
+        }
+    });
+  });
+
+  //选择人员
+  CUR.fn.selectUser = function (){
+    Ls.selectUnitUser(function(arg){
+      if(arg && $.type(arg)=="object"){
+        CUR.assignee = arg.list;
+        CUR.assigneePersonName.text(arg.name);
+      }
+    },{
+      scope:0,
+      scopeType:'single',
+      organIds:'$!{unitId}',
+      data:{
+        list: CUR.assignee
+      }
+    });
+  }
+  CUR.fn.ok = function (){
+    if(!Ls.isEmpty(CUR.params.oldAssigneeId)){
+      if(CUR.params.oldAssigneeId == CUR.assignee[0].userId){
+        Ls.tipsErr("移交办理人不能为原办理人");
+        return;
+      }
+    }
+    //提交数据
+    var reason = $("#reason").val();
+    var postData = {};
+    postData.taskId = CUR.params.taskId;
+    postData.recordId = CUR.params.recordId;
+    postData.moduleCode = CUR.params.moduleCode;
+    postData.reason = reason;
+    postData.assigneeStr = JSON.stringify(CUR.assignee);
+    var url = '/process/transfer';
+    Ls.ajax({
+        type: "POST",
+        data: postData,
+        url: url,
+        success: function (json) {
+            if(json.status == 1){
+                Ls.tipsOk("移交成功",function(){
+                    try{
+                        if(CUR.pWin.cur.grid){
+                            CUR.pWin.cur.grid.reload();
+                        }
+                        if(CUR.pWin.cur.fn.close){
+                            CUR.pWin.cur.fn.close();
+                        }
+                    }catch(e){}
+                    CUR.dg.close();
+                });
+            }else{
+                Ls.tipsErr(json.desc);
+            }
+        }
+    });
+  };
+</script>

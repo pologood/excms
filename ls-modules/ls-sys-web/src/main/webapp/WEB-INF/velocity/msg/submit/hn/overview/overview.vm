@@ -1,0 +1,577 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+
+            <h3 class="page-title"> 待办报送事项统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat blue">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                            </div>
+                            <div class="desc"> 我要报送信息</div>
+                        </div>
+                        <a class="more" href="javascript:void(0);" data-code="" data-type="" onclick="javascript:submitMsg();"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat red">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="msg_lookMsg">0</span>
+                            </div>
+                            <div class="desc"> 待查阅报送信息</div>
+                        </div>
+                        <a class="more todolink" data-code="lookMsg" data-type="lookMsg"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat red">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="msg_tobeMsg">0</span>
+                            </div>
+                            <div class="desc"> 待发布报送信息</div>
+                        </div>
+                        <a class="more todolink" data-code="tobeMsg" data-type="tobeMsg"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat red">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="msg_beMsg">0</span>
+                            </div>
+                            <div class="desc"> 已发布报送信息</div>
+                        </div>
+                        <a class="more todolink" data-code="beMsg" data-type="beMsg"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                #if($!{isUserPageShow})
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                        <div class="dashboard-stat blue">
+                            <div class="visual">
+                                <i class="fa fa-comments"></i>
+                            </div>
+                            <div class="details">
+                                <div class="number">
+                                </div>
+                                <div class="desc"> 用户管理</div>
+                            </div>
+                            <a class="more" href="javascript:void(0);" data-code="" data-type="" onclick="javascript:App.getContentHtml('/person/userPage');"> 查看更多>>
+                                <i class="m-icon-swapright m-icon-white"></i>
+                            </a>
+                        </div>
+                    </div>
+                #end
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat green">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                            </div>
+                            <div class="desc"> 修改密码</div>
+                        </div>
+                        <a class="more" href="javascript:void(0);" data-code="" data-type="" onclick="javascript:indexMgr.editPersonalInfo();"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat green">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                            </div>
+                            <div class="desc"> 退出</div>
+                        </div>
+                        <a class="more" href="javascript:void(0);" data-code="" data-type="" onclick="javascript:logoutView();"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            #*<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <div class="dashboard-stat grey">
+                    <div class="visual">
+                        <i class="fa fa-comments"></i>
+                    </div>
+                    <div class="details">
+                        <div class="number">
+                        </div>
+                        <div class="desc"> <a href="http://www.huainan.gov.cn" target="_blank" class="desc">淮南市人民政府网站</a>  </div>
+                    </div>
+                    <a class="more" href="http://www.huainan.gov.cn" target="_blank" data-code="" data-type=""> 点击打开
+                        <i class="m-icon-swapright m-icon-white"></i>
+                    </a>
+                </div>
+            </div>*#
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12"
+                     style="display: #if("$!{webdomain}" == "http://www.huainan.gov.cn" || "$!{webdomain}" == "http://new.huainan.gov.cn")none #else block #end">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                            </div>
+                            <div class="desc"><a href="$!{webdomain}" target="_blank" class="desc">$!{siteName}</a></div>
+                        </div>
+                        <a class="more" href="$!{webdomain}" target="_blank" data-code="" data-type=""> 点击打开
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <!-- END DASHBOARD STATS 1-->
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日访问地区分析图</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">全站关键词搜索排行
+                                    <!--</span> &nbsp; <span style="font-size:14px;color:red">(数据来自搜索引擎统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_b" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日流量分析图</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_c" style="height: 365px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="portlet light tasks-widget bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日流量趋势统计</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_d" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    mini.parse();
+
+    var cur = {
+        dialog: Ls.getWin.dialog
+    };
+
+    var cnzzData = {};
+
+    $(document).ready(function () {
+
+        get_todoNumber();
+
+        Ls.parseEcharts(function () {
+            // 使用
+            require([
+                    'echarts',
+                    'echarts/chart/line',
+                    'echarts/chart/bar',
+                    'echarts/chart/pie',
+                    'echarts/chart/funnel'
+                ], function (ec) {
+                    Ls.ajax({
+                        type: "GET",
+                        data: "",
+                        url: "/siteChartIndex/index",    // "/charts/getData",
+                        success: function (text) {
+                            if (text.status == 1) {
+                                cnzzData.llList = text.data.trendData;
+                                cnzzData.syList = text.data.syList;
+                                cnzzData.fwlyList = text.data.innerVisitSource;
+                                cnzzData.ssyqList = text.data.outVisitSource;
+                                cnzzData.provList = text.data.cityList;
+                                cnzzData.proNumList = text.data.cityData;
+                                cnzzData.kwList = text.data.kwList;
+                                cnzzData.kwNumList = text.data.kwNumList;
+                                var inner = [0, 85];
+                                var outer = [110, 150];
+                                if (cnzzData.ssyqList == "") {
+                                    inner = [0, 140];
+                                    outer = [];
+                                }
+
+                                cnzzData.option_a = {
+                                    grid: {
+                                        x: 50,
+                                        x2: 20,
+                                        y: 50
+                                    },
+                                    title: {
+                                        text: '',
+                                        subtext: ''
+                                    },
+                                    tooltip: {
+                                        trigger: 'item'
+                                    },
+                                    legend: {
+                                        show: false,
+                                        data: ['访问量']
+                                    },
+                                    toolbox: {
+                                        show: true,
+                                        feature: {
+                                            magicType: {show: true, type: ['line', 'bar']},
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        }
+                                    },
+                                    calculable: true,
+                                    xAxis: [
+                                        {
+                                            type: 'category',
+                                            axisLabel: {
+                                                interval: 0
+                                            },
+                                            data: cnzzData.provList
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'value'
+                                        }
+                                    ],
+                                    series: [
+                                        {
+                                            name: '访问量',
+                                            type: 'bar',
+                                            itemStyle: {
+                                                normal: {
+                                                    label: {
+                                                        show: true,
+                                                        position: 'top'
+                                                    }
+                                                }
+                                            },
+                                            data: cnzzData.proNumList
+
+                                        }
+                                    ]
+                                };
+
+
+                                cnzzData.option_b = {
+                                    grid: {
+                                        x: 80,
+                                        x2: 40,
+                                        y: 50
+                                    },
+                                    title: {
+                                        show: false,
+                                        text: '',
+                                        subtext: ''
+                                    },
+                                    tooltip: {
+                                        trigger: 'item',
+                                        formatter: "{a} <br/>{b} : {c} ({d}次)"
+                                    },
+                                    legend: {
+                                        show: false,
+                                        data: ['关键词搜索']
+                                    },
+                                    toolbox: {
+                                        show: true,
+                                        feature: {
+                                            magicType: {show: true, type: ['line', 'bar']},
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        }
+                                    },
+                                    calculable: true,
+                                    xAxis: [
+                                        {
+                                            type: 'value',
+                                            boundaryGap: [0, 0.01]
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'category',
+                                            data: cnzzData.kwList
+                                        }
+                                    ],
+                                    series: [
+                                        {
+                                            name: '关键词搜索',
+                                            type: 'bar',
+                                            data: cnzzData.kwNumList
+                                        }
+                                    ],
+                                    color: [
+                                        '#1790cf', '#1bb2d8', '#99d2dd', '#88b0bb',
+                                        '#1c7099', '#038cc4', '#75abd0', '#afd6dd'
+                                    ]
+                                }
+
+
+                                cnzzData.option_c = {
+                                    tooltip: {
+                                        trigger: 'item',
+                                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                    },
+                                    legend: {
+                                        orient: 'vertical',
+                                        x: 'left',
+                                        data: cnzzData.syList
+                                    },
+                                    toolbox: {
+                                        show: true,
+                                        feature: {
+                                            magicType: {
+                                                show: true,
+                                                type: ['pie', 'funnel']
+                                            },
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        }
+                                    },
+                                    calculable: false,
+                                    series: [
+                                        {
+                                            name: '访问来源',
+                                            type: 'pie',
+                                            selectedMode: 'single',
+                                            radius: inner,
+
+                                            x: '20%',
+                                            width: '40%',
+                                            funnelAlign: 'right',
+                                            // max: 1548,
+
+                                            itemStyle: {
+                                                normal: {
+                                                    label: {
+                                                        position: 'inner'
+                                                    },
+                                                    labelLine: {
+                                                        show: false
+                                                    }
+                                                }
+                                            },
+                                            data: cnzzData.fwlyList
+                                        },
+                                        {
+                                            name: '访问来源',
+                                            type: 'pie',
+                                            radius: outer,
+
+                                            x: '60%',
+                                            width: '35%',
+                                            funnelAlign: 'left',
+                                            max: 1048,
+
+                                            data: cnzzData.ssyqList
+                                        }
+                                    ]
+                                };
+
+
+                                cnzzData.option_d = {
+                                    grid: {
+                                        x: 50,
+                                        x2: 20,
+                                        y: 50
+                                    },
+                                    tooltip: {
+                                        trigger: 'item'
+                                    },
+                                    legend: {
+                                        show: false,
+                                        data: ['访问次数']
+                                    },
+                                    toolbox: {
+                                        show: true,
+                                        feature: {
+                                            magicType: {
+                                                show: true,
+                                                type: ['line', 'bar']
+                                            },
+                                            restore: {show: true},
+                                            saveAsImage: {show: true}
+                                        }
+                                    },
+                                    calculable: true,
+                                    xAxis: [
+                                        {
+                                            type: 'category',
+                                            boundaryGap: false,
+                                            data: ['00:59-01:00', '01:59-02:00', '02:59-03:00', '03:59-04:00', '04:59-05:00', '05:59-06:00', '06:59-07:00',
+                                                '07:59-08:00', '08:59-09:00', '09:59-10:00', '10:59-11:00', '11:59-12:00', '12:59-13:00', '13:59-14:00', '14:59-15:00',
+                                                '15:59-16:00', '16:59-17:00', '17:59-18:00', '18:59-19:00', '19:59-20:00', '20:59-21:00', '21:59-22:00', '22:59-23:00', '23:59-00:00']
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'value'
+                                        }
+                                    ],
+                                    series: [
+                                        {
+                                            name: '访问次数',
+                                            type: 'line',
+                                            stack: '次数',
+                                            data: cnzzData.llList
+                                        }
+                                    ]
+                                };
+
+                                var chart_a = ec.init(document.getElementById('statistics_a'));
+                                chart_a.setOption(cnzzData.option_a);
+
+                                var chart_b = ec.init(document.getElementById('statistics_b'));
+                                chart_b.setOption(cnzzData.option_b);
+
+                                var chart_c = ec.init(document.getElementById('statistics_c'));
+                                chart_c.setOption(cnzzData.option_c);
+
+                                var chart_d = ec.init(document.getElementById('statistics_d'));
+                                chart_d.setOption(cnzzData.option_d);
+
+
+                            }
+                        }
+                    });
+                }
+            );
+
+        })
+
+        $(".todolink").on('click', function () {
+            var _this = $(this),
+                code = _this.data("code"),
+                type = _this.data("type");
+            App.getContentHtml("/msg/submit/hn/" + code);
+        })
+    })
+
+    function get_todoNumber() {
+        Ls.ajaxGet({
+            url: "/msg/submit/hn/getOverViewData",
+            data: {}
+        }).done(function (d) {
+            var d = d.data;
+            if (d.lookMsg) {
+                $('#msg_lookMsg').text(d.lookMsg);
+            }
+            if (d.tobeMsg) {
+                $('#msg_tobeMsg').text(d.tobeMsg);
+            }
+            if (d.beMsg) {
+                $('#msg_beMsg').text(d.beMsg);
+            }
+        })
+    };
+
+    function submitMsg() {
+        cur.dialog.data('type', 'add');
+        Ls.openWin("/msg/submit/hn/addOrEdit", '1000px', '500px', {
+            title: "添加报送信息",
+            zIndex: 99999
+        });
+    }
+
+    function callback_add_or_edit(msg) {
+        get_todoNumber();
+        Ls.tips(msg, {times: 2});
+    }
+
+    function logoutView() {
+        Ls.ajaxGet({
+            url: "/logout"
+        }).done(function (d) {
+            if (d.status == 1) {// 登出成功
+                window.location.replace(Ls.getLocation.url + GLOBAL_CONTEXTPATH + d.data);
+            } else {
+                Ls.tips(d.desc, {
+                    icons: "error"
+                });
+            }
+        });
+    }
+</script>

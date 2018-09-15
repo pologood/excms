@@ -1,0 +1,179 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<style>
+    .thumb img {
+        max-width: 620px;
+    }
+</style>
+<div class="container-fluid">
+    <!-- BEGIN SAMPLE FORM PORTLET-->
+    <div class="portlet light">
+        <div class="portlet-body form">
+            <form role="form" ms-controller="specialMaterialForm" id="specialMaterialForm" name="specialThemeForm">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="">素材分类</label>
+                        <select id="materialType" name="materialType" class="form-control" placeholder="请选择">
+                            <option value="">==请选择分类==</option>
+                            #foreach($s in $materialCategory)
+                                <option value="${s.code}">${s.name}</option>
+                            #end
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">所属类别</label>
+                        <select id="materialType" name="materialType" class="form-control" placeholder="请选择">
+                            <option value="">==请选择分类==</option>
+                            #foreach($s in $materialType)
+                                <option value="${s.code}">${s.name}</option>
+                            #end
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="">素材名称</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="素材名称" ms-duplex="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="">素材宽度</label>
+                        <input type="text" id="width" name="width" class="form-control" placeholder="素材宽度" ms-duplex="width">
+                    </div>
+                    <div class="form-group">
+                        <label for="">素材高度</label>
+                        <input type="text" id="height" name="height" class="form-control" placeholder="素材高度" ms-duplex="height">
+                    </div>
+                    <div class="form-group">
+                        <label for="">素材图片</label>
+                        <div class="thumb">
+                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                        </div>
+                        <div class="mt10 mb20">
+                            <button type="button" class="btn btn-default btn-add" id="uploadImg">上传</button>
+                            <button type="button" class="btn btn-default btn-delete" id="delImg">删除</button>
+                        </div>
+                    </div>
+                    <input type="submit" style="display: none;" id="doSubmit">
+                    <input type="hidden" id="imgPath" name="imgPath" class="form-control" placeholder="图片路径" ms-duplex="imgPath">
+            </form>
+        </div>
+    </div>
+</div>
+
+    #parse("_page_layout/_footer.vm")
+
+<script>
+
+    var cur = {
+        formId: 'specialMaterialForm',
+        params: {
+            id: '$!{id}'
+        },
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        vm: {},
+        imgLink: $("#imageLink")
+    }
+
+    $(document).ready(function () {
+        cur.api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    $("#doSubmit").click();
+                    return false;
+                }
+            },
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+        getData();
+        validate();
+    })
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function validate() {
+        $('#' + cur.formId).validator({
+            fields: {
+                'name': '素材名称:required;'
+            },
+            valid: function () {
+                saveData();
+            }
+        });
+    }
+
+
+    function getData() {
+        Ls.ajaxGet({
+            url: "/specialMaterial/getSpecialMaterial",
+            data: {id: cur.params.id}
+        }).done(function (json) {
+            var data = json.data;
+            //初始化表单字段
+            cur.initData = Ls.initFORM(cur.formId, data);
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.define(cur.initData);
+            avalon.scan($("#" + cur.formId).get(0), cur.vm);
+            if (!Ls.isEmpty(data.imgPath)) {
+//                cur.imgLink.attr("width", 630);
+//                cur.imgLink.attr("height", 70);
+                if (data.imgPath.indexOf('/') > -1) {
+                    cur.imgLink.attr("src", data.imgPath);
+                } else if (data.imgPath.indexOf('.') != -1){
+                    cur.imgLink.attr("src", GLOBAL_FILESERVERNAMEPATH + data.imgPath);
+                } else {
+                    cur.imgLink.attr("src", GLOBAL_FILESERVERPATH + data.imgPath);
+                }
+            }
+        });
+    }
+
+    function saveData() {
+        var data = Ls.toJSON(cur.vm.$model);
+        Ls.ajax({
+            type: "POST",
+            data: data,
+            url: "/specialMaterial/saveSpecialMaterial",
+            success: function (json) {
+                if (json.status == 1) {
+                    Ls.tipsOk("操作成功", function () {
+                        cur.win.cur.grid.reload();
+                        Ls.winClose();
+                    })
+                }
+            }
+        });
+    }
+
+    $("#uploadImg").click(function () {
+        Ls.uploadFile(function (filePath) {
+            var path = filePath[0].fileName;
+            cur.vm.imgPath = path;
+            cur.imgLink.attr("src", (path.indexOf(".") != -1 ? GLOBAL_FILESERVERNAMEPATH ：GLOBAL_FILESERVERPATH) + path);
+            return true;
+        }, {
+            file_upload_limit: 1,
+            post_params: {}
+        });
+    });
+
+    $("#delImg").click(function () {
+        cur.imgLink.attr("src", GLOBAL_CONTEXTPATH + '/assets/images/no.photo.jpg');
+        cur.vm.imgPath = '';
+    });
+
+</script>
+</body>
+</html>

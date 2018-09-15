@@ -1,0 +1,318 @@
+<style>
+    .weibo_retweet_content {
+        background-color: gainsboro;
+        width: 90%;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        margin: 0px auto;
+        margin-bottom: 20px;
+        border: 1px solid #CEE3E9;
+        background-color: #F1F7F9
+    }
+
+    .weibo_active {
+        background-color: #27d5ff;
+    }
+</style>
+<div class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>新浪微博</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding: 15px 0 0;">
+                <div class="tab-pane active weibo_wrap" id="tab_1_1" style="padding: 5px 5px 0px 5px;">
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table width="100%">
+                                    <tr>
+                                        <td>
+                                            <button id="btn_group_commentToMe" class="btn btn-info" onclick="commentToMe(this)">评论我的</button>
+                                            <button id="btn_group_commentByMe" class="btn btn-default" onclick="commentByMe(this)">我的评论</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="doc-manage" id="sina_comment"></div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        commentType: 'toMe',
+        pageIndex: 0,
+        pageSize: 15
+    };
+
+    $(document).ready(function () {
+        sina_load_self_info();
+        sina_weibo_comment_load();
+    });
+
+    /*
+    * 评论我的
+    * */
+    function commentToMe(obj) {
+        btn_css_update('commentToMe');
+        cur.commentType = "toMe";
+        cur.pageIndex = 0;
+        sina_weibo_comment_load();
+    }
+
+    /*
+    * 我的评论
+    * */
+    function commentByMe(obj) {
+        btn_css_update('commentByMe');
+        cur.commentType = "byMe";
+        cur.pageIndex = 0;
+        sina_weibo_comment_load();
+    }
+
+    /**
+     * 按钮样式切换
+     * @param obj
+     */
+    function btn_css_update(obj) {
+        $("[id ^= btn_group]").removeClass("btn-info");
+        $("[id ^= btn_group]").addClass("btn-default");
+        $("[id = btn_group_" + obj + "]").addClass("btn-info");
+    }
+
+    function sina_weibo_comment_load() {
+        Ls.ajaxGet({
+            url: "/weibo/sina/getPageComments",
+            data: {
+                commentType: cur.commentType,
+                pageIndex: cur.pageIndex,
+                pageSize: cur.pageSize
+            },
+            success: function (resp) {
+                if (resp.data == null) {
+                    Ls.tips("加载失败!", {icons: 'error'});
+                } else {
+                    resp.type = cur.commentType;
+                    $('#sina_comment').html(Ls.template("sina_comment_tpl", resp));
+                    sina_weibo_comment_page(resp);
+                }
+            }
+        });
+    }
+
+    /*
+    * 加载自己的微博信息
+    * */
+    function sina_load_self_info() {
+        Ls.ajaxGet({
+            url: "/weibo/sina/getSelfWeiboInfo",
+            success: function (resp) {
+                if (resp.data == null) {
+                } else {
+                    cur.userDomain = resp.userDomain;
+                    cur.profileImageUrl = resp.profileImageUrl;
+                }
+            }
+        });
+    }
+
+    /*
+    * 评论分页插件
+    * */
+    function sina_weibo_comment_page(d) {
+        Ls.pagination3("#comment_page", function (index) {
+            cur.pageIndex = index - 1;
+            sina_weibo_comment_load();
+        }, {
+            pageSize: cur.pageSize,
+            currPage: d.pageIndex + 1,
+            pageCount: d.pageCount,
+        });
+    }
+
+</script>
+<script type="template" id="sina_comment_tpl">
+    <table class="table weibo-list">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <tr>
+            <th class="w30" scope="row">
+                <span><a href="http://weibo.com/<?=el.userDomain?>" target="_blank"><img src="<?=el.profileImageUrl?>" width="30"></a></span><br>
+            </th>
+            <td style="text-align: left">
+                <span onmousemove="weiboDetailShow(this)" onmouseout="weiboDetailHide(this)" id="<?=el.commentId?>"><?=el.commentText?></span>
+                <label><a href="#" cid="<?=el.commentId?>" weiboId="<?=el.weiboId?>" onclick="replyComment(this)" show="false"><u><font color="#507bb6">回复</font></u></a></label>
+                <?if(type == 'byMe'){?>
+                <label><a href="#" cid="<?=el.commentId?>" weiboId="<?=el.weiboId?>" onclick="removeReplyComment(this)" show="false"><u><font
+                    color="#507bb6">删除</font></u></a></label>
+                <?}?>
+                <div id="<?=el.weiboId?>_<?=el.commentId?>_div" style="display: none">
+                    <table width="100%">
+                        <tr>
+                            <td>
+                                <textarea id="<?=el.weiboId?>_<?=el.commentId?>_comment" name="text" style="width: 100%;height: 80px;" class="form-control"></textarea>
+                            </td>
+                        </tr>
+                        <tr style="height: 5px">
+                        </tr>
+                        <tr style="height: 30px">
+                            <td style="text-align: right">
+                                <button cid="<?=el.commentId?>" weiboId="<?=el.weiboId?>" class="btn btn-default btn-add" onclick="submitReplyComment(this)">提交</button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="<?=el.commentId?>_div" class="weibo_retweet_content weibo_wrap" style="width: 80%;display: none;position: fixed;">
+                    微博内容:
+                    <table class="table weibo-list" style="padding: 0px 0px 0px 5px">
+                        <tr>
+                            <th class="w40" scope="row">
+                                <span><a href="#" target="_blank"><img src="<?=el.profileImageUrl?>" width="50"></a></span><br>
+                            </th>
+                            <td>
+                                <table>
+                                    <tr><span><a href="#" target="_blank"><font color="#5f9ea0"><?=el.screenName?></font></a></span></tr>
+                                    <tr>
+                                        <div class="weibo-title"></div>
+                                        <div class="weibo-attr"></div>
+                                        <div class="weibo-body">
+                                            <?if(el.isRetweeted=='true') {?>
+                                            转发微博：<br>
+                                            <div class="weibo_retweet_content">
+                                                <?==el.text?> <br>
+                                                <?if(el.thumbnailPic!='' && el.thumbnailPic!=null) {?>
+                                                <a href="#"><img src="<?=el.thumbnailPic?>" showOrgin="false" thumbnailPic="<?=el.thumbnailPic?>" bmiddlePic="<?=el.bmiddlePic?>"
+                                                                 originalPic="<?=el.originalPic?>" onclick="showSinaOrginPic(this)"></img></a>
+                                                <?}?>
+                                            </div>
+                                            <?}else{?>
+                                            <?==el.text?> <br>
+                                            <?if(el.thumbnailPic!='' && el.thumbnailPic!=null) {?>
+                                            <a href="#"><img src="<?=el.thumbnailPic?>" showOrgin="false" thumbnailPic="<?=el.thumbnailPic?>" bmiddlePic="<?=el.bmiddlePic?>"
+                                                             originalPic="<?=el.originalPic?>" onclick="showSinaOrginPic(this)"></img></a>
+                                            <?}?>
+                                            <?}?>
+                                        </div>
+                                    </tr>
+                                </table>
+                            </td>
+                        <tr>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <?}?>
+    </table>
+    <div id="comment_page" class="quotes pull-right mr22 weibo_wrap"></div>
+</script>
+
+<script>
+    /**
+     * 回复信息
+     * @param obj
+     */
+    function replyComment(obj) {
+        var weiboId = $(obj).attr("weiboId");
+        var cid = $(obj).attr("cid");
+        var show = $(obj).attr("show");
+        if (show == 'true') {
+            $('#' + weiboId + "_" + cid + '_div').hide();
+            $(obj).attr("show", 'false');
+        } else {
+            $('#' + weiboId + "_" + cid + '_div').show();
+            $(obj).attr("show", 'true');
+        }
+    }
+
+    function removeReplyComment(obj) {
+        var cid = $(obj).attr("cid");
+        if (confirm('确认删除评论?')) {
+            Ls.ajaxGet({
+                url: "/weibo/sina/removeReplyComment",
+                data: {
+                    cid: cid,
+                    commentType: cur.commentType
+                },
+                success: function (resp) {
+                    Ls.tips(resp.desc);
+                    if (resp.status == 1) {
+                        sina_weibo_comment_load();
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 提交回复信息
+     * @param obj
+     */
+    function submitReplyComment(obj) {
+        var weiboId = $(obj).attr("weiboId");
+        var cid = $(obj).attr("cid");
+        var comment = $('#' + weiboId + "_" + cid + '_comment').val();
+        Ls.ajaxGet({
+            url: "/weibo/sina/replyComment",
+            data: {
+                cid: cid,
+                weiboId: weiboId,
+                comment: comment
+            },
+            success: function (resp) {
+                Ls.tips(resp.desc);
+                if (resp.status == 1) {
+                    $('#' + weiboId + "_" + cid + '_div').hide();
+                    $('#' + weiboId + "_" + cid + '_comment').val('');
+                    sina_weibo_comment_load();
+                }
+            }
+        });
+    }
+
+    /**
+     * 显示微博内同
+     * @param obj
+     */
+    function weiboDetailShow(obj) {
+        var id = $(obj).attr("id");
+        $('#' + id + '_div').show();
+    }
+
+    /**
+     * 隐藏微博内同
+     * @param obj
+     */
+    function weiboDetailHide(obj) {
+        var id = $(obj).attr("id");
+        $('#' + id + '_div').hide();
+    }
+
+    /**
+     * 查看缩略图
+     * @param obj
+     */
+    function showSinaOrginPic(obj) {
+        var obj = $(obj);
+        var showOrgin = obj.attr("showOrgin");
+        var picShow = null;
+        if (showOrgin == 'true') {
+            picShow = obj.attr("thumbnailPic");
+            obj.attr("showOrgin", false);
+        } else {
+            picShow = obj.attr("bmiddlePic");
+            obj.attr("showOrgin", true);
+        }
+        obj.attr("src", picShow);
+    }
+
+</script>

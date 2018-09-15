@@ -1,0 +1,388 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+
+    <script type="text/javascript">
+
+        function Args() {
+            return frameElement._DialogArguments;
+        }
+
+        function ParentDialog(dialog) {
+            return dialog ? dialog._ParentDialog : frameElement._ParentDialog;
+        }
+
+        var EWIN = frameElement._DialogArguments.EditorWindow;
+        var EWEB = EWIN.EWEB;
+        var EWEBDialog = EWIN.EWEBDialog;
+        var EWEBTools = EWIN.EWEBTools;
+        var EWEBBrowser = EWIN.EWEBBrowser;
+        var EWEBSelection = EWIN.EWEBSelection;
+        var lang = EWIN.lang;
+        var config = EWIN.config;
+
+
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+        document.write("<title>eWebEditor</title>");
+
+
+        if (EWEBBrowser.IsIE && !EWEBBrowser.IsIE7P) {
+            document.write('<' + 'script type="text/javascript" src="dialog_ie6.js"><' + '\/script>');
+        }
+
+
+        EWEBTools.RegisterDollarFunction(window);
+
+
+        var DragAndDrop = function () {
+            var registeredWindows = [];
+            var lastCoords;
+            var currentPos;
+
+            var cleanUpHandlers = function () {
+                for (var i = 0; i < registeredWindows.length; i++) {
+                    EWEBTools.RemoveEventListener(registeredWindows[i].document, 'mousemove', dragMouseMoveHandler);
+                    EWEBTools.RemoveEventListener(registeredWindows[i].document, 'mouseup', dragMouseUpHandler);
+                }
+            }
+
+            var dragMouseMoveHandler = function (evt) {
+                if (!lastCoords) {
+                    return;
+                }
+
+                if (!evt) {
+                    evt = EWEBTools.GetElementDocument(this).parentWindow.event;
+                }
+
+                var currentCoords = {
+                    x: evt.screenX,
+                    y: evt.screenY
+                };
+
+                currentPos = {
+                    x: currentPos.x + (currentCoords.x - lastCoords.x),
+                    y: currentPos.y + (currentCoords.y - lastCoords.y)
+                };
+
+                lastCoords = currentCoords;
+
+                frameElement.style.left = currentPos.x + 'px';
+                frameElement.style.top = currentPos.y + 'px';
+
+                if (evt.preventDefault) {
+                    evt.preventDefault();
+                } else {
+                    evt.returnValue = false;
+                }
+            }
+
+            var dragMouseUpHandler = function (evt) {
+                if (!lastCoords) {
+                    return;
+                }
+                if (!evt) {
+                    evt = EWEBTools.GetElementDocument(this).parentWindow.event;
+                }
+                cleanUpHandlers();
+                lastCoords = null;
+            }
+
+            return {
+
+                MouseDownHandler: function (evt) {
+                    var view = null;
+                    if (!evt) {
+                        view = EWEBTools.GetElementDocument(this).parentWindow;
+                        evt = view.event;
+                    } else {
+                        view = evt.view;
+                    }
+
+                    var target = evt.srcElement || evt.target;
+                    if (target.id == 'TitleCloseButton') {
+                        return;
+                    }
+
+                    lastCoords = {
+                        x: evt.screenX,
+                        y: evt.screenY
+                    };
+
+                    currentPos = {
+                        x: parseInt(EWEBTools.GetCurrentElementStyle(frameElement, 'left'), 10),
+                        y: parseInt(EWEBTools.GetCurrentElementStyle(frameElement, 'top'), 10)
+                    };
+
+                    for (var i = 0; i < registeredWindows.length; i++) {
+                        EWEBTools.AddEventListener(registeredWindows[i].document, 'mousemove', dragMouseMoveHandler);
+                        EWEBTools.AddEventListener(registeredWindows[i].document, 'mouseup', dragMouseUpHandler);
+                    }
+
+                    if (evt.preventDefault) {
+                        evt.preventDefault();
+                    } else {
+                        evt.returnValue = false;
+                    }
+                },
+
+                RegisterHandlers: function (w) {
+                    registeredWindows.push(w);
+                }
+            }
+        }();
+
+
+        var Selection = {
+            EnsureSelection: function () {
+                window.focus();
+                $('TitleCloseButton').focus();
+
+                EWEBSelection.Restore();
+            }
+        };
+
+        var onReadyRegister = function () {
+            if (this.readyState != 'complete') {
+                return;
+            }
+            DragAndDrop.RegisterHandlers(this.contentWindow);
+        };
+
+
+        (function () {
+            var setOnKeyDown = function (targetDocument) {
+                targetDocument.onkeydown = function (e) {
+                    e = e || event || this.parentWindow.event;
+                    switch (e.keyCode) {
+                        case 13 :		// ENTER
+                            var oTarget = e.srcElement || e.target;
+                            if (oTarget.tagName == 'TEXTAREA')
+                                return true;
+                            Ok();
+                            return false;
+
+                        case 27 :		// ESC
+                            Cancel();
+                            return false;
+                    }
+                    return true;
+                }
+            };
+
+            var _Dialog_OnContextMenu = function (e) {
+                e = e || window.event || $('frmMain').contentWindow.event;
+                var o_Target = e.target || e.srcElement;
+                var s_TagName = o_Target.tagName;
+                if (!((s_TagName == "INPUT" && o_Target.type == "text") || s_TagName == "TEXTAREA")) {
+                    return EWEBTools.CancelEvent(e);
+                }
+            };
+
+            var _DisableContextMenu = function (targetDocument) {
+                EWEBTools.AddEventListener(targetDocument, 'contextmenu', _Dialog_OnContextMenu);
+            };
+
+            var _DoResizeDialog = function () {
+                var frmMain = $('frmMain');
+                var innerDoc = frmMain.contentWindow.document;
+                var isStrict = EWEBTools.IsStrictMode(innerDoc);
+
+                var innerWidth = isStrict ? innerDoc.documentElement.scrollWidth : innerDoc.body.scrollWidth;
+                var innerHeight = isStrict ? innerDoc.documentElement.scrollHeight : innerDoc.body.scrollHeight;
+
+                var n_RootWidth = 0;
+                var n_RootHeight = 0;
+                var o_RootNode = innerDoc.getElementById("tabDialogSize");
+                if (o_RootNode) {
+                    n_RootWidth = o_RootNode.offsetWidth;
+                    n_RootHeight = o_RootNode.offsetHeight;
+                }
+                innerWidth = Math.max(innerWidth, n_RootWidth);
+                innerHeight = Math.max(innerHeight, n_RootHeight);
+
+                var frameSize = EWEBTools.GetViewPaneSize(frmMain.contentWindow);
+
+                if (innerWidth == 0 || frameSize.Width == 0 || frameElement.offsetWidth == 0 || frameElement.offsetHeight == 0) {
+                    window.setTimeout(_DoResizeDialog, 1);
+                    return;
+                }
+
+                frmMain.style.width = innerWidth;
+                frmMain.style.height = innerHeight;
+
+                var deltaWidth = innerWidth - frameSize.Width;
+                var deltaHeight = innerHeight - frameSize.Height;
+
+                if (deltaWidth <= 0 && deltaHeight <= 0) {
+                    return;
+                }
+
+                window.frameElement.style.width = ($("ml").offsetWidth + $("mr").offsetWidth + innerWidth) + "px";
+                window.frameElement.style.height = ($("TitleArea").offsetHeight + $("bc").offsetHeight + innerHeight) + "px";
+
+
+                if (typeof window.DoResizeFixes == 'function') {
+                    window.DoResizeFixesAndCenter();
+                } else {
+                    EWEBDialog.CenterDialog(frameElement);
+                }
+            };
+
+
+            window.Init = function () {
+                if (typeof window.DoResizeFixes == 'function') {
+                    if (!window.DoResizeFixes()) {
+                        window.setTimeout(Init, 1);
+                        return;
+                    }
+                }
+
+
+                $("TitleCaption").innerHTML = lang["DlgDlgTitle"];
+
+                LoadInnerDialog();
+
+                EWEBTools.DisableSelection(document.body);
+
+                var titleElement = $('TitleArea');
+                titleElement.onmousedown = DragAndDrop.MouseDownHandler;
+
+                DragAndDrop.RegisterHandlers(window);
+                DragAndDrop.RegisterHandlers(Args().TopWindow);
+
+                if (EWEBBrowser.IsIE && !EWEBBrowser.IsIE7P) {
+                    var blockerFrame = EWEBDialog.GetCover().firstChild;
+                    if (blockerFrame.readyState == 'complete') {
+                        DragAndDrop.RegisterHandlers(blockerFrame.contentWindow);
+                    } else {
+                        blockerFrame.onreadystatechange = onReadyRegister;
+                    }
+                }
+
+                //setOnKeyDown( document ) ;
+                _DisableContextMenu(document);
+            };
+
+            window.LoadInnerDialog = function () {
+                $('ContentArea').innerHTML = '<iframe id="frmMain" src="' + Args().Page + '" name="frmMain" frameborder="0" width="100%" height="100%" scrolling="auto" style="visibility: hidden;" allowtransparency="true"><\/iframe>';
+            };
+
+            window.InnerDialogLoaded = function (s_Caption) {
+                if (!frameElement.parentNode) {
+                    return null;
+                }
+
+                var frmMain = $('frmMain');
+                var innerWindow = frmMain.contentWindow;
+                var innerDoc = innerWindow.document;
+                window.InnerDialog = innerWindow;
+
+                if (Args().Hide) {
+                    return;
+                }
+
+                $("TitleCaption").innerHTML = s_Caption;
+                $("LoadingArea").style.display = "none";
+                frmMain.style.visibility = '';
+
+                _DoResizeDialog();
+
+                //setOnKeyDown( innerDoc ) ;
+                _DisableContextMenu(innerDoc);
+
+
+                DragAndDrop.RegisterHandlers(innerWindow);
+
+                innerWindow.focus();
+
+
+                EWEBTools.DisableSelection(innerDoc.body);
+            };
+
+
+            window.ResizeDialog = function (w, h) {
+                if (!w) {
+                    _DoResizeDialog();
+                    return;
+                }
+
+                var frmMain = $('frmMain');
+
+                frmMain.style.width = w;
+                frmMain.style.height = h;
+
+                window.frameElement.style.width = $("ml").offsetWidth + $("mr").offsetWidth + w + "px";
+                window.frameElement.style.height = $("TitleArea").offsetHeight + $("bc").offsetHeight + h + "px";
+
+                if (typeof window.DoResizeFixes == 'function') {
+                    window.DoResizeFixes();
+                }
+
+            };
+
+
+            window.Ok = function (o_DoAfterClose) {
+                //Selection.EnsureSelection() ;
+                CloseDialog(true, o_DoAfterClose);
+            };
+
+            window.Cancel = function (b_DontCheck) {
+                if (!b_DontCheck && window.InnerDialog && window.InnerDialog.DoCancel) {
+                    window.InnerDialog.DoCancel();
+                    return;
+                }
+                Selection.EnsureSelection();
+                CloseDialog(false);
+            };
+
+            window.CloseDialog = function (b_Ok, o_DoAfterClose) {
+                if ($('frmMain')) {
+                    $('frmMain').src = EWEBTools.GetVoidUrl();
+                }
+
+                var o_ParentDialog = ParentDialog();
+                if (o_ParentDialog) {
+                    o_ParentDialog = o_ParentDialog.contentWindow.InnerDialog;
+                }
+                try {
+                    o_ParentDialog.OnSubDialogClose();
+                } catch (e) {
+                }
+
+
+                EWEBDialog.OnDialogClose(window, b_Ok, o_DoAfterClose);
+            };
+
+
+        })();
+
+    </script>
+
+</head>
+<body onload="Init();" class="PopupBody">
+<div class="tl" id="tl"></div>
+<div class="tc" id="TitleArea">
+    <div id="TitleCaption" class="TitleCaption"></div>
+    <div id="TitleCloseButton" class="TitleCloseButton" onclick="Cancel();"></div>
+</div>
+<div class="tr" id="tr"></div>
+<div class="ml" id="ml"></div>
+<div class="mc" id="ContentArea"></div>
+<div class="mr" id="mr"></div>
+<div class="bl" id="bl"></div>
+<div class="bc" id="bc"></div>
+<div class="br" id="br"></div>
+<div class="mc" id="LoadingArea">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+        <tr>
+            <td align="center" valign="middle"><img src="images/loading.gif" border="0"/></td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

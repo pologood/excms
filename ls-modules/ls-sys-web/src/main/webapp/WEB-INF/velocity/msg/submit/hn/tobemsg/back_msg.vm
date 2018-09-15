@@ -1,0 +1,63 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+    <div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+        <div title="center" region="center" style="border:none; overflow: auto;">
+            <form id="backmsg_form" role="form" ms-controller="backmsg_form">
+                <div class="form-body" style="margin-right: 20px">
+                    <table class="table table-bordered article-table" >
+                        <tr>
+                            <td style="width: 80px" align="right">退回原因:</td>
+                            <td>
+                                <textarea id="backReason" name="backReason" class="form-control" style="width: 100%;height: 200px;" maxlength="250" placeholder="最多只能输入250个汉字"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "backmsg_form",
+        form: $('#backmsg_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        backReason:$('#backReason')
+    };
+
+    $(document).ready(function () {
+        //初始化文本编辑器
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+    })
+
+    function saveData() {
+        Ls.ajax({
+            url: "/msg/submit/hn/saveBackMsg",
+            data: {
+                msgId:cur.dialog.data("msgId"),
+                backReason:cur.backReason.val()
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback(resp);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+</script>

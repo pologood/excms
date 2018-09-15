@@ -1,0 +1,138 @@
+#parse("_page_layout/_header.vm")
+<div id="form1" style="padding:5px;">
+    <table id="table1" class="form-table" border="0" cellpadding="1" cellspacing="2">
+        <div style="display:none;">
+            <input name="organId" class="mini-textbox"></input>
+            <input name="pid" class="mini-textbox"></input>
+            <input name="parentNodeType" class="mini-textbox"></input>
+            <input name="isParentFictitious" class="mini-textbox"></input>
+            <input name="organId" class="mini-textbox"></input></div>
+        <tr>
+            <td class="form-label" align="right" align="right">县区单位/部门：</td>
+            <td style="width:250px;padding:2px;">
+                <input name="isExternal" class="mini-radiobuttonlist" value="false" data="[{id: 'true', text: '是'}, {id: 'false', text: '否'}]"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="form-label" align="right" align="right">是否虚拟：</td>
+            <td style="width:250px;padding:2px;">
+                <input name="fictitious" id="fictitious" class="mini-radiobuttonlist"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="form-label" align="right">类型：</td>
+            <td>
+                <input name="nodeType" id="nodeType" class="mini-radiobuttonlist"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="form-label" align="right">名称：</td>
+            <td><input name="name" class="mini-textbox" required="true" width="230px" requiredErrorText="名称不能为空"></td>
+        </tr>
+        <tr>
+            <td class="form-label" align="right">简称：</td>
+            <td><input name="simpleName" class="mini-textbox" width="230px"></td>
+        </tr>
+        <tr>
+            <td class="form-label" style="width:100px;" align="right">排序号：</td>
+            <td><input name="sortNum" class="mini-textbox" required="true" width="100px" requiredErrorText="排序号不能为空"/>
+                <span class="gray-2">无特殊要求可不更改</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="form-label" align="right">简介：</td>
+            <td><textarea name="description" class="mini-textarea" style="width:180px;"></textarea></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td style="width:250px;padding:2px;padding-top:10px;">
+                <input value="确  定" type="button" onclick="save()"/>
+                <input style="margin-left:10px;" value="取  消" type="button" onclick="cancel()"/>
+            </td>
+        </tr>
+    </table>
+</div>
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var form = new mini.Form("#form1");
+    var d = "";
+    var id = '$!{id}';
+    var pid = '$!{pid}';
+    var nType = '$!{nType}';
+    var nodeTypes = [{id: 'Organ', text: '单位'}, {id: 'OrganUnit', text: '处室（科室）'}];
+    var fictitiousChecks = [{id: 1, text: '是'}, {id: 0, text: '否'}];
+    $(document).ready(function () {
+        mini.parse();
+        Ls.ajaxGet({
+            url: "/organ/getOrgan",
+            data: {
+                organId: id, parentId: pid
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                if (pid != '') {
+                    data.pid = pid;
+                }
+                if (id == '') {
+                    if (nType == "Organ" && data.isParentFictitious == 1) {
+                        nodeTypes = [{id: 'Organ', text: '单位'}]
+                    } else if (data.nodeType == "Organ" && data.fictitious == 1) {
+                        nodeTypes = [{id: 'Organ', text: '单位'}]
+                    } else if (nType == "Organ" && data.fictitious == 0) {
+                        fictitiousChecks = [{id: 0, text: '否'}]
+                    } else if (nType == "OrganUnit") {
+                        fictitiousChecks = [{id: 0, text: '否'}]
+                        nodeTypes = [{id: 'OrganUnit', text: '处室（科室）'}]
+                    }
+                } else {
+                    if (data.fictitious == 1) {
+                        fictitiousChecks = [{id: 1, text: '是'}]
+                    } else {
+                        fictitiousChecks = [{id: 0, text: '否'}]
+                    }
+                    if (data.nodeType == 'Organ') {
+                        nodeTypes = [{id: 'Organ', text: '单位'}]
+                    } else {
+                        nodeTypes = [{id: 'OrganUnit', text: '处室（科室）'}]
+                    }
+                }
+                mini.get("nodeType").setData(nodeTypes);
+                mini.get("fictitious").setData(fictitiousChecks);
+                form.setData(data);
+            } else {
+                alert('加载数据失败!');
+                window.CloseOwnerWindow();
+            }
+        })
+
+    })
+
+    save = function () {
+        form.validate();
+        if (form.isValid() == false) return;
+        var data = form.getData();
+        var url = "/organ/updateOrgan";
+        if (id == '') url = "/organ/saveOrgan";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("操作成功");
+                d.data.nType = nType
+                parent.editNodeAfterFn(d.data);
+                window.CloseOwnerWindow();
+            } else {
+
+            }
+        })
+    }
+
+
+    cancel = function () {
+        window.CloseOwnerWindow();
+    }
+</script>
+

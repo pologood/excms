@@ -1,0 +1,78 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($isLine="$!{paramObj.isLine}")
+#set($isHit="$!{paramObj.isHit}")
+#set($length=$Integer.parseInt($length))
+#set($lineCount=$Integer.parseInt("$!{paramObj.lineCount}"))
+#if($resultObj.data.size()>0)
+<ul class="doc_list list-$!{context.columnId}">
+    #if("$!{paramObj.isPage}"=="false")
+        <li class="columnName">
+            <a class="left title" href="$!{context.uri}/$!{indicatorEO.parentNamesPinyin}/$!{indicatorEO.namePinyin}/index.html">$!{indicatorEO.name}</a>
+            <a class="right more" href="$!{context.uri}/$!{indicatorEO.parentNamesPinyin}/$!{indicatorEO.namePinyin}/index.html">更多>></a>
+        </li>
+    #end
+    #foreach($eo in $resultObj.data)
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <li class="$!{css}">
+            <a href="$!{eo.link}" target="_blank" title="$!{eo.title}" class="left">
+                #set($style="")
+                #if("$!{eo.isBold}" == "1")
+                    #set($style="font-weight:bold;")
+                #end
+                #if("$!{eo.isTilt}" == "1")
+                    #set($style=$style+"font-style:italic;")
+                #end
+                #if("$!{eo.isUnderline}" == "1")
+                    #set($style=$style+"text-decoration:underline;")
+                #end
+                #set($new_length=0)
+                #if("$!{eo.isNew}" == "1")
+                    #set($new_length=$!{length} - 2)
+                #else
+                    #set($new_length=$!{length})
+                #end
+                #if("$!{eo.titleColor}" != "#000000")
+                    #set($style=$style+"color:$!{eo.titleColor};")
+                #end
+                #set($title=$!{eo.title})
+                <span style='$style'>#cutstr($title,$new_length)</span>
+            </a>
+            #if("$!{eo.isNew}" == "1")
+                <img src="/images/news.gif">
+            #end
+            #if("$isHit"=="true")<span class="right hit">[$!{eo.hit}]</span>#end
+            #if("$isDate"=="true")<span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>#end
+        </li>
+        #if("${isLine}"=="true")
+            #if($velocityCount>0 && $velocityCount%$lineCount == 0)
+                #if("$!{paramObj.isPage}"=="false")
+                    <li class="lm_line add"></li>
+                #else
+                    <li class="lm_line"></li>
+                #end
+            #end
+        #end
+
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            isTotal: true,
+            total: $!{resultObj.total},
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+#end

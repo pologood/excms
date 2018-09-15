@@ -1,0 +1,233 @@
+<style>
+    .toggle {
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        box-sizing: border-box;
+        align-self: center;
+        width: 48px;
+        border-radius: 16px;
+        height: 28px;
+    }
+
+    .toggle-icon {
+        z-index: 0;
+        margin: 0;
+        padding: 0;
+        border: none;
+        position: relative;
+        -webkit-transition: .3s;
+        transition: .3s;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: block;
+        cursor: pointer;
+    }
+
+    .toggle-icon {
+        width: 48px;
+        border-radius: 16px !important;
+        height: 28px;
+        background: #e5e5e5;
+    }
+
+    .toggle input[type=checkbox]:checked+.toggle-icon {
+        background: #1296db;
+    }
+
+    .toggle-icon:after, .toggle-icon:before {
+        content: '';
+    }
+
+    .toggle-icon:before {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 48px;
+        height: 28px;
+        border-radius: 16px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        z-index: 1;
+        -webkit-transition-duration: .3s;
+        transition-duration: .3s;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+
+    .toggle-icon:after {
+        background: #fff;
+        position: absolute;
+        z-index: 2;
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+        -webkit-transition-duration: .3s;
+        transition-duration: .3s;
+    }
+
+    .toggle-icon:after {
+        height: 26px;
+        width: 26px;
+        top: 1px;
+        left: 0px;
+        -webkit-box-shadow: 0 2px 4px rgba(0,0,0,.3);
+        box-shadow: 0 2px 4px rgba(0,0,0,.3);
+        border-radius: 14px;
+    }
+
+    .toggle input[type=checkbox]:checked+.toggle-icon:after {
+        -webkit-transform: translateX(20px);
+        transform: translateX(20px);
+    }
+
+    .toggle input[type=checkbox] {
+        display: none;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">智能检索配置</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="table-toolbar" style="margin-bottom: 10px">
+                        <div class="note note-danger">
+                            <h4 class="block">检索结果排序(设置完成需重建索引)</h4>
+                            <p style="font-size: 14px;">
+                                1、支持对检索结果进行排序，后台设置排序规则，前台按照规则推送信息
+                            </p>
+                            <p style="font-size: 14px;">
+                                2、提供多维度分类展现，聚合相关信息和服务，实现“搜索即服务”
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="datagrid" class="mini-datagrid" style="width:100%;" allowCellSelect="false"
+                         onlyCheckSelection="true" url="/site/smartquery/config/getPage"
+                         idField="postId" sizeList="[10,15,20]" pageSize="15" allowCellSelect="true" multiSelect="true"
+                         allowCellWrap="true" allowHeaderWrap="true">
+                        <div property="columns">
+                            <div type="indexcolumn" headerAlign="center" width="50" allowSort="true">序号
+                            </div>
+                            <div headerAlign="center" align="center" width="80" renderer="sort"
+                                 allowSort="true">排序
+                            </div>
+                            <div field="name" width="100%" align="center" headerAlign="center" allowSort="true">
+                                分类名称
+                            </div>
+                            <div width="100" align="center" headerAlign="center" allowSort="ture"
+                                 renderer="opt">前台是否调取
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+    };
+
+    $(document).ready(function () {
+        cur.grid.load(function () {
+            Ls.mini_datagrid_height(cur.grid, 200, true);
+        });
+
+    })
+
+    function sort(obj) {
+        var rec = obj.record;
+        var rowIndex = obj.rowIndex;
+        var str = '<div class="rows text-center">',
+                up = '<a onclick="contentSort(' + rec.itemId + ',' + (rowIndex - 1) + ',1)" href="javascript:;"><i class="fa fa-2x fa-long-arrow-up" style="margin-top:8px;color:#929090;font-size: 16px;" title=""></i></a>',
+                down = ' <a onclick="contentSort(' + rec.itemId + ',' + (rowIndex + 1) + ',0)" href="javascript:;"><i class="fa fa-2x fa-long-arrow-down" style="margin-top:8px;color:#929090;font-size: 16px;" title=""></i></a>';
+
+        var index = (obj.rowIndex + 1) + (cur.grid.pageSize * cur.grid.pageIndex);
+        if (index == 1) {
+            str += down;
+        } else if (cur.grid.totalCount == index) {
+            str += up;
+        } else {
+            str += up + down;
+        }
+        str += '</div>';
+        return str;
+    }
+
+    function contentSort(itemId, rowIndex, type) {
+        var row = cur.grid.data[rowIndex];
+        if(row == null){
+            return false;
+        }
+
+        var itemIds = [itemId];
+        var sortNums = [rowIndex+1];
+        //加入第二个对象的数据
+        itemIds.push(row.itemId);
+
+        if (type == '1') {
+            sortNums.push(rowIndex+2);
+        }else {
+            sortNums.push(rowIndex);
+        }
+
+        //保存信息
+        saveItems(itemIds,sortNums,null);
+    }
+
+    function opt(obj) {
+        var record = obj.record, ischecked = '';
+        var value = true;
+        //判断是否显示
+        if (record.description != null) {
+            var description = JSON.parse(record.description);
+            if (description.isShow) {
+                ischecked = 'checked';
+                value = false;
+            }
+        }
+        btnStr = '<label class="toggle toggle-init" style="border-radius: 16px !important;">\n' +
+                '    <input type="checkbox" '+ ischecked +' onclick="fn(' + record.itemId + ','+value+')">\n' +
+                '    <span class="toggle-icon"></span>\n' +
+                '</label>';
+        return btnStr;
+    }
+    
+    function fn(itemId,isShow) {
+        var itemIds = [itemId];
+        var isShows = [isShow];
+        //保存信息
+        saveItems(itemIds,null,isShows);
+    }
+
+    //保存
+    function saveItems(itemIds,sortNums,isShows) {
+        Ls.ajax({
+            type: "POST",
+            url: "/site/smartquery/config/saveItems",
+            data: {
+                itemIds:itemIds == null ? "":itemIds.join(","),
+                sortNums:sortNums == null ? "":sortNums.join(","),
+                isShows:isShows == null ? "":isShows.join(",")
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                Ls.tipsOk("设置成功");
+                cur.grid.reload();
+            }
+        });
+    }
+
+</script>

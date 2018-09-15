@@ -1,0 +1,39 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+<table border="0" class="guestbook-table">
+    <tbody>
+    <tr>
+        <th>信件编号</th>
+        <th>信件标题</th>
+        <th>办理人</th>
+        <th>状态</th>
+        <th>提交时间</th>
+    </tr>
+        #foreach($eo in $resultObj)
+            #set($title=$!{eo.title})
+        <tr>
+            <td>$!{eo.id}</td>
+
+            <td>
+                <a href="$!{eo.link}" target="_blank" title="${title}">
+                    <font style='$style'>#cutstr($title,$length)</font>
+                </a>
+            </td>
+
+            <td>$!{eo.author}</td>
+           <td>
+            #if($!{eo.statusName})
+            【$!{eo.statusName}】
+            #else
+              【未办理】
+            #end
+          </td>
+            <td>#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</td>
+        </tr>
+        #end
+    </tbody>
+</table>
+

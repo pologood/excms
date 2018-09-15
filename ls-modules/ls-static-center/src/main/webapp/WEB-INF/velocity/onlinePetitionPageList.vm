@@ -1,0 +1,63 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+###set($action="$!{paramObj.action}")
+#if($action== 'new')
+    #set($eo=$resultObj)
+    #parse("onlinePetitionForm.vm")
+
+#elseif($action== 'list')
+<table border="0" class="guestbook-table">
+    <tbody>
+    <tr>
+        <th class="t1">主题</th>
+        <th class="t2">回复人</th>
+        <th class="t3">留言时间</th>
+        <th class="t4">回复状态</th>
+    </tr>
+
+        #foreach($eo in $resultObj.data)
+            #set($title=$!{eo.title})
+        <tr>
+            <td class="tt1">
+                <a class="wz_title_txt" href="$!{eo.link}" title="${title}" target="_blank">
+                    <font>#cutstr($title,$length)</font>
+                </a></td>
+            <td class="tt2">$!{eo.author}</td>
+            <td class="tt3">[#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")]</td>
+            <td class="tt4">
+            #if($!{eo.statusName})
+              【$!{eo.statusName}】
+            #else
+             【未办理】
+            #end
+            </td>
+        </tr>
+        #end
+    </tbody>
+</table>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}_' + pageIndex + ".htm";
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+#else
+    #set($eo=$resultObj)
+    #if($eo=="0"||$eo=="1")
+        $message
+    #else
+        #parse("onlinePetitionInfo.vm")
+    #end
+#end
+
+
+

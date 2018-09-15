@@ -1,0 +1,19 @@
+<style>
+    .init {
+    ##        transform: rotate(-16deg);##Rotate div
+    ##        -ms-transform: rotate(-16deg); ##Internet Explorer
+    ##        -moz-transform: rotate(-16deg); ##Firefox
+    ##        -webkit-transform: rotate(-16deg); ##afari 和 Chrome
+    ##        -o-transform: rotate(-16deg); ##Opera
+    ##        line-height: 340px;
+    ##        text-align: center;
+        background: url($!{resultObj.fileurl});
+        width: $!{resultObj.width};
+        height: $!{resultObj.height};
+    }
+</style>
+#if($!{resultObj.istofile}==1)
+<div class="guidang init">
+##    <font color="#FF0000" size="2px"><strong>$!{resultObj.content}</strong></font>
+</div>
+#end

@@ -1,0 +1,829 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var sAction = "INSERT";
+        var sTitle = lang["DlgComInsert"];
+
+        var oControl;
+
+        var sFromUrl = "http://";
+        var sWidth = "480";
+        var sHeight = "400";
+        var sPlugin = "";
+        var sAlign = "";
+        var sVSpace = "";
+        var sHSpace = "";
+        var sAutostart = "true";
+        var sFlvPreviewImg = "";
+
+        var sCheckFlag = "file";
+
+        var bAllowUpload = ((parseFloat(config.AllowMediaSize) > 0) ? true : false);
+
+
+        InitParam();
+
+
+        var sCaption = lang["DlgMedia"] + "(" + sTitle + ")";
+        document.write("<title>" + sCaption + "</title>");
+
+        function InitParam() {
+            if (EWEBSelection.GetType() != "Control") {
+                return;
+            }
+
+            var s_FakeTag;
+            oControl = EWEBSelection.GetSelectedElement();
+            if (oControl.tagName == "IMG") {
+                s_FakeTag = GetFakeTag(oControl);
+                if (s_FakeTag == "mediaplayer6" || s_FakeTag == "mediaplayer7" || s_FakeTag == "realplayer" || s_FakeTag == "quicktime" || s_FakeTag == "flv" || s_FakeTag == "vlc" || s_FakeTag == "video" || s_FakeTag == "audio") {
+                    sAction = "MODI";
+                }
+            }
+
+            if (sAction != "MODI") {
+                return;
+            }
+
+            sTitle = lang["DlgComModify"];
+            sCheckFlag = "url";
+
+            sPlugin = s_FakeTag;
+            sAlign = GetAttribute(oControl, "align")
+            sWidth = RemovePX(GetStyleAttribute(oControl, "width"));
+            sHeight = RemovePX(GetStyleAttribute(oControl, "height"));
+            sVSpace = GetAttribute(oControl, "vspace");
+            sHSpace = GetAttribute(oControl, "hspace");
+
+            HtmlParamParser.Init(GetFakeValue(oControl));
+
+            switch (s_FakeTag) {
+                case "mediaplayer6":
+                    if (HtmlParamParser.Tag == "object") {
+                        sFromUrl = HtmlParamParser.GetValue("filename");
+                    } else {
+                        sFromUrl = HtmlParamParser.GetValue("src");
+                    }
+                    sAutostart = HtmlParamParser.GetValue("autostart");
+                    break;
+                case "mediaplayer7":
+                    if (HtmlParamParser.Tag == "object") {
+                        sFromUrl = HtmlParamParser.GetValue("url");
+                    } else {
+                        sFromUrl = HtmlParamParser.GetValue("src");
+                    }
+                    sAutostart = HtmlParamParser.GetValue("autostart");
+                    break;
+                case "realplayer":
+                    sFromUrl = HtmlParamParser.GetValue("src");
+                    sAutostart = HtmlParamParser.GetValue("autostart");
+                    break;
+                case "quicktime":
+                    sFromUrl = HtmlParamParser.GetValue("src");
+                    sAutostart = HtmlParamParser.GetValue("autoplay");
+                    break;
+                case "vlc":
+                    sFromUrl = HtmlParamParser.GetValue("mrl");
+                    sAutostart = HtmlParamParser.GetValue("autoplay");
+                    break;
+                case "flv":
+                    var s_FlashVars = HtmlParamParser.GetValue("flashvars");
+                    sFromUrl = GetFlashvarsParam(s_FlashVars, "file");
+                    sAutostart = GetFlashvarsParam(s_FlashVars, "autostart");
+                    sFlvPreviewImg = GetFlashvarsParam(s_FlashVars, "image");
+                    break;
+                case "video":
+                    sFromUrl = HtmlParamParser.GetValue("src");
+                    sAutostart = HtmlParamParser.GetValue("autoplay");
+                    sFlvPreviewImg = HtmlParamParser.GetValue("poster");
+                    if (sAutostart == "autoplay") {
+                        sAutostart = "true";
+                    }
+                    break;
+                case "audio":
+                    sFromUrl = HtmlParamParser.GetValue("src");
+                    sAutostart = HtmlParamParser.GetValue("autoplay");
+                    if (sAutostart == "autoplay") {
+                        sAutostart = "true";
+                    }
+                    break;
+            }
+
+            if (sAutostart == "-1" || sAutostart == "1") {
+                sAutostart = "true";
+            } else if (sAutostart == "0") {
+                sAutostart = "false";
+            }
+
+        }
+
+
+        function GetFlashvarsParam(s_Flashvars, s_Name) {
+            var re = new RegExp('^[\\s\\S]*?\\b' + s_Name + '\\s*?=\\s*?([^&=]+)(?=[&$])[\\s\\S]*?$', 'gi');
+            if (re.test(s_Flashvars)) {
+                return s_Flashvars.replace(re, '$1')
+            } else {
+                return '';
+            }
+        }
+
+
+        function RadioClick(what) {
+            if (what == "url") {
+                $("d_fromurl").disabled = false;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = false;
+                }
+                $("d_checkfromurl").checked = true;
+                if (bAllowUpload) {
+                    $("d_checkfromfile").checked = false;
+                    $("uploadfile").disabled = true;
+                }
+
+            } else {
+                $("d_checkfromurl").checked = false;
+                $("uploadfile").disabled = false;
+                $("d_checkfromfile").checked = true;
+                $("d_fromurl").disabled = true;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = true;
+                }
+            }
+        }
+
+        function UploadError(s_Flag) {
+            AbleItems();
+            RadioClick('file');
+            DLGDoingMsg.Hide();
+            try {
+                BaseAlert($("uploadfile"), getUploadErrDesc(s_Flag, config.AllowMediaExt, config.AllowMediaSize));
+            }
+            catch (e) {
+            }
+        }
+
+        function UploadSaved(sOriginalFileName, sPathFileName) {
+            EWIN.addUploadFile(sOriginalFileName, sPathFileName);
+
+            if (config.BaseHref != "") {
+                var s_Ext = sPathFileName.substr(sPathFileName.lastIndexOf(".") + 1);
+                if ((s_Ext.toLowerCase() == "flv" && $("d_plugin").value == "") || ($("d_plugin").value == "flv")) {
+                    sPathFileName = Root2PlugRel(Rel2RootByBase(sPathFileName));
+                }
+            }
+
+            $("d_fromurl").value = sPathFileName;
+            ReturnValue();
+        }
+
+        function ReturnValue() {
+            EWIN.insertHTML(GetMediaPlayerHtml());
+            parent.Ok();
+        }
+
+        function ok() {
+            if (config.FSPath != "" && config.FSL != "ok") {
+                alert(lang["ErrFSL"]);
+                return;
+            }
+
+            $("d_width").value = ToInt($("d_width").value);
+            $("d_height").value = ToInt($("d_height").value);
+            $("d_vspace").value = ToInt($("d_vspace").value);
+            $("d_hspace").value = ToInt($("d_hspace").value);
+
+            if ($("d_checkfromurl").checked) {
+                ReturnValue();
+            } else {
+                if (!IsExt($("uploadfile").value, config.AllowMediaExt)) {
+                    UploadError("ext");
+                    return false;
+                }
+
+                CheckSizeAsync($("uploadfile"), config.AllowMediaSize,
+                    function (s_SizeFlag) {
+                        if (s_SizeFlag == "no") {
+                            UploadError("size");
+                            return false;
+                        }
+
+                        DisableItems();
+                        DLGDoingMsg.Show();
+                        document.myuploadform.submit();
+                    }
+                );
+            }
+        }
+
+        function DisableItems() {
+            $("d_checkfromfile").disabled = true;
+            $("d_checkfromurl").disabled = true;
+            $("d_fromurl").disabled = true;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = true;
+            }
+            $("d_plugin").disabled = true;
+            $("d_align").disabled = true;
+            $("d_autostart").disabled = true;
+            $("d_width").disabled = true;
+            $("d_height").disabled = true;
+            $("d_vspace").disabled = true;
+            $("d_hspace").disabled = true;
+            $("btn_ok").disabled = true;
+        }
+
+        function AbleItems() {
+            $("d_checkfromfile").disabled = false;
+            $("d_checkfromurl").disabled = false;
+            $("d_fromurl").disabled = false;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = false;
+            }
+            $("d_plugin").disabled = false;
+            $("d_align").disabled = false;
+            $("d_autostart").disabled = false;
+            $("d_width").disabled = false;
+            $("d_height").disabled = false;
+            $("d_vspace").disabled = false;
+            $("d_hspace").disabled = false;
+            $("btn_ok").disabled = false;
+        }
+
+
+        function doPreview() {
+            $("tdPreview").innerHTML = GetMediaPlayerHtml(true);
+
+            try {
+                if ($("d_plugin").value == "vlc") {
+                    var c = $("tdPreview").firstChild;
+                    if (c) {
+                        if (c.tagName == "OBJECT") {
+                            if (c.width == "0") {
+                                c.style.cssText = "";
+                                c.width = "180";
+                                c.height = "140";
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+
+        }
+
+
+        function GetMediaPlayerHtml(b_IsPreview, s_MediaFile) {
+            sAlign = $("d_align").value;
+            sWidth = $("d_width").value;
+            sHeight = $("d_height").value;
+            sVSpace = $("d_vspace").value;
+            sHSpace = $("d_hspace").value;
+            sAutostart = $("d_autostart").value;
+            sPlugin = $("d_plugin").value;
+            sFlvPreviewImg = $("d_image").value;
+            if (sFlvPreviewImg == lang["DlgMediaPreviewImgDesc"] || sFlvPreviewImg.indexOf(".") < 0) {
+                sFlvPreviewImg = "";
+            }
+
+            if (s_MediaFile) {
+                sFromUrl = s_MediaFile;
+            } else {
+                if (b_IsPreview) {
+                    sWidth = "180";
+                    sHeight = "140";
+
+                    var s_Url, v;
+                    if ($("d_checkfromurl").checked) {
+                        v = $("d_fromurl").value;
+                        s_Url = v;
+                        if (config.BaseHref != "") {
+                            s_Url = Rel2RootByBase(s_Url);
+                        }
+                    } else {
+                        v = $("uploadfile").value;
+                        s_Url = "file:///" + v;
+                    }
+                    sFromUrl = s_Url;
+
+                } else {
+                    sFromUrl = BaseTrim($("d_fromurl").value);
+                }
+
+                if (sFromUrl == "http://" || sFromUrl == "file:///") {
+                    return "";
+                }
+            }
+
+            sFromUrl = EscapeFlvUrl(sFromUrl);
+            sFlvPreviewImg = EscapeFlvUrl(sFlvPreviewImg);
+
+            if (sPlugin == "") {
+                var n = sFromUrl.lastIndexOf(".");
+                if (n > 0) {
+                    var s_Ext = sFromUrl.substr(n + 1).toLowerCase();
+                    switch (s_Ext) {
+                        case "flv":
+                        case "f4v":
+                            sPlugin = "flv";
+                            break;
+                        case "mp4":
+                        case "ogg":
+                        case "webm":
+                            sPlugin = "video";
+                            break;
+                        case "mp3":
+                        case "wav":
+                            sPlugin = "audio";
+                            break;
+                        case "asf":
+                        case "avi":
+                        case "mpg":
+                        case "mpeg":
+                        case "mid":
+                        case "midi":
+                        case "aif":
+                        case "aifc":
+                        case "aiff":
+                            sPlugin = "mediaplayer6";
+                            break;
+                        case "wmv":
+                        case "wma":
+                            sPlugin = "mediaplayer7";
+                            break;
+                        case "ra":
+                        case "ram":
+                        case "rm":
+                        case "rmvb":
+                            sPlugin = "realplayer";
+                            break;
+                        case "qt":
+                        case "mov":
+                            sPlugin = "quicktime";
+                            break;
+                    }
+                }
+            }
+
+            if (s_MediaFile) {
+                if (sPlugin == "") {
+                    sPlugin = "realplayer";
+                }
+            }
+
+            if (sPlugin == "") {
+                alert(lang["DlgMediaMsgPlugin"]);
+                return "";
+            }
+
+
+            var s_FlvPluginPath;
+            if (sPlugin == "flv") {
+                if (b_IsPreview) {
+                    s_FlvPluginPath = "../plugin/flvplayer.swf";
+                } else {
+                    s_FlvPluginPath = relativePath2setPath("plugin/flvplayer.swf", true);
+                }
+            }
+
+
+            var s_Att = '';
+            var s_Style = '';
+            if (sWidth != '') {
+                s_Att += ' width="' + sWidth + '"';
+                s_Style += 'width:' + AddUnitPX(sWidth) + ';';
+            }
+            if (sHeight != '') {
+                s_Att += ' height="' + sHeight + '"';
+                s_Style += 'height:' + AddUnitPX(sHeight) + ';';
+            }
+            if (sAlign != '') {
+                s_Att += ' align="' + sAlign + '"';
+            }
+            if (sVSpace != '') {
+                s_Att += ' vspace="' + sVSpace + '"';
+            }
+            if (sHSpace != '') {
+                s_Att += ' hspace="' + sHSpace + '"';
+            }
+            s_Style = ' style="' + s_Style + '" ';
+
+
+            var s_Html = "";
+
+            switch (sPlugin) {
+                case "mediaplayer6":
+                    s_Html = '<object classid="clsid:22d6f312-b0f6-11d0-94ab-0080c74c7e95"' + s_Att + '>'
+                        + '<param name="filename" value="' + sFromUrl + '">'
+                        + '<param name="autostart" value="' + sAutostart + '">'
+                        + '<param name="showcontrols" value="true">'
+                        + '<param name="loop" value="true">'
+                        + '<embed type="application/x-mplayer2" src="' + sFromUrl + '"' + s_Att + ' autostart="' + sAutostart + '" showcontrols="true" loop="true" pluginspage="http://microsoft.com/windows/mediaplayer/en/download/"></embed>'
+                        + '</object>';
+                    break;
+                case "mediaplayer7":
+                    s_Html = '<object classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"' + s_Att + '>'
+                        + '<param name="url" value="' + sFromUrl + '">'
+                        + '<param name="autostart" value="' + sAutostart + '">'
+                        + '<param name="uimode" value="full">'
+                        + '<embed type="application/x-mplayer2" src="' + sFromUrl + '"' + s_Att + ' autostart="' + sAutostart + '" uimode="full" pluginspage="http://microsoft.com/windows/mediaplayer/en/download/"></embed>'
+                        + '</object>';
+                    break;
+                case "realplayer":
+                    s_Html = '<object classid="clsid:cfcdaa03-8be4-11cf-b84b-0020afbbccfa"' + s_Att + '>'
+                        + '<param name="src" value="' + sFromUrl + '">'
+                        + '<param name="autostart" value="' + sAutostart + '">'
+                        + '<param name="controls" value="ImageWindow,ControlPanel,StatusBar">'
+                        + '<param name="console" value="Clip1">'
+                        + '<embed type="audio/x-pn-realaudio-plugin" src="' + sFromUrl + '"' + s_Att + ' autostart="' + sAutostart + '" controls="ImageWindow,ControlPanel,StatusBar" console="Clip1"></embed>'
+                        + '</object>';
+                    break;
+                case "quicktime":
+                    s_Html = '<object classid="clsid:02bf25d5-8c17-4b23-bc80-d3488abddc6b" codebase="http://www.apple.com/qtactivex/qtplugin.cab"' + s_Att + '>'
+                        + '<param name="src" value="' + sFromUrl + '">'
+                        + '<param name="autoplay" value="' + sAutostart + '">'
+                        + '<param name="controller" value="false">'
+                        + '<embed type="video/quicktime" src="' + sFromUrl + '"' + s_Att + ' autoplay="' + sAutostart + '" controller="false" pluginspage="http://www.apple.com/quicktime/download/"></embed>'
+                        + '</object>';
+                    break;
+                case "vlc":
+                    s_Html = '<object classid="clsid:9be31822-fdad-461b-ad51-be1d1c159921"' + s_Att + '>'
+                        + '<param name="mrl" value="' + sFromUrl + '">'
+                        + '<param name="autoplay" value="' + sAutostart + '">'
+                        + '<param name="showdisplay" value="true">'
+                        + '<param name="autoloop" value="true">'
+                        + '<param name="toolbar" value="true">'
+                        + '<embed type="application/x-vlc-plugin" mrl="' + sFromUrl + '"' + s_Att + ' autoplay="' + sAutostart + '" showdisplay="true" autoloop="true" toolbar="true" pluginspage="http://www.videolan.org" version="VideoLAN.VLCPlugin.2"></embed>'
+                        + '</object>';
+                    break;
+                case "flv":
+                    s_Html = '<object id="' + _CreateFlvId() + '" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"' + s_Att + '>'
+                        + '<param name="movie" value="' + s_FlvPluginPath + '">'
+                        + '<param name="flashvars" value="file=' + sFromUrl + '&autostart=' + sAutostart + '&image=' + sFlvPreviewImg + '&provider=video">'
+                        + '<param name="quality" value="high">'
+                        + '<param name="bgcolor" value="#000000">'
+                        + '<param name="allowfullscreen" value="true">'
+                        + '<embed type="application/x-shockwave-flash" src="' + s_FlvPluginPath + '"' + s_Att + ' flashvars="file=' + sFromUrl + '&autostart=' + sAutostart + '&image=' + sFlvPreviewImg + '&provider=video" quality="high" bgcolor="#000000" allowfullscreen="true" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed>'
+                        + '</object>';
+                    break;
+                case "video":
+                    s_Html = '<video controls="controls" loop="loop"' + s_Att + ' src="' + sFromUrl + '"';
+                    if (sAutostart == "true") {
+                        s_Html += ' autoplay="autoplay"';
+                    }
+                    if (sFlvPreviewImg != "") {
+                        s_Html += ' poster="' + sFlvPreviewImg + '"';
+                    }
+                    s_Html += '>';
+
+                    s_Html += '<object classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"' + s_Att + '>'
+                        + '<param name="url" value="' + sFromUrl + '">'
+                        + '<param name="autostart" value="' + sAutostart + '">'
+                        + '<param name="uimode" value="full">'
+                        + '<embed type="application/x-mplayer2" src="' + sFromUrl + '"' + s_Att + ' autostart="' + sAutostart + '" uimode="full" pluginspage="http://microsoft.com/windows/mediaplayer/en/download/"></embed>'
+                        + '</object>';
+
+                    s_Html += '</video>';
+                    break;
+                case "audio":
+                    s_Html = '<audio controls="controls" loop="loop"' + s_Att + s_Style + ' src="' + sFromUrl + '"';
+                    if (sAutostart == "true") {
+                        s_Html += ' autoplay="autoplay"';
+                    }
+                    s_Html += '>';
+
+                    if (!b_IsPreview || !EWEBBrowser.IsIE11P) {
+                        s_Html += '<object classid="clsid:6bf52a52-394a-11d3-b153-00c04f79faa6"' + s_Att + '>'
+                            + '<param name="url" value="' + sFromUrl + '">'
+                            + '<param name="autostart" value="' + sAutostart + '">'
+                            + '<param name="uimode" value="full">'
+                            + '<embed type="application/x-mplayer2" src="' + sFromUrl + '"' + s_Att + ' autostart="' + sAutostart + '" uimode="full" pluginspage="http://microsoft.com/windows/mediaplayer/en/download/"></embed>'
+                            + '</object>';
+                    }
+
+                    s_Html += '</audio>';
+                    break;
+                default:
+
+                    break;
+            }
+
+            return s_Html
+
+        }
+
+        function EscapeFlvUrl(s_Url) {
+            return s_Url.replace(/\?/gi, "%3F").replace(/=/gi, "%3D").replace(/&/gi, "%26");
+        }
+
+        function _CreateFlvId() {
+            var a_Img = EWEB.EditorDocument.getElementsByTagName("IMG");
+            var s_Attr = "";
+            for (var i = 0; i < a_Img.length; i++) {
+                if (a_Img[i].className == "ewebeditor__flv") {
+                    s_Attr += GetAttribute(a_Img[i], "_ewebeditor_fake_value");
+                }
+            }
+
+            var j = 0;
+            while (true) {
+                j++;
+                var s_ID = "flv__id__" + j;
+                if (s_Attr.indexOf(s_ID) < 0) {
+                    return s_ID;
+                }
+            }
+        }
+
+        function SelectImage1() {
+            $("tdPreview").innerHTML = "";
+            DoEmptyPreviewImgDesc();
+            EWEBDialog.OpenDialog("image1.htm");
+        }
+
+        function DoEmptyPreviewImgDesc() {
+            var o = $("d_image");
+            if (o.value == lang["DlgMediaPreviewImgDesc"]) {
+                o.value = "";
+            }
+        }
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            SearchSelectValue($("d_plugin"), sPlugin.toLowerCase());
+            SearchSelectValue($("d_align"), sAlign.toLowerCase());
+            SearchSelectValue($("d_autostart"), sAutostart.toLowerCase());
+
+            if (!bAllowUpload) {
+                sCheckFlag = "url";
+            }
+            RadioClick(sCheckFlag);
+
+            $("d_fromurl").value = sFromUrl;
+            $("d_width").value = sWidth;
+            $("d_height").value = sHeight;
+            $("d_vspace").value = sVSpace;
+            $("d_hspace").value = sHSpace;
+
+            if (sFlvPreviewImg == "") {
+                $("d_image").value = lang["DlgMediaPreviewImgDesc"];
+            } else {
+                $("d_image").value = sFlvPreviewImg;
+            }
+
+            //same height
+            var o1 = $("TD_Right");
+            var o2 = $("Fieldset_Right");
+            var h1 = o1.offsetHeight;
+            var h2 = o2.offsetHeight;
+            if (h1 > h2) {
+                if (EWEBBrowser.IsIE) {
+                    o2.style.height = h1 + "px";
+                } else {
+                    o2.style.height = (h1 - 2) + "px";
+                }
+            }
+
+
+            doPreview();
+
+            parent.InnerDialogLoaded(sCaption);
+
+            if (bAllowUpload && document.documentMode == 5) {
+                var b_UFDisable = (sCheckFlag == "url") ? false : true;
+                $("uploadfile").disabled = b_UFDisable;
+                $("uploadfile").disabled = !b_UFDisable;
+            }
+        }
+
+        function TabOnClick(n_Index, n_Count, s_TabID) {
+            if (s_TabID == "tab_mfu") {
+                DLGMFU.Load("media", $(s_TabID), DLGTab.TabSize[1].Width + "px", DLGTab.TabSize[1].Height + "px");
+            }
+        }
+
+        function MFUReturn(s_Value) {
+            var s_Html = "";
+            var aFile = s_Value.split("|");
+            for (var i = 0; i < aFile.length; i++) {
+                var a = aFile[i].split("::");
+                if (a.length == 3 && a[1] != "") {
+                    var s_OriginalFileName = a[0].substr(a[0].lastIndexOf("\\") + 1);
+                    var s_SavePathFile = a[1];
+                    s_Html += GetMediaPlayerHtml(false, s_SavePathFile) + "<br>";
+                    EWIN.addUploadFile(s_OriginalFileName, s_SavePathFile);
+                }
+            }
+            EWIN.insertHTML(s_Html);
+            parent.Ok();
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <script type="text/javascript">
+                if (config.MFUEnable == "1") {
+                    DLGTab.Create([
+                        [lang["DlgComTabNormal"], "tab_normal"],
+                        [lang["DlgComTabMFU"], "tab_mfu"]
+                    ]);
+                }
+            </script>
+
+            <table id="tab_normal" border=0 cellpadding=0 cellspacing=5 align=center>
+                <tr valign=top>
+                    <td>
+
+                        <table border=0 cellpadding=0 cellspacing=0 align=center width="100%">
+                            <tr>
+                                <td>
+                                    <fieldset>
+                                        <legend><span lang=DlgMediaSource></span></legend>
+                                        <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                            <tr>
+                                                <td>
+
+                                                    <table border=0 cellpadding=0 cellspacing=0 width="300px">
+                                                        <tr>
+                                                            <td></td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                                        <script type="text/javascript">
+                                                            if (bAllowUpload) {
+                                                                document.write("<tr>");
+                                                                document.write("<td noWrap width=\"20%\"><input type=radio id=\"d_checkfromfile\" value=\"1\" onclick=\"RadioClick('file')\"><label for=d_checkfromfile>" + lang["DlgFromFile"] + "</label>:</td>");
+                                                                document.write("<td noWrap width=\"80%\">");
+                                                                document.write(getUploadForm("media"));
+                                                                document.write("</td>");
+                                                                document.write("</tr>");
+                                                            }
+                                                        </script>
+                                                        <tr>
+                                                            <td noWrap width="20%"><input type=radio id="d_checkfromurl" value="1" onclick="RadioClick('url')"><label
+                                                                for=d_checkfromurl><span lang=DlgFromUrl></span></label>:
+                                                            </td>
+                                                            <td noWrap width="80%">
+                                                                <script type="text/javascript">
+                                                                    if (config.AllowBrowse == "1") {
+                                                                        document.write("<table border=0 cellpadding=0 cellspacing=0 width='100%'><tr><td width='100%'><input type=text id='d_fromurl' style='width:100%' size=10 value='http://'></td><td><input class='dlgBtnBrowse' type=button id='d_browse' onclick=\"SelectBrowse('media','fromurl')\" value='" + lang["DlgBtnBrowse"] + "' align=absmiddle></td></tr></table>");
+                                                                    } else {
+                                                                        document.write("<input type=text id='d_fromurl' style='width:100%' size=10 value='http://'>");
+                                                                    }
+                                                                </script>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height=5></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <fieldset>
+                                        <legend><span lang=DlgMediaEffect></span></legend>
+                                        <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                            <tr>
+                                                <td>
+
+                                                    <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgMediaPlugin></span>:</td>
+                                                            <td noWrap colspan=4>
+                                                                <select id=d_plugin size=1 style="width:100%">
+                                                                    <option value='' selected lang=DlgMediaPluginAuto></option>
+                                                                    <option value='mediaplayer6' lang=DlgMediaPluginWMP6></option>
+                                                                    <option value='mediaplayer7' lang=DlgMediaPluginWMP7></option>
+                                                                    <option value='realplayer' lang=DlgMediaPluginReal></option>
+                                                                    <option value='quicktime' lang=DlgMediaPluginQT></option>
+                                                                    <option value='flv' lang=DlgMediaPluginFLV></option>
+                                                                    <option value='vlc' lang=DlgMediaPluginVLC></option>
+                                                                    <option value='video' lang=DlgMediaPluginVideo></option>
+                                                                    <option value='audio' lang=DlgMediaPluginAudio></option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgAlign></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_align size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='left' lang=DlgAlignLeft></option>
+                                                                    <option value='right' lang=DlgAlignRight></option>
+                                                                    <option value='top' lang=DlgAlignTop></option>
+                                                                    <option value='middle' lang=DlgAlignMiddle></option>
+                                                                    <option value='bottom' lang=DlgAlignBottom></option>
+                                                                    <option value='absmiddle' lang=DlgAlignAbsmiddle></option>
+                                                                    <option value='absbottom' lang=DlgAlignAbsbottom></option>
+                                                                    <option value='baseline' lang=DlgAlignBaseline></option>
+                                                                    <option value='texttop' lang=DlgAlignTexttop></option>
+                                                                </select>
+                                                            </td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgMediaAutoStart></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_autostart size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='true' lang=DlgComYes></option>
+                                                                    <option value='false' lang=DlgComNo></option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgMediaWidth></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_width size=10 value="480"></td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgMediaHeight></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_height size=10 value="400"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgComVSpace></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_vspace size=10 value=""
+                                                                                          onkeydown="OnDigitFieldKeyDown(event);"></td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgComHSpace></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_hspace size=10 value=""
+                                                                                          onkeydown="OnDigitFieldKeyDown(event);"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgMediaPreviewImg></span>:</td>
+                                                            <td colspan=4><input style="width:215px" type=text id=d_image size=7 value="" onclick="DoEmptyPreviewImgDesc()"><img
+                                                                border=0 src="images/rectimg.gif" width=18 style="cursor:hand" id=s_bgimage onclick="SelectImage1()"
+                                                                align=absmiddle></td>
+                                                        </tr>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                    </td>
+                    <td id="TD_Right">
+
+                        <fieldset id="Fieldset_Right">
+                            <legend><span lang=DlgComPreview></span></legend>
+                            <table border=0 cellpadding=0 cellspacing=5 width="200" height="160" valign=top id=tablePreview>
+                                <tr>
+                                    <td colspan=2 bgcolor=#FFFFFF align=center valign=middle id=tdPreview height="100%">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id=tdPreviewSize></td>
+                                    <td align=right><input type=button class="dlgBtn" id=btnPreivew onclick="doPreview()" lang=DlgComPreview></td>
+                                </tr>
+                            </table>
+                        </fieldset>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td noWrap align=right colspan=2><input type=submit class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                                         class="dlgBtnCommon dlgBtn"
+                                                                                                                                                                         value=''
+                                                                                                                                                                         onclick="$('tdPreview').innerHTML='';parent.Cancel();"
+                                                                                                                                                                         lang=DlgBtnCancel>
+                    </td>
+                </tr>
+            </table>
+
+
+            <div id="tab_mfu" style="display:none"></div>
+
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgComUploading"]);
+</script>
+
+</body>
+</html>

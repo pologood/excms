@@ -1,0 +1,113 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="btn-group">
+                        <button id="btn-add" class="btn btn-add btn-refresh" onclick="addFirm()"> 新 增</button>
+                    </div>
+                    <div class="btn-group">
+                        <button id="btn-delete" class="btn btn-delete btn-refresh-all" onclick="deleteFirms()"> 批量删除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:600px;" allowCellSelect="false"
+             onlyCheckSelection="true"
+             allowResize="true" url="/manufacturer/getPage" sizeList="[20,30,50]" pageSize="20" showPager="false"
+             idField="id" multiSelect="true">
+            <div property="columns">
+                <div type="checkcolumn" width="5%"></div>
+                <div type="indexcolumn" width="10%" headerAlign="center" align="center">序号</div>
+                <div field="name" width="25%" headerAlign="center" allowSort="flase" align="center">厂商名称</div>
+                <div field="productName" width="20%" headerAlign="center" allowSort="flase" align="center">产品版本</div>
+                <div field="uniqueCode" width="20%" headerAlign="center" allowSort="flase" align="center">唯一编码</div>
+                <div width="20%" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var cur = {}
+    mini.parse();
+    cur.grid = mini.get("datagrid1");
+    cur.grid.load({dataFlag: 1});
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(cur.grid);
+    var addFirm = function () {
+        Ls.openWin("/manufacturer/edit", '500px', '280px', {
+            id: 'manufacturer', title: "新增厂商", ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    }
+    var editFirm = function (id) {
+        Ls.openWin("/manufacturer/edit?id=" + id, '500px', '280px', {
+            id: 'manufacturer', title: "修改厂商", ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    }
+    //操作加载
+    var renderOp = function (e) {
+        var str = "", editBtn = "", delBtn = "";
+        var rec = e.record;
+        editBtn = '<button class="btn btn-default btn-sm btn-edit" onclick="editFirm(' + rec.id + ')">修 改</button> '
+        delBtn = '<button class="btn btn-default btn-sm btn-delete" onclick="deleteFirm(' + rec.id + ')">删 除</button>'
+        str += editBtn + delBtn;
+        return str;
+    }
+    // 批量删除
+    var deleteFirms = function () {
+        var manufacturerIds = [];
+        var selected = cur.grid.getSelecteds();
+        var length = selected.length;
+        if (length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        for (var i = 0; i < length; i++) {
+            manufacturerIds.push(selected[i].id);
+        }
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/manufacturer/delete",
+                data: {
+                    ids: manufacturerIds
+                }
+            }).done(function (d) {
+                Ls.tips('删除成功!', {
+                    icons: "success"
+                });
+                cur.grid.reload();
+            });
+        }
+    }
+    // 单个删除
+    var deleteFirm = function (id) {
+        if (confirm("您确定要删除该条记录吗?")) {
+            Ls.ajaxGet({
+                url: "/manufacturer/delete",
+                data: {
+                    ids: id
+                }
+            }).done(function (d) {
+                Ls.tips('删除成功!', {
+                    icons: "success"
+                });
+                cur.grid.reload();
+            });
+        }
+    }
+</script>

@@ -1,0 +1,95 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="formReviewType" role="form" ms-controller="formReviewType">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>类型名称：</label>
+                    <input name="name" type="text" class="form-control" placeholder="类型名称不能为空" ms-duplex="name">
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        typeId: Ls.url.get("typeId"),
+        params: {
+            siteId: Ls.url.get("siteId"),
+            columnId: Ls.url.get("columnId")
+        }
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/reviewType/getReviewType",
+                data: {
+                    typeId: cur.typeId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formReviewType"
+                data.$id = cur.$id;
+                data.columnId = cur.params.columnId;
+                data.siteId = cur.params.siteId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+
+            })
+        };
+
+        getData();
+
+        $('#formReviewType').validator({
+            fields: {
+                'name': '分类名称:required;length[2~50]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            var url = "/reviewType/save";
+            Ls.ajaxGet({
+                url: url,
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        icons: "success", callback: function () {
+                            Ls.winClose();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+</script>
+</body>
+</html>

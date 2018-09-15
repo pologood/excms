@@ -1,0 +1,13 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $eos)
+<li class="num${velocityCount}">
+    #if($!{eo.isStartUrl} == 0)
+        <a href="/content/column/$!{eo.indicatorId}" class="$!{eo.active}" target="$!{target}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+    #else
+        <a href="$!{eo.transUrl}" target="#if($!{eo.transWindow} == 0) _self #else _blank#end" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+    #end
+</li>
+#end

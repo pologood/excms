@@ -1,0 +1,1001 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" ms-controller="model_formId" id="model_formId" name="model_formId">
+                    <input type="hidden" class="form-control" name="id" placeholder="" ms-duplex="id" readonly/>
+                    <input type="hidden" class="form-control" name="siteId" placeholder="" ms-duplex="siteId" readonly/>
+                    <input type="hidden" class="form-control" name="type" placeholder="" ms-duplex="type" readonly/>
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>模型名称</label>
+                            <input type="text" class="form-control" name="name" id="name" placeholder="" ms-duplex="name" maxlength="40"/>
+                        </div>
+                        <div class="form-group hide">
+                            <label>模型标识</label>
+                            <input type="text" class="form-control" name="code" id="code" placeholder="" ms-duplex="code"/>
+                        </div>
+                        <div class="form-group">
+                            <label>栏目类型</label>
+                            <select id="modelTypeCode" class="form-control" name="modelTypeCode" placeholder="请选择"
+                                    ms-duplex="modelTypeCode" ms-change="columnTypeChange">
+                            </select>
+                        </div>
+                        <div class="form-group linkNO hide ">
+                            <label>绑定流程</label>
+                            <select id="processId" class="form-control" name="processId" ms-data-name="processId" placeholder="请选择流程"
+                                    ms-duplex="processId" ms-change="processIdChange">
+                                <option value="">请选择流程</option>
+                            </select>
+                            <input type="hidden" class="form-control" id="processName" name="processName" placeholder="" ms-data-name="processName" ms-duplex="processName"/>
+                        </div>
+                        <div class="form-group linkNO ">
+                            <label>二级页面模板</label>
+                            <select id="columnTempId" class="form-control" ms-data-name="columnTempId" ms-duplex="columnTempId" placeholder="请选择">
+                                <option value="">请选择</option>
+                                #foreach($s in $columnList)
+                                    <option value="$!{s.id}">$!{s.name}</option>
+                                #end
+                            </select>
+                        </div>
+                        <div class="form-group linkNO">
+                            <label>详细页面模板</label>
+                            <select id="articalTempId" class="form-control" name="articalTempId" ms-duplex="articalTempId" placeholder="请选择">
+                                <option value="">请选择</option>
+                                #foreach($s in $contentList)
+                                    <option value="$!{s.id}">$!{s.name}</option>
+                                #end
+                            </select>
+                        </div>
+                        #if($isWap==1)
+                            <div class="form-group linkNO ">
+                                <label>wap二级页面模板</label>
+                                <select id="wapColumnTempId" class="form-control" ms-data-name="wapColumnTempId" ms-duplex="wapColumnTempId" placeholder="请选择">
+                                    <option value="">请选择</option>
+                                    #foreach($s in $columnList)
+                                        <option value="$!{s.id}">$!{s.name}</option>
+                                    #end
+                                </select>
+                            </div>
+                            <div class="form-group linkNO">
+                                <label>wap详细页面模板</label>
+                                <select id="wapArticalTempId" class="form-control" name="wapArticalTempId" ms-duplex="wapArticalTempId" placeholder="请选择">
+                                    <option value="">请选择</option>
+                                    #foreach($s in $contentList)
+                                        <option value="$!{s.id}">$!{s.name}</option>
+                                    #end
+                                </select>
+                            </div>
+                        #end
+                        <!--    论坛配置开始   -->
+                        <div class="form-group bbs dn">
+                            <label>发帖限制</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isIssue" value="1" ms-duplex-string="isIssue"/>允许发布主题 </label>
+                                <label class="radio-inline"><input type="radio" name="isIssue" value="0" ms-duplex-string="isIssue"/>禁止发布主题</label>
+                                <label class="radio-inline"><input type="radio" name="isReply" value="1" ms-duplex-string="isReply"/>允许回复帖子</label>
+                                <label class="radio-inline"><input type="radio" name="isReply" value="0" ms-duplex-string="isReply"/>禁止回复帖子</label>
+                            </div>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>限制回帖年份</label>
+                            <input type="text" name="year" ms-duplex="year" class="form-control" placeholder="如果设定，在设定年以前的帖子将禁止回复"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>禁止发帖IP</label>
+                            <textarea name="ips" class="form-control" rows="1" placeholder="格式为 (IP地址),多个，请用'#'分隔符分隔" ms-duplex="ips"></textarea>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>注册会员积分</label>
+                            <input type="text" name="registerNum" ms-duplex="registerNum" class="form-control" placeholder="注册会员积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>会员登录积分</label>
+                            <input type="text" name="loginNum" ms-duplex="loginNum" class="form-control" placeholder="会员登录积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>发帖积分</label>
+                            <input type="text" name="postedNum" ms-duplex="postedNum" class="form-control" placeholder="用户发帖时积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>回复积分</label>
+                            <input type="text" name="replyNum" ms-duplex="replyNum" class="form-control" placeholder="用户回帖时积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>审核通过积分</label>
+                            <input type="text" name="checkNum" ms-duplex="checkNum" class="form-control" placeholder="用户发帖被审核通过时积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>删贴积分</label>
+                            <input type="text" name="delNum" ms-duplex="delNum" class="form-control" placeholder="用户帖子别删除时积分减少"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>固顶积分</label>
+                            <input type="text" name="topNum" ms-duplex="topNum" class="form-control" placeholder="用户帖子被固顶时积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>推荐积分</label>
+                            <input type="text" name="essenceNum" ms-duplex="essenceNum" class="form-control" placeholder="用户帖子被推荐时积分增加"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>按时回复时间 (超时状态天数)</label>
+                            <input type="text" name="replyDay" ms-duplex="replyDay" class="form-control" placeholder="设置成超时状态天数"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>红牌期限 (红牌状态天数)</label>
+                            <input type="text" name="redDay" ms-duplex="redDay" class="form-control" placeholder="设置成红牌状态天数"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>黄牌期限 (黄牌状态天数)</label>
+                            <input type="text" name="yellowDay" ms-duplex="yellowDay" class="form-control" placeholder="设置成黄牌状态天数"/>
+                        </div>
+                        <div class="form-group bbs dn">
+                            <label>日期池 (节假日 [2015-03-13 ，日期间用'#'号分隔])</label>
+                            <textarea name="times" class="form-control" rows="1" placeholder="节假日 [2015-03-13 ，日期间用'#'号分隔]" ms-duplex="times"></textarea>
+                        </div>
+                        <!--    论坛配置结束   -->
+
+                        <div class="form-group dn guestBook messageBoard">
+                            <label>绑定类型</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="recType" value="2" ms-click="typeChange(2)"/>不绑定
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="recType" value="0" ms-click="typeChange(0)"/> 接收单位
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="recType" value="1" ms-click="typeChange(1)"/> 接收人
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group dn workGuide tableResources onlinePetition onlineDeclaration relatedRule sceneService guestBookN messageBoardN">
+                            <label>绑定单位</label>
+                            <textarea class="form-control readonly" rows="3" name="recUnitNames" id="recUnitNames" ms-duplex="recUnitNames" ms-click="getUnitIds()"
+                                      placeholder="点击选择接收单位" readonly></textarea>
+                        </div>
+                        <div class="form-group dn">
+                            <label>绑定单位</label>
+                            <textarea class="form-control" rows="3" name="recUnitIds" id="recUnitIds" ms-duplex="recUnitIds" readonly></textarea>
+                        </div>
+                        <div class="form-group dn guestBookY messageBoardY">
+                            <label>绑定人员</label>
+                            <textarea class="form-control" rows="3" name="recUserNames" id="recUserNames" ms-duplex="recUserNames" ms-click="getUserIds()"
+                                      placeholder="点击选择接收人" readonly></textarea>
+                        </div>
+                        <!-- 转办单位-->
+                        <div class="form-group dn guestBook messageBoard" id="turnUnit">
+                            <label>转办单位</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="turn" value="1" ms-click="turnChange(1)"/>是
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="turn" value="0" ms-click="turnChange(0)"/> 否
+                                </label>
+                            </div>
+                        </div>
+                        <div id="turnUnitName" class="form-group dn ">
+                            <label>转办单位</label>
+                            <textarea class="form-control readonly" rows="3" name="turnUnitNames" id="turnUnitNames" ms-duplex="turnUnitNames" ms-click="getTurnUnitIds()"
+                                      placeholder="点击选择转办单位" readonly></textarea>
+                        </div>
+                        <!--转办单位-->
+
+
+                        <div class="form-group dn guestBook messageBoard">
+                            <label>留言类型</label>
+                            <textarea class="form-control readonly" rows="3" name="classNames" id="classNames" ms-duplex="classNames" ms-click="getClassCodes()"
+                                      placeholder="点击选择留言类型" readonly></textarea>
+                        </div>
+
+                        <div class="form-group dn">
+                            <label>留言类型</label>
+                            <textarea class="form-control" rows="3" name="classCodes" id="classCodes" ms-duplex="classCodes"></textarea>
+                        </div>
+                        <div class="form-group dn guestBook messageBoard onlinePetition onlineDeclaration">
+                            <label>办理状态</label>
+                            <textarea class="form-control readonly" rows="3" name="statusName" id="statusName" ms-duplex="statusName" ms-click="getDealStatus()"
+                                      placeholder="点击选择办理状态"></textarea>
+                        </div>
+                        <div class="form-group dn">
+                            <label>办理状态</label>
+                            <textarea class="form-control" rows="3" name="statusCode" id="statusCode" ms-duplex="statusCode"></textarea>
+                        </div>
+                        <div class="form-group dn">
+                            <label>绑定人员</label>
+                            <textarea class="form-control" rows="3" name="recUserIds" id="recUserIds" ms-duplex="recUserIds"></textarea>
+                        </div>
+                        <div class="form-group dn guestBook messageBoard interviewInfo collectInfo">
+                            <label>开启会员登录验证</label>
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isLoginGuest" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isLoginGuest" value="0"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group dn guestBook messageBoard">
+                            <label>开启流转区域</label>
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isLocalUnit" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isLocalUnit" value="0"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group dn guestBook messageBoard">
+                            <label>是否启用红黄牌</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isRedYellow" value="1" ms-click="colorChange(1)"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isRedYellow" value="0" ms-click="colorChange(0)"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group guestBookM messageBoardM dn">
+                            <label>按时回复时间 (超时状态天数)</label>
+                            <input type="text" name="limitDay" ms-duplex="limitDay" class="form-control" placeholder="设置成超时状态天数"/>
+                        </div>
+                        <div class="form-group guestBookM  messageBoardM dn">
+                            <label>黄牌期限 (黄牌状态天数,大于回复时间)</label>
+                            <input type="text" name="yellowCardDay" ms-duplex="yellowCardDay" class="form-control" placeholder="设置成黄牌状态天数"/>
+                        </div>
+                        <div class="form-group guestBookM messageBoardM dn">
+                            <label>红牌期限 (红牌状态天数,大于黄牌期限)</label>
+                            <input type="text" name="redCardDay" ms-duplex="redCardDay" class="form-control" placeholder="设置成红牌状态天数"/>
+                        </div>
+                        <div class="form-group guestBookM messageBoardM dn">
+                            <label>日期池 (节假日 [2015-03-13 ，日期间用'#'号分隔])</label>
+                            <textarea name="datePool" class="form-control" rows="1" placeholder="节假日 [2015-03-13 ，日期间用'#'号分隔]" ms-duplex="datePool"></textarea>
+                        </div>
+
+                        <div class="form-group dn articleNews pictureNews videoNews fileDownload onlinePetition public_content">
+                            <label>排序方式</label>
+                            <select id="orderTypeCode" class="form-control" name="orderTypeCode" ms-duplex="orderTypeCode"/>
+                            </select>
+                        </div>
+
+                        <div class="form-group dn articleNews pictureNews videoNews ordinaryPage fileDownload collectInfo interviewInfo leaderInfo">
+                            <label>是否启用水印</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isWater" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isWater" value="0"> 否 </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group dn articleNews pictureNews videoNews ordinaryPage fileDownload collectInfo interviewInfo leaderInfo">
+                            <label>缩略图宽度</label>
+                            <input type="text" name="picWidth" ms-duplex="picWidth" placeholder="" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="form-group dn articleNews pictureNews videoNews ordinaryPage fileDownload collectInfo interviewInfo leaderInfo">
+                            <label>缩略图高度</label>
+                            <input type="text" name="picHeight" ms-duplex="picHeight" class="form-control" placeholder="为0或为空不限制缩略图高度"/>
+                        </div>
+                        <div class="form-group dn articleNews pictureNews videoNews ordinaryPage">
+                            <label>正文图片宽度</label>
+                            <input type="text" name="contentWidth" ms-duplex="contentWidth" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="form-group dn articleNews pictureNews ">
+                            <label>是否启用评论</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isComment" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isComment" value="0"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group dn guestBook messageBoard">
+                            <label>是否启用评价</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isAssess" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isAssess" value="0"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group guestBook messageBoard dn">
+                            <label>自动评价时间</label>
+                            <input type="text" name="assessDay" ms-duplex="assessDay" class="form-control" placeholder="自动评价时间"/>
+                        </div>
+
+                        <div class="form-group dn workGuide sceneService ">
+                            <label></label>
+                            <div class="radio-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isConsole" name="isConsole" onclick="zx_link()" value=""/> 允许网民咨询
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isComplaint" name="isComplaint" onclick="ts_link()" value=""/> 允许网民投诉
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isDeclaration" name="isDeclaration" onclick="sb_link()" value=""/> 允许网民申报
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isVisit" name="isVisit" onclick="visit_link()" value=""/> 最少去现场次数
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group dn" id="zx_field">
+                            <label>咨询链接</label>
+                            <input type="text" name="consoleLink" ms-duplex="consoleLink" placeholder="请填写咨询链接" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="form-group dn" id="ts_field">
+                            <label>投诉链接</label>
+                            <input type="text" name="complaintLink" ms-duplex="complaintLink" placeholder="请填写投诉链接" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="form-group dn" id="sb_field">
+                            <label>申报链接</label>
+                            <input type="text" name="declarationLink" ms-duplex="declarationLink" placeholder="请填写申报链接" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="form-group dn" id="visit_field">
+                            <label>现场次数</label>
+                            <input type="text" name="visitCount" ms-duplex="visitCount" placeholder="请填写现场次数" class="form-control" placeholder=""/>
+                        </div>
+
+                        <div class="form-group linkNO">
+                            <label>启用美图</label>
+                            <div class="radio-group">
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isEnableBeauty" value="1"> 是 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" ms-duplex-number="isEnableBeauty" value="0"> 否 </label>
+                            </div>
+                        </div>
+                        <div class="form-group dn articleNews pictureNews">
+                            <label>内容过滤</label>
+
+                            <div class="radio-group">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isSensitiveWord" name="isSensitiveWord" value=""/> 启用检查敏感词
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isEasyWord" name="isEasyWord" value=""/> 启用检查易错词
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="isHotWord" name="isHotWord" value=""/> 启用检查热词
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group hide">
+                            <label>tplId</label>
+                            <input type="text" class="form-control" name="tplId" id="tplId" placeholder="" ms-duplex="tplId"/>
+                        </div>
+
+                        <div class="form-group" id="abcd">
+                            <label>描述</label> <textarea class="form-control" name="description" id="description" rows="3" ms-duplex="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions noborder hide">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default btn-cancle" onclick="doCancle()">取 消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/model_guest_type.js"></script>
+<script>
+    var id = "${id}";
+    var isFlag = "${isFlag}";
+    var parent = Ls.getWin.win;
+    var siteId = parent.GLOBAL_SITEID;
+    if(!siteId){
+      siteId=parent.parent.GLOBAL_SITEID;
+    }
+    var isPublic = "${isPublic}";
+    var isAddModel = '${isAddModel}';
+    var validateCode = "";
+    var curr = {
+        vm: {},
+        columnTypeList: {},
+        length: 0,
+        columnTypeStr: '',
+        zx_ck: $('#isConsole'),
+        ts_ck: $('#isComplaint'),
+        sb_ck: $('#isDeclaration'),
+        visit_ck: $('#isVisit'),
+        zx_field: $('#zx_field'),
+        ts_field: $('#ts_field'),
+        sb_field: $('#sb_field'),
+        visit_field: $('#visit_field')
+    }
+
+    $(document).ready(function () {
+        var dialog = art.dialog,
+            api = art.dialog.open.api;
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'saveBtn',
+                focus: true,
+                callback: function () {
+                    $("#model_formId").trigger("validate");
+                    return false;
+                }
+            }
+        );
+        getModelType().done(function () {
+            getModelVO();
+        });
+
+        doSubmit();
+    });
+
+    function getModelVO() {
+        Ls.ajaxGet({
+            url: "/contentModel/getVO",
+            data: {id: id, isPublic: isPublic}
+        }).done(function (text) {
+            data = text.data;
+            data.modelTypeCode = Ls.isEmpty(data.modelTypeCode) ? "" : data.modelTypeCode;
+            data.articalTempId = Ls.isEmpty(data.articalTempId) ? "" : data.articalTempId;
+            data.columnTempId = Ls.isEmpty(data.columnTempId) ? "" : data.columnTempId;
+            data.processId = Ls.isEmpty(data.processId) ? "" : data.processId;
+            data.processName = Ls.isEmpty(data.processName) ? "" : data.processName;
+
+            if ("${isWap}" == 1) {
+                data.wapArticalTempId = Ls.isEmpty(data.wapArticalTempId) ? "" : data.wapArticalTempId;
+                data.wapColumnTempId = Ls.isEmpty(data.wapColumnTempId) ? "" : data.wapColumnTempId;
+            }
+            validateCode = data.modelTypeCode;
+
+            data.\$id = "model_formId";
+            curr.vm = avalon.define(data);
+            avalon.scan($("#model_formId").get(0), curr.vm);
+
+            modelTypeChange(curr.vm.modelTypeCode);
+            if (curr.vm.modelTypeCode == 'guestBook' || curr.vm.modelTypeCode == 'messageBoard') {
+                typeChange(curr.vm.recType);
+                colorChange(curr.vm.isRedYellow);
+            }
+            if (curr.vm.modelTypeCode == 'workGuide' || curr.vm.modelTypeCode == 'sceneService') {
+                if (data.isConsole == 1) {
+                    curr.zx_ck.prop("checked", true);
+                    curr.zx_field.show();
+                }
+                if (data.isComplaint == 1) {
+                    curr.ts_ck.prop("checked", true);
+                    curr.ts_field.show();
+                }
+                if (data.isDeclaration == 1) {
+                    curr.sb_ck.prop("checked", true);
+                    curr.sb_field.show();
+                }
+                if (data.isVisit == 1) {
+                    curr.visit_ck.prop("checked", true);
+                    curr.visit_field.show();
+                }
+            }
+            if (data.isSensitiveWord == 1) {
+                $("#isSensitiveWord").prop("checked", true);
+            }
+            if (data.isEasyWord == 1) {
+                $("#isEasyWord").prop("checked", true);
+            }
+            if (data.isHotWord == 1) {
+                $("#isHotWord").prop("checked", true);
+            }
+            if (!Ls.isEmpty(data.modelTypeCode)) {
+                for (var i = 0; i < curr.length; i++) {
+                    if (curr.columnTypeList[i].code == data.modelTypeCode) {
+                        var str = ' <option value=' + curr.columnTypeList[i].code + '>' + curr.columnTypeList[i].key + '</option> ';
+                        $("#modelTypeCode").html('');
+                        $("#modelTypeCode").append(str);
+                        break;
+                    }
+                }
+            } else {
+                $("#modelTypeCode").html('');
+                $("#modelTypeCode").append(curr.columnTypeStr);
+            }
+            getProcessList(data.processId);
+
+        }).done(function () {
+            type_select_tree_ser.init();
+        });
+    }
+
+    function getColumnTemp() {
+        var columnList = '{columnList}';
+        var str = '<option value=""> 请选择 </option> ';
+        if (text.data != null) {
+            var data = text.data;
+            var length = data.length;
+            if (length > 0) {
+                for (i = 0; i < length; i++) {
+                    str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> ';
+                }
+            }
+        }
+        $("#columnTempId").append(str);
+    }
+
+    function getArticalTemp() {
+        return Ls.ajaxGet({
+            url: "/contentModel/getTemplate",
+            data: {type: 2}
+        }).done(function (text) {
+            var str = '<option value=""> 请选择 </option> ';
+            if (text.data != null) {
+                var data = text.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> ';
+                    }
+                }
+            }
+            $("#articalTempId").append(str);
+        });
+    }
+
+    function getModelType() {
+        return Ls.ajaxGet({
+            url: "/contentModel/getModelType",
+            data: {}
+        }).done(function (text) {
+
+            curr.columnTypeStr = '<option value=""> 请选择 </option> ';
+            if (text != null) {
+                var data = text;
+                curr.columnTypeList = text;
+                curr.length = data.length;
+                if (curr.length > 0) {
+                    for (i = 0; i < curr.length; i++) {
+                        curr.columnTypeStr += ' <option value=' + data[i].code + '>' + data[i].key + '</option> '
+                    }
+                }
+            }
+            //$("#modelTypeCode").append(str);
+        });
+    }
+
+    function doSubmit() {
+        $('#model_formId').validator({
+            rules: {
+                bbsRule: function (el, param, field) {
+                    var isTrue = (validateCode == "bbs" ? true : false);
+                    return isTrue;
+                },
+                contentWidthRule:function (element,param) {
+                  var code = validateCode;
+                 if(code=='articleNews'||code=='pictureNews'||code=='videoNews'||code=='ordinaryPage'){
+                     if(null==element.value ||  element.value==''){
+                          return true;
+                      }
+                       else{
+                        return false;
+                     }
+
+                  }
+                    return false;
+                },
+                picWidthRule:function (element,param) {
+                    var code = validateCode;
+                    if(code=='articleNews'||code=='pictureNews'||code=='videoNews'||code=='ordinaryPage'||code=='fileDownload'||code=='collectInfo'||code=='interviewInfo'||code=='leaderInfo'){
+                        if(null==element.value ||  element.value==''){
+                            return true;
+                        }
+                        else{
+                            return false;
+                        }
+
+                    }
+                    return false;
+                }
+
+
+
+            },
+            fields: {
+                'name': '名称:required;',
+                'modelTypeCode': '模型类别:required;',
+                'columnTempId': '栏目页:required;',
+                'year': '限制回帖年份:integer;range[1999~9999]',
+                'registerNum': '注册新会员积分:integer;range[0~99999]',
+                'loginNum': '会员每次登录积分:integer;range[0~99999]',
+                'postedNum': '发帖积分:integer;range[0~99999]',
+                'replyNum': '回复积分:integer;range[0~99999]',
+                'checkNum': '审核积分:integer;range[0~99999]',
+                'delNum': '删贴积分:integer;range[0~99999]',
+                'topNum': '固顶积分:integer;range[0~99999]',
+                'essenceNum': '推荐积分:integer;range[0~99999]',
+                'replyDay': '按时回复时间:integer;range[0~99999]',
+                'yellowDay': '黄牌期限:integer;range[0~99999]',
+                'redDay': '红牌期限:integer;range[0~99999]',
+                'limitDay': '按时回复时间:integer;range[0~99999]',
+                'yellowCardDay': '黄牌期限:integer;range[0~99999]',
+                'redCardDay': '红牌期限:integer;range[0~99999]',
+                'assessDay': '自动评价时间:integer;range[0~99999]',
+                'picWidth':'缩略图宽度:required(picWidthRule);integer;range[0~99999]',
+                'contentWidth':'正文图片宽度:required(contentWidthRule);integer;range[0~99999]',
+                'visitCount': '现场次数:integer;range[0~99999]'
+            },
+            valid: function () {
+
+                checkEO();
+            }
+        });
+    }
+
+    function checkEO() {
+        var name = curr.vm.name;
+        var id = curr.vm.id;
+        Ls.ajaxGet({
+            url: "/contentModel/checkNameExisted",
+            data: {name: name, modelId: id, siteId: siteId, isPublic: isPublic},
+        }).done(function (data) {
+            if (data.data) {
+                checkModelType();
+            } else {
+                Ls.tipsInfo("模型名称已存在");
+                return;
+            }
+        });
+    }
+
+    function checkModelType() {
+        Ls.ajaxGet({
+            url: "/contentModel/checkModelType",
+            data: {modelTypeCode: curr.vm.modelTypeCode, siteId: siteId, modelId: curr.vm.id, isPublic: isPublic}
+        }).done(function (data) {
+          　if(!data.status){
+             Ls.tipsInfo(data.desc);
+             return;
+           }else{
+             if (data.data) {
+               saveEO();
+             } else {
+               Ls.tipsInfo("该类型的内容模型已存在，不能重复添加");
+               return;
+             }
+           }
+
+        });
+    }
+
+    function saveEO() {
+        var type = curr.vm.recType;
+        if (!Ls.isEmpty(type) && type == 0 && Ls.isEmpty(curr.vm.recUnitIds)) {
+            Ls.tipsInfo("请选择接收单位");
+            return;
+        } else if (!Ls.isEmpty(type) && type == 1 && Ls.isEmpty(curr.vm.recUserIds)) {
+            Ls.tipsInfo("请选择接收人员");
+            return;
+
+        }
+        ;
+        var isRedYellow = curr.vm.isRedYellow;
+        if ("guestBook" == curr.vm.modelTypeCode || "messageBoard" == curr.vm.modelTypeCode) {
+            if (curr.vm.isRedYellow == 1) {
+                if (Ls.isEmpty(curr.vm.limitDay)) {
+                    Ls.tipsInfo("请填写回复时间");
+                    return;
+                }
+                if (Ls.isEmpty(curr.vm.yellowCardDay)) {
+                    Ls.tipsInfo("请填写黄牌期限");
+                    return;
+                }
+                if (parseInt(curr.vm.limitDay) > parseInt(curr.vm.yellowCardDay)) {
+                    Ls.tipsInfo("黄牌期限应大于回复时间");
+                    return;
+                }
+                if (Ls.isEmpty(curr.vm.redCardDay)) {
+                    Ls.tipsInfo("请填写红牌期限");
+                    return;
+                }
+                if (parseInt(curr.vm.yellowCardDay) > parseInt(curr.vm.redCardDay)) {
+                    Ls.tipsInfo("红牌期限应大于黄牌期限");
+                    return;
+                }
+            }
+        }
+
+        if (curr.vm.modelTypeCode == 'workGuide' || curr.vm.modelTypeCode == 'sceneService') {
+            if (curr.zx_ck.is(':checked')) {
+                curr.vm.isConsole = 1;
+            } else {
+                curr.vm.isConsole = 0;
+            }
+            if (curr.ts_ck.is(':checked')) {
+                curr.vm.isComplaint = 1;
+            } else {
+                curr.vm.isComplaint = 0;
+            }
+            if (curr.sb_ck.is(':checked')) {
+                curr.vm.isDeclaration = 1;
+            } else {
+                curr.vm.isDeclaration = 0;
+            }
+            if (curr.visit_ck.is(':checked')) {
+                curr.vm.isVisit = 1;
+            } else {
+                curr.vm.isVisit = 0;
+            }
+        }
+        if ($("#isSensitiveWord").is(':checked')) {
+            curr.vm.isSensitiveWord = 1;
+        } else {
+            curr.vm.isSensitiveWord = 0;
+        }
+        if ($("#isEasyWord").is(':checked')) {
+            curr.vm.isEasyWord = 1;
+        } else {
+            curr.vm.isEasyWord = 0;
+        }
+        if ($("#isHotWord").is(':checked')) {
+            curr.vm.isHotWord = 1;
+        } else {
+            curr.vm.isHotWord = 0;
+        }
+
+        //curr.vm.vo=Ls.toJSON(curr.vm.vo);
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        value.orderTypeCode = $("#orderTypeCode").val();
+        Ls.ajax({
+            type: "POST",
+            url: "/contentModel/saveEO",
+            data: value
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            } else {
+                Ls.tipsOk("保存成功");
+                if (isFlag == '1' && isAddModel == 'true') {
+                    parent.addContentModel(text.data.code, text.data.name);
+                } else {
+                    parent.grid.reload();
+                }
+                art.dialog.close();
+                return;
+            }
+        });
+    }
+
+    function doCancle() {
+        art.dialog.close();
+    }
+
+    function columnTypeChange() {
+        var code = curr.vm.modelTypeCode;
+        modelTypeChange(code);
+        validateCode = code;
+        if (code != "guestBook" && code != "messageBoard") {
+            $("." + code + "N").show();
+        }
+
+    }
+
+    function processIdChange() {
+        var processId = $("#processId option:selected").val();
+        if (processId != null && processId != "") {
+            var processName = $("#processId option:selected").text();
+        } else {
+            var processName = "";
+        }
+        curr.vm.processName = processName;
+    }
+
+    function getUnitIds() {
+        Ls.openWin('/contentModel/getUnitIds', '430px', '460px', {
+            id: 'rec_unit',
+            title: '选择接收单位',
+            padding: 0,
+        });
+    }
+
+    function getTurnUnitIds() {
+        Ls.openWin('/contentModel/getTurnUnitIds', '430px', '460px', {
+            id: 'rec_unit',
+            title: '选择转发单位',
+            padding: 0,
+        });
+
+
+    }
+
+
+    function getUserIds() {
+        Ls.openWin('/contentModel/getUserIds?siteId=' + siteId, '400px', '500px', {
+            id: 'rec_user',
+            title: '选择接收人',
+            padding: 0,
+        });
+    }
+
+    function getClassCodes() {
+        Ls.openWin('/contentModel/getClassCodes?classCodes=' + curr.vm.classCodes, '300px', '400px', {
+            id: 'rec_user',
+            title: '选择留言类型',
+            padding: 0,
+        });
+    }
+
+    function getDealStatus() {
+        Ls.openWin('/contentModel/getDealStatus?dealStatus=' + curr.vm.statusCode, '300px', '400px', {
+            id: 'rec_user',
+            title: '选择办理状态',
+            padding: 0,
+        });
+    }
+
+    function modelTypeChange(code) {
+        $(".dn").hide();
+        code && $("." + code).show();
+        if (code == "linksMgr") {
+            $(".linkNO").hide();
+        } else {
+            $(".linkNO").show();
+            if (code == "articleNews" || code == "pictureNews" || code == "videoNews" || code == "fileDownload" || code == "onlinePetition" || code == "public_content") {
+                getOrderType(code);
+            }
+        }
+
+    }
+
+    function getOrderType(code) {
+        Ls.ajax({
+            type: "POST",
+            url: "/contentModel/getOrderType",
+            data: {code: code}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            } else {
+                var data = text.data;
+                var str = "";
+                if (data.length > 0) {
+                    str += '<option value="">请选择排序方式</option> ';
+                    for (var i = 0; i < data.length; i++) {
+                        var selected = "";
+                        if (curr.vm.orderTypeCode == data[i].code) {
+                            selected = "selected";
+                        }
+                        str += ' <option ' + selected + ' value="' + data[i].code + '">' + data[i].key + '</option> ';
+                    }
+                    $("#orderTypeCode").html(str);
+//                    if (curr.vm.orderTypeCode == null || curr.vm.orderTypeCode == '') {
+//                        curr.vm.orderTypeCode = data[0].code;
+//                    }
+                }
+
+            }
+
+        });
+    }
+
+    function typeChange(type) {
+        var code = curr.vm.modelTypeCode;
+        if (type == 1) {
+            $("." + code + "N").hide();
+            $("." + code + "Y").show();
+            $("#turnUnit").show();
+            if (curr.vm.turn == 1) {
+                $("#turnUnitName").show();
+            }
+
+
+        } else if (type == 0) {
+            $("." + code + "Y").hide();
+            $("." + code + "N").show();
+            $("#turnUnit").hide();
+        } else {
+            $("." + code + "Y").hide();
+            $("." + code + "N").hide();
+            $("#turnUnit").hide();
+        }
+    }
+
+    function turnChange(type) {
+        if (type == 1) {
+            $("#turnUnitName").show();
+        } else if (type == 0) {
+            $("#turnUnitName").hide();
+            curr.vm.turnUnitIds = "";
+            curr.vm.turnUnitNames = "";
+
+        }
+
+
+    }
+
+
+    function colorChange(type) {
+        if (curr.vm.modelTypeCode == "guestBook") {
+            if (type == 1) {
+                $(".guestBookM").show();
+            } else {
+                $(".guestBookM").hide();
+            }
+        } else if (curr.vm.modelTypeCode == "messageBoard") {
+            if (type == 1) {
+                $(".messageBoardM").show();
+            } else {
+                $(".messageBoardM").hide();
+            }
+        }
+    }
+
+
+    function zx_link() {
+        if (curr.zx_ck.prop("checked")) {
+            curr.zx_field.show();
+        } else {
+            curr.zx_field.hide();
+        }
+    }
+
+    function ts_link() {
+        if (curr.ts_ck.prop("checked")) {
+            curr.ts_field.show();
+        } else {
+            curr.ts_field.hide();
+        }
+    }
+
+    function sb_link() {
+        if (curr.sb_ck.prop("checked")) {
+            curr.sb_field.show();
+        } else {
+            curr.sb_field.hide();
+        }
+    }
+
+    function visit_link() {
+        if (curr.visit_ck.prop("checked")) {
+            curr.visit_field.show();
+        } else {
+            curr.visit_field.hide();
+        }
+    }
+
+    function getProcessList(processId) {
+        Ls.ajax({
+            type: "POST",
+            url: "/process/getProcessList",
+            data: {moduleCode: "EX"}
+        }).done(function (d) {
+            var data = d.data;
+            if (data && data.length > 0) {
+                var _html = ' <option value="">请选择流程</option>';
+                for (var i = 0, l = data.length; i < l; i++) {
+                    if (!Ls.isEmpty(processId)) {
+                        if (data[i].processId == processId) {
+                            _html += "<option value='" + data[i].processId + "' selected>" + data[i].name + "</option>";
+                        } else {
+                            _html += "<option value='" + data[i].processId + "'>" + data[i].name + "</option>";
+                        }
+
+                    } else {
+                        _html += "<option value='" + data[i].processId + "'>" + data[i].name + "</option>";
+                    }
+
+                }
+                $("#processId").html(_html);
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,177 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="link_form" role="form" ms-controller="link_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>链接名称</label>
+                            <input type="text" name="title" class="form-control" placeholder="" ms-duplex="title" maxlength="160">
+                        </div>
+                        <div class="form-group">
+                            <label>链接地址</label>
+                            <input type="text" name="redirectLink" class="form-control" placeholder="" ms-duplex="redirectLink">
+                        </div>
+                        <div class="form-group">
+                            <label>排序号</label>
+                            <input type="text" name="num" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="num" maxlength="4">
+                        </div>
+                        ### 是否是logo 1.是 2.否
+                        #if("$!{isLogo}" == "1")
+                            <div class="form-group">
+                                <label>Logo</label>
+
+                                <div class="input-group">
+									<input type="text" id="imageLink" name="imageLink" ms-duplex="imageLink" class="form-control"/>
+                                    <input type="hidden" id="attachRealName" name="attachRealName" ms-duplex="attachRealName"/>
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default btn-default-upload" type="button" onclick="uploadPic()">上传
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        #end
+
+                        <div class="form-group">
+                            <label>是否定时显示</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isJob" value="1" ms-duplex-number="isJob">是</label>
+                                <label class="radio-inline"><input type="radio" name="isJob" value="0" ms-duplex-number="isJob">否</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ms-if="isJob_div">
+                            <label>显示开始时间</label>
+                            <div class="controls">
+                                <input type="datetime" id="startTime" class="form-control readonly" placeholder="开始时间" name="showStartTime"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate: '#F{$dp.$D(\'endTime\')}',readOnly:true})"
+                                       ms-duplex="showStartTime" readonly data-rule="required(datetime)" data-msg-datetime="请至少填写一个时间"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ms-if="isJob_div">
+                            <label>显示结束时间</label>
+                            <div class="controls">
+                                <input type="datetime" id="endTime" class="form-control readonly" placeholder="结束时间" name="showEndTime"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate: '#F{$dp.$D(\'startTime\')}',readOnly:true})"
+                                       ms-duplex="showEndTime" readonly data-rule="required(datetime)" data-msg-datetime="请至少填写一个时间"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="remarks" ms-duplex="remarks" rows="5" placeholder="描述"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "link_form",//表单
+        vm: null,//模型
+        W: art.dialog.opener//父对象
+    };
+
+    function uploadPic() {
+        Ls.uploadFile(function (filePath) {
+			$("#attachRealName").val(filePath[0].fileName);
+            $("#imageLink").val(filePath[0].fileName);
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif;*.swf",
+            file_upload_limit: "1",
+            post_params: {
+                "code": cur.W.content_mgr.node.columnTypeCode,
+                "siteId": cur.W.GLOBAL_SITEID,
+                "columnId": cur.W.content_mgr.node.indicatorId,
+                "desc": "链接管理Logo",
+                "contentId": !cur.W.link_mgr.id ? "" : cur.W.link_mgr.id
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        var node = cur.W.content_mgr.node;
+        var contentId = cur.W.link_mgr.id;
+
+        Ls.ajaxGet({
+            url: "/linksMgr/getLinkContent",
+            data: {
+                columnId: cur.W.content_mgr.node.indicatorId,
+                contentId: !contentId ? "" : contentId
+            }
+        }).done(function (d) {
+            var data = d.data;
+
+            data.isJob_div = data.isJob == 1 ? true : false;
+            data.$id = cur.id;
+            data.siteId = cur.W.GLOBAL_SITEID;
+            data.columnId = cur.W.content_mgr.node.indicatorId;
+            data.typeCode = cur.W.content_mgr.node.columnTypeCode;
+            if (Ls.isEmpty(data.redirectLink)) {
+                data.redirectLink = "#";
+            }
+            // 如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[data.$id];
+            if (!cur.vm) {
+                // 绑定模型
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan($("#link_form").get(0), cur.vm);
+            // 自定义值
+            cur.vm.$watch("isJob", function (a, b) {
+                cur.vm.isJob_div = (a == 1);
+            });
+        });
+
+        //验证
+        $('#' + cur.id).validator({
+            rules : {
+                datetime : function() {// 当选择了定时时，时间只选其一就行了
+                    var isJob = $("input[name='isJob']:checked").val() == "1";
+                    return isJob && !($("#endTime").val() != "" || $("#startTime").val() != "");
+                }
+            },
+            fields: {
+                'title': '链接名称:required;',
+                'redirectLink': '链接地址:required;',
+                'num': '排序号:required;integer'
+                #if("$!{isLogo}" == "1")
+                    , 'imageLink': 'Logo:required;'
+                #end
+                , 'remarks': '描述:length[~500]'
+            },
+            valid: function () {
+                var data = Ls.toJSON(cur.vm.$model);
+                data.showStartTime = $("#startTime").val();
+                data.showEndTime = $("#endTime").val();
+
+                // 提交
+                Ls.ajax({
+                    url: "/linksMgr/linkEdit",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tipsInfo('操作成功!');
+                        cur.W.link_mgr.grid.reload();
+                    } else {
+                        Ls.tipsErr(d.desc);
+                    }
+                    // 关闭弹框
+                    art.dialog.close();
+                });
+            }
+        });
+    });
+</script>

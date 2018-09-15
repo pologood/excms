@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" ><![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="/assets/res/css/common.css">
+    <link rel="stylesheet"  href="styles/grapheditor.css?v=11">
+	<script type="text/javascript">
+		// Public global variables
+		var MAX_REQUEST_SIZE = 10485760;
+		var MAX_WIDTH = 6000;
+		var MAX_HEIGHT = 6000;
+	
+		// URLs for save and export
+		var EXPORT_URL = '/flowExport';
+		var SAVE_URL = '/flowSave';
+		var OPEN_URL = '/flowOpen';
+		var RESOURCES_PATH = 'resources';
+		var RESOURCE_BASE = RESOURCES_PATH + '/grapheditor';
+		var STENCIL_PATH = 'stencils';
+		var IMAGE_PATH = 'images';
+		var STYLE_PATH = 'styles';
+		var CSS_PATH = 'styles';
+		var OPEN_FORM = 'open.html';
+		var SELECT_MODEL = null;
+	
+		// Specifies connection mode for touch devices (at least one should be true)
+		var tapAndHoldStartsConnection = true;
+		var showConnectorImg = true;
+
+		// Parses URL parameters. Supported parameters are:
+		// - lang=xy: Specifies the language of the user interface.
+		// - touch=1: Enables a touch-style user interface.
+		// - storage=local: Enables HTML5 local storage.
+		var urlParams = (function(url)
+		{
+			var result = new Object();
+			var idx = url.lastIndexOf('?');
+	
+			if (idx > 0)
+			{
+				var params = url.substring(idx + 1).split('&');
+				
+				for (var i = 0; i < params.length; i++)
+				{
+					idx = params[i].indexOf('=');
+					
+					if (idx > 0)
+					{
+						result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+					}
+				}
+			}
+			
+			return result;
+		})(window.location.href);
+
+		// Sets the base path, the UI language via URL param and configures the
+		// supported languages to avoid 404s. The loading of all core language
+		// resources is disabled as all required resources are in grapheditor.
+		// properties. Note that in this example the loading of two resource
+		// files (the special bundle and the default bundle) is disabled to
+		// save a GET request. This requires that all resources be present in
+		// each properties file since only one file is loaded.
+		mxLoadResources = false;
+		mxBasePath = 'src';
+		mxLanguage = urlParams['lang'];
+		mxLanguages = ['zh'];
+	</script>
+    <script src="/assets/core/jquery.min.js"></script>
+ 	<script src="/assets/core/boot.js" debug="1"></script>   
+	<script src="src/js/mxClient.js"></script>
+	<script src="js/flowDesign.js?v=12"></script>
+    <!--
+	<script type="text/javascript" src="js/Editor.js"></script>
+	<script type="text/javascript" src="js/Graph.js"></script>
+	<script type="text/javascript" src="js/Shapes.js"></script>
+	<script type="text/javascript" src="js/EditorUi.js"></script>
+	<script type="text/javascript" src="js/Actions.js"></script>
+	<script type="text/javascript" src="js/Menus.js"></script>
+	<script type="text/javascript" src="js/Sidebar.js"></script>
+	<script type="text/javascript" src="js/Toolbar.js"></script>
+	<script type="text/javascript" src="js/Dialogs.js"></script>-->
+    
+	<script src="jscolor/jscolor.js"></script>
+</head>
+<body class="geEditor">
+<script type="text/javascript">
+Ls.debug = true;
+Ls.ajax.url = "/flowChart.do";
+var COA_PROCESSID = Ls.url.get('processId') || 42778,
+	COA_MODULEID = Ls.url.get('moduleId') || 2,
+	COA_FORMID = Ls.url.get('formId') || 3;
+var cur = {
+	action:{
+		getProcessInfo : "getProcessInfo"	
+	}	
+};
+
+// Extends EditorUi to update I/O action states
+(function()
+{
+	var editorUiInit = EditorUi.prototype.init;
+	// 复写初始化方法
+	EditorUi.prototype.init = function()
+	{
+		
+		editorUiInit.apply(this, arguments);
+		Ls.log.add('index.html  EditorUi.prototype.init >>>');
+		this.actions.get('export').setEnabled(true);
+
+		// Updates action states which require a backend
+		if (!useLocalStorage)
+		{
+			//mxUtils.post(OPEN_URL, '', mxUtils.bind(this, function(req)
+//					{
+//						var enabled = req.getStatus() != 404;
+//						this.actions.get('open').setEnabled(enabled || fileSupport);
+//						this.actions.get('import').setEnabled(enabled || fileSupport);
+//						this.actions.get('save').setEnabled(enabled);
+//						this.actions.get('saveAs').setEnabled(enabled);
+//						this.actions.get('export').setEnabled(enabled);
+//					}));
+
+			Ls.ajax.get({method:"getMxchart",processId:COA_PROCESSID}
+			,function(json){
+				var xml = json.data;
+				try
+				{
+					var doc = mxUtils.parseXml(xml); 
+					//console.log(doc);
+					editorUi.editor.setGraphXml(doc.documentElement);
+					editorUi.editor.modified = false;
+					editorUi.editor.undoManager.clear();
+									
+				}
+				catch (e)
+				{
+					mxUtils.alert(mxResources.get('invalidOrMissingFile') + ': ' + e.message);
+				}
+			});
+		}
+	};
+	// 复写保存方法
+	var editorUiSave = EditorUi.prototype.saveFile;
+	EditorUi.prototype.saveFile = function(){
+
+		editorUiSave.apply(this, arguments);
+		//console.log('index.html save >>>')
+		var xml = mxUtils.getXml(editorUi.editor.getGraphXml());	
+		//alert(xml)
+		//alert(xml.indexOf('mxGraphModel'))
+		if(xml.indexOf('mxGraphModel')==-1)
+			xml = '<mxGraphModel>' + xml + '</mxGraphModel>';
+		
+		//alert(xml)
+		try
+		{
+			
+			if (xml.length < MAX_REQUEST_SIZE)
+			{
+				//xml = encodeURIComponent(xml);
+				Ls.ajax.post({
+					method:"saveMxchart",
+					moduleId:COA_FORMID,
+					processId:COA_PROCESSID,
+					xml:xml}
+				,function(json){
+					Ls.tip.success();
+					editorUi.editor.filename = name;
+					editorUi.editor.modified = false;
+				});
+			}
+			else
+			{
+				mxUtils.alert(mxResources.get('drawingTooLarge'));
+				mxUtils.popup(xml);
+				return;
+			}
+		
+
+			
+		}
+		catch (e)
+		{
+			this.editor.setStatus('Error saving file');
+		}
+	};
+	
+})();
+
+var editorUi = new EditorUi(new Editor());
+//Ls.ajax.url = "/flowChart.do";
+
+// 获取当前流程的标题
+function getPTitle(){
+	Ls.ajax.get({
+		method: cur.action.getProcessInfo,
+		processId:COA_PROCESSID
+	},function(json){
+		Ls.log.add(json);
+		if(json.data.processName){
+			document.title = json.data.processName;	
+		}
+	});
+}
+
+/*document.addEventListener('DOMContentLoaded', function(){
+  getPTitle();
+}, false);*/
+	
+jQuery(document).ready(function(){
+	//getPTitle();
+});
+
+
+	
+
+	
+	
+	
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="invalid_form" ms-controller="invalid_form">
+            <table class="table table-bordered public-info-table">
+                <tbody>
+                <tr>
+                    <th>标注为：</th>
+                    <td>
+                        <label class="radio-inline">
+                            <input type="radio" name="isInvalid" ms-duplex-number="isInvalid" id="isInvalid" value="1"
+                                   ms-change="invalidChange(1)"/> 失效
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isInvalid" ms-duplex-number="isInvalid" id="isStop"  value="2"
+                                   ms-change="invalidChange(0)"/> 废止
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isInvalid" ms-duplex-number="isInvalid" id="isChange"  value="3"
+                                   ms-change="invalidChange(0)"/> 修改
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isInvalid" ms-duplex-number="isInvalid" id="isNone"  value="0"
+                                   ms-change="invalidChange(0)"/> 取消标注
+                        </label>
+                    </td>
+                </tr>
+                <tr id="invalidReasonTr">
+                    <th>标注原因：</th>
+                    <td>
+                        <textarea class="form-control" id="invalidReason" rows="3" placeholder=""></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </form>
+    </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var curr = {
+        vm: "",
+        isInvalid:"$!{isInvalid}",
+        invalidReason:"$!{invalidReason}"
+    }
+    var id = '${id}';
+    var api = Ls.getWin.api;
+    if ('$!{toolbar}' != 'hide') {
+        api.button({
+            id: 'abcd',
+            focus: true,
+            name: '保 存',
+            callback: function () {
+                $("#invalid_form").submit();
+                return false;
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        if(curr.isInvalid=="0") {
+           $("#isNone").attr("checked","checked");
+        }else if(curr.isInvalid=="1"){
+            $("#isInvalid").attr("checked","checked");
+        }
+        else if(curr.isInvalid=="2"){
+            $("#isStop").attr("checked","checked");
+        }
+        else if(curr.isInvalid=="3"){
+            $("#isChange").attr("checked","checked");
+        }
+        if (!Ls.isEmpty(curr.invalidReason)) {
+            $("#invalidReason").val(curr.invalidReason);
+        }
+
+    });
+
+    $('#invalid_form').validator({
+        fields: {
+            isInvalid: '标注:checked;',
+            invalidReason: '标注原因:required;length[1~500]'
+        },
+        valid: function () {
+            save();
+        }
+    })
+
+
+    function save() {
+        var invalidReason = $("#invalidReason").val();
+        var isInvalid= $("input[name='isInvalid']:checked").val();
+        Ls.ajax({
+            type: "POST",
+            url: "/public/content/setInvalid",
+            data: {id:id,isInvalid:isInvalid,invalidReason:invalidReason}
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                parent.resetContent();
+                Ls.tipsOk("操作成功", function () {
+                    Ls.winClose();
+                });
+
+            }
+        })
+
+    }
+
+    function invalidChange(type) {
+        Ls.log(type);
+        if (type == 0) {
+            $("#invalidReasonTr").addClass("hide");
+        } else {
+            $("#invalidReasonTr").removeClass("hide");
+        }
+    }
+</script>

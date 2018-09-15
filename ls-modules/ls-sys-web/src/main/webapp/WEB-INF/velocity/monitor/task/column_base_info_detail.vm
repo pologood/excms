@@ -1,0 +1,174 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+        position: relative;
+        padding-bottom: 26px;
+    }
+    .alert-wrapper {
+        height: 78px;
+        overflow: hidden;
+    }
+    .alert .icon {
+        width: 50px;
+        height: 26px;
+        margin-left: -25px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+    }
+    .alert .fa {
+        line-height: 28px;
+        font-size: 22px;
+    }
+    .alert .icon:hover .fa {
+        font-size: 26px;
+    }
+    .mb3 {
+        margin-bottom: 3px;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <div class="alert-wrapper">
+                        <div class="mb5"><strong>考察点：</strong>
+                            首页栏目信息更新数量；基本信息更新是否及时；基本信息内容是否准确。
+                        </div>
+                        <div class="mb5"><strong>普查扣分细则：</strong>
+                            <div style="margin-left: 12px;">
+                                <div class="mb3">
+                                    首页扣分细则：
+                                    <div>1.监测时间点前2周内，首页栏目信息更新总量少于10条的，扣5分（2周内首页栏目信息更新总量为0的，直接列入单项否决）。</div>
+                                </div>
+                                基本扣分细则：
+                                <div>
+                                    1.监测时间点前2周内，动态、要闻类信息，每发现1个栏目未更新的，扣3分。<br>
+                                    2.监测时间点前6个月内，通知公告、政策文件类信息，每发现1个栏目未更新的，扣4分。<br>
+                                    3.监测时间点前1年内，人事、规划计划类信息，每发现1个栏目未更新的，扣5分。<br>
+                                    4.机构设置及职能、动态、要闻、通知公告、政策文件、规划计划、人事等信息不准确的，每发现1次扣1分。
+                                </div>
+                            </div>
+                        </div>
+                        <div><strong>本站监测扣分细则：</strong>
+                            <div style="margin-left: 12px;">
+                                <div class="mb3">
+                                    首页扣分细则：
+                                    <div>
+                                        1.监测时间点前【<span>$!{indexMonitoredNum}</span>】【<span>$!{indexMonitoredTimeType}</span>】内，首页栏目信息更新总量少于【<span>$!{indexLimitNum}</span>】条的，扣【<span>$!{indexNum}</span>】分。
+                                    </div>
+                                </div>
+                                基本扣分细则：
+                                <div>
+                                    1.监测时间点前【<span>$!{dtywMonitoredNum}</span>】$!{dtywMonitoredTimeType}内，动态、要闻类信息，每发现1个栏目未更新的，扣【<span>$!{dtywNum}</span>】分。<br>
+                                    2.监测时间点前【<span>$!{tzzcMonitoredNum}</span>】【<span>$!{tzzcMonitoredTimeType}</span>】内，通知公告、政策文件类信息，每发现1个栏目未更新的，扣【<span>$!{tzzcNum}</span>】分。<br>
+                                    3.监测时间点前【<span>$!{rsghMonitoredNum}</span>】【<span>$!{rsghMonitoredTimeType}</span>】内，人事、规划计划类信息，每发现1个栏目未更新的，扣【<span>$!{rsghNum}</span>】分。<br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon text-center" onclick="toggle()"><i class="fa fa-angle-double-down"></i></div>
+                </div>
+                <div>小计：<br>
+                    #set($i=1)
+                    #if($indexUpdateCount<$!{indexLimitNum})
+                        （$i）监测点前$!{indexMonitoredNum}$!{indexMonitoredTimeType}内，首页栏目更新总量<span class="red">$indexUpdateCount</span>条少于$!{indexLimitNum}条，扣<span class="red">$!{indexNum}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($dtywCounts>0)
+                        （$i）监测点前$!{dtywMonitoredNum}$!{dtywMonitoredTimeType}内，动态要闻类栏目未更新<span class="red">$!{dtywCounts}</span>个，每发现1个未更新扣$!{dtywNum}分，扣<span class="red">$!{dtywCounts}*$!{dtywNum}=$!{dtywScore}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($tzzcCounts>0)
+                        （$i）监测点前$!{tzzcMonitoredNum}$!{tzzcMonitoredTimeType}内，通知政策类栏目未更新<span class="red">$!{tzzcCounts}</span>个，每发现1个未更新扣$!{tzzcNum}分，扣<span class="red">$!{tzzcCounts}*$!{tzzcNum}=$!{tzzcScore}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+                    #if($rsghCounts>0)
+                        （$i）监测点前$!{rsghMonitoredNum}$!{rsghMonitoredTimeType}内，人事规划类栏目未更新<span class="red">$!{rsghCounts}</span>个，每发现1个未更新扣$!{rsghNum}分，扣<span class="red">$!{rsghCounts}*$!{rsghNum}=$!{rsghScore}</span>分
+                        #set($i=$i+1)
+                    #end
+
+                    #if($i==1)
+                        暂无扣分项
+                    #end
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getColumnBaseInfoPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="columnType" width="200" align="center" headerAlign="center" renderer="columnType" >栏目类型</div>
+                        <div field="columnName" width="240" align="left" headerAlign="center" renderer="columnName" >栏目名称</div>
+                        <div field="updateCount" width="150" align="center" headerAlign="center" >更新数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({monitorId:cur.params.monitorId});
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_index': columnTypeName = '首页栏目';break;
+            case 'columnType_update': columnTypeName = '应更新栏目';break;
+            case 'columnType_DTYW': columnTypeName = '动态、要闻类栏目';break;
+            case 'columnType_TZZC': columnTypeName = '通知公告、政策文件类栏目';break;
+            case 'columnType_RSGH': columnTypeName = '人事、规划计划类栏目';break;
+            case 'columnType_BLANK': columnTypeName = '空白栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+
+        return columnTypeName;
+
+    }
+
+
+    function columnName(obj) {
+        var rec = obj.record;
+        var columnName = rec.columnName;
+        var columnUrl = rec.columnUrl;
+
+        return "<a target='_blank' href='"+columnUrl+"' title='"+columnName+"' >"+columnName+"</a>";
+
+    }
+
+    function toggle() {
+        var $ele = $(".alert-wrapper");
+        if($ele.hasClass("on")){
+                $ele.removeClass("on").css("height","78px");
+            $(".fa").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+        }else {
+                $ele.addClass("on").css("height","auto");
+            $(".fa").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+        }
+    }
+
+</script>

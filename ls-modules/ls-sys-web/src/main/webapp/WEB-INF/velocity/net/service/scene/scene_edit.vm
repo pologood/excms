@@ -1,0 +1,187 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="menuContent"
+     style="display:none;position: absolute; z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow:hidden;background-color: InactiveBorder">
+    <ul id="treeDemo" class="ztree"></ul>
+</div>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="scene_edit_form" role="form" ms-controller="scene_edit_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>所属栏目</label>
+
+                            <div class="input-group">
+                                <input type="text" id="columnId" style="display: none" name="columnId" disabled ms-duplex="columnId" class="form-control readonly"
+                                       ms-duplex="columnId">
+                                <input type="text" id="columnName" class="form-control readonly">
+
+                                <div class="input-group-btn">
+                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showTree()">
+                                        <i class="fa fa-caret-down"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>标题名称</label>
+                            <input type="text" id="id" style="display: none" ms-duplex="id">
+                            <input type="text" id="name" name="name" class="form-control" data-rule="必填项:required;name" placeholder="填写表格名称" ms-duplex="name">
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            <label>加入时间</label>
+                            <input type="text" id="joinDate" name="joinDate" class="form-control" placeholder="填写加入时间" ms-duplex="joinDate">
+                        </div>
+                        <div class="form-group" id="content_field">
+                            <label>具体内容</label>
+                            <textarea id="content" name="content" style="width: 100%;height: 300px" ms-duplex="content"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" onclick="saveData()">保 存</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">取 消</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/table_edit_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/column_select_tree.js"></script>
+<script>
+    mini.parse();
+    var eweb;
+    var cur = {
+        $id
+    :
+    "scene_edit_form",
+        form
+    :
+    $('#scene_edit_form'),
+        //操作类型 新增，修改
+        type
+    :
+    art.dialog.data("type"),
+        content
+    :
+    $("#content"), //具体内容
+        columnId
+    :
+    $('#columnId'),//添加修改部门选择组件
+        columnName
+    :
+    $('#columnName'),
+        siteId
+    :
+    art.dialog.data('siteId'),
+        win
+    :
+    Ls.getWin.win
+    }
+
+    $(document).ready(function () {
+        //滚动条滚动时触发
+        $(".mini-layout-region-body ").scroll(function () {
+            hideTree();
+        })
+        initKindEditor();
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.$id, {});
+        } else {
+            cur.model = art.dialog.data("record");
+            /*cur.editor.html(cur.model.content);*/
+            eweb.setHtml(cur.model.content);
+            cur.columnId.val(cur.model.columnId);
+            cur.columnName.val(cur.model.columnName);
+        }
+        column_select_tree.init();
+        setData(cur.model);
+    })
+
+    //拉取数据
+    function setData(obj) {
+        data = obj;
+        data.$id = cur.$id;
+        cur.vm = avalon.define(data);
+    }
+
+    /**
+     * 保存数据
+     */
+    function saveData() {
+
+        var formValid = new mini.Form("#scene_edit_form");
+
+        formValid.validate();
+        if (formValid.isValid() == false) return;
+
+        //同步编辑器内容到textarea
+        /*cur.editor.sync();*/
+        eweb.update();
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/scene/service/save"
+        } else {
+            url = "/scene/service/update"
+        }
+
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                name: cur.vm.name,
+                columnId: cur.columnId.val(),
+                content: cur.vm.content,
+                joinDate: cur.vm.joinDate
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback_add_or_edit(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + 0});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERPATH
+        });*/
+    }
+
+    function beforenodeselect(e) {
+        //禁止选中父节点
+        if (e.isLeaf == false) e.cancel = true;
+    }
+</script>
+</body>
+</html>

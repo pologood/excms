@@ -1,0 +1,19 @@
+#if($!{resultObj.isLogin} == "0")
+   #if($!{resultObj.action} == "login")
+      #parse("member_login.vm")
+   #elseif($!{resultObj.action} == "register")
+	  #parse("member_register.vm")
+   #elseif($!{resultObj.action} == "setpw")
+	  #parse("member_setpw.vm")
+   #else
+   #end  
+#else
+	 #if($!{resultObj.action} == "register")
+       #parse("member_register.vm")
+	 #elseif($!{resultObj.action} == "setpw")
+	   #parse("member_setpw.vm")
+     #else
+	   #parse("member_center.vm")
+     #end 
+#end  
+  

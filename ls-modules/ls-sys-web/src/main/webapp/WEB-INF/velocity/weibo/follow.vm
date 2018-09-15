@@ -1,0 +1,206 @@
+<div class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>新浪微博</strong></a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab"><strong>腾讯微博</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding: 15px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div id="sina_follows_grid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/weibo/sina/getPageFollows" sizeList="[5,10,20,50]" pageSize="10"
+                         idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div type="checkcolumn" width="50"></div>
+                            <div field="" width="100" align="center" headerAlign="center" renderer="sina_avatar">头像</div>
+                            <div field="name" width="50%" align="center" align="center" headerAlign="center">昵称</div>
+                            <div field="" width="100" align="center" align="center" headerAlign="center" renderer="sina_gender">性别</div>
+                            <div field="location" width="50%" align="center" align="center" headerAlign="center">所在地</div>
+                            <div field="followersCount" width="100" align="center" align="center" headerAlign="center">粉丝数</div>
+                            <div field="friendsCount" width="100" align="center" align="center" headerAlign="center">关注数</div>
+                            <div field="" width="100" align="center" align="center" headerAlign="center" renderer="sina_ifFans">是否粉丝</div>
+                            <div field="" width="100" align="center" align="center" headerAlign="center" renderer="sina_cancelIdolOpt">取消关注</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                    <div id="tencent_follows_grid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/weibo/tencent/getPageFollows" sizeList="[5,10,20,50]" pageSize="10"
+                         idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div type="checkcolumn" width="50"></div>
+                            <div field="" width="100" align="center" headerAlign="center" renderer="tencent_avatar">头像</div>
+                            <div field="nick" width="50%" align="center" align="center" headerAlign="center">昵称</div>
+                            <div field="sex" width="100" align="center" align="center" headerAlign="center">性别</div>
+                            <div field="location" width="50%" align="center" align="center" headerAlign="center">所在地</div>
+                            <div field="fansNum" width="100" align="center" align="center" headerAlign="center">粉丝数</div>
+                            <div field="idolNum" width="100" align="center" align="center" headerAlign="center">关注数</div>
+                            <div field="" width="100" align="center" align="center" headerAlign="center" renderer="tencent_ifFans">是否粉丝</div>
+                            <div field="" width="100" align="center" align="center" headerAlign="center" renderer="tencent_idolOpt">取消关注</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        pageIndex: 0,
+        pageSize: 10,
+        sina_follows_grid: mini.get('sina_follows_grid'),
+        tencent_follows_grid: mini.get('tencent_follows_grid')
+    };
+
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.sina_follows_grid, 70);
+        Ls.mini_datagrid_height(cur.tencent_follows_grid, 70);
+        cur.sina_follows_grid.load();
+        cur.tencent_follows_grid.load();
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.sina_follows_grid.load();
+            }
+            else if (id == '#tab_1_2') {
+                cur.tencent_follows_grid.load();
+            }
+        });
+    });
+
+    /**
+     * 用户头像
+     */
+    function sina_avatar(obj) {
+        var record = obj.record;
+        return '<span><a href="http://weibo.com/' + record.userDomain + '"  target="_blank"><img src="' + record.profileImageUrl + '" width="50"></a></span>'
+    }
+
+    /**
+     * 取消关注
+     */
+    function sina_cancelIdolOpt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" data-id=' + record.id + ' class="btn btn-default btn-sm btn-delete" onclick="sina_cancelIdol(this)">取消关注</button>';
+        return diyDom;
+    }
+
+    /*
+    * 性别
+    * */
+    function sina_gender(obj) {
+        var record = obj.record;
+        return record.gender == 'm' ? '男' : '女';
+    }
+
+    /**
+     * 是否是自己粉丝
+     * @returns {string}
+     */
+    function sina_ifFans(obj) {
+        var record = obj.record;
+        return record.followMe ? "是" : "否";
+    }
+
+    /**
+     * 取消关注
+     */
+    function sina_cancelIdol(obj) {
+        var uid = $(obj).attr('data-id');
+        if (confirm('确定取消关注?')) {
+            Ls.ajaxGet({
+                url: "/weibo/sina/cancelFollow",
+                data: {
+                    uid: uid
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                        cur.tencent_follows_grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 用户头像
+     */
+    function tencent_avatar(obj) {
+        var record = obj.record;
+        return '<span><a href="http://t.qq.com/' + record.name + '" target="_blank"><img src="' + record.avatar.avatarURL100 + '" width="50"></a></span>'
+    }
+
+    /**
+     * 是否关注了
+     * @returns {string}
+     */
+    function tencent_ifIdol(obj) {
+        var record = obj.record;
+        return record.idol ? "是" : "否";
+    }
+
+    /**
+     * 是否是自己粉丝
+     * @returns {string}
+     */
+    function tencent_ifFans(obj) {
+        var record = obj.record;
+        return record.fans ? "是" : "否";
+    }
+
+    /**
+     * 取消关注
+     */
+    function tencent_idolOpt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" data-id=' + record.openID + ' class="btn btn-default btn-sm btn-delete" onclick="tencent_cancelIdol(this)">取消关注</button>';
+        return diyDom;
+    }
+
+    /**
+     * 取消关注
+     */
+    function tencent_cancelIdol(obj) {
+        var openID = $(obj).attr('data-id');
+        if (confirm('确定取消关注?')) {
+            Ls.ajaxGet({
+                url: "/weibo/tencent/cancelIdol",
+                data: {
+                    openIDs: openID
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                        cur.tencent_follows_grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 按钮样式切换
+     * @param obj
+     */
+    function btn_css_update(obj) {
+        $("[id ^= btn_group]").removeClass("btn-info");
+        $("[id ^= btn_group]").addClass("btn-default");
+        $("[id = btn_group_" + obj + "]").addClass("btn-info");
+    }
+
+</script>

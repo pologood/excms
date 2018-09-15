@@ -1,0 +1,41 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isHit="$!{paramObj.isHit}")
+#set($target="$!{paramObj.target}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#if($resultObj.data.size()>0)
+<ul class="download-list list-$!{paramObj.id}">
+    #foreach($eo in $resultObj.data)
+        #set($title=$!{eo.title})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <li class="$!{css}">
+
+            <a href="$!{eo.link}" target="$!{target}" title="$!{eo.title}" class="left">
+                <span>#cutstr($title,$length)</span>
+            </a>
+            #if($isHit == "true")
+                <span class="right hit">$!{eo.count}</span>
+            #end
+            #if($isDate == "true")
+                <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+            #end
+        </li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{paramObj.id}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{paramObj.id}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount}
+        });
+    </script>
+    #end
+#end

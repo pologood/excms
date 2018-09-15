@@ -1,0 +1,7 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+#parse("_page_layout/_footer.vm")
+#parse("site/contModel/model_edit.vm")
+
+</body>

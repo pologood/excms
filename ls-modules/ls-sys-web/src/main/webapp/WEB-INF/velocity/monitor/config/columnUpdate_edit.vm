@@ -1,0 +1,245 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <form id="config_edit_form" role="form" ms-controller="config_edit_form">
+            <div class="form-body">
+                <table class="table table-bordered article-table" style="margin-bottom: 0px;width: 95%;margin-top:15px;">
+                    <tr>
+                        <input type="hidden" value="before" name="monitoredType">
+                        <input type="hidden" value="$!{id}" name="id">
+                        <input type="hidden" value="$!{typeCode}" name="typeCode">
+                        <th><font color="red"></font>栏目类别:</th>
+                        <td>
+                            <input type="text" id="columnTypeName" readonly name="columnTypeName"  ms-duplex="columnTypeName" value=""  class="form-control input-sm" ></input>
+
+                        ##                            <select class="form-control" id="columnTypeCode" name="columnTypeCode" ms-duplex="columnTypeCode">
+                        ##                                #foreach($vo in $dictVOs)
+                        ##                                    <option value="$!{vo.typeCode}">$!{vo.typeName}</option>
+                        ##                                #end
+                        ##                            </select>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th><font color="red"></font>类别编码:</th>
+                        <td>
+                            <input type="text" id="columnTypeCode" readonly  name="columnTypeCode" ms-duplex="columnTypeCode" value="" class="form-control input-sm" ></input>
+                        </td>
+                    </tr>
+                    <tr id="monitored">
+                        <th><span style="float:left" class="bold"></span>监测周期:</th>
+
+                        <td>
+                            监测点开始之前: &nbsp;&nbsp; &nbsp;&nbsp;  <input type="text "  ms-duplex="monitoredNum" name="monitoredNum" id="monitoredNum" value="" class
+                                =""  placeholder=""
+                                >
+                            <select class="" id="monitoredTimeType" ms-duplex="monitoredTimeType" name="monitoredTimeType" >
+                                <option value="">单位</option>
+                                <option value="day">天</option>
+                                <option value="week">周</option>
+                                <option value="month">月</option>
+                                <option value="year">年</option>
+                            </select>
+                        </td>
+
+                    </tr>
+
+                    <tr >
+                        <th><span style="float:left"
+                                  class="bold"></span>否决标准:</th>
+                        <td>
+                            <input type="hidden"  ms-duplex="standardCode" id="standardCode" name="standardCode" value="">
+                            <span id="standardName">未更新栏目数量</span>: &nbsp;&nbsp;>=<input type="text"  ms-duplex="num"  name="num" id="num" value=""
+                                                             class="" placeholder="">个
+
+                        </td>
+                    </tr>
+
+
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "config_edit_form",
+        form: $('#config_edit_form'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        typeCode:"$!{typeCode}",
+        id:'$!{id}'
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+                {id:'save',className:'btn-save',focus:true,name:'保存',callback:function(){saveSubmit();return false;}},
+                {id:'syn',className:'btn-save',focus:true,name:'同步',callback:function(){syn();return false;}},
+                {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+        );
+
+        $('#config_edit_form').validator({
+            fields: {
+//                'monitoredNum': '监测时长:monitoredNumRule;',
+//                'num':'未更新信息数量:required;integer(+);'
+//                'monitoredTimeType':'监测时长单位:monitoredTimeTypeRule;',
+            },
+            valid: function () {
+                saveData();
+            },
+            timely:1,
+            msgClass: "n-right"
+        });
+
+
+      $("#columnTypeCode").on('change',function(){
+          $("#num").val('');
+          $("#monitoredNum").val('');
+          $("#monitoredTimeType").val('');
+
+          var typeCode =$("#columnTypeCode").val();
+          if(typeCode=='columnType_update'||typeCode=='columnType_BLANK'){
+              $("#monitored").hide();
+          }
+          if(typeCode=='columnType_DTYW'||typeCode=='columnType_TZZC'){
+              $("#monitored").show();
+          }
+          if(typeCode=='columnType_BLANK'){
+           $("#standardName").html("空白栏目数");
+           $("#standardCode").val("blankColumnNum")
+          }else{
+              $("#standardName").html("未更新栏目数量");
+              $("#standardCode").val("notUpdateColumnNum");
+          }
+
+        });
+
+
+        setData();
+    })
+     function syn(){
+         Ls.ajax({
+             url: "/monitor/vetoConfig/synByCode",
+             data: {
+                 baseCode:'vote',
+                 columnTypeCode:$("#columnTypeCode").val(),
+                 typeCode:cur.typeCode
+             },
+             type:"get",
+             success: function (resp) {
+                 if (resp.status == '1') {
+                     var data=resp.data;
+                     $("#num").val(data.num);
+                     $("#monitoredNum").val(data.monitoredNum);
+                     $("#monitoredTimeType").val(data.monitoredTimeType);
+
+                 } else {
+                     Ls.tips(resp.desc, {icons:'error',times: 2});
+                 }
+             }
+
+         })
+
+
+
+
+     }
+    function setData() {
+        Ls.ajax({
+            url: "/monitor/vetoConfig/getDataByCode",
+            data: {
+                id: cur.id,
+                typeCode:cur.typeCode
+            },
+            type:"get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data=resp.data;
+                    cur.init = Ls.initFORM(cur.vm_id,data);
+                    //如果模型已经绑定，不再绑定
+                    cur.vm = avalon.vmodels[cur.vm_id];
+                    cur.vm = avalon.define(cur.init);
+                    //avalon.scan(document.body, curr.vm);
+                    avalon.scan(cur.form.get(0), cur.vm);
+                    if(""!=data.id&&null!=data.id){
+//                        $("#columnTypeCode").attr("disabled",true);
+//                        $("#columnTypeCodeHidden").val(data.columnTypeCode);
+                        if(data.columnTypeCode=='columnType_update'||data.columnTypeCode=='columnType_BLANK'){
+                            $("#monitored").hide();
+                        }
+                    }
+                    if(""==data.id||null==data.id){
+                        $("#columnTypeCode").val("columnType_TZZC");
+                        $("#standardCode").val("notUpdateColumnNum");
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+
+        })
+    }
+    function saveSubmit() {
+        $("#config_edit_form").submit();
+
+    }
+    function saveData() {
+        var typeCode =$("#columnTypeCode").val();
+
+        if(typeCode=='columnType_DTYW'||typeCode=='columnType_TZZC'){
+            var reg = new RegExp("^[1-9]+$");
+            var monitoredNum = $("#monitoredNum").val();
+            if(!reg.test(monitoredNum)){
+                Ls.tipsErr("请填写正确监测周期时长!");
+                return;
+            }
+            var monitoredTimeType =$("#monitoredTimeType option:selected").val();
+            if(""==monitoredTimeType||null==monitoredTimeType){
+                Ls.tipsErr("请填写监测周期单位!");
+                return;
+            }
+
+            var num =$("#num").val();
+            if(""==num||null==num){
+                Ls.tipsErr("请填写正确未更新栏目数控!");
+                return;
+            }
+        }
+        if(typeCode=='columnType_update'||typeCode=='columnType_BLANK'){
+           $("#monitoredNum").val('');
+            $("#monitoredTimeType").val('');
+        }
+        var data =$("#config_edit_form").serializeObject();
+        Ls.ajax({
+            url: "/monitor/vetoConfig/saveData",
+            data: {content:JSON.stringify(data),typeCode:data.typeCode},
+            type:"POST",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tipsOk("保存成功",function(){
+                        cur.win.search();
+                        Ls.winClose();
+                    });
+
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+
+
+
+
+
+</script>

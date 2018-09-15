@@ -1,0 +1,13 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $!{page.data})
+    <li>
+        #if("$!{eo.linkUrl}" != "")
+            <a href="$!{eo.linkUrl}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #else
+            <a href="/content/article/$!{eo.contentId}?guideId=$!{eo.id}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #end
+    </li>
+#end

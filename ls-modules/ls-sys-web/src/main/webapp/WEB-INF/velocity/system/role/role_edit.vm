@@ -1,0 +1,128 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+
+<body class="page-body-white" ms-controller="role_form">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="role_form" role="form">
+                    <div class="form-body">
+                        <div class="form-group">
+                        </div>
+                        <div class="form-group">
+                            <label>角色名称</label>
+                            <input id="opt_type" type="hidden" value="${type}">
+                            <input type="text" id="roleId" name="roleId" style="display: none" ms-duplex="roleId">
+                            <input type="text" id="name" name="name" class="form-control" data-rule="角色名称:required;name" placeholder="填写角色名称" ms-duplex="name">
+                        </div>
+
+                        <div class="form-group" style="display: none">
+                            <label>角色编码</label>
+                            <input type="text" id="code" name="code" class="form-control" placeholder="填写角色编码" ms-duplex="code">
+                        </div>
+                        <div class="form-group">
+                            <label class="radio-inline"><input type="radio" name="type" value="Role" ms-duplex-string="type" checked> 普通管理角色 </label> &nbsp;&nbsp;
+                            <label id="column_admin"  class="radio-inline"><input type="radio" name="type" value="Column" ms-duplex-string="type"> 栏目管理角色 </label>
+                        </div>
+                        <div class="form-group">
+                            <label>备注</label>
+                            <textarea id="description" name="description" class="form-control" rows="3" placeholder="备注"
+                                      ms-duplex="description"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" ms-click="addOrEdit">保 存</button>
+            <button type="button" class="btn btn-default btn-reset" ms-click="cancel">取 消</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        vm_id: 'role_form',
+        type: art.dialog.data("type"),
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    }
+
+    $(document).ready(function () {
+        var root = cur.win.GLOBAL_RIGHTS;
+        if(root != 'siteAdmin') {
+            $('#column_admin').hide();
+        }
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {});
+        } else {
+            $('#code').attr('disabled', true);
+            $('#code').addClass('readonly');
+            cur.model = cur.dialog.data("node");
+        }
+        setData(cur.model);
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function addOrEdit() {
+
+        if (!$('#role_form').isValid()) {
+            return;
+        }
+
+        var url = "";
+        var node = cur.vm.$model;
+        if (cur.type == 'add') {
+            url = "/role/conf/save";
+        } else {
+            url = "/role/conf/update";
+            node.code = node.roleId + "_code";
+        }
+
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                roleId: node.roleId,
+                name: node.name,
+                code: node.code,
+                description: node.description,
+                type: node.type,
+                scope: 'CMS'
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.cur.node_edit = resp.data;
+                    cur.win.callback_editRole();
+                    Ls.getWin.api.close();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

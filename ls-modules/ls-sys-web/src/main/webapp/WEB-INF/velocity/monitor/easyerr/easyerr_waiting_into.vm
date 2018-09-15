@@ -1,0 +1,168 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+##            <ul class="nav nav-tabs">
+##                <li class="active">
+##                    <a href="#tab_1_1" data-toggle="tab">易错词</a>
+##                </li>
+##            </ul>
+            <div class="tab-pane active" id="tab_1_1">
+                <div class="table-toolbar" style="margin-bottom: 10px">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="pdr10">
+                                <button type="button" class="btn btn-default btn-add"
+                                        onclick="join()"> 加入词库
+                                </button>
+                                <button type="button" class="btn btn-default btn-excel-import"
+                                        onclick="del()"> 删除
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid2" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/wordsEasyerr/getPage" sizeList="[5,10,20,50]" pageSize="20"
+                     idField="id" multiSelect="true" showColumnsMenu="true" sortField="words" sortOrder="asc" style="width:100%;">
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="words" width="50%" align="center" headerAlign="center" allowSort="true">错词</div>
+                        <div field="replaceWords" width="50%" align="center" headerAlign="center">替换词</div>
+                        <div width="115" align="center" headerAlign="center" renderer="seriousErr">严重错误</div>
+                        <div field="createDate" width="130" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                        <div field="siteName" width="50%" align="center" headerAlign="center">来源</div>
+                        <div field="pushDate" width="130" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">推送时间</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        gridEasyerr:mini.get("datagrid2"),
+        dialog: Ls.getWin.dialog,
+        seriousErr:$('#seriousErr'),
+        params:{isInto:1}
+    };
+    $(document).ready(function () {
+        cur.gridEasyerr.load(cur.params);
+
+        /*
+        * grid高度渲染
+        * */
+        Ls.mini_datagrid_height(cur.gridEasyerr, 50);
+
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.gridEasyerr.load();
+            }
+        });
+    })
+
+    function seriousErr(obj) {
+        var record = obj.record;
+        var str = "";
+        if(record.seriousErr!=null && record.seriousErr==0){
+            str="是";
+        }
+        if(record.seriousErr!=null && record.seriousErr==1){
+            str="否";
+        }
+        return str;
+    }
+
+    function del() {
+        var idsArr = [];
+        var ids="";
+        var records = cur.gridEasyerr.getSelecteds();
+        for (var i = 0; i < records.length; i++) {
+            idsArr.push(records[i].id);
+        }
+
+        if(idsArr.length<=0){
+            Ls.tips("请选择至少一项");
+            return;
+        }
+        ids = idsArr.join(',');
+        var url = "/monitor/wordsEasyerr/delEOs";
+
+        if(confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: url,
+                data: {
+                    ids: ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.gridEasyerr.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function join() {
+        var idsArr = [];
+        var ids="";
+        var records = cur.gridEasyerr.getSelecteds();
+        for (var i = 0; i < records.length; i++) {
+            idsArr.push(records[i].id);
+        }
+
+        if(idsArr.length<=0){
+            Ls.tips("请选择至少一项");
+            return;
+        }
+        ids = idsArr.join(',');
+        var url = "/monitor/wordsEasyerr/join";
+
+        if(confirm('确定加入?')) {
+            Ls.ajaxGet({
+                url: url,
+                data: {
+                    ids: ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.gridEasyerr.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+
+    function getSelectedNode(type,id) {
+        return cur.gridEasyerr.findRow(function(row){
+            if(row.id == id) return true;
+        });
+    }
+
+    function success_save_callback(type,msg) {
+        cur.gridEasyerr.load();
+        Ls.tips(msg, {times: 2});
+    }
+
+
+
+</script>

@@ -1,0 +1,141 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="tabbable-line">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#tab_1_1" data-toggle="tab"><span id="configName"></span>配置</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content pt10">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <ul class="ztree" id="column_tree">
+                                <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+#*<div class="tabbable-line" style="margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab"><span id="configName"></span>配置</a>
+        </li>
+    </ul>
+
+    <div class="tab-content pt10">
+        <div class="tab-pane active" id="tab_1_1">
+            <ul class="ztree" id="column_tree">
+                <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+            </ul>
+        </div>
+    </div>
+</div>*#
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/system/mobile/config.js"></script>
+<script>
+
+    var initZtree = {};
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        contentModeCode: "articleNews",
+        column_tree: null,
+        configType: Ls.url.get("configType")
+    };
+
+    if (cur.configType == "videoNews") {
+        cur.contentModeCode = "videoNews";
+    } else if (cur.configType == "nav") {
+        cur.contentModeCode = "articleNews,videoNews,leaderInfo";
+    } else if (cur.configType == "focus") {
+        cur.contentModeCode = "articleNews,pictureNews";
+    } else if (cur.configType == "interaction") {
+        cur.contentModeCode = "collectInfo,interviewInfo,messageBoard,survey,guestBook";
+    } else if (cur.configType == "onlineWork") {
+        cur.contentModeCode = "workGuide,relatedRule,tableResources,redirect";
+    } else if (cur.configType == "leaderInfo") {
+        cur.contentModeCode = "articleNews";
+    }
+
+    $(document).ready(function () {
+
+        //配置类型
+        $("#configName").text(Ls.url.get("configName"));
+
+        /*var checkedColumnIds = Ls.ajax({
+            async: false,// 同步
+            url: Ls.getWin.win.GLOBAL_CONTEXTPATH + "/mobilecfg/getConfigList",
+        }).responseJSON;*/
+
+        var isSubmit = false;
+        api.button({
+            name: "确定",
+            callback: function () {
+                // 提交
+                !isSubmit && Ls.ajax({
+                    url: "/mobilecfg/saveMobileConfig",
+                    data: {
+                        columnIds: getColumnIds,
+                        checkedIds: getCheckedIds,
+                        type: cur.configType
+                    }
+                }).done(function (d) {
+                    Ls.tipsOk('操作成功!', {
+                        callback: function () {
+                            isSubmit = false;
+//                            W.cur.mobile_config_grid.reload();
+                            api.close();
+                        }
+                    });
+                }).always(function () {
+                    isSubmit = true;
+                });
+                return false;
+            }
+        });
+
+        cur.column_tree = mobile_mgr.columnInit("column_tree", cur.contentModeCode, W.GLOBAL_SITEID, cur.columnId);
+
+        //绑定标签事件
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            if (!initZtree[activeTab]) {
+                initZtree[activeTab] = true;
+            }
+        });
+
+    });
+
+    function getCheckedIds() {
+        return $("input[name='isChecked']:checked").map(function () {
+            return $(this).val();
+        }).get().join(",")
+    }
+
+    // 获取数据，内容管理选中、信息公开选中、信息报送选中
+    function getColumnIds() {
+        var data = "",
+            checkIds = cur.column_tree.getCheckedNodes(true);
+        if (checkIds.length > 0) {//构建内容管理选中节点
+            var ids = "", chkId = "";
+            for (var i = 0, l = checkIds.length; i < l; i++) {
+                var el = checkIds[i];
+                if (i > 0) {
+                    ids += ",";
+                }
+                ids += el.indicatorId;
+            }
+            data = ids;
+        }
+        return data;
+    }
+</script>

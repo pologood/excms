@@ -1,0 +1,99 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body>
+<div class="mini-toolbar" style="text-align:center;line-height:30px;"
+     borderStyle="border-left:0;border-top:0;border-right:0;">
+    <label>名称：</label>
+    <input id="name" class="mini-textbox" style="width:150px;" onenter="onKeyEnter"/>
+    <a class="mini-button" style="width:60px;" onclick="search()">查询</a>
+</div>
+<div class="mini-fit">
+    <div class="mini-fit">
+        <ul class="ztree" id="treeview1"></ul>
+    </div>
+</div>
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+    <a class="mini-button" style="width:60px;" onclick="onOk()">确定</a>
+    <span style="display:inline-block;width:25px;"></span>
+    <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+    var tree = $("#treeview1");
+
+    function nodeClick(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview1");
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        }
+    }
+
+    var setting = {
+        isEdit: true,
+        view: {},
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'indicatorId',
+                pIdKey: 'parentId'
+            }
+        },
+        callback: {
+            //  onClick : nodeClick
+        }
+    };
+
+    $(document).ready(function () {
+        jQuery.ajax({
+            url: "$!{rc.contextPath}/siteMain/getSiteTree",
+            type: 'post',
+            data: {},
+            cache: false,
+            success: function (json) {
+                jQuery.fn.zTree.init($("#treeview1"), setting, json);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                mini.alert("error");
+            }
+        });
+    });
+    function CloseWindow(action) {
+        if (window.CloseOwnerWindow) return window.CloseOwnerWindow(action);
+        else window.close();
+    }
+    function GetData() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview1");
+        var nodes = zTree.getSelectedNodes();
+        if (nodes.length > 0) {
+            return nodes[0];
+        }
+    }
+
+    function onOk() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview1");
+        var nodes = zTree.getSelectedNodes();
+        CloseWindow("ok");
+    }
+    function onCancel() {
+        CloseWindow("cancel");
+    }
+    function search() {
+        var name = mini.get("name").getValue();
+        jQuery.ajax({
+            url: "$!{rc.contextPath}/siteMain/searchSiteTreeByName",
+            type: 'post',
+            data: {name: name},
+            cache: false,
+            success: function (json) {
+                jQuery.fn.zTree.init($("#treeview1"), setting, json);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                mini.alert("error");
+            }
+        });
+    }
+</script>
+</body>
+</html>

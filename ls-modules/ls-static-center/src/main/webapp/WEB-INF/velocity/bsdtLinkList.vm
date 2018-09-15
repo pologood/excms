@@ -1,0 +1,8 @@
+#foreach($eo in $resultObj)
+<li class="num$!{foreach.count}">
+    <a href="$!{eo.link}" target="_blank" title="$!{eo.mc}">
+        <span class="ico"></span>
+        <span class="tit">$!{eo.mc}</span>
+    </a>
+</li>
+#end

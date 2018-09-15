@@ -1,0 +1,9 @@
+信息公开
+本日发布 ： $!{paramObj.dayPublic}
+本月发布 ： $!{paramObj.monthPublic}
+
+依申请公开
+本月受理 ： $!{paramObj.monthApply}
+本月办结 ： $!{paramObj.monthReply}
+本年受理 ： $!{paramObj.yearApply}
+本年办结 ： $!{paramObj.yearReply}

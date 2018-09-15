@@ -1,0 +1,328 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    #if("#session('siteId')" == "")
+        <div region="west" showHeader="false" splitSize="0" width="260"
+             style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+
+            <div style="padding:5px; overflow: hidden;">
+                <ul id="ui_tree" class="ztree"></ul>
+            </div>
+        </div>
+    #end
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">站点信息</a>
+                </li>
+                #if("#session('siteId')" != "")
+                    <li>
+                        <a href="#tab_1_2" data-toggle="tab">全局模板管理</a>
+                    </li>
+                #end
+            </ul>
+            <div class="tab-content">
+                <form id="siteForm" role="form" ms-controller="siteForm" class="col-md-8" style="padding-left: 0;">
+                    <input type="hidden" name="themeId" id="themeId" ms-duplex="themeId">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <div class="form-body">
+                                <div class="form-group hide">
+                                    <label>ID</label>
+                                    <input type="text" name="indicatorId" ms-duplex="indicatorId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>PID</label>
+                                    <input type="text" name="parentId" ms-duplex="parentId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>父节点</label>
+                                    <input type="text" name="isParent" ms-duplex="isParent" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>类型</label>
+                                    <input type="text" name="type" ms-duplex="type" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>站点配置ID</label>
+                                    <input type="text" name="siteConfigId" ms-duplex="siteConfigId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="note note-danger">
+                                    <h4 class="block">注意事项</h4>
+                                    <p><strong>常规站点：</strong> 需要建立模板，模型等信息，限专业人员使用。</p>
+                                    <strong>模板子站：</strong>
+                                    <p style="text-indent: 2em;">
+                                        1、自带模板等配置信息，实现零代码自助建站。
+                                    </p>
+                                    <p style="text-indent: 2em;">
+                                        2、保存成功后，站点类型不可更改。
+                                    </p>
+                                    #if("#session('siteId')" != "")
+                                        <div class="mt15">
+                                            <a id="siteDesign" class="btn blue-madison hide" href="javascript:void(0)"
+                                               target="_blank">
+                                                <i class="fa fa-pencil-square"></i> 站点设计
+                                            </a>
+                                        </div>
+                                    #end
+                                    <p></p>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点类型</label>
+                                    <div class="radio-group">
+                                        <label class="radio-inline" ms-if="!indicatorId || (indicatorId && siteType==0)">
+                                            <input type="radio" ms-duplex-number="siteType" value="0"> 常规站点
+                                        </label>
+                                        <label class="radio-inline" ms-if="!indicatorId || (indicatorId && siteType==1)">
+                                            <input type="radio" ms-duplex-number="siteType" value="1"> 模板子站
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group" ms-if="(!indicatorId && siteType==1) || (indicatorId && siteType==1)">
+                                    <label>专题模板</label>
+                                    <div>
+                                        <div>
+                                            <a id="themeHref" href="javascript:void(0)" target="_blank">
+                                                <img id="themeImg" src="/assets/images/no.photo.jpg" style="height: 200px; width: 216px;">
+                                            </a>
+                                        </div>
+                                        <span ms-if="!indicatorId && siteType==1">
+                                        <hr class="mt5 mb5">
+                                        <a href="javascript:void(0)" onclick="siteManage.specialSelect()" class="btn btn-success"> <i class="fa fa-plus"></i> 选择模板</a>
+                                        <a href="javascript:void(0)" onclick="siteManage.clearSelect()" class="btn btn-delete ml15"> <i class="fa fa-trash-o"></i> 清空选择</a>
+                                        </span>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点简称</label>
+                                    <input type="text" name="name" class="form-control" ms-duplex="name" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点全称</label>
+                                    <input type="text" name="siteTitle" class="form-control" ms-duplex="siteTitle" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group" id="sortNumId">
+                                    <label>站点序号</label>
+                                    <input type="number" min="0" max="9999" name="sortNum" class="form-control" ms-duplex="sortNum" placeholder="用于站点排序，按从小到大排序">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点标识</label>
+                                    <input type="text"  name="siteIDCode" class="form-control" ms-duplex="siteIDCode" placeholder="">
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定单位（用于站点栏目选择单位的范围）</label>
+                                    <div class="input-group">
+                                        <div id="menuContent"
+                                             style="display:none;position: absolute; top: 34px;height:300px; left: 0px;z-index: 10000;width: 200px;border: solid 1px #c2cad8;border-top:0px; overflow: auto; ;background-color: InactiveBorder">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                        <input type="text" name="unitIds" class="form-control hide" ms-duplex="unitIds">
+                                        <input type="text" id="unitNames" placeholder="请选择单位" ms-duplex="unitNames"
+                                               class="form-control readonly" readonly onclick="showUnitTree()">
+                                        <span class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showUnitTree()">
+                                                <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label>启用wap站</label>
+
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="isWap" ms-duplex-number="isWap" value="1"> 是
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="isWap" ms-duplex-number="isWap" value="0"> 否
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定域名</label>
+                                #*
+                                                  <textarea class="form-control" name="uri" ms-duplex="uri" rows="3" placeholder="多个域名请换行"></textarea>
+                                *#
+                                    <input type="text" name="uri" class="form-control" ms-duplex="uri" placeholder="请绑定域名">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>关键词</label>
+                                    <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3" placeholder="站点关键字，建议100字以内有利搜索引擎抓取"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>描述</label>
+                                    <textarea class="form-control" name="description" ms-duplex="description" rows="3" placeholder="站点描述，建议1000字以内有利搜索引擎抓取"></textarea>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>启用视频转换</label>
+
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="isVideoTrans" ms-duplex-number="isVideoTrans" value="1"> 是
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="isVideoTrans" ms-duplex-number="isVideoTrans" value="0" checked> 否
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>视频转换地址</label>
+                                    <input class="form-control" name="videoTransUrl" ms-duplex="videoTransUrl" rows="3" placeholder="请输入视频转换地址"></input>
+                                </div>
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save" id="doSave">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab_1_2">
+                            <div class="form-group">
+                                <label>首页模板</label>
+                                <select class="form-control" name="indexTempId" id="indexTempId" ms-duplex="indexTempId" placeholder="请选择首页模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>信息公开首页模板</label>
+                                <select class="form-control" name="publicTempId" id="publicTempId" ms-duplex="publicTempId" placeholder="请选择信息公开首页模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>站点搜索模板</label>
+                                <select class="form-control" name="searchTempId" id="searchTempId" ms-duplex="searchTempId" placeholder="请选择站点搜索模板">
+                                </select>
+                            </div>
+
+                            <div class="form-group hide">
+                                <label>内容评论模板</label>
+                                <select class="form-control" name="commentTempId" id="commentTempId" ms-duplex="commentTempId" placeholder="请选择内容评论模板">
+                                </select>
+                            </div>
+                            <div class="form-group hide">
+                                <label>内容纠错模板</label>
+                                <select class="form-control" name="errorTempId" id="errorTempId" ms-duplex="errorTempId" placeholder="请选择内容纠错模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>会员中心模板</label>
+                                <select class="form-control" name="memberId" id="memberId" ms-duplex="memberId" placeholder="请选择会员中心模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>wap首页模板</label>
+                                <select class="form-control" name="wapTempId" id="wapTempId" ms-duplex="wapTempId" placeholder="请选择wap首页模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>wap信息公开首页模板</label>
+                                <select class="form-control" name="wapPublicTempId" id="wapPublicTempId" ms-duplex="wapPublicTempId" placeholder="请选择wap信息公开首页模板">
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>手机搜索模板</label>
+                                <select class="form-control" name="phoneTempId" id="phoneTempId" ms-duplex="phoneTempId" placeholder="请选择手机搜索模板">
+                                </select>
+                            </div>
+                            <div class="form-actions noborder">
+                                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                <button type="button" class="btn btn-default btn-reset" id="doReset1">重 置</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="tab_1_3">
+                            <div class="form-group">
+                                <label>站点ID</label>
+                                <input type="text" name="stationId" class="form-control" ms-duplex="stationId" placeholder="请输入站点ID" maxlength="50">
+                            </div>
+                            <div class="form-group">
+                                <label>查询密码</label>
+                                <input type="text" name="stationPwd" class="form-control" ms-duplex="stationPwd" placeholder="请输入查询密码" maxlength="127">
+                            </div>
+                            <div class="form-actions noborder">
+                                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                <button type="button" class="btn btn-default btn-reset" id="doReset2">重 置</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/site_unit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/site_manage.js"></script>
+<script>
+    mini.parse();
+
+    $(document).ready(function () {
+
+        //加载单位
+        unit_select_tree_ser.init();
+        if (GLOBAL_SITEID == "" || GLOBAL_SITEID == null) {
+            siteManage.site();
+        }
+
+    });
+
+    function getTemplate() {
+        Ls.ajaxGet({
+            url: "/contentModel/getTemplate",
+            data: {type: 0}
+        }).done(function (text) {
+            var str1 = '<option value=""> 请选择首页模板 </option> ';
+            var str2 = '<option value=""> 请选择信息公开首页模板 </option> '
+            var str3 = '<option value=""> 请选择站点搜索模板 </option> ';
+            var str4 = '<option value=""> 请选择wap首页模板 </option> ';
+            var str5 = '<option value=""> 请选择wap信息公开首页模板 </option> ';
+            var str6 = '<option value=""> 请选择手机搜索模板 </option>';
+            var str = "";
+            if (text.data != null) {
+                var data = text.data;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> ';
+                    }
+                }
+            }
+
+            $("#indexTempId").append(str1 + str);
+            $("#publicTempId").append(str2 + str);
+            $("#searchTempId").append(str3 + str);
+            $("#wapTempId").append(str4 + str);
+            $("#wapPublicTempId").append(str5 + str);
+            $("#phoneTempId").append(str6 + str);
+
+        }).done(function () {
+            Ls.ajaxGet({
+                url: "/contentModel/getTemplate",
+                data: {type: 3}
+            }).done(function (text) {
+                var str1 = '<option value=""> 请选择内容评论模板 </option> ';
+                var str2 = '<option value=""> 请选择内容纠错模板 </option> ';
+                var str3 = '<option value=""> 请选择会员中心模板 </option> ';
+
+                var str = "";
+                if (text.data != null) {
+                    var data = text.data;
+                    var length = data.length;
+                    if (length > 0) {
+                        for (i = 0; i < length; i++) {
+                            str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> ';
+                        }
+                    }
+                }
+                $("#commentTempId").append(str1 + str);
+                $("#errorTempId").append(str2 + str);
+                $("#memberId").append(str3 + str);
+
+                siteManage.site();
+
+            });
+        })
+    }
+</script>

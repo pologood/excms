@@ -1,0 +1,87 @@
+<form role="form" name="interview_form" id="interview_form">
+    <a name="interview_form"></a>
+    <table border="0" cellspacing="0" cellpadding="0" width="100%" class="interview-table">
+        <tbody>
+        <tr>
+            <th><span style="color:#F00; padding-right:5px;">*</span>您的姓名：</th>
+            <td class="name"><input name="name" id="interview_name" type="text" size="30" maxlength="20"></td>
+        </tr>
+        <tr>
+            <th><span style="color:#F00; padding-right:5px;">*</span>您的意见：</th>
+            <td class="opinion"><textarea name="content" id="interview_content" cols="70" rows="5" maxlength="500"></textarea></td>
+        </tr>
+        <tr>
+            <th><span style="color:#F00; padding-right:5px;">*</span>验证码：</th>
+            <td class="poll_input"><input name="checkCode" class="verification" id="checkimg" size="6" maxlength="4" type="text">
+                <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td class="btn-group">
+                <input id="btn_submit" class="btn btn-submit" name="Submit" type="button" accesskey="S" value="确定(S)">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script>
+    $(document).ready(function (e) {
+
+        using("validator", function () {
+
+            $("#interview_form").validator({
+                fields: {
+                    name: "您的姓名:required;length[2~20];",
+                    content: "您的意见:required;length[2~500];",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+                var name = $("#interview_name").val();
+                var content = $("#interview_content").val();
+                var checkCode = $("#checkimg").val();
+                return Ls.ajax({
+                    url: "/content/saveInterviewWeb",
+                    data: {
+                        interviewId:$!{resultObj.interviewId},
+                        name: name,
+                        content: content,
+                        checkCode: checkCode
+                    }
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        $("#interview_form")[0].reset();
+                        Ls.tipsOk("提交成功");
+                    } else {
+                        Ls.tipsErr(d.desc);
+                    }
+                }).always(function () {
+                    $("#imgCode").click();
+                });
+            }
+
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        })
+
+        $("#btn_submit").on('click', function () {
+            $("#interview_form").trigger("validate");
+        })
+
+    });
+
+</script>

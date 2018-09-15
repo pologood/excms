@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+
+<body>
+
+<form id="formDB" action="${imp_action}" method="post">
+        <table>
+            <tbody>
+            <tr>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                    站点ID: <input type="text" name="siteId" value="${siteId}"/>
+                </td>
+                <td align="left">
+                ${type_title}
+                </td>
+            </tr>
+            <tr>
+                <td>老网站：</td>
+                <td>
+                ##                <input name="oldColumnId" type="text"/>
+                    <select name="fromCode" size="30">
+                        #foreach($v in $fromList)
+                            <option value="${v.code}">
+                                $v.name
+                            </option>
+                        #end
+                    </select>
+                </td>
+                <td>ex8网站栏目：</td>
+                <td>
+                ##                <input name="curColumdId" type="text"/>
+                    <select name="indicatorIdAndCode" size="30">
+                        #foreach($v2 in $toList)
+                            <option value="${v2.columnTypeCode}~${v2.indicatorId}">${v2.name} - (${v2.indicatorId})</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" align="center">
+                    <button id="doSub" type="button" style="height: 40px; ">确定导入</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            if(confirm("确定导入吗？")){
+                var _this = $(this);
+                _this.attr("disabled", true).text("数据正在导入,请耐心等待(请勿关闭浏览器)。");
+                $("#formDB").submit();
+            }
+
+        });
+    });
+</script>
+</body>
+</html>

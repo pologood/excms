@@ -1,0 +1,111 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div style="margin: 25px 20px 10px 20px;">
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">网站访问排行</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 365px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{sysStaticPath}/assets/js/echarts/echarts.min.js"></script>
+<script type="text/javascript">
+var cnzzData = {};
+// 路径配置
+require.config({
+    paths: {
+        echarts: '/assets/js/echarts'
+    }
+});
+
+// 使用
+require(
+    [
+        'echarts',
+        'echarts/chart/line',
+        'echarts/chart/bar',
+        'echarts/chart/pie',
+        'echarts/chart/funnel'
+    ],
+    function (ec) {
+        cnzzData.provList = $!{nameList};
+        cnzzData.proNumList = $!{numList};
+        var inner = [0, 85];
+        var outer = [110, 150];
+
+        cnzzData.option_a = {
+            grid: {
+                x: 50,
+                x2: 20,
+                y: 50
+            },
+            title: {
+                text: '',
+                subtext: ''
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                show: false,
+                data: ['访问量']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            calculable: true,
+            xAxis: [
+                {
+                    type: 'category',
+                    axisLabel: {
+                        interval: 0,
+						rotate:45
+                    },
+                    data: cnzzData.provList
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: [
+                {
+                    name: '访问量',
+                    type: 'bar',
+                    itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,
+                                position: 'top'
+                            }
+                        }
+                    },
+                    data: cnzzData.proNumList
+                }
+            ]
+        };
+        var chart_a = ec.init(document.getElementById('statistics_a'));
+        chart_a.setOption(cnzzData.option_a);
+    }
+);
+</script>

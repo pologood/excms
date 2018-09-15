@@ -1,0 +1,286 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <ul class="ztree" id="treeview" style="overflow: hidden;">
+                    <span style="margin:auto" class="bold font-red-mint" id="udf">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+#*<div class="pd10" style="overflow: hidden;">
+    <ul class="ztree" id="treeview" style="overflow: hidden;">
+        <span style="margin:auto" class="bold font-red-mint" id="udf">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+    </ul>
+</div>*#
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var siteId =$!{OPR_EO.siteId};//站点ID
+    var contentId =$!{OPR_EO.id};
+    var columnType = '$!{OPR_EO.typeCode}';
+    var columnId =$!{OPR_EO.columnId};
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+
+    $(document).ready(function () {
+
+        api.button({
+            id: "do_submit",
+            name: "确定",
+            focus: true,
+            callback: function () {
+                saveCopy();
+                return false;
+            }
+        });
+
+        getColumnTreeBySite();
+    })
+
+    var setting = {
+        isEdit: true,
+        view: {
+            addDiyDom: function (id, node) {
+                if (!node.isParent) {
+                    node.isPublish = false;
+                    var isPublish = false;//判断是否有发布权限
+                    if (node.opt && node.opt == "super") {
+                        isPublish = true;
+                    } else {
+                        var functions = node.functions;
+                        if (functions && functions.length > 0) {
+                            for (var i in functions) {
+                                if (functions[i].action && functions[i].action == "publish") {
+                                    isPublish = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (isPublish) {
+                        var aObj = $("#" + node.tId + "_a");
+                        var thisId = "isPublish_" + node.columnStrId;
+                        var btn = "<input id='" + thisId + "' type='checkbox'/><label for='" + thisId + "'><span style='color:#da9264'>发布</span></label>";
+                        aObj.after(btn);
+                        $("#" + thisId).click(function () {
+                            if ($(this).is(':checked')) {//判断是否选中
+                                node.isPublish = true;
+                            }else{
+                                node.isPublish = false;
+                            }
+                        });
+
+//                        var synColumnIds = cur.synColumnIds.split(",");
+//                        var synColumnIsPublishs = cur.synColumnIsPublishs.split(",");
+//                        for(var i=0;i<synColumnIds.length;i++){
+//                            if(node.columnStrId==synColumnIds[i]){
+//                                if(synColumnIsPublishs[i]=="1"){
+//                                    $("#" + thisId).click();
+//                                }
+//                                break;
+//                            }
+//                        }
+                    }
+                }
+            }
+
+        },
+        data: {
+            simpleData: {
+                enable: true,
+                idKey: 'columnStrId',
+                pIdKey: 'parentStrId'
+            }
+        },
+        callback: {
+            //beforeCheck: zTreeBeforeCheck,
+        },
+        check: {
+            autoCheckTrigger: false,
+            enable: true,
+            chkboxType: {"Y": "ps", "N": "ps"},
+            chkStyle: "checkbox"
+        },
+    };
+
+    function zTreeBeforeCheck(event, treeId, treeNode) {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview");
+        if (treeNode.isParent) {
+
+        }
+    }
+
+
+    //获取叶子节点数
+    function getChecked() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview");
+        var nodes = zTree.getCheckedNodes(true);
+        if (nodes) {
+            for (var i = 0; i < nodes.length; i++) {
+                var nodeChildrens = nodes[i].children;
+                if (nodeChildrens) {
+                    nodes[i].nocheck = true;
+                }
+            }
+        }
+        nodes = zTree.getCheckedNodes(true);
+        return nodes;
+    }
+
+
+    /**
+     * 点击节点
+     */
+    function nodeClick(event, treeId, treeNode) {
+        if (treeNode.isParent) {
+            zTree.expandNode(treeNode);
+        } else {
+            // editNode(treeNode);
+            //阻止冒泡事件
+            //event.stopImmediatePropagation();
+            columnId = treeNode.indicatorId;
+        }
+
+        event.stopImmediatePropagation();
+    }
+
+    //初始化站点栏目树
+    function getColumnTreeBySite() {
+        if (siteId == null || siteId == "") {
+            return;
+        }
+        var referId = [];
+        Ls.ajaxGet({
+            data: {
+                causeId: contentId,
+                modelCode: "CONTENT",
+                type: "REFER"
+            },
+            url: "/referRelation/getRelation",
+            success: function (text) {
+                if (text.status == 1) {
+                    var data = text.data;
+                    if (data != null) {
+                        for (var i = 0; i < data.length; i++) {
+                            referId.push(data[i].columnId);
+                        }
+                    }
+                    Ls.ajaxGet({
+                        data: {
+                            columnTypeCode: columnType,
+                            columnId: columnId
+                        },
+                        url: "$!{rc.contextPath}/siteMain/getColumnTreeByType",
+                        cache: false,
+                        success: function (json) {
+                            if (json.data != null && json.data.length > 0) {
+                                var data = json.data;
+                                Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+                                for (var i = 0; i < data.length; i++) {
+                                    data[i].nocheck = true;
+                                    if (data[i].isParent != 1) {
+//                                        data[i].nocheck = false;
+//                                    }else{
+                                        if (columnType == "articleNews" || columnType == "pictureNews") {
+                                            if(data[i].columnTypeCode == "articleNews" || data[i].columnTypeCode == "pictureNews" ){
+                                                data[i].nocheck = false;
+                                            }
+                                        }
+                                    }
+                                    if (referId != null) {
+                                        for (var j = 0; j < referId.length; j++) {
+                                            if (data[i].indicatorId == referId[j]) {
+                                                data[i].checked = true;
+                                                data[i].chkDisabled = true;
+                                            }
+                                        }
+                                    }
+
+                                }
+                                tree = jQuery.fn.zTree.init($("#treeview"), setting, data);
+                                tree.expandAll(false);
+                            } else {
+                                $("#udf").html("未找到同类型栏目");
+                            }
+
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    var saveCopy = function () {
+        var ids = [];
+        var pIds = [];
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview");
+        var synColumnIsPublishs = "";
+//        var nodeArr = getChecked();
+//        for (var i = 0; i < nodeArr.length; i++) {
+//            if (nodeArr[i].chkDisabled != true) {
+//                ids.push(nodeArr[i].columnStrId);
+//                var pid = nodeArr[i].parentStrId;
+//                if (pid == null) pid = 0;
+//                pIds.push(pid);
+//            }
+//        }
+
+        if (zTree) {
+            var checks = zTree.getCheckedNodes(true);
+            if (checks.length > 0) {//构建内容管理选中节点
+                var ids = [], publishs = [], names = [];
+                for (var i = 0, l = checks.length; i < l; i++) {
+                    ids.push(checks[i].columnStrId);
+                    var pid = checks[i].parentStrId;
+                    if (pid == null) pid = 0;
+                    pIds.push(pid);
+                    if (checks[i].isPublish && checks[i].isPublish == true) {
+                        publishs.push("1");
+                        names.push(checks[i].name + "(发布)");
+                    } else {
+                        publishs.push("0");
+                        names.push(checks[i].name);
+                    }
+                }
+                synColumnIsPublishs = publishs.join(",");
+            }
+        }
+
+        if (ids.length == 0) {
+            Ls.tipsErr("至少选择引用到一个栏目");
+            return;
+        }
+        Ls.ajax({
+            type:"post",
+            data: {
+                ids: ids,
+                pIds: pIds,
+                contentId: contentId,
+                synColumnIsPublishs:synColumnIsPublishs
+            },
+            url: "/content/referArticle",
+            success: function (json) {
+                if (json.status == 0) {
+                    Ls.tipsErr("新闻引用失败");
+                } else {
+                    Ls.tips("引用完成，正在生成处理中", {
+                        icons: "success", callback: function () {
+                            Ls.winClose();
+                        }
+                    });
+                }
+            }
+        });
+
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+</script>

@@ -1,0 +1,99 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="works_form" role="form" ms-controller="works_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>领导</label>
+							<select name="leadersId" ms-duplex="leadersId" class="form-control" data-rule="领导:required;">
+								<option value="">请选择</option>
+								#foreach($leader in $leadersList)
+    								<option value="$!{leader.leadersId}">$!{leader.leadersName}</option>
+								#end
+							</select>
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+							<div class="controls">
+                                <label class="radio-inline"><input type="radio" name="enable" value="true" ms-duplex-boolean="enable">启用</label>
+                                <label class="radio-inline"><input type="radio" name="enable" value="false" ms-duplex-boolean="enable">禁用</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>日期</label>
+							<input type="datetime" name="workDate" ms-duplex="workDate" class="form-control" data-rule="日期:required;"
+                                       placeholder="日期" onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd'})" />
+                        </div>
+                        <div class="form-group">
+                            <label>内容</label>
+							<textarea class="form-control" data-rule="内容:required;length(~500);" name="jobContent"  ms-duplex="jobContent" rows="3" placeholder="每日工作动态内容"></textarea>
+                        </div>
+						<div class="form-group">
+                            <label>备注</label>
+							<textarea class="form-control" data-rule="备注:length(~100);" name="remark"  ms-duplex="remark" rows="2" placeholder="备注"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+var cur = {
+    id: "works_form",//表单
+    vm: null,//模型
+    W: art.dialog.opener//父对象
+};
+$(document).ready(function(){
+	// 获取数据
+    Ls.ajaxGet({
+        url: "/public/works/getPublicWorks",
+        data: {
+            id: cur.W.cur.id
+        }
+    }).done(function (data) {
+        data.$id = cur.id;
+		
+		if (cur.W.cur.id == "") {// 新增
+			data.siteId = cur.W.GLOBAL_SITEID
+			data.workDate = "$!{date}";
+		}
+        // 如果模型已经绑定，不再绑定
+        cur.vm = avalon.vmodels[data.$id];
+        if (!cur.vm) {
+            // 绑定模型
+            cur.vm = avalon.define(data);
+        } else {
+            Ls.assignVM(cur.vm, data);
+        }
+        avalon.scan($("#"+cur.id).get(0), cur.vm);
+    });
+
+    // 验证
+    $('#' + cur.id).validator({
+        valid: function() {
+            var data = Ls.toJSON(cur.vm.$model);
+			delete data.leaders; //删除领导属性
+            // 提交
+            Ls.ajax({
+                url: "/public/works/saveOrUpdate",
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tipsInfo('保存成功!');
+					cur.W.cur.grid.reload();
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+                // 关闭弹框
+                art.dialog.close();
+            });
+        }
+    });
+});
+</script>

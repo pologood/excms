@@ -1,0 +1,148 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="user_form" role="form" ms-controller="user_form">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>评议类型：</label>
+                    <input name="title" type="text" class="form-control" placeholder="选项不能为空" ms-duplex="title">
+                </div>
+
+                <div class="form-group">
+                    <label>票数：</label>
+                    <input name="votesCount" class="form-control w150" placeholder="" ms-duplex="votesCount">
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        questionId: '$!{questionId}',
+        themeId: '$!{themeId}',
+        optionId: '$!{optionId}',
+        picUrl: '',
+        options: Ls.url.get("options")
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/survey/question/getOption",
+                data: {
+                    optionId: cur.optionId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "user_form"
+                data.$id = cur.$id;
+                data.resetForm = function () {
+                    $("#user_form")[0].reset();
+                }
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+            })
+        };
+
+        getData();
+
+    })
+
+    $('#user_form').validator({
+        fields: {
+            'title': '选项名称:required;length[1~20]',
+            'votesCount': '票数:integer;'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        data.themeId = cur.themeId;
+        data.questionId = cur.questionId;
+        var url = "/survey/question/saveOption";
+        Ls.ajax({
+            url: url,
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.winClose();
+                    }
+                })
+            } else {
+                Ls.tipsOk(d.desc)
+            }
+        })
+    }
+
+
+    function fileUpload() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.vm.picUrl = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + data[0].fileName)
+                $("#uploadImg").hide();
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+            "type":"NotDefined"
+          },
+        })
+    }
+
+    function del() {
+        if (cur.vm.picUrl == null) {
+            Ls.tipsInfo("请上传图片！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.picUrl
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.picUrl = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg')
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+</script>
+</body>
+</html>

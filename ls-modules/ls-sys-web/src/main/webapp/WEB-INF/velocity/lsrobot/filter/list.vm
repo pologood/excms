@@ -1,0 +1,124 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="add()">新增</button>
+                                <button type="button" class="btn btn-delete" onclick="remove()" style="margin-left:5px;">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/lsrobot/filter/getPage?dataFlag=1" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" width="20px"></div>
+                        <div field="id" type="indexcolumn" headerAlign="center" width="30px">序号</div>
+                        <div field="keyWords" width="100" align="left" headerAlign="center">关键词</div>
+                        <div field="createDate" width="120px" align="center" headerAlign="center" dateFormat="yyyy-MM-dd" >创建日期</div>
+                        <div field="createUserName" width="120px" align="left" headerAlign="center">创建人</div>
+                        <div width="120px" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key:$('#ser_key'),
+        dialog:Ls.getWin.dialog
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    })
+
+    function add() {
+        Ls.openWin("/lsrobot/filter/adder", '400px', '130px', {
+            title: "新增",
+            close: function (data, iframe) {
+                if(data == 1){
+                    search();
+                }
+            }
+        });
+    }
+
+    function remove(id, keyWords) {
+        var ids = [];
+        var titles = [];
+
+        if(id != null && id != "") {
+            ids.push(id);
+            titles.push(keyWords);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for(var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+                titles.push(records[i].keyWords);
+            }
+        }
+
+        if (confirm('确定删除关键词【'+ titles.join(',') +'】?')) {
+            Ls.ajaxGet({
+                url: "/lsrobot/filter/remove",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="remove('+record.id+',\'' + record.keyWords + '\')">删 除</button>';
+        return   del;
+    }
+
+    function search() {
+        cur.grid.load({keyWords: cur.ser_key.val()});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+</script>

@@ -1,0 +1,359 @@
+<style>
+    .loginWrap {
+        border: 1px solid #cccccc;
+    }
+
+    .login-l {
+        padding: 15px;
+        border-right: 1px solid #CCC;
+    }
+
+    .loginContent-l {
+        margin-top: 14px;
+        text-align: center;
+    }
+
+    .loginContent-r {
+        margin-top: 20px;
+    }
+
+
+    .imgWeibo {
+        width: 100px;
+        height: 100px;
+        background: url('$!{rc.contextPath}/assets/images/weibo.png') 0 0 no-repeat;
+        -webkit-background-size: cover;
+        background-size: cover;
+        margin: 0 auto;
+    }
+
+    .imgQq {
+        width: 100px;
+        height: 100px;
+        background: url('$!{rc.contextPath}/assets/images/qq.png') 0 0 no-repeat;
+        -webkit-background-size: cover;
+        background-size: cover;
+        margin: 0 auto;
+    }
+
+    .imgWeixin {
+        width: 100px;
+        height: 100px;
+        background: url('$!{rc.contextPath}/assets/images/weixin.png') 0 0 no-repeat;
+        -webkit-background-size: cover;
+        background-size: cover;
+        margin: 0 auto;
+    }
+
+    .appContent {
+        width: 100%;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #CCC;
+    }
+
+    .appId>input {
+        float: right;
+    }
+
+    .appContent:first-child {
+        margin-bottom: 10px;
+        height: 30px;
+    }
+
+    .appContent>input{
+        display: none;
+        border: none;
+        outline: none;
+
+    }
+
+    .appContent:first-child>span {
+        float: right;
+        margin-right: 5px;
+    }
+
+    .appContent>span{
+        color: #565454;
+        font-weight: normal;
+    }
+
+    .appSecret {
+        height: 58px;
+    }
+
+    .set{
+        width: 48px;
+        height: 48px;
+        margin: 66px auto 0;
+        cursor: pointer;
+        background: url('$!{rc.contextPath}/assets/images/set.png') 0 0 no-repeat;
+        background-size: contain;
+    }
+
+    .loginContent-l>p {
+        font-size: 16px;
+        white-space: nowrap;
+        margin: 12px 0 0 0px;
+    }
+
+    .loginContent-r>.btn{
+        color: #999;
+        border: 1px solid #999;
+        border-radius: 8px !important;
+        float: right;
+    }
+
+    .loginBtn.active {
+        border-color: #ff6600;
+        color: #ff6600;
+    }
+
+    .loginContent-r>.btn:last-child {
+        display: none;
+    }
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">第三方登录配置</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="table-toolbar" style="margin-bottom: 10px">
+                        <div class="note note-danger">
+                            <h4 class="block">相关说明</h4>
+                            <p style="font-size: 14px;">
+                                1、网站会员中心接入第三方账号登录，第三方登录的相关配置可在后台进行配置，可配置每种登录方式的参数。
+                            </p>
+                            <p style="font-size: 14px;">
+                                2、针对每种第三方登录方式，后台支持是否开启的设置。
+                            </p>
+                        </div>
+
+                        <div style="/*margin: 25px 20px 10px 20px;*/">
+                            <div class="row">
+                                <div data-id="WeiBo" class="col-md-4 loginBox">
+                                    <div class="loginWrap">
+                                        <div class="col-md-10 login-l">
+                                            <div class="loginContent-l col-md-4">
+                                                <div class="imgWeibo"></div>
+                                                <p class="">新浪微博开放平台</p>
+                                            </div>
+                                            <div class="loginContent-r col-md-8">
+                                                <label class="appContent appId WeiBoId">
+                                                    App ID
+                                                    <input type="text" class="">
+                                                    <span></span>
+                                                </label>
+                                                <label class="appContent appSecret WeiBoSecret">
+                                                    <p>App Secret</p>
+                                                    <input type="text" class="" style="width: 100%;">
+                                                    <span></span>
+                                                </label>
+                                                <a href="javascript:void(0);" class="btn loginBtn WeiBoChangeStatus">未启用</a>
+                                                <a href="javascript:void(0);" class="btn btnSave WeiBoSave" style="margin-right: 5px;">保 存</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 login-r">
+                                            <div class="set"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                                <div data-id="QQ" class="col-md-4 loginBox">
+                                    <div class="loginWrap">
+                                        <div class="col-md-10 login-l">
+                                            <div class="loginContent-l col-md-4">
+                                                <div class="imgQq"></div>
+                                                <p class="">腾讯开放平台</p>
+                                            </div>
+                                            <div class="loginContent-r col-md-8">
+                                                <label class="appContent appId QQId">
+                                                    App ID
+                                                    <input type="text" class="">
+                                                    <span></span>
+                                                </label>
+                                                <label class="appContent appSecret QQSecret">
+                                                    <p>App Secret</p>
+                                                    <input type="text" class="" style="width: 100%;">
+                                                    <span>&nbsp;</span>
+                                                </label>
+                                                <a href="javascript:void(0);" class="btn loginBtn QQChangeStatus">未启用</a>
+                                                <a href="javascript:void(0);" class="btn btnSave QQSave" style="margin-right: 5px;">保 存</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 login-r">
+                                            <div class="set"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                                <div data-id="WeChat" class="col-md-4 loginBox">
+                                    <div class="loginWrap">
+                                        <div class="col-md-10 login-l">
+                                            <div class="loginContent-l col-md-4">
+                                                <div class="imgWeixin"></div>
+                                                <p class="">微信开放平台</p>
+                                            </div>
+                                            <div class="loginContent-r col-md-8">
+                                                <label class="appContent appId WeChatId">
+                                                    App ID
+                                                    <input type="text" class="">
+                                                    <span></span>
+                                                </label>
+                                                <label class="appContent appSecret WeChatSecret">
+                                                    <p>App Secret</p>
+                                                    <input type="text" class="" style="width: 100%;">
+                                                    <span></span>
+                                                </label>
+                                                <a href="javascript:void(0);" class="btn loginBtn WeChatChangeStatus">未启用</a>
+                                                <a href="javascript:void(0);" class="btn btnSave WeChatSave" style="margin-right: 5px;">保 存</a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2 login-r">
+                                            <div class="set"></div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+
+    };
+
+    $(document).ready(function () {
+
+        Ls.ajaxGet({
+            url: '/thirdLoginManage/getThirdLoginMgrInfo'
+        }).done(function (d) {
+            var d = d.data;
+            $.each(d, function (i, v) {
+                var status = v.status;
+                if(status==1||status=='1'){//当前已启用
+                    $('.' + v.type + 'ChangeStatus').attr("alt",0);
+                    $('.' + v.type + 'ChangeStatus').html("已启用").addClass('active');
+                }else{//当前未启用
+                    $('.' + v.type + 'ChangeStatus').attr("alt",1);
+                    $('.' + v.type + 'ChangeStatus').html("未启用")
+                }
+
+                $('.' + v.type + 'Id>input').val(v.appId==null?'':v.appId);
+                $('.' + v.type + 'Id>span').text(v.appId==null?'':v.appId);
+                $('.' + v.type + 'Secret>input').val(v.appSecret==null?'':v.appSecret);
+                $('.' + v.type + 'Secret>span').text(v.appSecret==null?'':v.appSecret);
+            })
+        })
+
+        //style
+        function loginStyle(){
+            if ($(".loginBox").length > 0) {
+                if ($(window).width() < 1600) {
+                    $(".loginBox").removeClass('col-md-4').addClass('col-md-5');
+                    $(".loginBox").eq(2).addClass('mt20');
+                }else {
+                    $(".loginBox").removeClass('col-md-5').addClass('col-md-4');
+                    $(".loginBox").eq(2).removeClass('mt20');
+                }
+            }else {
+                return
+            }
+        }
+
+        loginStyle();
+
+        $(window).resize(loginStyle);
+
+        // 编辑
+        $(".loginWrap .set").click(function () {
+            var name = $(this).parents('.loginBox').data('id');
+            $('.' + name + 'Id>input').show().focus().next().hide();
+            $('.' + name + 'Secret>input').show().next().hide();
+            $('.' + name + 'Save').show();
+        })
+
+
+        // 变更启用状态
+        $(".loginContent-r .loginBtn").click(function () {
+
+            var type = $(this).parents('.loginBox').data('id');
+            var status_ = $(this).attr("alt");
+            if(status_==0){
+                if (confirm('已有用户关联绑定此登录方式，是否确认禁用')) {
+                    changeStatus(type,status_);
+                }
+            }else{
+                changeStatus(type,status_);
+            }
+
+        })
+
+        function changeStatus(type,status_){
+            // ajax
+            Ls.ajax({
+                type:"POST",
+                data:{
+                    type:type,
+                    status:status_
+                },
+                url:"/thirdLoginManage/changeStatus"
+            }).done(function(d){
+                if(d.status==1){
+                    Ls.tipsOk("操作成功");
+                    if(status_==1||status_=='1'){//当前已启用
+                        $('.' + type + 'ChangeStatus').attr("alt",0);
+                        $('.' + type + 'ChangeStatus').html("已启用").addClass('active');
+                    }else{//当前未启用
+                        $('.' + type + 'ChangeStatus').attr("alt",1);
+                        $('.' + type + 'ChangeStatus').html("未启用").removeClass('active');
+                    }
+                }else{
+                    Ls.tipsErr(d.desc);
+                }
+            });
+        }
+
+
+        // 保存
+        $(".loginContent-r .btnSave").click(function () {
+            var type = $(this).parents('.loginBox').data('id');
+            var appId = $('.' + type + 'Id>input').val();
+            var appSecret = $('.' + type + 'Secret>input').val();
+            // ajax
+            Ls.ajax({
+                type:"POST",
+                data:{
+                    appId:appId,
+                    appSecret:appSecret,
+                    type:type
+                },
+                url:"/thirdLoginManage/saveThirdLoginMgr"
+            }).done(function(d){
+                if(d.status==1){
+                    Ls.tipsOk("保存成功");
+                    $('.' + type + 'Id>input').hide();
+                    $('.' + type + 'Secret>input').hide();
+                    $('.' + type + 'Id>span').text($('.' + type + 'Id>input').val()).show();
+                    $('.' + type + 'Secret>span').text($('.' + type + 'Secret>input').val()).show();
+                    $('.' + type + 'Save').hide();
+                }else{
+                    Ls.tipsErr(d.desc);
+                }
+            });
+        })
+    })
+
+</script>

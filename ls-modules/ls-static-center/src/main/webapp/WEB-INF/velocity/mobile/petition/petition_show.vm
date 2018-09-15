@@ -1,0 +1,116 @@
+<div class="listnews">
+    <table width="695" border="0" align="center" cellpadding="3" cellspacing="1" bgcolor="#E7E7E7">
+        <tr>
+            <td height="30" bgcolor="#f4f9fe">&nbsp;<strong><font color="#0071d1" style="font-size: 14px;">信件详细信息</font></strong></td>
+        </tr>
+        <tr>
+            <td bgcolor="#FFFFFF">
+                <table width="100%" border="0" cellpadding="0" cellspacing="3">
+                    <tr>
+                        <td colspan="2">
+                            <table width="100%" border="0" cellpadding="5" cellspacing="1" bgcolor="#efefef">
+                                <tr>
+                                    <TD width="14%" height="24" align=right bgColor=#f7f7f7><STRONG>信件编号：</STRONG></TD>
+                                    <td width="86%" bgcolor="#FFFFFF">$!{l.id}</td>
+                                </tr>
+                                <tr>
+                                    <TD width="14%" height="24"
+                                        align=right bgColor=#f7f7f7><STRONG>信件目的：</STRONG></TD>
+                                    #foreach($pcode in $plist)
+                                        #if("$!{l.purposeCode}" == "$!{pcode.code}")
+                                            <td bgcolor="#FFFFFF">&nbsp;$!{pcode.name}</td> #end
+                                    #end
+                                </tr>
+                                <tr>
+                                    <TD width="14%" height="24"
+                                        align=right bgColor=#f7f7f7><STRONG>信件类型：</STRONG></TD>
+                                    #foreach($ccode in $clist)
+                                        #if("$!{l.categoryCode}" == "$!{ccode.code}")
+                                            <td bgcolor="#FFFFFF">&nbsp;$!{ccode.name}</td> #end
+                                    #end
+                                </tr>
+                                <tr>
+                                    <TD width="14%" height="24"
+                                        align=right bgColor=#f7f7f7><STRONG>来信标题：</STRONG></TD>
+                                    <td bgcolor="#FFFFFF">$!{l.title}</td>
+                                </tr>
+                                <tr>
+                                    <TD width="14%" height="24"
+                                        align=right bgColor=#f7f7f7><STRONG>来信时间：</STRONG></TD>
+                                    <td bgcolor="#FFFFFF">#date_format("$!{l.createDate}","yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+                                <tr>
+                                    <TD width="14%" height="24" align=right vAlign=top bgColor=#f7f7f7><STRONG>来信内容：</STRONG></TD>
+                                    <td bgcolor="#FFFFFF" style="WORD-WRAP: break-word; ">
+                                        <div style="padding:6px;">$!{l.content}</div>
+                                    </td>
+                                </tr>
+                            </table>
+
+
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td height="4"></td>
+                                </tr>
+                                <tr>
+                                    <td height="30" bgcolor="#f4f9fe">&nbsp;<strong><font color="#0071d1" style="font-size: 14px;">来信件人详细信息</FONT></strong></td>
+                                </tr>
+                                <tr>
+                                    <td height="4"></td>
+                                </tr>
+                            </table>
+
+                            #if("$!{l.isPublic}" == "1")
+                                <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#efefef">
+                                    <TR>
+                                        <TD width="14%" height="23" align="right" bgColor="#f7f7f7"><STRONG>姓 名：</STRONG></TD>
+                                        <TD width="86%" bgColor="#ffffff">$!{l.author}</TD>
+                                    </TR>
+
+                                    <TR>
+                                        <TD width="14%" height="24" align="right" bgColor="#f7f7f7"><STRONG>联系电话：</STRONG></TD>
+                                        <TD bgColor="#ffffff">$!{l.phoneNum}</TD>
+                                    </TR>
+                                </table>
+                            #else
+                                <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#efefef">
+                                    <TR>
+                                        <TD height="24" colspan="2" bgColor="#FFFFFF">&nbsp;&nbsp;&nbsp;<font color="#FF0000" size="+0"><b>不公开</b></font></TD>
+                                    </TR>
+                                </table>
+                            #end
+
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td height="10"></td>
+                                </tr>
+                                <tr>
+                                    <td height="30" bgcolor="#f4f9fe">&nbsp;<strong><font color="#0071d1" style="font-size: 14px;">回复内容</FONT></strong></td>
+                                </tr>
+                                <tr>
+                                    <td height="10"></td>
+                                </tr>
+                            </table>
+                            <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="#efefef">
+                                <TR>
+                                    <TD width="14%" height="24" align="right" bgColor="#f7f7f7"><STRONG>收信单位
+                                    </STRONG></TD>
+                                    <TD width="86%" bgColor="#ffffff">$!{l.recUnitName}</TD>
+                                </TR>
+                                <TR>
+                                    <TD height="24" align="right" bgColor="#f7f7f7"><STRONG>办理时间：</STRONG></TD>
+                                    <TD bgColor="#ffffff">&nbsp;#date_format("$!{l.replyDate}","yyyy-MM-dd HH:mm:ss")</TD>
+                                </TR>
+                                <TR>
+                                    <TD height="24" align="right" vAlign="top" bgColor="#f7f7f7"><STRONG>回复内容：</STRONG></TD>
+                                    <TD bgColor="#ffffff" style="WORD-WRAP: break-word;">
+                                        <div style=" width:579px; overflow:hidden; padding:3px 8px;">$!{l.replyContent}</div>
+                                    </TD>
+                                </TR>
+                            </table>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>

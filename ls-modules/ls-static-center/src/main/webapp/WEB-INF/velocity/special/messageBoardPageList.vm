@@ -1,0 +1,163 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($action="$!{resultObj.action}")
+###set($action="$!{paramObj.action}")
+#set($isHit="$!{paramObj.isHit}")
+#if($action== 'new')
+    #if("$!{resultObj.curIsLogin}"!=""&&"$!{resultObj.curIsLogin}"=="false")
+    <div class="hd_loginbox">请先登录或注册 !<a class="hd_dl" href="/member/login/2657683?goId=$!{context.columnId}&goType=$!{typeStr}">登录</a><a class="hd_zc" href="/member/register/2657683">注册</a></div>
+    #else
+        #set($eo=$resultObj.vo)
+        #parse("/special/messageBoardForm.vm")
+    #end
+#elseif($action== 'singleList')
+    #if( $resultObj.page.data)
+    <div class="guestbook-table guestbook-table$!{context.columnId}">
+        <div class="guestbook_bt"><span>信件列表</span></div>
+        <ul class="guestbook_title">
+            <li class="t1">主题</li>
+            <li class="t3">发布时间</li>
+            <li class="t2">受理单位</li>
+            <li class="t4">受理状态</li>
+            #if($isHit== 'true')
+                <li class="t5">人气</li>
+            #end
+        </ul>
+        #foreach($eo in $resultObj.page.data)
+            #set($tit=$!{eo.title})
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css}">
+                <li class="t1">
+                    <a href="$!{eo.link}" title="${tit}" target="_blank">
+                        <font>#cutstr($tit,$length)</font>
+                    </a></li>
+                <li class="t2">[#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")]</li>
+                <li class="t3">$!{eo.receiveUnitName}</li>
+                <li class="t4">
+                    #if("$!{eo.dealStatus}"=="replyed" || "$!{eo.dealStatus}"=="handled")
+                        <span class="s1">【已回复】</span>
+                    #elseif("$!{eo.dealStatus}"=="handling")
+                        <span class="s2">【办理中】</span>
+                    #else
+                        <span class="s2">【未回复】</span>
+                    #end
+                </li>
+                #if($isHit== 'true')
+                    <li class="t5" data-id="$!{eo.baseContentId}" id="hit_$!{eo.baseContentId}">$!{eo.hit}</li>
+                #end
+            </ul>
+        #end
+
+    </div>
+        #if($!{resultObj.page.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+        <div id="page_$!{context.columnId}" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                location.href = '$!{resultObj.page.linkPrefix}?pageIndex=' + pageIndex+"&title=$!{title}";
+            }, {
+                currPage: ($!{resultObj.page.pageIndex}+1),
+                pageCount:$!{resultObj.page.pageCount}
+            });
+        </script>
+        #end
+    #else
+        $!{resultObj.msgPage}
+    #end
+#elseif($action== 'list')
+    #if($resultObj.page.data)
+    <div class="guestbook-table $!{context.columnId}">
+        <ul class="guestbook_title">
+            <li class="t1">主题</li>
+            <li class="t2">留言人</li>
+            <li class="t3">发布时间</li>
+            <li class="t4">处理状态</li>
+            #if($isHit== 'true')
+                <li class="t5">人气</li>
+            #end
+        </ul>
+        #foreach($eo in $resultObj.page.data)
+            #set($tit=$!{eo.title})
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css}">
+                <li class="t1">
+                    <a href="$!{eo.link}" title="${tit}" target="_blank">
+                        <font>#cutstr($tit,$length)</font>
+                    </a></li>
+                <li class="t2">$!{eo.personName}</li>
+                <li class="t3">[#date_format("$!{eo.addDate}","$!{paramObj.dateFormat}")]</li>
+                <li class="t4">
+                    #if("$!{eo.dealStatus}"=="replyed" || "$!{eo.dealStatus}"=="handled")
+                        <span class="s1">【已回复】</span>
+                    #elseif("$!{eo.dealStatus}"=="handling")
+                        <span class="s2">【办理中】</span>
+                    #else
+                        <span class="s2">【未回复】</span>
+                    #end
+                </li>
+                #if($isHit== 'true')
+                    <li class="t5">$!{eo.hit}</li>
+                #end
+            </ul>
+        #end
+
+    </div>
+        #if($!{resultObj.page.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+        <div id="page_$!{context.columnId}" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                location.href = '$!{resultObj.page.linkPrefix}?pageIndex=' + pageIndex;
+            }, {
+                currPage: ($!{resultObj.page.pageIndex}+1),
+                pageCount:$!{resultObj.page.pageCount}
+            });
+        </script>
+        #end
+    #else
+        $!{resultObj.msgPage}
+    #end
+    #if("$!{curIsLogin}"!=""&&"$!{curIsLogin}"=="false")
+    <div align="center" style="color: red">请  先  登  录 !<a href="/member/login/2657683?goId=$!{context.columnId}&goType=$!{typeStr}"
+                                                          style="color: blue">(点此链接进行登录)</a></div>
+    #else
+        #parse("/special/messageBoardForm.vm")
+    #end
+#else
+    #set($eo=$resultObj.vo)
+    #if($eo=="0"||$eo=="1")
+      <div class="guestbook-msg-info">您查询的信息不存在，请核准后再试！</div>
+    #else
+        #parse("/special/messageBoardInfo.vm")
+    #end
+#end
+#if($isHit== 'true')
+<script>
+
+
+    $(document).ready(function () {
+        var ids = $(".guestbook-table$!{context.columnId}").find("li[data-id]").map(function () {
+            var $this = $(this);
+            return $this.data("id");
+        }).get().join(',');
+        Ls.ajax({
+            url: "/frontGuestBook/getHit",
+            data:{ids:ids}
+        }).done(function (d) {
+            if(d.status){
+                var data=d.data;
+                if(data!=null){
+                    for(var i=0;i<data.length;i++){
+                        $("#hit_"+data[i].id).html(data[i].count);
+                    }
+                }
+            }
+        });
+    });
+</script>
+#end

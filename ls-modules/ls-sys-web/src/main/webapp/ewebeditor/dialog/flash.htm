@@ -1,0 +1,768 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sAction = "INSERT";
+        var sTitle = lang["DlgComInsert"];
+
+        var oControl;
+
+        var sFromUrl = "http://";
+        var sWidth = "200";
+        var sHeight = "200";
+        var sAlign = "";
+        var sVSpace = "";
+        var sHSpace = "";
+        var sLoop = "true";
+        var sPlay = "true";
+        var sBgColor = "";
+        var sScale = "";
+        var sQuality = "high";
+        var sMenu = "";
+        var sWmode = "";
+        var sFlashVars = "";
+
+        var sCheckFlag = "file";
+
+        var bAllowUpload = ((parseFloat(config.AllowFlashSize) > 0) ? true : false);
+
+
+        InitParam();
+
+        var sCaption = lang["DlgFlash"] + "(" + sTitle + ")";
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function InitParam() {
+            if (EWEBSelection.GetType() != "Control") {
+                return;
+            }
+
+            oControl = EWEBSelection.GetSelectedElement();
+            if (oControl.tagName == "IMG" && GetFakeTag(oControl) == "flash") {
+                sAction = "MODI";
+            }
+
+            if (sAction != "MODI") {
+                return;
+            }
+
+            sTitle = lang["DlgComModify"];
+            sCheckFlag = "url";
+
+
+            sAlign = GetAttribute(oControl, "align")
+            sWidth = RemovePX(GetStyleAttribute(oControl, "width"));
+            sHeight = RemovePX(GetStyleAttribute(oControl, "height"));
+            sVSpace = GetAttribute(oControl, "vspace");
+            sHSpace = GetAttribute(oControl, "hspace");
+
+            HtmlParamParser.Init(GetFakeValue(oControl));
+            if (HtmlParamParser.Tag == "object") {
+                sFromUrl = HtmlParamParser.GetValue("movie");
+            } else {
+                sFromUrl = HtmlParamParser.GetValue("src");
+            }
+
+            sLoop = HtmlParamParser.GetValue("loop");
+            if (sLoop == "-1" || sLoop == "1") {
+                sLoop = "true";
+            } else if (sLoop == "0") {
+                sLoop = "false";
+            }
+
+            sPlay = HtmlParamParser.GetValue("play");
+            if (sPlay == "-1" || sPlay == "1") {
+                sPlay = "true";
+            } else if (sPlay == "0") {
+                sPlay = "false";
+            }
+
+            sBgColor = HtmlParamParser.GetValue("bgcolor");
+            sScale = HtmlParamParser.GetValue("scale");
+            sQuality = HtmlParamParser.GetValue("quality");
+            sMenu = HtmlParamParser.GetValue("menu");
+            sWmode = HtmlParamParser.GetValue("wmode");
+            sFlashVars = HtmlParamParser.GetValue("flashvars");
+
+        }
+
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            SearchSelectValue($("d_align"), sAlign.toLowerCase());
+            SearchSelectValue($("d_loop"), sLoop.toLowerCase());
+            SearchSelectValue($("d_play"), sPlay.toLowerCase());
+            SearchSelectValue($("d_scale"), sScale.toLowerCase());
+            SearchSelectValue($("d_quality"), sQuality.toLowerCase());
+            SearchSelectValue($("d_menu"), sMenu.toLowerCase());
+            SearchSelectValue($("d_wmode"), sWmode.toLowerCase());
+
+            if (!bAllowUpload) {
+                sCheckFlag = "url";
+            }
+            RadioClick(sCheckFlag);
+
+            $("d_fromurl").value = sFromUrl;
+            $("d_bgcolor").value = sBgColor;
+            $("s_bgcolor").style.backgroundColor = sBgColor;
+            $("d_width").value = sWidth;
+            $("d_height").value = sHeight;
+            $("d_vspace").value = sVSpace;
+            $("d_hspace").value = sHSpace;
+            $("d_flashvars").value = sFlashVars;
+
+            //same height
+            var o1 = $("TD_Right");
+            var o2 = $("Fieldset_Right");
+            var h1 = o1.offsetHeight;
+            var h2 = o2.offsetHeight;
+            if (h1 > h2) {
+                if (EWEBBrowser.IsIE) {
+                    o2.style.height = h1 + "px";
+                } else {
+                    o2.style.height = (h1 - 2) + "px";
+                }
+            }
+
+
+            doPreview();
+
+            if ($("d_fromurl")) {
+                if (EWEBBrowser.IsIE) {
+                    $("d_fromurl").onpropertychange = _InputUrl_OnChange;
+                } else {
+                    EWEBTools.AddEventListener($("d_fromurl"), "input", _InputUrl_OnChange);
+                }
+            }
+
+            parent.InnerDialogLoaded(sCaption);
+
+            if (bAllowUpload && document.documentMode == 5) {
+                var b_UFDisable = (sCheckFlag == "url") ? false : true;
+                $("uploadfile").disabled = b_UFDisable;
+                $("uploadfile").disabled = !b_UFDisable;
+            }
+        }
+
+
+        function _InputUrl_OnChange() {
+            if (EWEBBrowser.IsIE) {
+                if (event.propertyName != 'value') {
+                    return;
+                }
+            }
+
+            doPreview();
+        }
+
+
+        function RadioClick(what) {
+            if (what == "url") {
+                $("d_fromurl").disabled = false;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = false;
+                }
+                $("d_checkfromurl").checked = true;
+                if (bAllowUpload) {
+                    $("d_checkfromfile").checked = false;
+                    $("uploadfile").disabled = true;
+                }
+            } else {
+                $("d_checkfromurl").checked = false;
+                $("uploadfile").disabled = false;
+                $("d_checkfromfile").checked = true;
+                $("d_fromurl").disabled = true;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = true;
+                }
+            }
+        }
+
+
+        function UploadError(s_Flag) {
+            AbleItems();
+            RadioClick('file');
+            DLGDoingMsg.Hide();
+            try {
+                BaseAlert($("uploadfile"), getUploadErrDesc(s_Flag, config.AllowFlashExt, config.AllowFlashSize));
+            }
+            catch (e) {
+            }
+        }
+
+
+        function UploadSaved(sOriginalFileName, sPathFileName) {
+            EWIN.addUploadFile(sOriginalFileName, sPathFileName);
+
+            $("d_fromurl").value = sPathFileName;
+            ReturnValue();
+        }
+
+
+        function ReturnValue() {
+            sFromUrl = BaseTrim($("d_fromurl").value);
+            sBgColor = $("d_bgcolor").value;
+            sAlign = $("d_align").value;
+            sWidth = $("d_width").value;
+            sHeight = $("d_height").value;
+            sVSpace = $("d_vspace").value;
+            sHSpace = $("d_hspace").value;
+            sLoop = $("d_loop").value;
+            sPlay = $("d_play").value;
+            sScale = $("d_scale").value;
+            sQuality = $("d_quality").value;
+            sMenu = $("d_menu").value;
+            sWmode = $("d_wmode").value;
+            sFlashVars = $("d_flashvars").value;
+
+
+            if (sAction == "MODI") {
+                oControl.style.width = AddUnitPX(sWidth);
+                oControl.style.height = AddUnitPX(sHeight);
+                SetAttribute(oControl, 'align', sAlign);
+                SetAttribute(oControl, 'vspace', sVSpace);
+                SetAttribute(oControl, 'hspace', sHSpace);
+
+                HtmlParamParser.SetValue('bgcolor', sBgColor);
+                HtmlParamParser.SetValue('loop', sLoop);
+                HtmlParamParser.SetValue('play', sPlay);
+                HtmlParamParser.SetValue('scale', sScale);
+                HtmlParamParser.SetValue('quality', sQuality);
+                HtmlParamParser.SetValue('menu', sMenu);
+                HtmlParamParser.SetValue('wmode', sWmode);
+                HtmlParamParser.SetValue('flashvars', sFlashVars);
+                SetFakeValue(oControl, HtmlParamParser.GetHtml())
+
+            } else {
+
+                var s_Html = "<embed type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\"";
+
+                if (sAlign != "") {
+                    s_Html += " align=\"" + sAlign + "\"";
+                }
+                if (sWidth != "") {
+                    s_Html += " width=\"" + sWidth + "\"";
+                }
+                if (sHeight != "") {
+                    s_Html += " height=\"" + sHeight + "\"";
+                }
+                if (sVSpace != "") {
+                    s_Html += " vspace=\"" + sVSpace + "\"";
+                }
+                if (sHSpace != "") {
+                    s_Html += " hspace=\"" + sHSpace + "\"";
+                }
+
+                s_Html += " src=\"" + sFromUrl + "\"";
+
+                if (sBgColor != "") {
+                    s_Html += " bgcolor=\"" + sBgColor + "\"";
+                }
+                if (sLoop != "") {
+                    s_Html += " loop=\"" + sLoop + "\"";
+                }
+                if (sPlay != "") {
+                    s_Html += " play=\"" + sPlay + "\"";
+                }
+
+                if (sScale != "") {
+                    s_Html += " scale=\"" + sScale + "\"";
+                }
+                if (sQuality != "") {
+                    s_Html += " quality=\"" + sQuality + "\"";
+                }
+                if (sMenu != "") {
+                    s_Html += " menu=\"" + sMenu + "\"";
+                }
+                if (sWmode != "") {
+                    s_Html += " wmode=\"" + sWmode + "\"";
+                }
+                if (sFlashVars != "") {
+                    s_Html += " flashvars=\"" + sFlashVars + "\"";
+                }
+
+                s_Html += "></embed>";
+
+                EWIN.insertHTML(s_Html);
+            }
+            parent.Ok();
+        }
+
+
+        function ok() {
+            if (config.FSPath != "" && config.FSL != "ok") {
+                alert(lang["ErrFSL"]);
+                return;
+            }
+
+            $("d_width").value = ToInt($("d_width").value);
+            $("d_height").value = ToInt($("d_height").value);
+            $("d_vspace").value = ToInt($("d_vspace").value);
+            $("d_hspace").value = ToInt($("d_hspace").value);
+
+//	if (!IsColor($("d_bgcolor").value)){
+//		BaseAlert($("d_bgcolor"),lang["DlgFlashErrBgColor"]);
+//		return false;
+//	}
+
+            if ($("d_checkfromurl").checked) {
+                ReturnValue();
+            } else {
+                if (!IsExt($("uploadfile").value, config.AllowFlashExt)) {
+                    UploadError("ext");
+                    return false;
+                }
+
+                CheckSizeAsync($("uploadfile"), config.AllowFlashSize,
+                    function (s_SizeFlag) {
+                        if (s_SizeFlag == "no") {
+                            UploadError("size");
+                            return false;
+                        }
+
+                        DisableItems();
+                        DLGDoingMsg.Show();
+                        document.myuploadform.submit();
+                    }
+                );
+            }
+        }
+
+
+        function DisableItems() {
+            $("d_checkfromfile").disabled = true;
+            $("d_checkfromurl").disabled = true;
+            $("d_fromurl").disabled = true;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = true;
+            }
+            $("d_bgcolor").disabled = true;
+            $("d_align").disabled = true;
+            $("d_width").disabled = true;
+            $("d_height").disabled = true;
+            $("d_vspace").disabled = true;
+            $("d_hspace").disabled = true;
+            $("d_loop").disabled = true;
+            $("d_play").disabled = true;
+            $("d_scale").disabled = true;
+            $("d_quality").disabled = true;
+            $("d_menu").disabled = true;
+            $("d_wmode").disabled = true;
+            $("d_flashvars").disabled = true;
+            $("d_ok").disabled = true;
+        }
+
+
+        function AbleItems() {
+            $("d_checkfromfile").disabled = false;
+            $("d_checkfromurl").disabled = false;
+            $("d_fromurl").disabled = false;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = false;
+            }
+            $("d_bgcolor").disabled = false;
+            $("d_align").disabled = false;
+            $("d_width").disabled = false;
+            $("d_height").disabled = false;
+            $("d_vspace").disabled = false;
+            $("d_hspace").disabled = false;
+            $("d_loop").disabled = false;
+            $("d_play").disabled = false;
+            $("d_scale").disabled = false;
+            $("d_quality").disabled = false;
+            $("d_menu").disabled = false;
+            $("d_wmode").disabled = false;
+            $("d_flashvars").disabled = false;
+            $("d_ok").disabled = false;
+        }
+
+        function doPreview() {
+            var s_Url, v;
+            if ($("d_checkfromurl").checked) {
+                v = $("d_fromurl").value;
+                s_Url = v;
+                if (config.BaseHref != "") {
+                    s_Url = Rel2RootByBase(s_Url);
+                }
+            } else {
+                v = $("uploadfile").value;
+                s_Url = "file:///" + v;
+            }
+
+            var s_Ext = "";
+            if (v.length > 4) {
+                s_Ext = v.substr(v.length - 4).toLowerCase();
+            }
+
+            if (s_Ext != ".swf") {
+                $("tdPreview").innerHTML = "";
+                return;
+            }
+
+            $("tdPreview").innerHTML = "";
+            var s_Html = "";
+            s_Html = "<embed src=\"" + s_Url + "\" quality=\"high\" wmode=\"transparent\" width=\"180\" height=\"200\" type=\"application/x-shockwave-flash\" pluginspage=\"http://www.macromedia.com/go/getflashplayer\"></embed>";
+            $("tdPreview").innerHTML = s_Html;
+
+
+            if (!$("d_checkfromurl").checked && EWEBBrowser.IsIE) {
+                // get flash width and height
+                if (s_Ext == ".swf") {
+                    EWEBActiveX.AsynCallBack("isinstalled", [false],
+                        function (o_Data) {
+                            if (!o_Data["Ret"]) {
+                                return;
+                            }
+
+                            EWEBActiveX.AsynCallBack("getflashheader", [v],
+                                function (o_Data) {
+                                    if (o_Data["Error"] != "") {
+                                        return;
+                                    }
+
+                                    h = o_Data["Ret"];
+                                    if (h) {
+                                        var a = h.split("|");
+                                        $("d_width").value = a[0];
+                                        $("d_height").value = a[1];
+                                    }
+                                }
+                            );
+                        }
+                    );
+                }
+            }
+        }
+
+        function TabOnClick(n_Index, n_Count, s_TabID) {
+            if (s_TabID == "tab_mfu") {
+                DLGMFU.Load("flash", $(s_TabID), DLGTab.TabSize[1].Width + "px", DLGTab.TabSize[1].Height + "px");
+            }
+        }
+
+        function _MFUGetHeaders(a_Ok, f_CallBack, n_Index) {
+            if (!n_Index) {
+                n_Index = 0;
+            }
+
+            var o_Ok = a_Ok[n_Index];
+            if (o_Ok["Ext"] == "swf") {
+                EWEBActiveX.AsynCallBack("getflashheader", [o_Ok["OriginalFileName"]],
+                    function (o_Data) {
+                        if (o_Data["Error"] == "") {
+                            s_Ret = o_Data["Ret"];
+                            if (s_Ret) {
+                                var a_Ret = s_Ret.split("|");
+                                s_Width = a_Ret[0];
+                                s_Height = a_Ret[1];
+                                a_Ok[n_Index]["w"] = s_Width;
+                                a_Ok[n_Index]["h"] = s_Height;
+                            }
+                        }
+
+                        if ((n_Index + 1) == a_Ok.length) {
+                            f_CallBack(a_Ok);
+                        } else {
+                            _MFUGetHeaders(a_Ok, f_CallBack, n_Index + 1);
+                        }
+                    }
+                );
+
+            } else {
+                if ((n_Index + 1) == a_Ok.length) {
+                    f_CallBack(a_Ok);
+                } else {
+                    _MFUGetHeaders(a_Ok, f_CallBack, n_Index + 1);
+                }
+            }
+        }
+
+        function MFUReturn(s_Value) {
+            var s_Html = "";
+            var a_Ok = [];
+            var aFile = s_Value.split("|");
+            for (var i = 0; i < aFile.length; i++) {
+                var a = aFile[i].split("::");
+                if (a.length == 3 && a[1] != "") {
+                    var s_OriginalFileName = a[0];
+                    var s_SavePathFile = a[1];
+                    var s_Ext = s_SavePathFile.substr(s_SavePathFile.lastIndexOf(".") + 1);
+                    s_Ext = s_Ext.toLowerCase();
+                    a_Ok[a_Ok.length] = {"OriginalFileName": s_OriginalFileName, "SavePathFile": s_SavePathFile, "Ext": s_Ext, "w": "200", "h": "200"};
+                }
+            }
+
+            _MFUGetHeaders(a_Ok, _MFUReturn2);
+        }
+
+        function _MFUReturn2(a_Ok) {
+            var s_Html = "";
+            for (var i = 0; i < a_Ok.length; i++) {
+                var o_Ok = a_Ok[i];
+                var s_OriginalFileName = o_Ok["OriginalFileName"].substr(o_Ok["OriginalFileName"].lastIndexOf("\\") + 1);
+                var s_SavePathFile = o_Ok["SavePathFile"];
+                var s_Width = o_Ok["w"];
+                var s_Height = o_Ok["h"];
+                s_Html += '<embed src="' + s_SavePathFile + '" quality="high" loop="true" play="true" width="' + s_Width + '" height="' + s_Height + '" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed><br>';
+                EWIN.addUploadFile(s_OriginalFileName, s_SavePathFile);
+            }
+
+            EWIN.insertHTML(s_Html);
+            parent.Ok();
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <script type="text/javascript">
+                if (config.MFUEnable == "1") {
+                    DLGTab.Create([
+                        [lang["DlgComTabNormal"], "tab_normal"],
+                        [lang["DlgComTabMFU"], "tab_mfu"]
+                    ]);
+                }
+            </script>
+
+            <table id="tab_normal" border=0 cellpadding=0 cellspacing=5 align=center>
+                <tr valign=top>
+                    <td>
+
+                        <table border=0 cellpadding=0 cellspacing=0 align=center width="100%">
+                            <tr>
+                                <td>
+                                    <fieldset>
+                                        <legend><span lang=DlgFlashSource></span></legend>
+                                        <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                            <tr>
+                                                <td>
+
+                                                    <table border=0 cellpadding=0 cellspacing=0 width="300px">
+                                                        <tr>
+                                                            <td></td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                                        <script type="text/javascript">
+                                                            if (bAllowUpload) {
+                                                                document.write("<tr>");
+                                                                document.write("<td noWrap width=\"20%\"><input type=radio id=\"d_checkfromfile\" value=\"1\" onclick=\"RadioClick('file')\"><label for=d_checkfromfile>" + lang["DlgFromFile"] + "</label>:</td>");
+                                                                document.write("<td noWrap width=\"80%\">");
+                                                                document.write(getUploadForm("flash"));
+                                                                document.write("</td>");
+                                                                document.write("</tr>");
+                                                            }
+                                                        </script>
+                                                        <tr>
+                                                            <td noWrap width="20%"><input type=radio id="d_checkfromurl" value="1" onclick="RadioClick('url')"><label
+                                                                for=d_checkfromurl><span lang=DlgFromUrl></span></label>:
+                                                            </td>
+                                                            <td noWrap width="80%">
+                                                                <script type="text/javascript">
+                                                                    if (config.AllowBrowse == "1") {
+                                                                        document.write("<table border=0 cellpadding=0 cellspacing=0 width='100%'><tr><td width='100%'><input type=text id='d_fromurl' style='width:100%' size=20 value=''></td><td><input class='dlgBtnBrowse' type=button id='d_browse' onclick=\"SelectBrowse('flash','fromurl')\" value='" + lang["DlgBtnBrowse"] + "' align=absmiddle></td></tr></table>");
+                                                                    } else {
+                                                                        document.write("<input type=text id='d_fromurl' style='width:100%' size=30 value=''>");
+                                                                    }
+                                                                </script>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td height=5></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <fieldset>
+                                        <legend><span lang=DlgFlashEffect></span></legend>
+                                        <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                            <tr>
+                                                <td>
+
+                                                    <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgFlashPlay></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_play size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='true' lang=DlgComYes></option>
+                                                                    <option value='false' lang=DlgComNo></option>
+                                                                </select>
+                                                            </td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgFlashLoop></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_loop size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='true' lang=DlgComYes></option>
+                                                                    <option value='false' lang=DlgComNo></option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgFlashMenu></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_menu size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='true' lang=DlgComYes></option>
+                                                                    <option value='false' lang=DlgComNo></option>
+                                                                </select>
+                                                            </td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgFlashWMode></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_wmode size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='window' lang=DlgFlashWmWindow></option>
+                                                                    <option value='opaque' lang=DlgFlashWmOpaque></option>
+                                                                    <option value='transparent' lang=DlgFlashWmTransparent></option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgFlashQuality></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_quality size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='low' lang=DlgFlashQuLow></option>
+                                                                    <option value='autolow' lang=DlgFlashQuAutoLow></option>
+                                                                    <option value='medium' lang=DlgFlashQuMedium></option>
+                                                                    <option value='autohigh' lang=DlgFlashQuAutoHigh></option>
+                                                                    <option value='high' lang=DlgFlashQuHigh></option>
+                                                                    <option value='best' lang=DlgFlashQuBest></option>
+                                                                </select>
+                                                            </td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgFlashScale></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_scale size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='showall' lang=DlgFlashScShowall></option>
+                                                                    <option value='noborder' lang=DlgFlashScNoborder></option>
+                                                                    <option value='exactfit' lang=DlgFlashScExactfit></option>
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgAlign></span>:</td>
+                                                            <td noWrap width="29%">
+                                                                <select id=d_align size=1 style="width:80px">
+                                                                    <option value='' selected lang=DlgComDefault></option>
+                                                                    <option value='left' lang=DlgAlignLeft></option>
+                                                                    <option value='right' lang=DlgAlignRight></option>
+                                                                    <option value='top' lang=DlgAlignTop></option>
+                                                                    <option value='middle' lang=DlgAlignMiddle></option>
+                                                                    <option value='bottom' lang=DlgAlignBottom></option>
+                                                                    <option value='absmiddle' lang=DlgAlignAbsmiddle></option>
+                                                                    <option value='absbottom' lang=DlgAlignAbsbottom></option>
+                                                                    <option value='baseline' lang=DlgAlignBaseline></option>
+                                                                    <option value='texttop' lang=DlgAlignTexttop></option>
+                                                                </select>
+                                                            </td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgComBgColor></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:62px" type=text id=d_bgcolor size=7 value=""><img border=0
+                                                                                                                                                         src="images/rect.gif"
+                                                                                                                                                         width=18
+                                                                                                                                                         style="cursor:hand"
+                                                                                                                                                         id=s_bgcolor
+                                                                                                                                                         onclick="SelectColor('bgcolor')"
+                                                                                                                                                         align=absmiddle></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgComWidth></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_width size=10 value=""></td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgComHeight></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_height size=10 value=""></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgComVSpace></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_vspace size=10 value=""
+                                                                                          onkeydown="OnDigitFieldKeyDown(event);"></td>
+                                                            <td width="2%">&nbsp;</td>
+                                                            <td noWrap width="20%"><span lang=DlgComHSpace></span>:</td>
+                                                            <td noWrap width="29%"><input style="width:80px" type=text id=d_hspace size=10 value=""
+                                                                                          onkeydown="OnDigitFieldKeyDown(event);"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td noWrap width="20%"><span lang=DlgFlashVars title="FlashVars"></span>:</td>
+                                                            <td noWrap width="80%" colspan=4><input type=text id=d_flashvars size=10 style="width:100%"></td>
+                                                        </tr>
+
+                                                    </table>
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                    </td>
+                    <td id="TD_Right">
+
+                        <fieldset id="Fieldset_Right">
+                            <legend><span lang=DlgComPreview></span></legend>
+                            <table border=0 cellpadding=0 cellspacing=5 width="200" height="240" valign=top id=tablePreview>
+                                <tr>
+                                    <td colspan=2 bgcolor=#FFFFFF align=center valign=middle id=tdPreview height="100%">
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id=tdPreviewSize></td>
+                                    <td align=right><input type=button class="dlgBtn" id=btnPreivew onclick="doPreview()" lang=DlgComPreview></td>
+                                </tr>
+                            </table>
+                        </fieldset>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td noWrap align=right colspan=2><input type=submit class="dlgBtnCommon dlgBtn" value='' id=d_ok onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                                     class="dlgBtnCommon dlgBtn"
+                                                                                                                                                                     value=''
+                                                                                                                                                                     onclick="$('tdPreview').innerHTML='';parent.Cancel();"
+                                                                                                                                                                     lang=DlgBtnCancel>
+                    </td>
+                </tr>
+            </table>
+
+
+            <div id="tab_mfu" style="display:none"></div>
+
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgComUploading"]);
+</script>
+
+</body>
+</html>

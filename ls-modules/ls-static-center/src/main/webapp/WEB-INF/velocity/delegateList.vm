@@ -1,0 +1,41 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#if($mapList)
+    #foreach($map in $mapList.entrySet())
+    <div class="db_title">
+        <span calss="fl"> $map.key</span>
+        #set($data=$map.value)
+        <span class="fr"> $data.size()人</span></div>
+    <ul class="db_list">
+        #if($map.value)
+            #set($count=0)
+            #foreach($eo in $map.value)
+                #set($count=$count+1)
+                #foreach($vo in $delegationList)
+                    #if($!{eo.delegation}==$vo.code)
+                        #set($nation =$vo.key)
+                    #end
+                #end
+                #if($!{eo.sex}&&$!{eo.nation})
+                    #set($title =$eo.name+'('+$!{eo.sex}+','+$nation+')')
+                 #elseif($!{eo.sex})
+                     #set($title =$eo.name+'('+$!{eo.sex}+')')
+                #elseif($!{eo.nation})
+                    #set($title =$eo.name+'('+$nation+')')
+                #end
+                <li>
+                    <a href="/delegate/getDelegateById?id=$eo.id"   title="$eo.name" target="_blank" >
+                        #cutstr( $title ,$length)
+                    </a>
+                </li>
+            #end
+        #end
+        <div class="clear"></div>
+    </ul>
+    #end
+#else
+    #foreach($key in $mapList.entrySet())
+        $key   0
+    #end
+#end

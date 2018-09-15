@@ -1,0 +1,134 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 470px"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div width="50%" align="center" headerAlign="center" renderer="siteName">站点名称</div>
+                        <div field="columnName" width="50%" align="center" headerAlign="center">栏目名称</div>
+##                        <div width="50%" align="center" headerAlign="center" renderer="link">地址</div>
+                        <div width="80" align="center" headerAlign="center" renderer="pushWeiboStatus">微博状态</div>
+                        <div width="80" align="center" headerAlign="center" renderer="pushWeixinStatus">微信状态</div>
+                        <div width="180" align="center" headerAlign="center" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        record:Ls.getWin.dialog.data("record"),
+    };
+
+    $(document).ready(function () {
+        cur.grid.setUrl("/msg/submit/hn/getColumnPageList?msgId=" + cur.record.id + "&status=1");
+        cur.grid.reload();
+        cur.api.button(
+            {id:'back',className:'btn-back',focus:true,name:'返回',callback:function(){Ls.winClose();return false;}}
+        );
+
+    })
+
+    function link(obj) {
+        var record = obj.record;
+        var href = cur.win.GLOBAL_HTMLFILEPATH + "/" + record.columnId + "/" + record.contentId + ".html"
+        return '<u><a href="' + href + '" target="_blank">' + href + '</a></u>'
+    }
+
+    function siteName() {
+        return cur.win.GLOBAL_SITENAME;
+    }
+
+    function pushWeiboStatus(obj) {
+        var record = obj.record;
+        var rst = "";
+        if(record.pushWeiboStatus == 1) {
+            rst =  '<font color="green">已推送</font>';
+        } else {
+            rst =  '<font color="red">未推送</font>';
+        }
+
+        return rst;
+    }
+
+    function pushWeixinStatus(obj) {
+        var record = obj.record;
+        var rst = "";
+        if(record.pushWeixinStatus == 1) {
+            rst =  '<font color="green">已推送</font>';
+        } else {
+            rst =  '<font color="red">未推送</font>';
+        }
+
+        return rst;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var pushtoweibo = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="pushToWeibo(' + cur.record.id +',' + record.columnId +')">推送到微博</button> ';
+        if(record.pushWeiboStatus == 1) {
+            pushtoweibo = '<button type="button" class="btn btn-default btn-sm btn-edit" disabled>推送到微博</button> ';
+        }
+        var pushtoweixin = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="pushToWeixin(' + cur.record.id +',' + record.columnId +')">推送到微信</button> ';
+        if(record.pushWeixinStatus == 1) {
+            pushtoweixin = '<button type="button" class="btn btn-default btn-sm btn-edit" disabled>推送到微信</button> '
+        }
+        return pushtoweibo + pushtoweixin;
+    }
+
+    function pushToWeibo(msgId,columnId) {
+        if (confirm('确定推送微博?')) {
+            Ls.ajaxGet({
+                url: "/msg/submit/hn/pushMsgToWeibo",
+                data: {
+                    msgId: msgId,
+                    columnId:columnId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function pushToWeixin(msgId,columnId) {
+        if (confirm('确定推送微信?')) {
+            Ls.ajaxGet({
+                url: "/msg/submit/hn/pushMsgToWeixin",
+                data: {
+                    msgId: msgId,
+                    columnId:columnId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

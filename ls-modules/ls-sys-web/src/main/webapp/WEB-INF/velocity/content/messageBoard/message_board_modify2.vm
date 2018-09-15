@@ -1,0 +1,366 @@
+#parse("_page_layout/_header.vm")
+<style>
+    @media (max-width: 1366px) {
+        .page-content-white {
+            overflow-y: auto !important;
+        }
+    }
+
+    .portlet-title-content {
+        float: left;
+        width: 475px;
+        margin-top: 8px;
+    }
+
+    .portlet-title-content input {
+        margin: 0;
+        vertical-align: middle;
+    }
+
+    .portlet-title-content label {
+        margin-right: 14px;
+        color: #0099ff;
+    }
+
+    ul.vztree li span.button.switch {
+        margin-right: 5px
+    }
+
+    ul.vztree li ul {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        margin-top: -24px;
+    }
+
+    ul.vztree ul ul li {
+        display: inline-block;
+        white-space: normal
+    }
+
+    ul.vztree > li > ul > li {
+        display: inline-block;
+        /*padding: 5px*/
+    }
+
+    ul.vztree > li {
+        padding: 3px 10px;
+    }
+
+    ul.vztree li {
+        white-space: normal !important;
+        padding-bottom: 5px;
+    }
+
+    ul.vztree > li > a > span {
+        font-size: 15px;
+        font-weight: 700
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full {
+        background-position: -15px 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full_focus {
+        background-position: -15px -21px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full {
+        background-position: 0 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full_focus {
+        background-position: 0px -20px;
+    }
+
+    ul.vztree li a.curSelectedNode {
+        border: none;
+        height: auto;
+        background: none;
+        padding-top: 1px;
+    }
+
+    .ztree.vztree li span.button.noline_open {
+        display: none;
+    }
+
+    .portlet.light .portlet-body {
+        position: relative;
+    }
+
+    .ztree li a.on {
+        color: #0099ff;
+    }
+
+    .treeWrap {
+        height: 340px;
+    }
+
+    .treeWrap.on {
+        overflow: auto;
+    }
+
+</style>
+<body class="page-body-white page-content-white">
+<div class="portlet light">
+    <div class="portlet-title">
+        <div class="caption font-grey-silver">
+            <span class="caption-subject bold uppercase">您的选择：</span>
+        </div>
+        <div class="portlet-title-content">
+
+        </div>
+        <div class="tools">
+            <button type="button" class="btn btn-default btn-delete" onclick="cancle()">清除所选</button>
+            <button type="button" class="btn btn-default btn-add" onclick="save()">确定分类</button>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="treeWrap">
+            <ul id="type_tree" class="ztree vztree"></ul>
+        </div>
+
+    </div>
+</div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+<script>
+    var curr = {
+        vm: "",
+        arr: []
+    }
+    var id = '$!{id}';
+    var knowledgeBaseId = '$!{knowledgeBaseId}';
+    var types = '$!{types}';
+    var siteId = '$!{siteId}';
+    var columnId = '$!{columnId}';
+    var contentId = '$!{baseContentId}';
+    var api = Ls.getWin.api;
+
+    var class_select_tree = function () {
+        var init = function (id, selectIds) {
+            var d = $.Deferred();
+            var setting = {
+                view: {
+                    nameIsHTML: true,
+                    showTitle: true,
+                    selectedMulti: false,
+                    dblClickExpand: false,
+                    expandSpeed: "fast",
+                    showIcon: false,
+                    showLine: false
+                },
+                check: {
+                    enable: true,
+                    nocheckInherit: false
+                },
+                async: {
+                    enable: true,
+                    type: "GET",
+                    dataType: "JSON",
+                    url: "/knowledgeBase/getClass",
+                    otherParam: {},
+                    dataFilter: dataFilter
+                },
+                callback: {
+                    onCheck: onCheck,
+                    onClick: onClick,
+                    onAsyncSuccess: onCheck
+                },
+                data: {
+                    keep: {},
+                    key: {
+                        title: "id"
+                    },
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "parentId"
+                    }
+                }
+            };
+
+            function dataFilter(treeId, parentNode, responseData) {
+                var arr = [];
+
+                if (selectIds && selectIds != "") {
+                    arr = selectIds.split(",");
+                }
+                for (var i = 0, l = responseData.length; i < l; i++) {
+                    var node = responseData[i];
+                    // 设置父节点不给checkbox
+                    if (node.parentId == 0 || !node.parentId) {
+                        node.nocheck = true;
+                        node.name += '：';
+                    } else {
+                        // 设置选中
+                        if (arr.indexOf("" + node.id) > -1) {
+                            node.checked = true;
+                        }
+                    }
+                }
+                return Ls.treeDataFilter(responseData, Ls.treeDataType.CATALOG);
+            }
+
+            function onClick(e, treeId, node) {
+                var tree = $.fn.zTree.getZTreeObj(treeId);
+                if (!node.isParent) {
+                    if (node.nocheck) {
+                        tree.expandNode(node);
+                        tree.cancelSelectedNode(node);
+                    } else {
+                        if (node.checked) $("a[title=" + node.id + "]").removeClass('on');
+                        tree.checkNode(node, !node.checked);
+                        tree.setting.callback.onCheck(null, treeId, node);
+                    }
+                }
+            }
+
+            function onCheck(e, treeId, node) {
+                if (node) {
+                    if (!node.checked) $("a[title=" + node.id + "]").removeClass('on');
+                    $("#" + node.id).remove();
+                }
+
+                var tree = $.fn.zTree.getZTreeObj(treeId);
+                var checks = tree.getCheckedNodes(true);
+                var nodes = tree.getNodes();
+
+
+                $.each(nodes, function (i, v) {
+                    if (v.isParent) {
+                        curr.arr.push(v.id);
+                    }
+                })
+                tree.expandAll(true);
+
+                // 为空
+                $("#" + id + "Ids").val("");
+                $("#" + id + "ParentIds").val("");
+                $("#" + id + "Names").val("");
+                curr.ids = [], curr.pIds = [], curr.names = [];
+                if (checks.length > 0) {
+                    for (var i = 0, l = checks.length; i < l; i++) {
+                        curr.ids.push(checks[i].id);
+                        if ($.inArray(checks[i].parentId, curr.pIds) == -1) {
+                            curr.pIds.push(checks[i].parentId);
+                        }
+                        curr.names.push(checks[i].name);
+                        $("a[title=" + checks[i].id + "]").addClass('on');
+
+
+                    }
+
+                    var label = $('.portlet-title-content label');
+                    var labelIds = [];
+
+                    $.each(label, function (i, v) {
+                        labelIds.push(parseInt(v.id));
+                    })
+
+                    $.each(curr.names, function (i, v) {
+                        if (labelIds.indexOf(curr.ids[i]) === -1) {
+                            $('.portlet-title-content').append('<label id="' + curr.ids[i] + '">' +
+                                    '                <input type="checkbox" checked> ' + v + '' +
+                                    ' </label>')
+                        }
+                    })
+
+
+
+                    $("#" + id + "Ids").val(curr.ids.join(","));
+                    $("#" + id + "ParentIds").val(curr.pIds.join(","));
+                    $("#" + id + "Names").val(curr.names.join(","));
+                }
+            }
+
+            curr.ztree = $.fn.zTree.init($("#" + id + "_tree"), setting);
+            d.resolve();
+
+            return d.promise();
+
+        }
+        return {
+            init: init
+        }
+    }();
+
+    $(document).ready(function () {
+
+        $.when(class_select_tree.init("type", types)).done(function () {
+            var timer = null;
+            timer = setInterval(function () {
+                if ($(".vztree li ul").length > 0) {
+                    var Warr = [], maxW = null;
+                    $.each(curr.arr, function (i, v) {
+                        Warr.push($("[title=" + v + "]").width());
+                    })
+                    maxW = Math.max.apply(null, Warr) - 20;
+                    $(".vztree li ul").each(function (i, v) {
+                        $(this).css({
+                            'marginLeft': maxW + 'px'
+                        });
+                    })
+                    clearInterval(timer);
+                }
+            }, 100)
+        })
+
+
+        $('.portlet-title-content').on('click', 'label', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            $(this).remove();
+            var node = curr.ztree.getNodesByParam("id", $(this).get(0).id, null)[0];
+            curr.ztree.checkNode(node, false, false, true);
+        })
+
+    });
+
+
+    function getVO() {
+        Ls.ajaxGet({
+            url: "/messageBoard/getVO",
+            data: {id: contentId}
+        }).done(function (text) {
+
+        });
+    }
+
+    function cancle() {
+        $('.portlet-title-content').empty();
+        $.each(curr.ids, function (i, v) {
+            var node = curr.ztree.getNodesByParam("id", v, null)[0];
+            curr.ztree.checkNode(node, false, false, true);
+        })
+        // Ls.winClose();
+    }
+
+    //保存常见问题
+    function save() {
+        if (curr.ids == '' || curr.ids == null) {
+            return Ls.tipsErr("请选择分类!");
+        }
+        Ls.ajax({
+            type: "POST",
+            url: "/messageBoard/commonSave",
+            data: {
+                id : id,
+                knowledgeBaseId : knowledgeBaseId,
+                ids : curr.ids.join(','),
+                pIds : curr.pIds.join(','),
+                names: curr.names.join(',')
+            }
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("设为常见问题成功", function () {
+                    Ls.winClose();
+                });
+            }
+        })
+
+    }
+</script>	

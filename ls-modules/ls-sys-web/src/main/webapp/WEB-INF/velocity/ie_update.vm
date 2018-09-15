@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>低版本IE升级提示</title>
+    <script>var _ntes_const = {stime: new Date()};</script>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft Yahei', 'Tahoma', 'Simsun';
+            line-height: 20px;
+            color: #535353;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        li {
+            list-style-type: none;
+        }
+
+        img {
+            vertical-align: top;
+            border: 0;
+        }
+
+        ol, ul {
+            list-style: none;
+        }
+
+        body {
+            background: #fff;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        em {
+            color: #cd0000;
+            font-style: normal;
+            font-size: 14px;
+        }
+
+        #update_browser_box {
+            background: url($!{sysStaticPath}/assets/images/update_browser_bg.png) repeat;
+            position: absolute;
+            z-index: 9998;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            _height: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight))
+        }
+
+        .update_browser {
+            width: 640px;
+            height: 350px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -320px;
+            margin-top: -175px
+        }
+
+        .update_browser .subtitle {
+            width: 640px;
+            /*height: 36px;*/
+            line-height: 26px;
+            font-size: 14px;
+            color: #777
+        }
+
+        .update_browser .title {
+            width: 640px;
+            height: 106px;
+            line-height: 96px;
+            font-size: 48px;
+            text-align: center;
+            color: #009AD9
+        }
+
+        .update_browser .title span {
+            font-size: 60px;
+            color: #F33
+        }
+
+        .update_browser .browser {
+            background: url($!{sysStaticPath}/assets/images/browser.png) no-repeat;
+            width: 640px;
+            height: 128px;
+            overflow: hidden
+        }
+
+        .update_browser .browser a {
+            display: block;
+            width: 128px;
+            height: 128px;
+            float: left;
+            text-indent: -999em
+        }
+
+        .update_browser .bottomtitle {
+            width: 640px;
+            height: 78px;
+            line-height: 78px;
+            text-align: center;
+            font-size: 14px;
+            color: #777
+        }
+
+        .update_browser .bottomtitle a {
+            color: #777
+        }
+
+        .update_browser .bottomtitle a:hover {
+            color: #999
+        }
+    </style>
+</head>
+<body>
+<script>
+    //上下文
+    var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+</script>
+<div id="update_browser_box">
+    <div class="update_browser">
+        <div class="subtitle">
+            您正在使用的IE浏览器版本过低，<br>
+            我们建议您升级或者更换浏览器，以便体验顺畅、兼容、安全的互联网。<br>
+            <span style="color: #ff0000; font-size: 16px;">系统为XP的用户，建议下载 360极速浏览器<a href="http://chrome.360.cn" target="_blank" title="360 极速浏览器">[下载]</a> 或 QQ浏览器<a
+                href="http://browser.qq.com" target="_blank" title="QQ 极速浏览器">[下载]</a></span>。
+        </div>
+        <div class="title">选择一款<span>新</span>浏览器吧</div>
+
+        <div class="browser">
+            <a href="http://rj.baidu.com/soft/detail/23356.html?ald" class="ie" target="_blank" title="ie浏览器">ie浏览器</a>
+            <a href="http://rj.baidu.com/soft/detail/14744.html?ald" class="chrome" target="_blank" title="谷歌浏览器">谷歌浏览器</a>
+            <a href="http://rj.baidu.com/soft/detail/10365.html" class="firefox" target="_blank" title="火狐浏览器">火狐浏览器</a>
+            <a href="http://rj.baidu.com/soft/detail/11508.html" class="opera" target="_blank" title="opera浏览器">opera浏览器</a>
+            <a href="http://rj.baidu.com/soft/detail/12966.html" class="safari" target="_blank" title="safari浏览器">safari浏览器</a>
+        </div>
+        <div class="bottomtitle">[&nbsp;<a href="http://www.baidu.com/search/theie6countdown.html" target="_blank">对IE6/IE7说再见</a>&nbsp;]
+        </div>
+    </div>
+</div>
+<script>
+    if (navigator.appName !== "Microsoft Internet Explorer" || parseInt(navigator.appVersion .split(";")[1].replace(/[ ]/g,"").substr(4,1)) > 8) {
+        window.location.replace(GLOBAL_CONTEXTPATH + "/login");
+    }
+</script>
+</body>
+</html>

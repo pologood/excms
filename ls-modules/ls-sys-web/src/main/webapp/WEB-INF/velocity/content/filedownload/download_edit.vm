@@ -1,0 +1,321 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="downForm" ms-controller="downForm">
+                <table class="table table-bordered download-table">
+                    <tbody>
+                    <tr>
+                        <th>名称：</th>
+                        <td>
+                            <input type="text" id="title" ms-duplex="title" class="form-control" placeholder="">
+                        </td>
+                        <td class="w300" rowspan="3">
+                            <div class="thumb_layout">
+                                <div class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                                </div>
+                                <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="picChange()"></i></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>添加日期：</th>
+                        <td>
+                            <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control readonly"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly>
+                        <td>
+                    </tr>
+                    <tr>
+                        <th>下载次数：</th>
+                        <td>
+                            <input type="text" ms-duplex="count" name="count" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>文件：</th>
+                        <td>
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" id="fileName" name="fileName" ms-duplex="fileName"
+                                               class="form-control"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-default btn-default-upload"
+                                    onclick="uploadDownFile()"><i class=" fa fa-upload">上传</i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">描述：</th>
+                        <td colspan="2">
+                            <textarea id="video_content" name="remarks" ms-duplex="remarks" class="form-control" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                            <button class="btn btn-default btn-save" type="submit"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    var curr = {
+        vm: "",
+        pageIndex: '$!{pageIndex}',
+    };
+    var data = {
+        siteId: GLOBAL_SITEID,
+        author: GLOBAL_PERSON.name,
+        typeCode: 'fileDownload',
+        downId: null,
+        id: null,
+        columnId: content_mgr.node.indicatorId,
+        imageLink: "",
+        fileName: '',
+        filePath: "",
+        publishDate: "",
+        isPublish: 0,
+        remarks: '',
+        text: ''
+    }
+    var expand = 0;
+    var flag = 0;
+    var eweb;
+
+    $(document).ready(function () {
+        eweb = Ls.editor("remarks", {cusdir: "/" + GLOBAL_SITEID + "/" + curr.vm.columnId});
+        /*editor = KindEditor.create('textarea[name="remarks"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/videoNews/upload?siteId=' + GLOBAL_SITEID + "&&columnId=" + data.columnId,//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: curr.vm.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        getVO();
+    });
+
+    function picChange() {
+      if (curr.model.isEnableBeauty == 1) {
+        meiTuUpload();
+      } else {
+        normalUpload();
+      }
+    }
+
+    function meiTuUpload(){
+      art.dialog.data("imageLink", curr.vm.imageLink);
+      art.dialog.data("siteId", GLOBAL_SITEID);
+      art.dialog.data("columnId", content_mgr.node.indicatorId);
+      art.dialog.data("contentId", curr.vm.id);
+      Ls.openWin('/fileDownload/toUploadPic', {
+        width: '650px',
+        height: '410px',
+        lock: true,
+        title: '缩略图'
+      });
+
+    }
+
+    function normalUpload(){
+      Ls.uploadFile(function (filePath) {
+        changeImg(filePath[0].fileName);
+        return true;
+      }, {
+        upload_url: '/content/normalUploadThumb',
+        file_upload_limit: 1,
+        post_params: {
+          "siteId": GLOBAL_SITEID,
+          "columnId": content_mgr.node.indicatorId,
+          "contentId": curr.vm.id || '',
+          "imgPath": curr.vm.imageLink || '',
+          "desc": "上传缩略图"
+        },
+        file_types: "*.jpg;*.gif;*.bmp;*.jpeg",
+      });
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+        curr.vm.imageLink = '';
+    })
+
+    function getVO() {
+        var contentId = "${contentId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/fileDownload/getVO",
+            data: {id: contentId}
+        }).done(function (d) {
+            data = d;
+            data.publishDate = Ls.isEmpty(data.publishDate) ? Ls.dateFormat(Ls.nowDate(), "yyyy-MM-dd hh:mm:ss") : data.publishDate;
+            curr.$id = "downForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            curr.vm = avalon.define(curr.init);
+            avalon.scan(document.body, curr.vm);
+            if (d.imageLink != null && d.imageLink != "") {
+                if(d.imageLink.indexOf(".") != -1){
+                    $("#imageLink").attr("src", "${fileServerNamePath}" + d.imageLink);
+                }else{
+                    $("#imageLink").attr("src", "${fileServerPath}" + d.imageLink);
+                }
+            }
+            /*editor.html(d.remarks);*/
+            eweb.setHtml(d.remarks);
+            getModelConfig();
+        });
+    }
+    $('#downForm').validator({
+        fields: {
+            'title': '标题:required;length[1~250];',
+            'publishDate': '添加日期:date',
+            'fileName': '文件:required;length[1~250];',
+            'remarks': '描述内容:length[0~1000];'
+        },
+        valid: function () {
+            doSave();
+        },
+        msgClass: "n-top"
+    });
+
+
+    function saveDownload() {
+        curr.vm.columnId = content_mgr.node.indicatorId;
+        curr.vm.siteId = GLOBAL_SITEID;
+        /*curr.vm.text = editor.text();
+        curr.vm.remarks = editor.html();*/
+        curr.vm.text = eweb.getText();
+        curr.vm.remarks = eweb.getHtml();
+        if (curr.vm.remarks.length > 1000) {
+            Ls.tipsInfo("描述内容字数长度应为0～1000");
+            return;
+        }
+        if (flag == 1) {
+            curr.vm.isPublish = 1;
+        } else {
+            curr.vm.isPublish = 0;
+        }
+        return 1;
+    }
+    function doSave() {
+        if (saveDownload() == 1) {
+            var value = curr.vm.$model;
+            value = JSON.parse(JSON.stringify(value));
+            Ls.ajax({
+                type: "POST",
+                url: "/fileDownload/saveVO",
+                data: value
+            }).done(function (text) {
+                if (!text.status) {
+                    Ls.tipsInfo(text.desc);
+                    return;
+                }
+                if (text.data == 0) {
+                    Ls.tipsOk("保存成功");
+                } else if (text.data == 1) {
+                    Ls.tipsOk("保存并发布成功");
+                }
+                goBack();
+            });
+        }
+    }
+
+    /*提交更新*/
+    $('button[type="submit"], #saveAndPublish').on("click", function () {
+        eweb.update();
+    });
+
+    $("#saveAndPublish").click(function () {
+        flag = 1;
+        curr.vm.isPublish = 1;
+        doSave();
+    });
+
+    function goBack() {
+        content_mgr.getContentApp('/fileDownload/index?pageIndex=' + curr.pageIndex);
+    }
+
+    //缩略图路径
+    function changeImg(path) {
+        if(path.indexOf(".") != -1){
+            $("#imageLink").attr("src", "${fileServerNamePath}" + path);
+        }else{
+            $("#imageLink").attr("src", "${fileServerPath}" + path);
+        }
+        curr.vm.imageLink = path;
+    }
+    function uploadDownFile() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                var videoPath = filePath[0].fileName;
+                var videoName = filePath[0].fileName;
+                curr.vm.fileName = videoName;
+                curr.vm.filePath = videoPath;
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传文件',
+            file_size_limit: "20 MB",
+            file_types: "*.zip;*.rar;*.doc;*.docx;*.xls;*.xlsx;*.ppt;*.pptx;*.txt;*.jpg;*.gif;*.bmp;*.pdf",
+            file_upload_limit: 1,  //配置上传个数
+             post_params: {
+            "type":"NotDefined"
+           }
+        });
+    }
+    function getModelConfig() {
+      Ls.ajaxGet({
+        data: {
+          columnId: content_mgr.indicatorId
+        },
+        url: "/content/getModelConfig",
+        success: function (text) {
+          if (text.status == 1) {
+            curr.model = text.data;
+
+          } else {
+            Ls.tipsErr("内容模型获取错误");
+          }
+        }
+      });
+    }
+</script>

@@ -1,0 +1,20 @@
+    #set($Integer=0)
+    #set($length="$!{paramObj.length}")
+    #set($length=$Integer.parseInt($length))
+    <ul>
+    #foreach($eo in $!{resultObj})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="")
+        #end
+        <li class="l1">$!{eo.CaseID}</li>
+        <li class="l2">
+            #*<a target="_blank" href="http://ggfw.mas.gov.cn/NetworkHome/GetServiceResults?CaseID=$!{eo.CaseID}&IdCardNum=$!{eo.IdCardNum}">$!{eo.WorkItemName}</a>*#
+            $!{eo.WorkItemName}
+        </li>
+        <li class="l3">#cut_date_format($!{eo.CreateDate},"yyyy-MM-dd","$!{paramObj.dateFormat}")</li>
+
+        <li class="l4">$!{eo.State}</li>
+
+    #end
+    </ul>

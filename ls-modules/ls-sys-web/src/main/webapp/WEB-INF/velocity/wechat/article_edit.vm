@@ -1,0 +1,237 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<form id="artForm">
+    <table class="table table-bordered picture-table pr20">
+        </br>
+        <tbody class="w100p">
+        <tr>
+            <th>标题：</th>
+            <td colspan="2"><input type="text" name="title" id="title" ms-duplex="title" class="form-control" autocomplete="off" placeholder=""></td>
+            <td rowspan="3" class="w300">
+                <div class="thumb_layout">
+                    <div class="thumb">
+                        <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" style="width:195px;height:150px;" alt="" id="thumbImg"/>
+                    </div>
+                    <div class="thum-upload" style="left:675px;top:100px" id="uploadImg" onclick="uploadPic()" title="上传"><i class="fa fa-upload"></i></div>
+                    <div class="thum-delete" style="left:675px;top:130px" id="delImg" onclick="deletePic()" title="删除"><i class="fa fa-trash"></i></div>
+                </div>
+            </td>
+        </tr>
+        <tr class="">
+            <th>发布日期：</th>
+            <td colspan="2">
+                <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+            </td>
+        </tr>
+        <tr>
+            <th>描述：</th>
+            <td colspan="2"><textarea id="description" name="description" ms-duplex="description" class="form-control" style="height:60px;width:100%;"></textarea></td>
+        </tr>
+        <tr>
+            <th>类型：</th>
+            <td colspan="3">
+                <div>
+                    <label class="radio-inline">
+                        <input type="radio" onclick="goView()" id="viewType" name="type" value="1" ms-duplex="">图文 [<a id="wx_editor" href="javascript:void(0)"
+                                                                                                                       class="bold text-primary"><u>启用微信编辑器</u></a>]</input>
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" onclick="goKey()" id="urlType" name="type" value="2" ms-duplex="">链接</input>
+                    </label>
+                </div>
+
+            </td>
+        </tr>
+        <tr class="hide" id="w_url">
+            <th> 原文链接：</th>
+            <td colspan="3"><input type="text" id="url" ms-duplex="url" class="form-control" placeholder=""></td>
+        </tr>
+        <tr class="hide" id="w_content">
+            <th>内 容：</th>
+            <td colspan="3"><textarea id="content" name="content" style="width: 100%;height:250px; visibility: visible;"></textarea></td>
+        </tr>
+
+        </tbody>
+    </table>
+</form>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var editor1;
+    var cmm = {}
+    var id = "$!{ID}";
+
+    $(document).ready(function () {
+        $("#publishDate").val('$!{nowDate}');
+        $("#author").val('$!{author}');
+        eweb = Ls.editor("content", {style: "Lmini",height: "300"});
+        editor1 = eweb;
+        /*editor1 = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&columnId=",//上传文件
+            fileManagerJson: '/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            items: [
+                'source', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                'insertunorderedlist', '|', 'emoticons', 'image', 'quickformat', "fullscreen"],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        if (id != null && id != "") {
+            Ls.ajax({
+                type: "GET",
+                data: {id: id},
+                url: "/weChat/pushMsg/getArticle",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("拉去数据失败");
+                    } else {
+                        cmm = text.data;
+                        $("#title").val(cmm.title);
+                        $("#author").val(cmm.author);
+                        if (cmm.thumbImg != null) {
+                            if(cmm.thumbImg.indexOf(".") != -1){
+                                $("#thumbImg").attr("src", GLOBAL_FILESERVERNAMEPATH + cmm.thumbImg);
+                            }else{
+                                $("#thumbImg").attr("src", GLOBAL_FILESERVERPATH + cmm.thumbImg);
+                            }
+                        }
+                        $("#description").val(cmm.description);
+                        $("#publishDate").val(cmm.publishDate);
+                        $("input[name=type][value='" + cmm.type + "']").attr("checked", 'checked');
+                        if (cmm.type == "1") {
+                            $("#w_content").removeClass("hide");
+                            $("#w_url").addClass("hide");
+                        } else {
+                            $("#w_url").removeClass("hide");
+                            $("#w_content").addClass("hide");
+                        }
+                        $("#url").val(cmm.url);
+                        /*editor1.html(cmm.content);*/
+                        eweb.setHtml(cmm.content);
+                    }
+                }
+            });
+        } else {
+            $("#viewType").attr("checked", true);
+            var type = $("input:radio[name='type']:checked").val();
+            if (type == 1) {
+                $("#w_content").removeClass("hide");
+            } else {
+                $("#w_url").removeClass("hide");
+            }
+
+        }
+
+        $("#wx_editor").on('click', function () {
+            Ls.openWin("/weChat/mateMgr/wxeditor?id=" + id, {
+                id: 'wxeditor',
+                width: '920px',
+                height: '540px',
+                lock: true,
+                title: '素材编辑',
+                close: function (d) {
+                    /*d && editor1.html(d);*/
+                    d && eweb.getHtml(d);
+                }
+            });
+        })
+    })
+
+    function goView() {
+        $("#w_content").removeClass("hide");
+        $("#w_url").addClass("hide");
+    }
+
+    function goKey() {
+        $("#w_url").removeClass("hide");
+        $("#w_content").addClass("hide");
+    }
+
+    var artForm = $('#artForm');
+    artForm.validator({
+        fields: {
+            'title': '标题不能为空:required;length[1~50]',
+            'author': '作者不能为空:required;',
+            'description': '描述不能为空:required;length[1~250]'
+        },
+        valid: function () {
+            saveEdit();
+        }
+    })
+
+    function saveEdit() {
+        cmm.title = $("#title").val();
+        cmm.author = $("#author").val();
+        cmm.type = $("input:radio[name='type']:checked").val();
+        cmm.description = $("#description").val();
+        cmm.publishDate = $("#publishDate").val();
+        cmm.url = $("#url").val();
+        /*cmm.content = editor1.html();*/
+        cmm.content = eweb.getHtml();
+        if (cmm.thumbImg == "") Ls.tipsInfo("缩略图不能为空");
+        Ls.ajax({
+            type: "POST",
+            data: cmm,
+            url: "/weChat/mateMgr/saveArticle",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败:" + text.desc);
+                } else {
+                    Ls.tipsOk("保存成功");
+                    Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+                }
+            }
+        });
+    }
+
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+//                mongoId = data[0].mongoId;
+//                $("#thumbImg").attr("src", GLOBAL_FILESERVERPATH + mongoId);
+//                cmm.thumbImg = mongoId;
+                $("#thumbImg").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                cmm.thumbImg = data[0].fileName;
+            }
+            return true;
+        }, {
+            file_size_limit: "1MB",
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "type": "NotDefined"
+            }
+        })
+    }
+
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            api.button(
+                {
+                    name: '保 存',
+                    callback: function () {
+                        artForm.submit();
+                        return false;
+                    },
+                    focus: true
+                }
+            )
+        })
+    }
+</script>

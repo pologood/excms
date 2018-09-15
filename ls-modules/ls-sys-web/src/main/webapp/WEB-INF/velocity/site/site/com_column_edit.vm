@@ -1,0 +1,104 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+
+<div id="layout1" class="mini-layout" style="width: 100%; height: 100%; border: none;">
+  <div title="center" region="center" style="border:0;">
+
+    <div class="portlet light">
+      <div class="portlet-body">
+
+        <form id="comEditForm" role="form" ms-controller="comEditForm">
+          <div class="form-body">
+
+            <div class="form-group">
+              <label>名称</label>
+              <input type="text" name="name" id="name" class="form-control" ms-duplex="name" placeholder="" maxlength="30">
+            </div>
+
+            <div class="form-group">
+              <label>序号</label>
+              <textarea class="form-control" name="sortNum" ms-duplex="sortNum" rows="3" placeholder=""></textarea>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+
+  var cur = {
+    id: ${indicatorId},
+    pid:null,
+    formId: "comEditForm",
+  }
+
+  var dialog = art.dialog, W = dialog.opener, api = dialog.open.api;
+
+  $(document).ready(function () {
+
+    var data = Ls.initFORM(cur.formId, {});
+
+    data.$id = cur.formId;
+
+    cur.vm = avalon.define(data);
+    avalon.scan($("#" + cur.formId).get(0), cur.vm);
+    cur.vm.name="${name}";
+    cur.vm.sortNum=${sortNum};
+    if(cur.id==-1){
+      cur.id=null;
+    }
+    $('#' + cur.formId).validator({
+      fields: {
+        'name': '名称:required;',
+        'sortNum':'序号:required;'
+      },
+      valid: function () {
+        saveData();
+      }
+    });
+
+    api.button({
+      name: '保存',
+      callback: function () {
+        $("#" + cur.formId).submit();
+        return false;
+      }
+    })
+
+  })
+
+  //保存数据
+  function saveData() {
+    var data = Ls.toJSON(cur.vm);
+    data.indicatorId = cur.id;
+
+    Ls.ajax({
+      url: '/comColumn/saveLevColumn',
+      data: data,
+      success: function (d) {
+        if (d.status) {
+          if (cur.id == null) {
+            var node = W.columnManage.ztree.getNodeByParam("indicatorId", cur.pid, null);
+            W.columnManage.ztree.reAsyncChildNodes(d.data, "refresh");
+          } else {
+            var node = W.columnManage.ztree.getNodeByParam("indicatorId", cur.id, null);
+            node.name = data.name;
+            node.description = data.sortNum;
+            W.columnManage.ztree.updateNode(node);
+          }
+          api.close();
+        } else {
+          Ls.tipsErr(d.desc);
+        }
+      }
+    });
+  }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/process/getProcessActivityListPagination?dataFlag=1&processId=$!{processId}" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <<div type="indexcolumn" width="40" headerAlign="center" align="center">序号</div>
+                        <div field="name" width="200" headerAlign="center" >活动名称</div>
+                        <div field="assigneeName" width="200" headerAlign="center" >办理人员</div>
+                        <div width="120" headerAlign="center" align="center" renderer="renderOp">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog: Ls.getWin.dialog
+
+    };
+
+    jQuery(document).ready(function(){
+        Ls.mini_datagrid_height(cur.grid, 50);
+        cur.grid.load();
+    });
+
+
+    //操作
+    function renderOp(e) {
+        var rec = e.record;
+        var zbBtn = '<button type="button" class="btn btn-default btn-transfer" onclick=selectUser1('+rec.elementId+','+rec.processId+','
+                +rec.formId+',"'+rec.assigneeId+'","'+rec.assigneeName+'","'+rec.assigneeOrgId+'","'+rec.assigneeUnitId+'")>人员设置</button>';
+
+        return zbBtn;
+    };
+
+
+    function selectUser1(activityId,processId,userSettingId,userIds,userNames,organIds,unitIds){
+        var usersList = [];
+        if(userIds!='null'&&userIds!=null&&userIds!=''){
+            var userId = userIds.split(",");
+            var userName = userNames.split(",");
+            var organId = organIds.split(",");
+            var unitId = unitIds.split(",");
+            for (var i = 0; i < userId.length; i++) {
+                var user = {name: userName[i], userId: userId[i], organId: organId[i], unitId: unitId[i]};
+                usersList.push(user);
+            }
+        }
+
+        var value = {};
+        value = Ls.toJSON(value);
+        value.processId = processId;
+        value.activityId = activityId;
+        value.id = userSettingId;
+        value.siteId = Ls.getWin.win.GLOBAL_SITEID;
+
+        Ls.selectUnitUser(function(arg) {
+            if(arg!=null){
+                var userIds = '';
+                var userNames = '';
+                var organIds = '';
+                var unitIds = '';
+                for(var i = 0;i<arg.list.length;i++){
+                    if(i>0){
+                        userIds += ",";
+                        userNames += ",";
+                        organIds += ",";
+                        unitIds += ",";
+                    }
+                    userIds += arg.list[i].id;
+                    userNames += arg.list[i].name;
+                    organIds += arg.list[i].organId;
+                    unitIds += arg.list[i].unitId;
+                }
+                value.userNames = userNames;
+                value.userIds = userIds;
+                value.organIds = organIds;
+                value.unitIds = unitIds;
+                Ls.ajax({
+                    type: "POST",
+                    url: "/process/saveUserSetInfo",
+                    data: value
+                }).done(function (text) {
+                    if (!text.status) {
+                        Ls.tipsErr(text.desc);
+                        return;
+                    } else {
+                        Ls.tipsOk("人员设置成功");
+                        Ls.mini_datagrid_height(cur.grid, 50);
+                        cur.grid.load();
+                    }
+                });
+            }
+        }, {
+//            organIds: 4964516,
+            data: {
+                list: usersList
+            }
+        });
+    }
+
+    //查看办理情况
+    function toUserSettingEdit(activityId,activityName) {
+        var url = '/process/toUserSettingEdit?processId=$!{processId}&activityId='+activityId+'&activityName='+activityName+'&siteId='+Ls.getWin.win.GLOBAL_SITEID;
+//        Ls.openWin(url, {
+//            winType: 1,
+//            title: '活动人员设置',
+//            width: '800px',
+//            height: '500px'
+//        });
+        location.href = url;
+    }
+</script>

@@ -1,0 +1,101 @@
+<div class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>移动端配置</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding: 15px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div id="mobile_config_grid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true"
+                         allowResize="true" sizeList="[5,10,20,50]" pageSize="10" showPager="false"
+                         idField="id" multiSelect="true" showColumnsMenu="true" style="width:500px;">
+                        <div property="columns">
+                            <div type="indexcolumn" width="50" headerAlign="center">序号</div>
+                            <div field="itemName" width="100%" align="center" headerAlign="center">配置项</div>
+                            <div width="60" align="center" align="center" headerAlign="center" renderer="configOpt">操作</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        pageIndex: 0,
+        pageSize: 10,
+        mobile_config_grid: mini.get('mobile_config_grid')
+    };
+    var initTabs = {};
+
+    $(document).ready(function () {
+
+        Ls.mini_datagrid_height(cur.mobile_config_grid, 70);
+        cur.mobile_config_grid.setData([
+            {id: 1, itemName: "导航调用", itemType: "nav"},
+            {id: 2, itemName: "轮播图调用", itemType: "focus"},
+//            {id: 3, itemName: "视频调用", itemType: "videoNews"},
+            {id: 4, itemName: "内容调用", itemType: "articleNews"},
+            {id: 5, itemName: "专题调用", itemType: "special"},
+            {id: 6, itemName: "互动调用", itemType: "interaction"},
+            {id: 7, itemName: "服务调用", itemType: "onlineWork"},
+            {id: 8, itemName: "信息公开-公共目录", itemType: "publicInfo"},
+            {id: 9, itemName: "信息公开-组配分类", itemType: "publicClass"},
+            {id: 10, itemName: "领导之窗-调用栏目", itemType: "leaderInfo"}
+        ]);
+        cur.mobile_config_grid.load();
+
+        //绑定标签事件
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            if (!initTabs[activeTab]) {
+                initTabs[activeTab] = true;
+            }
+        });
+
+    });
+
+    function configOpt(e) {
+        var record = e.record;
+        var btn = '<button type="button" class="btn btn-default btn-sm btn-config" onclick="funConfig(\'' + record.itemType + '\',\'' + record.itemName + '\')">配置</button>';
+        return btn;
+    }
+
+    function funConfig(type, itemName) {
+
+        /*Ls.openWin('/common/selectColumn?configType=articleNews', '400px', '400px', {
+            id: 'config',
+            title: '配置',
+            padding: 0,
+            close: function (data) {
+                Ls.log(data)
+            }
+        });
+        return false;*/
+
+        if (type != null && type == "publicInfo") {//信息公开
+            Ls.openWin('/mobilecfg/publicConfigEdit?configType=' + type + '&configName=' + itemName, '400px', '400px', {
+                id: 'config',
+                title: '配置',
+                padding: 0
+            });
+        } else if (type != null && type == "publicClass") {
+            Ls.openWin('/mobilecfg/publicClassConfigEdit?configType=' + type + '&configName=' + itemName, '400px', '400px', {
+                id: 'config',
+                title: '配置',
+                padding: 0
+            });
+        } else {
+            Ls.openWin('/mobilecfg/configEdit?configType=' + type + '&configName=' + itemName, '400px', '400px', {
+                id: 'config',
+                title: '配置',
+                padding: 0
+            });
+        }
+
+    }
+
+</script>

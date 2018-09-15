@@ -1,0 +1,183 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">站点无法访问</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="row">
+            <div class="col-md-8">
+                <form id="configForm" role="form">
+                    <input type="hidden" value="after" name="monitoredType">
+                    <input type="hidden" value="$!{typeCode}" name="typeCode">
+                    <input id="columnTypeCode" type="hidden" value="columnTypeCode" name="columnTypeCode">
+                    <input type="hidden" name="standardCode" id="standardCode" value="notOpenSite">
+                    <div class="tab-content">
+                        <!-- 站点无法访问 -->
+                        <div class="tab-pane active" id="tab_1_2">
+                            <div class="form-body">
+
+                                <div class="note note-info">
+                                    <h4 class="block">普查考核指标</h4>
+                                    <p>
+                                        <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                    </p>
+                                    <p>&nbsp;</p>
+                                    <p><strong>扣分细则：</strong>监测一周,每天间隔性访问20次以上,超过15秒网站仍打不开的次数比例累计超过(含)5%,即单项否决。</p>
+                                </div>
+                                <table class="table table2">
+                                    <tbody>
+                                    <tr>
+                                        <th>监测方式：</th>
+                                        <td> 监测点开始前</td>
+                                        <td class="w50">
+                                            <input type="text" name="monitoredNum" id="monitoredNum" placeholder="" maxlength="2"
+                                                   class="form-control w50"/>
+                                        </td>
+                                        <td> 周</td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td> 每天</td>
+                                        <td>
+                                            <input type="text" name="dayMonitoredCount" id="dayMonitoredCount" placeholder="" maxlength="2" class="form-control w50"/>
+                                        </td>
+                                        <td> 次</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>否决标准：</th>
+                                        <td>>=</td>
+                                        <td class="w50">
+                                            <input type="text" name="monitoredOvertime" id="monitoredOvertime" placeholder="" maxlength="2" class="form-control w50"/>
+                                        </td>
+                                        <td> 秒</td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td> 网站打不开占比 &gt;=</td>
+                                        <td>
+                                            <input type="text" name="notOpenRate" id="notOpenRate" placeholder="" maxlength="2" class="form-control w50"/>
+                                        </td>
+                                        <td> %</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4">
+                                            &nbsp;
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset" onclick="syn()">同 步</button>
+                                    <button type="reset" class="btn btn-default btn-reset">重 置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var cur = {
+        typeCode: "$!{typeCode}"
+    };
+    $(document).ready(function () {
+
+        Ls.ajax({
+            url: "/monitor/vetoConfig/getDataByCode",
+            data: {
+                typeCode: cur.typeCode
+            },
+            type: "get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    $("#columnTypeCode").val(data.columnTypeCode);
+                    $("#monitoredNum").val(data.monitoredNum)
+                    $("#dayMonitoredCount").val(data.dayMonitoredCount)
+                    $("#monitoredOvertime").val(data.monitoredOvertime)
+                    $("#notOpenRate").val(data.notOpenRate)
+
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+
+        $('#configForm').validator({
+            fields: {
+                'monitoredNum': '监测时长:required;integer(+);',
+                'dayMonitoredCount': '每日访问次数:required;integer(+);',
+                'monitoredOvertime': '访问时长:required;integer(+);',
+                'notOpenRate': '未访问成功概率:required;integer(+);'
+            },
+            valid: function () {
+                doSave();
+            },
+            timely: 1,
+            msgClass: "n-right"
+        });
+
+    })
+
+    function syn(){
+        Ls.ajax({
+            url: "/monitor/vetoConfig/synByCode",
+            data: {
+                typeCode: cur.typeCode,
+                baseCode:'vote'
+            },
+            type: "get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    $("#monitoredNum").val(data.monitoredNum)
+                    $("#dayMonitoredCount").val(data.dayMonitoredCount)
+                    $("#monitoredOvertime").val(data.monitoredOvertime)
+                    $("#notOpenRate").val(data.notOpenRate)
+
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+
+
+
+    }
+
+
+    function doSave() {
+        var data = $('#configForm').serializeObject();
+        if(data.columnTypeCode == undefined || data.columnTypeCode == null || data.columnTypeCode == "" || data.columnTypeCode == "null"){
+            //默认互动访谈类栏目
+            data.columnTypeCode = "columnType_index";
+        }
+        Ls.ajax({
+            url: "/monitor/vetoConfig/saveData",
+            data: {content:JSON.stringify(data),typeCode:data.typeCode},
+            type: "POST",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tipsOk("保存成功!");
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+
+    }
+
+</script>

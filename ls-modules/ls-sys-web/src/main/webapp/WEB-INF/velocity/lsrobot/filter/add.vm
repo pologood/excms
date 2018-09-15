@@ -1,0 +1,82 @@
+#parse("_page_layout/_header.vm")
+<body  style="background-color: #fafafa;padding-top: 20px;padding-bottom: 10px;">
+<form id="key_words_form" role="form" autocomplete="off" style="width:calc(100% - 20px);">
+    <table class="table table-bordered survey-table">
+        <tbody>
+        <tr>
+            <th>关键词：</th>
+            <td >
+                <input type="text" name="keyWords" id="keyWords" class="form-control" placeholder="请输入关键词">
+            </td>
+        </tr>
+        <tr>
+            <th  colspan="2">
+                <button type="reset" class="btn btn-danger" style="float: right;margin-top: 10px;margin-left:10px;" onclick="Ls.getWin.dialog.close(1)">取 消</button>
+                <button type="submit" class="btn btn-save" style="float: right;margin-top: 10px;">保 存</button>
+            </th>
+        </tr>
+        </tbody>
+    </table>
+</form>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cursave = {
+        params:{
+            siteId: GLOBAL_SITEID,
+        },
+    };
+//    $(document).ready(function () {
+//        getData();
+//    })
+
+##    //拉取数据
+##    function getData() {
+##        Ls.ajaxGet({
+##            url: "/dataopen/resourcedept/getById",
+##            data: {
+##                id: cursave.params.id
+##            }
+##        }).done(function (d) {
+##
+##            data = d.data;
+##            //如果是编辑，修改标题
+##            if(data.id != null){
+##                $("#pagetitletype").html("修改");
+##            }
+##            data.$id = "dept_form";
+##            data.siteId = cursave.params.siteId;
+##            cursave.vm = avalon.define(data);
+##            avalon.scan($("#dept_form").get(0), cursave.vm);
+##        })
+##    };
+
+    $('#key_words_form').validator({
+        rules: {},
+        fields: {
+            'keyWords': '关键词:required;length[1~50]',
+        },
+        valid: function () {
+            save()
+        }
+    });
+
+    function save () {
+        var data = {
+            keyWords: $("#keyWords").val()
+        };
+        Ls.ajax({
+            url: "/lsrobot/filter/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tipsOk("保存成功！");
+                Ls.getWin.dialog.close(1);
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        });
+    }
+</script>
+</body>
+</html>

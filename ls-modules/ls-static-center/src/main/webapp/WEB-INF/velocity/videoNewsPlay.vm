@@ -1,0 +1,18 @@
+<div id="a1"></div>
+#*<script src="http://www.5397068.cn/js/jQuery.js"></script>
+<script src="http://www.5397068.cn/js/ckplayer/ckplayer.js"></script>*#
+<script type="text/javascript">
+    $(document).ready(function () {
+        var videoPath = "$!{$resultObj.videoPath}";
+        var videoName = "$!{$resultObj.videoName}";
+        if (videoName != videoPath) {
+            videoPath = "${fileServerPath}" + videoPath;
+        }
+        var flashvars = {
+            f: videoPath,
+            c: 0
+        };
+        var params = {bgcolor: '#FFF', allowFullScreen: true, allowScriptAccess: 'always', wmode: 'transparent'};
+        CKobject.embedSWF('http://www.5397068.cn/js/ckplayer/player.swf', 'a1', 'ckplayer_a1', '600', '400', flashvars, params);
+    });
+</script>

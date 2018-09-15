@@ -1,0 +1,22 @@
+#set($Integer=0)
+#set($isDate="$!{paramObj.isDate}")
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+
+<div class="list">
+    <ul>
+        #foreach($eo in $resultObj)
+            #set($title=$!{eo.title})
+            <li class="">
+                <span class="s2">
+                    <a href="$!{eo.link}" target="$!{paramObj.target}" title="${title}">
+                        <font style='$style'>#cutstr($title,$length)</font>
+                    </a>
+                </span>
+                #if($isDate == "true")
+                    <span class="right date">#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</span>
+                #end
+            </li>
+        #end
+    </ul>
+</div>

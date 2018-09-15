@@ -1,0 +1,21 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css}">
+    #set($name=$!{eo.name})
+    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$name" class="left">
+        #cutstr($title,$length)
+    </a>
+    #if($isDate == "true")
+        <span class="right date">#date_format("$!{eo.issuedTime}","$!{paramObj.dateFormat}")</span>
+    #end
+</li>
+#end

@@ -1,0 +1,126 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12">
+                    <form class="form-inline tr search-toolbar" role="form" id="searchForm">
+                        <div class="form-group">
+                            <input type="text" id="searchKey" name="key" class="form-control w160" placeholder='标题'/>
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="searchContent()">搜 索</button>
+                        <button type="button" class="btn btn-default" onclick="resetContent();">显示全部</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="public_content_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true"
+             allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/public/content/getUnAuditPage">
+            <div property="columns">
+                <div type="indexcolumn" width="40" headerAlign="center" align="center">序号</div>
+                <div width="100%" renderer="titleDetail" headerAlign="center" allowSort="flase" align="left">文章标题
+                </div>
+                <div field="publishDate" width="160" headerAlign="center" allowSort="flase" align="center"
+                     dateFormat="yyyy-MM-dd HH:mm:ss">发文日期
+                </div>
+                <div width="60" headerAlign="center" allowSort="flase" align="center" renderer="IsPublish">发布
+                </div>
+                <div width="120" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.grid = mini.get("public_content_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+        //查询内容
+        searchContent("")
+    });
+
+    function titleDetail(e) {
+        var rec = e.record;
+        var str = "<a target='_blank' href='" + GLOBAL_HTMLFILEPATH + "/public/content/" + rec.id + "' >" + rec.title + "</a>"
+        return str;
+    }
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        str += '<button class="btn btn-default btn-sm btn-edit" onclick="edit(\'' + rec.id + '\',\'' + rec.redirectLink + '\')">修改</button> ';
+        str += '<button class="btn btn-default btn-sm btn-delete" onclick="deleteData(' + rec.id + ',' + rec.columnId + ')">&nbsp;&nbsp;删除</button>';
+        return str;
+    }
+
+    // 编辑
+    function edit(id, redirectLink) {
+        var isLink = false;
+        if (redirectLink && redirectLink != "" && redirectLink != "null") {
+            isLink = true;
+        }
+        getContentApp("/public/content/editUnPublic?contentId=" + id + "&verify=1&isLink=" + isLink);
+    }
+
+    function deleteData(id, columnId) {
+        var contentIds = [id];
+        if (confirm('真的要删除吗？')) {
+            Ls.ajaxGet({
+                url: "/public/content/deleteByContentIds",
+                data: {
+                    columnId: columnId,
+                    contentIds: contentIds
+                }
+            }).done(function (d) {
+                Ls.tipsInfo('删除成功!');
+                searchContent();
+                var num = $('#badge_' + cur.typeCode).html();
+                $('#badge_' + cur.typeCode).html(num - 1);
+            });
+        }
+    }
+
+    function IsPublish(e) {
+        var rec = e.record;
+        return '<a onclick="publish(' + rec.id + ',' + rec.columnId + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/noclick.gif" border="0" title="发布"></a>';
+    }
+
+    function searchContent() {
+        var q = {
+            "siteId": GLOBAL_SITEID,
+            "condition": "isPublish",
+            "status": "0",
+            "title": $("#searchKey").val()
+        };
+        cur.grid.load(q);
+    }
+
+    function resetContent() {
+        $("#searchForm")[0].reset();
+        searchContent();
+    }
+
+    function publish(id, organId) {
+        var title = "发布";
+        if (!confirm('确定' + title + '吗？')) {
+            return false;
+        }
+        Ls.ajaxGet({
+            url: "/public/content/publish",
+            data: {
+                ids: [id],
+                columnId: organId,
+                isPublish: 1
+            }
+        }).done(function (d) {
+            Ls.tipsInfo(title + '成功!');
+            searchContent();
+            var num = $('#badge_' + cur.typeCode).html();
+            $('#badge_' + cur.typeCode).html(num - 1);
+        });
+    }
+</script>

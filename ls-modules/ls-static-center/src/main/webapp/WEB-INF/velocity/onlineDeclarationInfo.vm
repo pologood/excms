@@ -1,0 +1,84 @@
+#set($l=$resultObj)
+#if($msg)
+  $msg
+#else
+<div class="listnews_info">
+  <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="info_table">
+    <tr>
+      <td class="title1">申报详细信息</td>
+    </tr>
+    <tr>
+      <td>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="xx_table">
+          <tr>
+            <th>信件编号：</th>
+            <td>$!{l.docNum}</td>
+          </tr>
+          <tr>
+            <th>事项名称：</th>
+            <td>$!{l.title}</td>
+          </tr>
+          <tr>
+            <th>事实理由：</th>
+            <td>$!{l.factReason}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td class="title2">申报人详细信息</td>
+    </tr>
+    <tr>
+      <td>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="lxr_table">
+          <tr>
+            <th>申请人：</th>
+            <td>$!{l.personName}</td>
+          </tr>
+          <tr>
+            <th>单位：</th>
+            <td>$!{l.unitName}</td>
+          </tr>
+          <tr>
+            <th>地址：</th>
+            <td>$!{l.address}</td>
+          </tr>
+          <tr>
+            <th>联系电话：</th>
+            <td>$!{l.phoneNum}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    #if("$!{l.dealStatus}"=="handled"||$eo.dealStatus=="replyed")
+      <tr>
+        <td class="title3">回复内容</td>
+      </tr>
+      <tr>
+        <td>
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" class="hf_table">
+            <tr>
+              <th>受理单位：</th>
+              <td>$!{l.recUnitName}</td>
+            </tr>
+            <TR>
+              <th>办理时间：</th>
+              <TD>&nbsp;#date_format("$!{l.replyDate}","$!{paramObj.dateFormat}")</TD>
+            </TR>
+            <TR>
+              <th>回复内容：</th>
+              <TD>$!{l.replyContent}</TD>
+            </TR>
+          </table>
+        </td>
+      </tr>
+    #end
+  </table>
+</div>
+<script>
+  function downLoad(mongdbid) {
+    document.getElementById("downLoad").src = "$!{rc.contextPath}/download/" + mongdbid;
+  }
+</script>
+<iframe style="display: none;" id="downLoad"></iframe>
+#end

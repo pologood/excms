@@ -1,0 +1,169 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="table-toolbar" style=" margin-bottom: 10px;">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="exportErrhref()">导出</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 400px"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="urlName" width="20%" align="center" headerAlign="center">错链名称</div>
+                        <div field="" width="40%" align="center" headerAlign="center" renderer="urlDiy">链接地址</div>
+                        <div field="" width="40%" align="center" headerAlign="center" renderer="parentUrlDiy">错链父链接</div>
+                        <div field="repCode" width="60" align="center" headerAlign="center">状态码</div>
+                        <div field="" width="150" align="center" headerAlign="center" renderer="errDesc">错误说明</div>
+                        <div field="createDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">检测时间</div>
+                        <div field="" width="140" align="center" headerAlign="center" renderer="optDiy">定位</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<iframe style="display: none;" id="download_frame_auto"></iframe>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        api: Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        taskId: Ls.getWin.dialog.data("taskId"),
+        taskName: Ls.getWin.dialog.data("taskName")
+    };
+
+    $(document).ready(function () {
+
+        if (cur.taskId == null) {
+            cur.taskId = "$!{taskId}";
+        }
+
+        if (cur.taskName == null) {
+            cur.taskName = "$!{taskType}";
+        }
+        cur.grid.setUrl("/err/href/getPageResultEOs?taskId=" + cur.taskId);
+        cur.grid.reload();
+    })
+
+    function urlDiy(obj) {
+        var record = obj.record;
+        return '<a href="' + record.url + '" target="_blank"><u>' + record.url + '</u></a>'
+    }
+
+    function errDesc(obj) {
+        var record = obj.record;
+        var errCode = record.repCode;
+        var desc = "错误链接";
+        if (errCode == '400') {
+            desc = "错误请求";
+        } else if (errCode == '403') {
+            desc = "服务器拒绝请求";
+        } else if (errCode == '404') {
+            desc = "服务器找不到请求的网页";
+        } else if (errCode == '405') {
+            desc = "禁用请求中指定的方法";
+        } else if (errCode == '406') {
+            desc = "无法使用请求的内容特性响应请求的网页";
+        } else if (errCode == '407') {
+            desc = "指定请求者应当授权使用代理";
+        } else if (errCode == '408') {
+            desc = "服务器等候请求时发生超时";
+        } else if (errCode == '409') {
+            desc = "服务器在完成请求时发生冲突";
+        } else if (errCode == '410') {
+            desc = "资源已删除";
+        } else if (errCode == '500') {
+            desc = "服务器遇到错误，无法完成请求";
+        } else if (errCode == '501') {
+            desc = "服务器不具备完成请求的功能";
+        } else if (errCode == '502') {
+            desc = "错误网关";
+        } else if (errCode == '503') {
+            desc = "服务不可用";
+        } else if (errCode == '504') {
+            desc = "网关超时";
+        } else if (errCode == '505') {
+            desc = "HTTP 版本不受支持";
+        }
+
+        return desc;
+    }
+
+    function parentUrlDiy(obj) {
+        var record = obj.record;
+        return '<a href="' + record.parentUrl + '" target="_blank"><u>' + record.parentUrl + '</u></a>'
+    }
+
+    function optDiy(obj) {
+        var record = obj.record;
+        var location = '<a href="/err/href/errLocation?resultId=' + record.id + '" target="_blank"><img src="$!{sysStaticPath}/assets/images/location.png" border="0" title="页面定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var code = '<a href="/err/href/htmlLocation?resultId=' + record.id + '" target="_blank"><img src="$!{sysStaticPath}/assets/images/code.png" border="0" title="源码定位" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var recheck = '<a onclick="recheck(' + record.id + ')" href="#"><img src="$!{sysStaticPath}/assets/images/recheck.png" border="0" title="重新检测" ></a>&nbsp;&nbsp;&nbsp;&nbsp;';
+        var remove = '<a onclick="removeHref(' + record.id + ')" href="#"><img src="$!{sysStaticPath}/assets/images/remove.png" border="0" title="移除链接" ></a>';
+        return location + code + recheck + remove;
+    }
+
+    function recheck(resultId) {
+        var tips = Ls.tipsLoading("检测中", {autoClose: false});
+        Ls.ajaxGet({
+            url: "/err/href/recheck",
+            data: {
+                resultId: resultId
+            },
+            success: function (resp) {
+                tips.hide();
+                if (resp.status == 1) {
+                    if (resp.data == 200) {
+                        if (confirm("链接检测正常，确认移除?")) {
+                            remove(resultId);
+                            cur.grid.reload();
+                        }
+                    } else {
+                        Ls.tipsErr("检测完成，错误编码:【" + resp.data + "】");
+                    }
+                } else {
+                    Ls.tipsErr(resp.desc);
+                }
+            }
+        });
+    }
+
+    function removeHref(resultId) {
+        if (confirm("确认移除链接?")) {
+            Ls.ajaxGet({
+                url: "/err/href/remove",
+                data: {
+                    resultId: resultId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.reload();
+                        Ls.tipsOk(resp.desc);
+                    } else {
+                        Ls.tipsErr(resp.desc);
+                    }
+                }
+            });
+        }
+    }
+
+    function exportErrhref() {
+        $("#download_frame_auto").attr("src", "$!{rc.contextPath}/err/href/exportErrhref?taskId=" + cur.taskId + "&taskName=" + cur.taskName);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<style>
+    .weibo_retweet_content {
+        background-color: gainsboro;
+        width: 90%;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        margin: 0px auto;
+        margin-bottom: 20px;
+        border: 1px solid #CEE3E9;
+        background-color: #F1F7F9
+    }
+
+    .w_icon {
+        display: inline-block;
+        background-image: url("$!{sysStaticPath}/assets/images/w_icon.png");
+        background-repeat: no-repeat;
+    }
+
+    .icon_verify_v {
+        background-position: 0 -50px;
+        width: 14px;
+        height: 14px;
+        margin-left: 3px;
+        vertical-align: -2px;
+    }
+</style>
+<div class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>新浪微博</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding: 15px 0 0;">
+                <div class="tab-pane active weibo_wrap" id="tab_1_1" style="padding: 5px 5px 0px 5px">
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-3">
+                            </div>
+                            <div class="col-md-9">
+                                <form class="form-inline tr search-toolbar" role="form">
+                                    <div class="form-group">
+                                        <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                               placeholder="内容/微博账号">
+                                    </div>
+                                    <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                        搜索
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                        显示全部
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="doc-manage" id="sina_content"></div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        ser_key: $('#ser_key'),//查询关键字
+        keys: ['text', 'screenName'],
+        keyValue: '',
+        auth: 'mention',
+        commentType: 'byWeiboId',
+        pageIndex: 0,
+        pageSize: 10
+    };
+
+    $(document).ready(function () {
+        sina_load_self_info();
+        mentionSinaWeibo();
+    });
+
+    /*
+    * 加载自己的微博信息
+    * */
+    function sina_load_self_info() {
+        Ls.ajaxGet({
+            url: "/weibo/sina/getSelfWeiboInfo",
+            success: function (resp) {
+                if (resp.data == null) {
+                } else {
+                    cur.userDomain = resp.userDomain;
+                    cur.profileImageUrl = resp.profileImageUrl;
+                }
+            }
+        });
+    }
+
+    /*
+   * 分页加载@我的微博
+   * */
+    function mentionSinaWeibo() {
+        cur.auth = 'mention';
+        sina_content_load();
+    }
+
+    function sina_content_load() {
+        Ls.ajaxGet({
+            url: "/weibo/sina/getPageCurWeibo",
+            data: {
+                keys: cur.keys.join(','),
+                keyValue: cur.keyValue,
+                auth: cur.auth,
+                pageIndex: cur.pageIndex,
+                pageSize: cur.pageSize
+            },
+            success: function (resp) {
+                if (resp.data == null) {
+                    Ls.tips("加载失败!", {icons: 'error'});
+                } else {
+                    $('#sina_content').html(Ls.template("sina_content_tpl_mention", resp));
+                    sina_weibo_content_page(resp);
+                }
+            }
+        });
+    }
+
+</script>
+
+<script type="template" id="sina_content_tpl_mention">
+    <table class="table weibo-list">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <tr>
+            <th class="w40" scope="row">
+                <span><a href="http://weibo.com/<?=el.userDomain?>" target="_blank"><img src="<?=el.profileImageUrl?>" width="50"></a></span><br>
+            </th>
+            <td>
+                <table>
+                    <tr>
+                        <span>
+                            <a href="http://weibo.com/<?=el.userDomain?>" target="_blank"><font color="#5f9ea0"><?=el.screenName?></font>
+                                <?if(el.verified =='true'){?>
+                                <i title="微博个人认证" class="w_icon icon_verify_v"></i>
+                                <?}?>
+                            </a>
+                        </span>
+                    </tr>
+                    <tr>
+                        <div class="weibo-title"></div>
+                        <div class="weibo-attr"></div>
+                        <div class="weibo-body">
+                            <?if(el.isRetweeted=='true') {?>
+                            转发微博：<br>
+
+                            <div class="weibo_retweet_content">
+                                <?==el.text?> <br>
+                                <?if(el.thumbnailPic!='' && el.thumbnailPic!=null) {?>
+                                <a href="#"><img src="<?=el.thumbnailPic?>" showOrgin="false" thumbnailPic="<?=el.thumbnailPic?>" bmiddlePic="<?=el.bmiddlePic?>"
+                                                 originalPic="<?=el.originalPic?>" onclick="showSinaOrginPic(this)"></img></a>
+                                <?}?>
+                            </div>
+                            <?}else{?>
+                            <?==el.text?> <br>
+                            <?if(el.thumbnailPic!='' && el.thumbnailPic!=null) {?>
+                            <a href="#"><img src="<?=el.thumbnailPic?>" showOrgin="false" thumbnailPic="<?=el.thumbnailPic?>" bmiddlePic="<?=el.bmiddlePic?>"
+                                             originalPic="<?=el.originalPic?>" onclick="showSinaOrginPic(this)"></img></a>
+                            <?}?>
+                            <?}?>
+                        </div>
+                        <div class="weibo-bottom">
+                            <span class="pull-left">
+                                <font size="2" color="#F4A460"><?==el.createdAtWeibo?> 来自 <?==el.sourceName?></font>
+                            </span>
+                            <span class="pull-right">
+                                <ol class="tools-bar">
+                                    <li>
+                                        <button weiboId="<?=el.weiboId?>" onclick="favoriteSinaWeibo(this)" class="btn btn-default btn-xs"
+                                                type="button"><?if(el.favorited=='true'){?>
+                                            已收藏<?}else{?>收藏<?}?></button>
+                                    </li>
+                                    <li>
+                                        <button weiboId="<?=el.weiboId?>" reweeted="<?=el.isRetweeted?>" onclick="repostSinaWeibo(this)" class="btn btn-default btn-xs"
+                                                type="button">转发(<?=el.repostsCount?>)
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button weiboId="<?=el.weiboId?>" onclick="commentSinaWeibo(this)" show="false" class="btn btn-default btn-xs" type="button">
+                                            评论(<?=el.commentsCount?>)
+                                        </button>
+                                    </li>
+                                </ol>
+                            </span>
+                        </div>
+                        <div id="<?=el.weiboId?>" style="display: none"></div>
+                    </tr>
+                </table>
+            </td>
+        <tr>
+            <?}?>
+    </table>
+    <div class="clearfix"></div>
+    <div id="weibo_content_page" class="pagination pull-right mr22 weibo_wrap"></div>
+</script>
+
+<script type="template" id="sina_comment_tpl_mention">
+    <table class="table weibo-list" style="padding-bottom: 5px">
+        <tr>
+            <th class="w30" scope="row">
+                <span><a href="http://weibo.com/<?=map.selfInfo.userDomain?>" target="_blank"><img src="<?=map.selfInfo.profileImageUrl?>" width="30"></a></span><br>
+            </th>
+            <td>
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <textarea id="<?=map.weiboId?>_comment" name="text" style="width: 100%;height: 80px;" class="form-control"></textarea>
+                        </td>
+                    </tr>
+                    <tr style="height: 5px">
+                    </tr>
+                    <tr style="height: 30px">
+                        <td style="text-align: right">
+                            <button weiboId="<?=map.weiboId?>" class="btn btn-default btn-add" onclick="submitSinaComment(this)">评论</button>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table class="table weibo-list">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <tr>
+            <th class="w30" scope="row">
+                <span><a href="http://weibo.com/<?=el.userDomain?>" target="_blank"><img src="<?=el.profileImageUrl?>" width="30"></a></span><br>
+            </th>
+            <td style="text-align: left">
+                <?=el.text?>
+            </td>
+        </tr>
+        <?}?>
+    </table>
+    <div id="<?=map.weiboId?>_page" class="quotes pull-right mr22 weibo_wrap"></div>
+</script>
+
+<script>
+
+    /*
+   * 查询
+   * */
+    function search() {
+        cur.keyValue = cur.ser_key.val();
+        mentionSinaWeibo();
+    }
+
+    /*
+    * 显示全部
+    * */
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+
+    /*
+    * 转发一条微博
+    * */
+    function repostSinaWeibo(obj) {
+
+        var commnet = '确认转发微博?';
+        if (cur.auth == 'self') {
+            commnet = '确认要重复发布此项微博?';
+        }
+
+        var weiboId = $(obj).attr('weiboId');
+        if (confirm(commnet)) {
+            Ls.ajaxGet({
+                url: "/weibo/sina/repostWeibo",
+                data: {
+                    weiboId: weiboId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                        sina_content_load();
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+        ;
+    }
+
+    /*
+    * 收藏一条微博
+    * */
+    function favoriteSinaWeibo(obj) {
+        var weiboId = $(obj).attr('weiboId');
+        if (confirm("确定收藏?")) {
+            Ls.ajaxGet({
+                type: 'POST',
+                url: "/weibo/sina/favoriteWeibo",
+                data: {
+                    weiboId: weiboId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                        sina_content_load();
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+        ;
+    }
+
+    /*
+    * 取消收藏一条微博
+    * */
+    function cancelFavoriteSinaWeibo(obj) {
+        var weiboId = $(obj).attr('weiboId');
+        if (confirm("确定取消收藏?")) {
+            Ls.ajaxGet({
+                url: "/weibo/sina/cancelFavoriteWeibo",
+                data: {
+                    weiboId: weiboId
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+        ;
+    }
+
+    /*
+    * 评论微博
+    * */
+    function commentSinaWeibo(obj) {
+        var weiboId = $(obj).attr('weiboId');
+        var show = $(obj).attr('show');
+        if (show == 'true') {
+            $('#' + weiboId).hide();
+            $(obj).attr('show', 'false');
+        } else {
+            $('#' + weiboId).show();
+            $(obj).attr('show', 'true');
+            sina_weibo_comment_load(weiboId);
+        }
+    }
+
+    function sina_weibo_comment_load(weiboId) {
+        Ls.ajaxGet({
+            url: "/weibo/sina/getPageComments",
+            data: {
+                auth: cur.auth,
+                weiboId: weiboId,
+                commentType: cur.commentType,
+                pageIndex: cur.pageIndex,
+                pageSize: cur.pageSize
+            },
+            success: function (resp) {
+                if (resp.data == null) {
+                    Ls.tips("加载失败!", {icons: 'error'});
+                } else {
+                    $('#' + weiboId).html(Ls.template("sina_comment_tpl_mention", resp));
+                    sina_weibo_comment_page(resp);
+                }
+            }
+        });
+    }
+
+    /*
+    * 提交微博评论
+    * */
+    function submitSinaComment(obj) {
+        var weiboId = $(obj).attr("weiboId");
+        var comment = $("#" + weiboId + "_comment").val();
+        Ls.ajaxGet({
+            url: "/weibo/sina/commentWeibo",
+            data: {
+                weiboId: weiboId,
+                comment: comment
+            },
+            success: function (resp) {
+                Ls.tips(resp.desc);
+                if (resp.status == 1) {
+                    sina_weibo_comment_load(weiboId);
+                    $("#" + weiboId + "_comment").val("");
+                }
+            }
+        });
+    }
+
+    /**
+     * 查看缩略图
+     * @param obj
+     */
+    function showSinaOrginPic(obj) {
+        var obj = $(obj);
+        var showOrgin = obj.attr("showOrgin");
+        var picShow = null;
+        if (showOrgin == 'true') {
+            picShow = obj.attr("thumbnailPic");
+            obj.attr("showOrgin", false);
+        } else {
+            picShow = obj.attr("bmiddlePic");
+            obj.attr("showOrgin", true);
+        }
+        obj.attr("src", picShow);
+    }
+
+    /*
+    * 内容也分页插件
+    * */
+    function sina_weibo_content_page(d) {
+        Ls.pagination3("#weibo_content_page", function (index) {
+            cur.pageIndex = index - 1;
+            sina_content_load();
+        }, {
+            pageSize: cur.pageSize,
+            currPage: d.pageIndex + 1,
+            pageCount: d.pageCount,
+        });
+    }
+
+    /*
+    * 评论分页插件
+    * */
+    function sina_weibo_comment_page(d) {
+        Ls.pagination3("#" + d.map.weiboId + "_page", function (index) {
+            cur.pageIndex = index - 1;
+            sina_weibo_comment_load(d.map.weiboId);
+        }, {
+            pageSize: cur.pageSize,
+            currPage: d.pageIndex + 1,
+            pageCount: d.pageCount,
+        });
+    }
+
+    /**
+     * 判断字符串长度
+     * @param data
+     * @returns {number}
+     */
+    function dataLength(data) {
+        var intLength = 0
+        for (var i = 0; i < data.length; i++) {
+            if ((data.charCodeAt(i) < 0) || (data.charCodeAt(i) > 255))
+                intLength = intLength + 2;
+            else
+                intLength = intLength + 1;
+        }
+        return intLength;
+    }
+</script>

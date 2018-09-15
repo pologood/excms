@@ -1,0 +1,596 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+<div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li  class="active">
+                    <a href="#tab_1_1" id="tab_1_a" data-toggle="tab">基本信息</a>
+                </li>
+                <li >
+                    <a href="#tab_1_2" id="tab_2_a" data-toggle="tab">代表信息</a>
+                </li>
+                <li>
+                    <a href="#tab_1_3" id="tab_3_a" data-toggle="tab">其他信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="delegateForm" role="form" ms-controller="delegateForm">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                    <table class="table table-bordered video-table">
+                        <tbody>
+                        <tr>
+                            <th>代表证号：</th>
+                            <td><input type="text" name="deleNum" id="deleNum" ms-duplex="deleNum" class="form-control"></td>
+                            <td class="w200" rowspan="5">
+                                <div class="thumb_layout">
+                                    <div class="thumb">
+                                        <img src="$!{sysStaticPath}/assets/images/no_photo.jpg" alt="" id="imageLink"/>
+                                    </div>
+                                    <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                    <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="fileUpload()"></i></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>姓名：</th>
+                            <td>
+                                <input type="text" name="name" id="name" ms-duplex="name" class="form-control" placeholder="">
+                            <td>
+                        </tr>
+                        <tr>
+                            <th>民族：</th>
+                            <td>
+                                    <select class="form-control" name="nation" id="nation" ms-duplex="nation"
+                                            placeholder="请选择民族">
+                                        <option value="">请选择民族</option>
+                                        #foreach($eo in $nationList)
+                                            <option value="$!{eo.code}">$!{eo.key}</option>
+                                        #end
+                                    </select>
+                            <td>
+                        </tr>
+                        <tr>
+                            <th>籍贯：</th>
+                            <td>
+                                <input type="text" name="birthPlace" id="birthPlace" ms-duplex="birthPlace" class="form-control" placeholder="">
+                            <td>
+                        </tr>
+                        <tr>
+                            <th>性别：</th>
+                            <td>
+                                <div class="radio-group">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="sex"  ms-duplex-string="sex" value="男"> 男
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="sex" ms-duplex-string="sex" value="女"> 女
+                                    </label>
+                                </div>
+                            <td>
+                        </tr>
+
+                        <tr>
+                            <th>出生日期：</th>
+                            <td>
+                                <div class="form-group">
+                                    <select class="form-control" name="birthYear" id="birthYear" ms-duplex="birthYear"
+                                            placeholder="请选择年份" ms-change="dayOpt(0)">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" name="birthMonth" id="birthMonth" ms-duplex="birthMonth"
+                                            placeholder="请选择月份" ms-change="dayOpt(0)">
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" name="birthDay" id="birthDay" ms-duplex="birthDay"
+                                            placeholder="请选择日份">
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <td colspan="2">
+                            <button type="submit" class="btn btn-default btn-save" >保 存</button>
+                            <button type="button" class="btn btn-default btn-reset goBack" onclick="goBack()">返 回
+                            </button>
+                        </tr>
+                        </tbody>
+                    </table>
+                            </div>
+
+                            <div class="tab-pane" id="tab_1_2">
+                                <table class="table table-bordered video-table">
+                                    <tbody>
+                                    <tr>
+                                        <th>代表团：</th>
+                                        <td> <select class="form-control" name="delegation" id="delegation"
+                                                     ms-duplex="delegation" placeholder="请选择代表团">
+                                            #foreach($eo in $delegationList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>代表小组：</th>
+                                        <td> <select class="form-control" name="deleGroup" id="deleGroup"
+                                                     ms-duplex="deleGroup" placeholder="请选择代表小组">
+                                            <option value="">请选择代表小组</option>
+                                            #foreach($eo in $groupList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>届：</th>
+                                        <td> <select class="form-control" name="session" id="session" ms-duplex="session"
+                                                     placeholder="请选择届">
+                                            #foreach($eo in $sessionList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>党派：</th>
+                                        <td>  <select class="form-control" name="party" id="party" ms-duplex="party"
+                                                      placeholder="请选择党派">
+                                            <option value="">请选择党派</option>
+                                            #foreach($eo in $partyList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>入党日期：</th>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="form-control" name="partyYear" id="partyYear" ms-duplex="partyYear"
+                                                        placeholder="请选择年份"  ms-change="dayOpt(1)">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control" name="partyMonth" id="partyMonth" ms-duplex="partyMonth"
+                                                        placeholder="请选择月份"  ms-change="dayOpt(1)">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control" name="partyDay" id="partyDay" ms-duplex="partyDay"
+                                                        placeholder="请选择日份">
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>代表构成：</th>
+                                        <td>  <select class="form-control" name="deleComp" id="deleComp" ms-duplex="deleComp"
+                                                       placeholder="请选择代表构成">
+                                            <option value="">请选择代表构成</option>
+                                            #foreach($eo in $deleCompList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>是否连任：</th>
+                                        <td>
+                                            <div class="radio-group">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="isTerm" ms-duplex-number="isTerm" value="1"> 是
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="isTerm" ms-duplex-number="isTerm" value="0"> 否
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>代表资格：</th>
+                                        <td>  <select class="form-control" name="deleQualify" id="deleQualify"
+                                                      ms-duplex="deleQualify" placeholder="请选择代表资格">
+                                            #foreach($eo in $qualificationList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>身份证号：</th>
+                                        <td>   <input type="text" name="idNum" id="idNum" class="form-control" ms-duplex="idNum"
+                                                      placeholder=""></td>
+                                    </tr>
+                                    <tr>
+                                        <th>行业分类：</th>
+                                        <td> <select class="form-control" name="industryClass" id="industryClass"
+                                                     ms-duplex="industryClass" placeholder="请选择行业分类">
+                                            <option value="">请选择行业分类</option>
+                                            #foreach($eo in $industryList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>职业构成：</th>
+                                        <td>  <select class="form-control" name="careerComp" id="careerComp"
+                                                        ms-duplex="careerComp" placeholder="请选择职业构成">
+                                            <option value="">请选择职业构成</option>
+                                            #foreach($eo in $careerList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>增加方式：</th>
+                                        <td>  <select class="form-control" name="addType" id="addType" ms-duplex="addType"
+                                                      placeholder="请选择增加方式">
+                                            <option value="">请选择增加方式</option>
+                                            #foreach($eo in $addList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>工作单位：</th>
+                                        <td>   <input type="text" name="workUnit" class="form-control" ms-duplex="workUnit"
+                                                   id="workUnit"   placeholder=""></td>
+                                    </tr>
+                                    <tr>
+                                        <th>工作时间：</th>
+                                        <td>
+                                            <div class="form-group">
+                                                <select class="form-control" name="workYear" id="workYear" ms-duplex="workYear"
+                                                        placeholder="请选择年份"  ms-change="dayOpt(2)">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control" name="workMonth" id="workMonth" ms-duplex="workMonth"
+                                                        placeholder="请选择月份"  ms-change="dayOpt(2)">
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <select class="form-control" name="workDay" id="workDay" ms-duplex="workDay"
+                                                        placeholder="请选择日份">
+                                                </select>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>职称：</th>
+                                        <td>  <input type="text" name="workTitle" id="workTitle" class="form-control" ms-duplex="workTitle"
+                                                     placeholder="" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th>职务：</th>
+                                        <td> <input type="text" name="work" class="form-control" ms-duplex="work" id="work"
+                                                    placeholder="" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th>健康状态：</th>
+                                        <td><input type="text" name="health" class="form-control" ms-duplex="health" id="health"
+                                                   placeholder="" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td colspan="2">
+                                            <button type="submit" class="btn btn-default btn-save" >保 存</button>
+                                            <button type="button" class="btn btn-default btn-reset goBack" onclick="goBack()">返 回
+                                            </button>
+                                    </tr>
+                                    </tbody>
+                                    </table>
+                            </div>
+
+                            <div class="tab-pane" id="tab_1_3">
+                                <table class="table table-bordered video-table">
+                                    <tbody>
+                                    <tr>
+                                        <th>毕业院校：</th>
+                                        <td> <input type="text" name="gradSchool" class="form-control" ms-duplex="gradSchool" id="gradSchool"
+                                                    placeholder="毕业院校" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th>专业：</th>
+                                        <td> <input type="text" name="study" class="form-control" ms-duplex="study" id="study"
+                                                    placeholder="请输入专业"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>学历：</th>
+                                        <td>  <select class="form-control" name="education" id="education"
+                                                      ms-duplex="education" placeholder="请选择学历">
+                                            <option value="">请选择学历</option>
+                                            #foreach($eo in $educationList)
+                                                <option value="$!{eo.code}">$!{eo.key}</option>
+                                            #end
+                                        </select></td>
+                                    </tr>
+                                    <tr>
+                                        <th>手机号码：</th>
+                                        <td> <input type="text" name="phoneNum" class="form-control" ms-duplex="phoneNum" id="phoneNum"
+                                                    placeholder="请输入手机号码" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th>邮编：</th>
+                                        <td><input type="text" name="zipCode" class="form-control" ms-duplex="zipCode" id="zipCode"
+                                                   placeholder="请输入邮编"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>首页显示：</th>
+                                        <td>
+                                            <div class="radio-group">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="isShow" ms-duplex-number="isShow" value="1"> 是
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="isShow" ms-duplex-number="isShow" value="0"> 否
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>通信地址：</th>
+                                        <td><input type="text" name="address" class="form-control" ms-duplex="address" id="address"
+                                                   placeholder="请输入通信地址"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>电子邮件：</th>
+                                        <td> <input type="text" name="email" class="form-control" ms-duplex="email" id="email"
+                                                    placeholder="请输入电子邮件" ></td>
+                                    </tr>
+                                    <tr>
+                                        <th>备注：</th>
+                                        <td>    <textarea class="form-control" name="remark" ms-duplex="remark" rows="3" id="remark"
+                                                          placeholder="请输入备注"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <th>密码：</th>
+                                        <td>  <input type="password" name="password" class="form-control" ms-duplex="password" id="password"
+                                                     placeholder="请输入密码"></td>
+                                    </tr>
+
+                                    <tr>
+                                        <th></th>
+                                        <td colspan="2">
+                                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                            <button type="button" class="btn btn-default btn-reset goBack" onclick="goBack()">返 回
+                                            </button>
+                                    </tr>
+                                    </tbody>
+                                    </table>
+                            </div>
+                            </div>
+
+                </form>
+            </div>
+        </div>
+</div>
+    </div>
+##<script src="$!{rc.contextPath}/assets/js/pages/site_unit.js"></script>
+##<script src="$!{rc.contextPath}/assets/js/pages/site_manage.js"></script>
+<script>
+    var curr = {
+        vm: {}
+    };
+    mini.parse();
+
+    $(document).ready(function () {
+        doYearOption();
+        doMonthOption();
+        $('#delegateForm').validator({
+            rules: {
+                dNum: [/^[a-zA-Z0-9]{1,8}$/, "请填写有效的代表证号"],
+            },
+            fields: {
+                'deleNum': '代表证号:required;length[1~12];dNum;',
+                'name': '姓名:required;length[1~120]',
+                'delegation': '代表团:required;',
+                'idNum':'身份证号:IDcard',
+                'phoneNum':'手机号码:mobile',
+                'zipCode':'邮编:zipcode',
+                'email':'电子邮件:email',
+                'birthPlace':'籍贯:length[0~120];',
+                'workUnit':'工作单位:length[0~120];',
+                'workTitle':'职称:length[0~120];',
+                'work':'职务:length[0~120];',
+                'health':'健康状态:length[0~120];',
+                'gradSchool':'毕业院校:length[0~120];',
+                'study':'专业:length[0~120];',
+                'education':'学历:length[0~120];',
+                'remark':'备注:length[0~120];',
+                'password':'密码:password'
+
+
+            },
+            valid: function () {
+                saveEO();
+            },
+            validation: function(element, result){
+                if(!result.isValid){
+                    var key=result.key;
+                    var msg=result.msg;
+                    var eId=$("#"+key).closest('.tab-pane').attr('id');
+                    $(".active").removeClass("active");
+                    if(eId=="tab_1_1"){
+                        $("#tab_1_a").click();
+                    }else if(eId=="tab_1_2"){
+                        $("#tab_2_a").click();
+                    }else if(eId=="tab_1_3"){
+                        $("#tab_3_a").click();
+                    }
+                    Ls.tipsErr(msg);
+                }
+            }
+        });
+
+
+    });
+    function doYearOption(){
+        var date=new Date;
+        var year=date.getFullYear();
+        var str="<option value=''>请选择年份</option>";
+        for(var i=1917;i<=year;i++){
+            str+="<option value="+i+">"+i+"</option>";
+        }
+        $("#birthYear").append(str);
+        $("#partyYear").append(str);
+        $("#workYear").append(str);
+    }
+    function doMonthOption(){
+        var str="<option value=''>请选择月份</option>";
+        for(var i=1;i<=12;i++){
+            str+="<option value="+i+">"+i+"</option>";
+        }
+        $("#birthMonth").append(str);
+        $("#partyMonth").append(str);
+        $("#workMonth").append(str);
+        getEO();
+    }
+    function getEO(){
+        var id = "$!{delegateId}";
+        Ls.ajax({
+            type: "POST",
+            url: "/delegate/getEO",
+            data: {id: id}
+        }).done(function (d) {
+            if (!d.status) {
+                Ls.tipsErr(d.desc);
+                return;
+            }
+            var data = d.data;
+            curr.$id = "delegateForm";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            avalon.scan($("#delegateForm").get(0),curr.vm);
+            dayOpt(0);
+            dayOpt(1);
+            dayOpt(2);
+            $("#birthDay").val(curr.vm.birthDay);
+            $("#partyDay").val(curr.vm.partyDay);
+            $("#workDay").val(curr.vm.workDay);
+            if(!Ls.isEmpty(data.picPath)){
+                if ((data.picPath).indexOf("http://") >= 0) {
+                    $("#imageLink").attr("src", data.picPath);
+                }else if(data.picPath.indexOf(".")  != -1){
+                    $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + data.picPath);
+                }else {
+                    $("#imageLink").attr("src", GLOBAL_FILESERVERPATH + data.picPath);
+                }
+            }
+        });
+    }
+
+    function dayOpt(type){
+        var day=1;
+       if(type==0){
+           if(Ls.isEmpty(curr.vm.birthYear)||Ls.isEmpty(curr.vm.birthMonth)){
+               return ;
+           }else{
+               day=getMonthDays(curr.vm.birthYear,curr.vm.birthMonth);
+           }
+       }else if(type==1){
+           if(Ls.isEmpty(curr.vm.partyYear)||Ls.isEmpty(curr.vm.partyMonth)){
+               return ;
+           }else{
+               day=getMonthDays(curr.vm.partyYear,curr.vm.partyMonth);
+           }
+       }else if(type==2){
+           if(Ls.isEmpty(curr.vm.workYear)||Ls.isEmpty(curr.vm.workMonth)){
+               return ;
+           }else{
+               day=getMonthDays(curr.vm.workYear,curr.vm.workMonth);
+           }
+       }
+        var str="<option value=''>请选择日份</option>";
+        for(var i=1;i<=day;i++){
+            str+="<option value="+i+">"+i+"</option>";
+        }
+        if(type==0){
+            $("#birthDay").append(str);
+        }else if(type==1){
+            $("#partyDay").append(str);
+        }else if(type==2){
+            $("#workDay").append(str);
+        }
+    }
+    //获得某月的天数  
+    function getMonthDays(myYear,myMonth){
+       var  month = parseInt(myMonth, 10);
+        var d= new Date(myYear, month, 0);
+        return d.getDate();
+    }
+
+
+
+    function saveEO(){
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            type: "POST",
+            url: "/delegate/saveEO",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("保存成功");
+                goBack();
+
+            }
+        })
+    }
+
+    function goBack() {
+        getContent('/delegate/getList');
+    }
+
+    //加载内容
+    var getContent = function (url, options) {
+        return App.getContentAjax(url, options).done(function (res) {
+            $(".page-content-body").html(res)
+        });
+    }
+
+    function fileUpload() {
+
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].fileName, filePath[0].fileName);
+            return true;
+        }, {
+            upload_url: '/waterMark/uploadPic',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "imgPath": curr.vm.picPath || '',
+                "desc": "上传缩略图",
+                "type": "NotDefined"
+            },
+            file_types: "*.jpg;*.gif;*.bmp;*.jpeg;*.png;",
+        });
+
+    }
+
+    //缩略图路径
+    function changeImg(path, name) {
+        curr.vm.picPath = path;
+        curr.vm.picName = name;
+        if(path.indexOf(".") != -1){
+            $("#imageLink").attr("src", GLOBAL_FILESERVERNAMEPATH + path);
+        }else{
+            $("#imageLink").attr("src", GLOBAL_FILESERVERPATH + path);
+        }
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no_photo.jpg');
+        curr.vm.picPath = '';
+        curr.vm.picName = '';
+    })
+
+</script>

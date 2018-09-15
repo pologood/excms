@@ -1,0 +1,2 @@
+#set($Integer=0)
+$!{resultObj}

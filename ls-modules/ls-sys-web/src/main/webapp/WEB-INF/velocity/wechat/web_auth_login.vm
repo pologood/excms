@@ -1,0 +1,11 @@
+${sessionScope.snsUser.nickname}
+${sessionScope.snsUser.openId}
+
+${session.snsUser.nickname}
+${session.snsUser.openId}
+
+${nickname}
+
+<script>
+    console.log(encodeURIComponent("http://localhost:8080/index#c21fOTI1MjMz"));
+</script>

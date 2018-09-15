@@ -1,0 +1,33 @@
+#if($!{paramObj.url}&&$!{paramObj.url}!="")
+    #set($url = $!{paramObj.url})
+#else
+    #set($url = "/site/search/$!{siteId}")
+#end
+<div class="searchType-title">搜索范围</div>
+<div class="searchType-column">
+    <ul>
+        #*<li class="class-title"><a
+            href="/site/search/$!{siteId}?columnId=&columnIds=&typeCode=&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=&datecode=$!{datecode}&sort=$!{sort}&scope=all&flag=false"
+            #if(("" == "$!{columnId}") && ("$!{excColumns}" == "")) #end
+        >全部</a>
+        </li>*#
+        #foreach($eo in $resultObj)
+            <li>
+                <a
+                   href="$!url?columnId=&typeCode=$!{eo.typeCode}&beginDate=$!{beginDate}&endDate=$!{endDate}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=$!{eo.excColumns}&datecode=$!{datecode}&sort=$!{sort}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}"
+                   target="_self" class="$!{eo.active}">
+                    #if("$!{eo.typeCode}" == "workGuide")
+                        在线办事
+                    #elseif("$!{eo.typeCode}" == "public_content")
+                        信息公开
+                    #elseif("$!{eo.typeCode}" == "guestBook")
+                        政民互动
+                    #else
+                        新闻资讯
+                    #end
+                    ($!{eo.total})
+                </a>
+            </li>
+        #end
+    </ul>
+</div>

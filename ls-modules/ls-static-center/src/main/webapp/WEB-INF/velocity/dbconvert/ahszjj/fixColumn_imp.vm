@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>${type_title}</title>
+    <link rel="stylesheet" href="/assets/css/font-awesome/css/font-awesome.css"/>
+    <link rel="stylesheet" href="/assets/css/core-min.css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+<body>
+<form id="formDB" action="${imp_action}" method="post">
+    <input type="hidden" id="loadedDetail" value="0"/>
+        <table>
+            <tbody>
+            <tr><td>栏目：${type_title},ID:${curColumdId}</td></tr>
+            <tr>
+                <td align="left">
+                    过滤无效数据总数:${validateCount}条,导入操作，导入数据源
+                    <input type="radio" name="rangType" value="0" checked onclick="clickRangtype(this)"/>全部
+                    &nbsp;&nbsp;
+                    <input type="radio" name="rangType" value="1" onclick="clickRangtype(this)" />选择
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <button id="doSub" type="button" style="height: 40px; ">确定导入</button>
+                </td>
+            </tr>
+            <tr  id="loadedDetailTR">
+                <table border="0" id="loadedDetailTable" style="display: none">
+                 <tr>
+                    <td><input type="checkbox" onclick="selectIdAll(this)"/> <span id="countSpan"></span></td>
+                     <td>标题</td>
+                </tr>
+                </table>
+            </tr>
+
+            </tbody>
+        </table>
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            if ($('input[name=rangType]:checked').val()=='1'){
+                if($('input[name=id]:checked').length<1){
+                    alert('请选择');
+                    return false;
+                }
+            }
+            if(confirm("确定同步吗")){
+                var _this = $(this);
+                _this.attr("disabled", true).text("数据正在导入,请耐心等待(请勿关闭浏览器)。");
+                $("#formDB").submit();
+            }
+
+        });
+    });
+
+    function clickRangtype(obj){
+        if(obj.value=='0'){
+            $('#loadedDetailTable').hide();
+        }else{
+            $('#loadedDetailTable').show();
+            if($('#loadedDetail').val()=='0'){
+                $.getJSON('/ahszjj/db/loadDetail?type=${type}',function(json){
+                    var data = json.data;
+                    if(data && $.isArray(data)){
+                        $('#countSpan').html(data.length + '条');
+                        for(var i=0;i<data.length;i++){
+                            var tr = '<tr>';
+                             tr += '<td>' + '<input type="checkbox"  name="id" value="' + data[i].id + '"/></td>' ;
+                            if(data[i].replaydate !=null && data[i].replaydate.length>0){
+                                tr += '<td style="color:#ff0000">' + data[i].title + '(已回复)</td>';
+                            }else{
+                                tr += '<td>' + data[i].title + '</td>';
+                            }
+                             tr += '</tr>';
+                            $('#loadedDetailTable').append(tr);
+                        }
+                    }
+                    $('#loadedDetail').val('1');
+                });
+            }
+        }
+    }
+    function selectIdAll(obj){
+        $('input[name=id]').each(function(i){
+            $(this).attr('checked',obj.checked);
+        });
+    }
+</script>
+</body>
+</html>

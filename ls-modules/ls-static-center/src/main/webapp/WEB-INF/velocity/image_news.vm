@@ -1,0 +1,28 @@
+<!--文字列表新闻的图片轮播-->
+<div id="myFocus" style="width:$!{condition.width}px; height:$!{condition.height}px;"><!--焦点图盒子-->
+  <div class="loading"></div><!--载入画面(可删除)-->
+  <div class="pic"><!--图片列表-->
+  	<ul>
+		#foreach($eo in $list)
+			#if($!{eo.imageLink} !="")
+				#if($eo.imageLink.indexOf("/")>=0)
+					#set($filePath="")
+				#elseif($eo.imageLink.indexOf(".")>=0)
+					#set($filePath="$!{fileServerNamePath}")
+				#else
+					#set($filePath="$!{fileServerPath}")
+				#end
+				<li><a href="$!{eo.link}"><img src="$!{filePath}$!{eo.imageLink}" text="$!{eo.title}" /></a></li>
+			#end
+		#end
+  	</ul>
+  </div>
+</div>
+<script type="text/javascript" src="/demo/assets/js/myfocus.js"></script>
+<script type="text/javascript">
+//设置
+myFocus.set({
+	id:'myFocus',//ID
+	pattern:'$!{condition.pattern}'//风格
+});
+</script>

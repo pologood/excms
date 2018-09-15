@@ -1,0 +1,62 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:5px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">详细信息</a>
+                </li>
+
+            </ul>
+
+            <div class="tab-content" style="overflow:auto;height:530px">
+                <div class="tab-pane active" id="tab_1_1">
+                    <table class="table table-bordered picture-table">
+                        <tbody class="w100p">
+                        <tr>
+                            <th>内容类型：</th>
+                            <td>
+                                <input type="text" id="typeCode" ms-duplex="typeCode" #if($!{eo.typeCode}=="articleNews") value="文章新闻" #end class="form-control" placeholder="">
+                            </td>
+                            <th>跳转URL：</th>
+                            <td>
+                                <input type="text" id="redirectLink" ms-duplex="redirectLink" value="$!{eo.redirectLink}" class="form-control" placeholder="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>标题：</th>
+                            <td colspan="3"><input type="text" id="title" value="$!{eo.title}" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>副标题：</th>
+                            <td><input type="text" id="subTitle" ms-duplex="subTitle" value="$!{eo.subTitle}" class="form-control" placeholder=""></td>
+                            <th>来源：</th>
+                            <td><input type="text" id="resources" ms-duplex="resources" value="$!{eo.resources}" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>创建时间：</th>
+                            <td><input type="createDate" id="publishDate" ms-duplex="createDate" class="form-control" value="$!{eo.createDate}"
+                                       onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly></td>
+                            <th>作者：</th>
+                            <td><input type="text" id="author" ms-duplex="author" value="$!{eo.author}" class="form-control" placeholder=""></td>
+                        </tr>
+                        <tr>
+                            <th>摘要：</th>
+                            <td colspan="3"><input type="text" id="remarks" ms-duplex="remarks" value="$!{eo.remarks}" class="form-control" placeholder=""></td>
+                        </tr>
+
+                        <tr>
+                            <th>内容：</th>
+                            <td colspan="3">
+						<textarea class="form-control" id="content" name="content" rows="8" placeholder=""
+                                  ms-duplex="content">$!{content}</textarea>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>

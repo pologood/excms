@@ -1,0 +1,765 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form id="columnAddForm" role="form" ms-controller="columnAddForm">
+
+            <div class="form-body">
+                <div class="form-group">
+                    <label>栏目名称</label>
+                    <input type="text" name="name" class="form-control" ms-duplex-string="name" placeholder=""
+                           maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>栏目简称</label>
+                    <input type="text" name="shortName" class="form-control" ms-duplex-string="shortName"
+                           placeholder="" maxlength="40">
+                </div>
+
+                <div class="form-group">
+                    <label>栏目序号</label>
+                    <input type="text" name="sortNum" class="form-control" ms-duplex-number="sortNum"
+                           placeholder="用于站点排序，按从小到大排序" maxlength="3">
+                </div>
+
+                <div class="form-group" id="contentModel">
+                    <label>内容模型</label>
+
+                    <div class="input-group select2-bootstrap-append">
+                        <select id="contentModelCode" class="form-control" name="contentModelCode"
+                                ms-duplex="contentModelCode" placeholder="请选择内容模型"
+                                ms-change="checkColumnType">
+                        </select>
+                        <span class="input-group-btn">
+                                      <button class="btn btn-default" type="button" onclick="linkModel()">
+                                        <span>内容模型</span>
+                                      </button>
+                                      </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>栏目类别</label>
+                    <input id="columnClassCode" class="form-control" name="columnClassCode"
+                    #*ms-duplex="columnClassCode"*# placeholder="请选择栏目类别">
+                ##                            <select id="columnClassCode" class="form-control" name="columnClassCode"
+                ##                                    ms-duplex="columnClassCode" placeholder="请选择内容模型">
+                ##                            </select>
+
+                ##                            <div class="input-group" id="resMark">
+                ##                                <input type="text" id="columnClassName" name="columnClassName" class="form-control"
+                ##                                       ms-duplex="columnClassName"  placeholder=""/>
+                ##                                <input type="hidden" id="columnClassCode" name="columnClassCode" class="form-control"
+                ##                                       ms-duplex="columnClassCode"  placeholder=""/>
+                ##                                <div class="input-group-btn">
+                ##                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                ##                                            onclick="showRes()">
+                ##                                        <i class="fa fa-caret-down" id="select_icon"></i>
+                ##                                    </button>
+                ##                                </div>
+                ##                            </div>
+                </div>
+
+                <div class="form-group linkNO">
+                    <label>绑定流程</label>
+                    <select id="processId" class="form-control" name="processId" placeholder="请选择流程"
+                            ms-duplex="processId" ms-change="processIdChange">
+                        <option value="">请选择流程</option>
+                    </select>
+                ##                                <input type="text" class="form-control" id="processName" name="processName"   ms-duplex="processName"/>
+                </div>
+
+                <div id="isStart" style="display: none">
+                    <div class="form-group">
+                        <label>启用跳转地址</label>
+
+                        <div class="radio-group">
+                            <label class="radio-inline">
+                                <input type="radio" name="isStartUrl" ms-duplex-number="isStartUrl" value="1"
+                                       ms-click="changeUrl(1)"> 是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="isStartUrl" ms-duplex-number="isStartUrl" value="0"
+                                       ms-click="changeUrl(0)"> 否
+                            </label>
+                        </div>
+                    </div>
+                    <div id="startUrl" style="display: none">
+                        <div class="form-group">
+                            <label>跳转地址</label>
+                            <input type="text" name="transUrl" ms-duplex-string="transUrl" class="form-control"
+                                   placeholder="跳转URL，需要Http://" maxlength="200">
+                        </div>
+                        <div class="form-group">
+                            <label>跳转窗口</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="transWindow"
+                                                                   ms-duplex-number="transWindow" value="0">
+                                    本窗口打开
+                                </label>
+                                <label class="radio-inline"><input type="radio" name="transWindow"
+                                                                   ms-duplex-number="transWindow" value="1">
+                                    新窗口打开
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="synAndGener">
+                    <div class="form-group">
+                        <label>复制信息到栏目</label>
+                        <textarea class="form-control" name="synColumnNames" id="synColumnNames"
+                                  ms-duplex-string="synColumnNames" rows="3" 　ms-click="getSynColumn()"
+                                  placeholder="点击选择栏目"></textarea>
+                        <input type="hidden" name="synColumnIds" id="synColumnIds"
+                               ms-duplex-string="synColumnIds">
+                    </div>
+                    <div class="form-group">
+                        <label>引用信息到栏目</label>
+                        <textarea class="form-control" name="referColumnNames" id="referColumnNames"
+                                  ms-duplex-string="referColumnNames" rows="3" 　ms-click="getReferColumn()"
+                                  placeholder="点击选择栏目"></textarea>
+                        <input type="hidden" name="referColumnIds" id="referColumnIds"
+                               ms-duplex-string="referColumnIds">
+                    </div>
+                    <div class="form-group">
+                        <label>引用信息到信息公开目录</label>
+                        <textarea class="form-control" name="referOrganCatNames" id="referOrganCatNames"
+                                  ms-duplex-string="referOrganCatNames" rows="3" 　ms-click="getReferOrganCat()"
+                                  placeholder="点击选择信息公开目录"></textarea>
+                        <input type="hidden" name="referOrganCatIds" id="referOrganCatIds"
+                               ms-duplex-string="referOrganCatIds">
+                    </div>
+                    <div class="form-group">
+                        <label>生成关联页面</label>
+                        <textarea class="form-control" rows="3" name="genePageNames" id="genePageNames"
+                                  ms-duplex-string="genePageNames" ms-click="getGenePage()"
+                                  placeholder="点击选择栏目"></textarea>
+                        <input type="hidden" name="genePageIds" id="genePageIds" ms-duplex-string="genePageIds">
+                    </div>
+                </div>
+
+                <div id="bbsUnit" class="form-group dn">
+                    <label>可受理单位列表</label>
+                    <textarea class="form-control" rows="3" name="unitNames" ms-duplex="unitNames"
+                              ms-click="getUnitIds()" laceholder="点击选择接收单位"></textarea>
+                </div>
+                <div class="form-group dn linksMgr">
+                    <label>是否为logo图片</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline">
+                            <input type="radio" ms-duplex-number="isLogo" value="1" ms-click="typeChange(1)"> 是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" ms-duplex-number="isLogo" value="0" ms-click="typeChange(0)"> 否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group dn linksMgrY">
+                    <label>图片宽度</label>
+                    <input type="text" class="form-control" ms-duplex="width" placeholder="为0不限制图片宽度"
+                           maxlength="5">
+                </div>
+                <div class="form-group dn linksMgrY">
+                    <label>图片高度</label>
+                    <input type="text" class="form-control" ms-duplex="height" placeholder="为0不限制图片高度"
+                           maxlength="5">
+                </div>
+                <div class="form-group dn linksMgr">
+                    <label>条数</label>
+                    <input type="text" class="form-control" ms-duplex="num" maxlength="3">
+                </div>
+                <div class="form-group dn linksMgr">
+                    <label>模板名称</label>
+                    <input type="text" class="form-control" ms-duplex="linkCode" placeholder="指定前端的模板"
+                           maxlength="50">
+                </div>
+                <div class="form-group dn linksMgr">
+                    <label>标题字数</label>
+                    <input type="text" class="form-control" ms-duplex="titleCount" maxlength="3">
+                </div>
+                <div class="form-group dn linksMgr">
+                    <label>摘要字数</label>
+                    <input type="text" class="form-control" ms-duplex="remarksCount" maxlength="3">
+                </div>
+                <div class="form-group">
+                    <label>栏目关键词</label>
+                    <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3"
+                              placeholder="默认为栏目类别管理中配置的内容"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>栏目描述</label>
+                    <textarea class="form-control" name="description" ms-duplex="description" rows="3"
+                              placeholder="默认为栏目类别管理中配置的内容"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>归档时间</label>
+                    <input type="datetime" id="toFileDate" ms-duplex="toFileDate"
+                           class="form-control readonly"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                </div>
+                <div class="form-group" id="specialSub">
+                    <label>是否归档</label>
+                    <div class="radio-group">
+                        <label class="radio-inline">
+                            <input type="radio" name="isToFile" ms-duplex-number="isToFile" value="1"> 是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isToFile" ms-duplex-number="isToFile" value="0"> 否
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>前台是否显示（预览地址：<a href="javascript:void(0)" target="_blank" ms-attr-href="previewUrl"
+                                          ms-text="previewUrl">无</a>）</label>
+                    <div class="radio-group">
+                        <label class="radio-inline">
+                            <input type="radio" name="isShow" ms-duplex-number="isShow" value="1"> 是
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="isShow" ms-duplex-number="isShow" value="0"> 否
+                        </label>
+                    </div>
+                </div>
+            ##
+
+                <input type="hidden" name="siteId" ms-duplex-number="siteId" disabled/>
+                <input type="hidden" name="parentId" ms-duplex-number="parentId" disabled/>
+                <input type="hidden" name="indicatorId" ms-duplex-number="indicatorId" disabled/>
+                <input type="hidden" name="isParent" ms-duplex-number="isParent" disabled/>
+                <input type="hidden" name="columnConfigId" ms-duplex-number="columnConfigId" disabled/>
+                <input type="hidden" name="unitIds" ms-duplex="unitIds"/>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/selectPage/selectpage.min.js"></script>
+<script>
+    var cur = {
+        vm: {},
+        contentList: {},
+        contentModelStr: '',
+        length: 0,
+        isAddModel: true,
+        columnClassCode:"$!{columnClassCode}"
+    };
+    var parent = Ls.getWin.win;
+    var parentId = "${parentId}";
+
+    function getContentModel() {
+        Ls.ajaxGet({
+            url: "/columnConfig/getContentModel",
+            data: {
+                siteId: parent.GLOBAL_SITEID, isPublic: 0
+            }
+        }).done(function (text) {
+            cur.contentModelStr = '<option value="">请选择内容模型</option>';
+            if (text != null && text.data != null) {
+                cur.contentList = text.data;
+                var data = text.data;
+                cur.length = data.length;
+                //  debugger
+                if (cur.length > 0) {
+                    for (i = 0; i < cur.length; i++) {
+                        cur.contentModelStr += ' <option  value=' + data[i].code + '>' + data[i].name + '</option> '
+                    }
+                }
+            }
+
+            getColumnEO();
+        });
+    }
+
+    function getColumnClass() {
+        Ls.ajaxGet({
+            url: "/columnType/getList",
+            data: {}
+        }).done(function (text) {
+            var str = '<option value="">请选择栏目类别</option>';
+            if (text != null && text.data != null) {
+                var data = text.data,
+                    val = '';
+
+                $('#columnClassCode').attr('value', cur.vm.columnClassCode);
+
+                $('#columnClassCode').selectPage({
+                    showField: 'typeName',
+                    keyField: 'id',
+                    orderBy: ['id desc'],
+                    data: data,
+                    listSize: 10,
+                    selectOnly: true,
+                    pagination: false,
+                    multiple: true,
+                    eSelect: function (data) {
+                        $("#columnClassCode").trigger("hidemsg");
+                    }
+                });
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        var dialog = art.dialog,
+            api = art.dialog.open.api;
+        if (!api) return;
+        // 操作对话框
+        api.button(
+            {
+                name: '保存',
+                id: 'column_add',
+                focus: true,
+                callback: function () {
+                    $("#columnAddForm").trigger("validate");
+                    return false;
+                }
+            }
+        );
+
+        getContentModel();
+        doSubmit();
+    });
+
+    function getColumnEO() {
+        Ls.ajaxGet({
+            type: "POST",
+            url: "/columnConfig/getNewSortNum",
+            data: {parentId: parentId, isCom: false}
+        }).done(function (d) {
+            var data = d.data;
+            delete data.functions;
+            delete data.childs;
+            data.parentId = parentId;
+            data.siteId = parent.GLOBAL_SITEID;
+            data.columnClassCode = cur.columnClassCode;
+            data.processId = '';
+            getProcessList(null);
+            data.$id = "columnAddForm";
+            cur.vm = avalon.define(data);
+            avalon.scan($("#columnAddForm").get(0), cur.vm);
+            cur.vm.type = 'CMS_Section';
+
+            $("#contentModelCode").html('');
+            $("#contentModelCode").append(cur.contentModelStr);
+            cur.isAddModel = true;
+            getColumnClass();
+        });
+
+    }
+
+    function doSubmit() {
+        $('#columnAddForm').validator({
+            /*  rules: {
+             mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']
+             },*/
+            target: function (elem) {
+                var selectP = $(elem).parent(),
+                    msgbox = selectP.find('span.msg-box');
+                if (!msgbox.length) {
+                    if (selectP.hasClass('sp_container')) {
+                        msgbox = $('<span class="msg-box"></span>').prependTo(selectP);
+                    } else {
+                        msgbox = $(elem).before('<span class="msg-box"></span>');
+                    }
+
+                }
+                return msgbox;
+            },
+            fields: {
+                'name': '名称:required;length[0~64];',
+                'sortNum': '序号:required;integer(+)',
+                'siteId': '站点:required;',
+                'indicatorId': '栏目:required;',
+                'keyWords': '关键词:length[0~300];',
+                'description': '描述:length[0~1000];',
+                'width': '图片宽度:range[0~999]',
+                'height': '图片高度:range[0~999]',
+                'num': '条数:range[0~999]',
+                'titleCount': '标题字数:range[0~999]',
+                'remarksCount': '摘要字数:range[0~999]',
+                'columnClassCode': '栏目类别:required;'
+            },
+            valid: function () {
+                doSave();
+            },
+            msgClass: "n-top"
+        });
+    }
+
+    function doSave() {
+        var name = cur.vm.name;
+        var pId = cur.vm.parentId;
+        var indicatorId = cur.vm.indicatorId;
+        if (cur.vm.keyWords != null && Ls.strLen(cur.vm.keyWords) > 300) {
+            Ls.tipsInfo("关键词的字数长度应小于1000个字符");
+            return;
+        }
+        if (cur.vm.description != null && Ls.strLen(cur.vm.description) > 1000) {
+            Ls.tipsInfo("描述的字数长度应小于1000个字符");
+            return;
+        }
+
+        if (cur.vm.isStartUrl != 1 && cur.vm.contentModelCode == '') {
+            Ls.tipsInfo("请选择内容模型");
+            return;
+        } else {
+            //检查站点名称是否重复
+            Ls.ajaxGet({
+                url: "/columnConfig/checkColumnNameExist",
+                type: 'post',
+                data: {name: name, parentId: pId, indicatorId: indicatorId}
+            }).done(function (text) {
+                if (text.data) {
+                    saveColumnConfigEO();
+                } else {
+                    Ls.tipsInfo("栏目名称已存在");
+                    return;
+                }
+            });
+        }
+
+    }
+
+    /**
+     * 保存栏目信息
+     */
+    function saveColumnConfigEO() {
+        cur.vm.synColumnNames = $("#synColumnNames").val();
+        cur.vm.synColumnIds = $("#synColumnIds").val();
+        cur.vm.referColumnNames = $("#referColumnNames").val();
+        cur.vm.referColumnIds = $("#referColumnIds").val();
+        cur.vm.referOrganCatNames = $("#referOrganCatNames").val();
+        cur.vm.referOrganCatIds = $("#referOrganCatIds").val();
+        cur.vm.genePageNames = $("#genePageNames").val();
+        cur.vm.genePageIds = $("#genePageIds").val();
+        cur.vm.contentModelCode = $("#contentModelCode").val();
+        cur.vm.columnClassCode = $("#columnClassCode").val();
+        cur.vm.columnClassName = $("#columnClassCode option:selected").text();
+        cur.vm.siteId = parent.GLOBAL_SITEID;
+        cur.vm.type = 'CMS_Section';
+
+        var value = cur.vm.$model;
+        value = Ls.toJSON(value);
+        value.processId = $("#processId").val();
+        if (value.processId != null && value.processId != "") {
+            value.processName = $("#processId option:selected").text();
+        }
+        Ls.ajax({
+            type: "POST",
+            url: "/columnConfig/saveColumnEO",
+            data: value
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            } else {
+                Ls.tipsOk("保存成功");
+                var nodes = parent.treeObj.getSelectedNodes();
+                if (nodes[0].children != null) {
+                    parent.treeObj.reAsyncChildNodes(nodes[0], "refresh");
+                } else {
+                    var newNodes = {};
+                    parent.treeObj.addNodes(nodes[0], newNodes);
+                    parent.treeObj.reAsyncChildNodes(nodes[0], "refresh");
+                }
+            }
+            art.dialog.close();
+            return;
+
+        });
+    }
+
+
+    function getSynColumn() {
+        var synColumnIds = $("#synColumnIds").val();
+        var contentModelCode = $("#contentModelCode").val();
+        var indicatorId = cur.vm.indicatorId;
+        if (indicatorId == null) {
+            indicatorId = '';
+        }
+        var url = '/siteMain/toSelectColumnTree?siteId=' + GLOBAL_SITEID + '&synColumnIds='
+            + synColumnIds + '&flag=0&contentModelCode=' + contentModelCode + "&indicatorId=" + indicatorId;
+        Ls.openWin(url, '400px', '500px', {
+            id: 'syn_column',
+            title: '复制信息到栏目',
+            padding: 0,
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.doOk();
+                if (data != null) {
+                    cur.vm.synColumnIds = data.ids;
+                    cur.vm.synColumnNames = data.names;
+                }
+            }
+        });
+    }
+
+    function getReferColumn() {
+        var referColumnIds = $("#referColumnIds").val();
+        var contentModelCode = $("#contentModelCode").val();
+        var indicatorId = cur.vm.indicatorId;
+        if (indicatorId == null) {
+            indicatorId = '';
+        }
+        var url = '/siteMain/getReferColumns?siteId=' + parent.GLOBAL_SITEID + '&synColumnIds='
+            + referColumnIds + '&contentModelCode=' + contentModelCode + "&indicatorId=" + indicatorId;
+        Ls.openWin(url, '400px', '500px', {
+            id: 'refer_column',
+            title: '引用信息到栏目',
+            padding: 0,
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.doOk();
+                if (data != null) {
+                    cur.vm.referColumnIds = data.ids;
+                    cur.vm.referColumnNames = data.names;
+                }
+            }
+        });
+    }
+
+    function getReferOrganCat() {
+        var referOrganCatIds = $("#referOrganCatIds").val();
+        var contentModelCode = $("#contentModelCode").val();
+        var indicatorId = cur.vm.indicatorId;
+        if (indicatorId == null) {
+            indicatorId = '';
+        }
+        var url = '/public/catalog/getReferOrganCats?referOrganCatIds='
+            + referOrganCatIds + '&catId=';
+
+        Ls.openWin(url, '400px', '500px', {
+            id: 'refer_organ_cat',
+            title: '引用信息到信息公开',
+            padding: 0,
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                var data = iframe.cur.ok();
+                if (data != null) {
+                    cur.vm.referOrganCatIds = data.selectIds;
+                    cur.vm.referOrganCatNames = data.selectNames;
+                    console.log(data.selectIds);
+                    console.log(data.selectNames);
+                }
+            }
+        });
+
+    }
+
+    function getGenePage() {
+        var genePageIds = $("#genePageIds").val();
+        var contentModelCode = $("#contentModelCode").val();
+        var indicatorId = cur.vm.indicatorId;
+        if (indicatorId == null) {
+            indicatorId = '';
+        }
+        var url = '/siteMain/toSelectColumnTree?siteId=' + GLOBAL_SITEID + '&genePageIds='
+            + genePageIds + '&flag=1&contentModelCode=' + contentModelCode + "&indicatorId=" + indicatorId;
+        Ls.openWin(url, '400px', '500px', {
+            id: 'gene_page',
+            title: '生成关联页面',
+            padding: 0,
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.doOk();
+                if (data != null) {
+                    cur.vm.genePageIds = data.ids;
+                    cur.vm.genePageNames = data.names;
+                }
+            }
+        });
+    }
+
+    function checkColumnType() {
+        contentModelCode = cur.vm.contentModelCode;
+
+        if (contentModelCode == '' && cur.vm.isStartUrl == 0) {
+            Ls.tipsInfo("请选择内容模型");
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/columnConfig/checkColumnType",
+            data: {
+                contentModelCode: contentModelCode
+            }
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tips(text.desc, {icon: "info"});
+            }
+            var columnTypeCode = text.data;
+            if (columnTypeCode == "articleNews") {
+                $("#isStart").show();
+                $("#synAndGener").show();
+                $(".linksMgr").hide();
+            } else {
+                $("#synAndGener").hide();
+                if (columnTypeCode == 'redirect' || columnTypeCode == 'sceneService' || columnTypeCode == 'workGuide' || columnTypeCode == "net_work" || columnTypeCode == "InteractiveVirtual") {
+                    $("#isStart").show();
+                    $(".linksMgr").hide();
+                } else {
+                    $("#isStart").hide();
+                    if (columnTypeCode == "bbs") {
+                        $("#bbsUnit").show();
+                    } else {
+                        $("#bbsUnit").hide();
+                    }
+                    if (columnTypeCode == "linksMgr") {
+                        $(".linksMgr").show();
+                        if (cur.vm.isLogo == 1) {
+                            $(".linksMgrY").show();
+                        } else {
+                            $(".linksMgrY").hide();
+                        }
+                    } else {
+                        $(".linksMgr").hide();
+                    }
+                }
+            }
+            if (cur.vm.isStartUrl == 1) {
+                $("#startUrl").show();
+            } else {
+                $("#startUrl").hide();
+            }
+        });
+    }
+
+    function changeUrl(isStartUrl) {
+        cur.vm.isStartUrl = isStartUrl;
+        if (isStartUrl == 1) {
+            $("#contentModel").hide();
+            $("#startUrl").show();
+            $("#synAndGener").hide();
+            //cur.vm.contentModelCode = '';
+        } else {
+            $("#startUrl").hide();
+            $("#contentModel").show();
+            $("#synAndGener").show();
+        }
+
+    }
+
+    function linkModel() {
+        Ls.openWin('/siteMain/linkModel?isAddModel=' + cur.isAddModel, '600px', '500px', {
+            id: 'link_model',
+            title: '内容模型',
+            padding: 0
+        });
+
+    }
+
+
+    function addContentModel(code, name) {
+        var str = ' <option  value=' + code + ' selected >' + name + '</option> ';
+        $("#contentModelCode").append(str);
+    }
+
+    function typeChange(type) {
+        if (type == 1) {
+            $(".linksMgrY").show();
+        } else {
+            $(".linksMgrY").hide();
+
+        }
+    }
+
+    function getUnitIds() {
+        Ls.openWin('/bbsPlate/getUnits?unitIds=' + cur.vm.unitIds, '400px', '500px', {
+            id: 'bbs_unit',
+            title: '选择接收单位',
+            padding: 0,
+        });
+    }
+
+    function processIdChange() {
+        var processId = $("#processId option:selected").val();
+        var processName = $("#processId option:selected").text();
+        cur.vm.processId = processId;
+        cur.vm.processName = processName;
+        $("#processName").val(processName);
+    }
+
+    function getProcessList(processId) {
+        Ls.ajax({
+            type: "POST",
+            url: "/process/getProcessList",
+            data: {moduleCode: "EX"}
+        }).done(function (d) {
+            var data = d.data;
+            if (data && data.length > 0) {
+                var _html = ' <option value="">请选择流程</option>';
+                for (var i = 0, l = data.length; i < l; i++) {
+                    if (!Ls.isEmpty(processId)) {
+                        if (data[i].processId == processId) {
+                            _html += "<option value='" + data[i].processId + "' selected>" + data[i].name + "</option>";
+                        } else {
+                            _html += "<option value='" + data[i].processId + "'>" + data[i].name + "</option>";
+                        }
+
+                    } else {
+                        _html += "<option value='" + data[i].processId + "'>" + data[i].name + "</option>";
+                    }
+
+                }
+                $("#processId").html(_html);
+            }
+        });
+    }
+
+    function showRes() {
+        Ls.dropDowns2('resMark', {
+            async: {
+                url: "/columnType/getList",
+                otherParam: {siteId: parent.GLOBAL_SITEID}
+            },
+            data: {
+                key: {
+                    title: "typeName",
+                    name: "typeName"
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "parentId"
+                    }
+                }
+            },
+            check: {
+                enable: true,
+                autoCheckTrigger: false,
+                nocheckInherit: false,
+                chkboxType: {"Y": "p", "N": "p"}
+            },
+            callback: {
+                onClick: doCheck,
+                onCheck: doCheck
+            }
+        });
+
+    }
+
+    function doCheck(e, treeId, node) {
+        var zTree = jQuery.fn.zTree.getZTreeObj(treeId);
+        var nodes = zTree.getCheckedNodes(true);
+        cur.vm.columnClassCode = "";
+        cur.vm.columnClassName = "";
+        if (nodes != null && nodes != "") {
+            for (i = 0; i < nodes.length; i++) {
+                if (nodes.length == 1) {
+                    cur.vm.columnClassCode += nodes[i].id;
+                    cur.vm.columnClassName += nodes[i].typeName;
+                } else {
+                    cur.vm.columnClassCode += nodes[i].id + ",";
+                    cur.vm.columnClassName += nodes[i].typeName + ",";
+                }
+
+            }
+        }
+    }
+
+
+</script>

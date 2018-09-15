@@ -1,0 +1,239 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <button type="button" id="butonDel"  class="btn btn-default" onclick="delMsg()">留言删除</button>
+                        </div>
+                        <div class="col-md-7">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="留言内容">
+                                    <input type="datetime" id="createDate" ms-duplex="" class="form-control w160" placeholder="发送时间"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly/>
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChatDeal/getTurnList" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="" width="100" headerAlign="center" align="center" allowSort="flase" renderer="headImg" align="left">头像</div>
+                        <div field="nickname" width="140" headerAlign="center" allowSort="false" align="center">昵称</div>
+                        <div field="" width="50" headerAlign="center" allowSort="flase" renderer="Sex" align="center">性别</div>
+                        <div field="content" width="300" headerAlign="center" allowSort="flase" align="center">留言</div>
+                        <div field="createDate" width="150" headerAlign="center" allowSort="flase" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" >发送时间</div>
+                        <div field="repMsgContent" width="240" headerAlign="center" allowSort="flase" align="center">答复内容</div>
+                        <div field="judge" width="80" headerAlign="center" allowSort="flase" align="center"  renderer="rederJudge">评价</div>
+                        <div field="" width="100" headerAlign="center" allowSort="flase" align="center" renderer="renProcess">办理流程</div>
+                    ##                        <div field="createDate" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                    ##                             align="center">关注时间
+                    ##                        </div>
+                        <div field="" width="105" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    mini.parse();
+
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID,
+        site:$!{site},
+        super:$!{super}
+    }
+    var grid = mini.get("datagrid1");
+    grid.load(cmm);
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+
+    $(document).ready(function () {
+        $("#butonDel").hide();
+        if(cmm.site||cmm.super){
+            $("#butonDel").show();
+        }
+
+    })
+
+    function headImg(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<img src="' + rec.headimgurl + '" height="36" width="36"/>';
+        return str;
+    }
+
+    function Sex(e) {
+        var str = "";
+        var rec = e.record.sex;
+        if (rec == 1) {
+            str = "男";
+        } else if (rec == 2) {
+            str = "女";
+        } else {
+            str = "-";
+        }
+        return str;
+    }
+
+    function renProcess(e){
+        var rec= e.record;
+        return '<button  class=" btn btn-default btn-sm btn-edit" onclick="detail(' + rec.id + ')"> 详情 </button> ';
+    }
+    function  rederJudge(e){
+        var value = e.value;
+        var str = '';
+        if(value==1){
+            str='非常满意';
+        } else if(value==2){
+            str='满意';
+        }
+        else if(value==3){
+            str='一般';
+        }
+        else if(value==4){
+            str='不满意'
+        }
+        return str;
+    }
+    function detail(id){
+        Ls.openWin("/weChatDeal/procesPage?id="+id, {
+            width: '600px',
+            height: '350px',
+            lock: true,
+            title: '办理流程',
+        });
+
+
+    }
+
+    //操作加载
+    function renderOp(e) {
+        var rec = e.record;
+        var str='';
+        var disk ='';
+        var reply='';
+        var time =rec.createTime;
+        var myDate = new Date();
+        if( myDate.getTime() -  time*1000>48*3600*1000){
+            disk='disabled';
+        }
+
+        if(null!=rec.repMsgContent || 1==rec.isRep){
+            reply='disabled';
+
+        }
+        var turn='<button '+disk+' '+reply+' class=" btn btn-default btn-sm btn-edit" onclick="turnMsg(' + rec.id + ')"> 转办 </button> ';
+        return turn;
+    }
+
+    function replyMsg(id) {
+        Ls.openWin("/weChatDeal/replyPage?id="+id, {
+            width: '600px',
+            height: '350px',
+            lock: true,
+            title: '回复',
+        });
+
+    }
+
+    function turnMsg(id) {
+        Ls.openWin("/weChatDeal/turnPage?id="+id, {
+            width: '600px',
+            height: '400px',
+            lock: true,
+            title: '转办',
+        });
+
+    }
+
+    function search() {
+        var name = $("#searchKey").val();
+        var createDate = $("#createDate").val();
+        grid.load({nickname: name, dataFlag: 1,createDate:createDate});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        $("#createDate").val("")
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+
+    function userGroup() {
+        Ls.openWin("/weChat/userMgr/userGroup", {
+            width: '650px',
+            height: '450px',
+            lock: true,
+            title: '用户组管理',
+        });
+    }
+
+    function delMsg(){
+        var ids=getIDS();
+        if(ids==''||ids.length<=0){
+            Ls.tipsInfo("请选择待删除项");
+            return;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            data: {'ids':ids},
+            url: "/weChatDeal/delMag",
+            success: function (text) {
+                Ls.tips
+
+                Ls.tipsOk("删除成功",{
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                        Ls.winClose();
+                    }
+                });
+            }
+        })
+
+
+
+    }
+
+
+    function getIDS() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].id);
+        }
+        ids = ids.join(",");
+        return ids;
+    }
+
+
+</script>

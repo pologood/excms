@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+
+<body>
+<form id="formDB" action="" method="post">
+    <table>
+        <tbody>
+        <tr>
+            <td align="left">
+            ex6网址：  <input id="ex6Uri" type="text" style="width: 300px;"  value="http://www.yingzhou.gov.cn"/>
+                (需要读取图片保存至mongoDB)
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+                ex6需导入栏目ID：  <input id="ssId" type="text" style="width: 100px;" name="isDeleteNewsData" value="241"/>
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+                导入ex8栏目ID：  <input id="columnId" type="text" style="width: 100px;" name="isDeleteNewsData" value="2655289"/>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="4" align="center">
+                <button id="doSub" type="button" style="height: 40px; ">提交</button>
+              <span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+    var cur = {
+        id: "interview_form",
+        ex6Uri: '',
+        ssId: '',
+        columnId: ''
+    };
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            var _this = $(this);
+            cur.ex6Uri = $("#ex6Uri").val();
+            cur.ssId = $("#ssId").val();
+            cur.columnId = $("#columnId").val();
+            if (cur.ex6Uri == '') {
+                alert(" ex6网址不能为空!");
+                return;
+            }
+            if (cur.ssId == '') {
+                alert("ex6栏目Id不能为空!");
+                return;
+            }
+            if (cur.columnId == '') {
+                alert("ex8栏目Id不能为空!");
+                return;
+            }
+            if (confirm("确定导入数据？")) {
+                $("#doSub").attr("disabled", "disabled");
+                $("#doSub_msg").show();
+                return Ls.ajax({
+                    url: "/yingzhou/news/importInterview",
+                    data: {ex6Uri: cur.ex6Uri, ssId: cur.ssId, columnId: cur.columnId}
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        alert("完成导入!");
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+                    } else {
+                        alert(d.desc);
+                        $("#doSub").attr("disabled", false);
+                        $("#doSub_msg").hide();
+
+                    }
+                }).always(function () {
+                    $("#doSub").attr("disabled", false);
+                    $("#doSub_msg").hide();
+                });
+            }
+        });
+
+    })
+</script>
+</body>
+</html>

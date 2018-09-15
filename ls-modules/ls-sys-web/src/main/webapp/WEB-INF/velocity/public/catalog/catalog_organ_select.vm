@@ -1,0 +1,34 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+#*<div class="tabbable-line" style="margin:12px 20px 15px;">
+    <ul class="ztree" id="public_catalog_tree">
+        <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+    </ul>
+</div>*#
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <ul class="ztree" id="public_catalog_tree">
+                    <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150" width="80">...</marquee></span>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_catalog_organ_select.js"></script>
+<script>
+    var cur = {
+        W: Ls.getWin.win,
+        catalog_tree_id: "public_catalog_tree",
+        public_catalog_url: "/public/catalog/getCatalogs",//获取统计指标对象
+        public_catalog_tree: null,
+        ok: null//
+    };
+    $(document).ready(function () {
+        // 初始化布局
+        public_catalog_organ_select.init(cur.catalog_tree_id, "DRIVING_PUBLIC", cur.W.cur.W.cur.node.id, cur.W.cur.vm.relCatIds);
+    });
+</script>

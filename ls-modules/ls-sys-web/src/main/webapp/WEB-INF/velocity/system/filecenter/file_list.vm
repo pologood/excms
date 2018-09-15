@@ -1,0 +1,444 @@
+<style>
+    #center .table-toolbar .col-md-2 {
+        display: none;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <button id="deletes" class="btn btn-default btn-delete" onclick="deletesF()">批量删除</button>
+                            </div>
+                            <div class="btn-group">
+                                <button id="adduser_btn" class="btn btn-default btn-download" onclick="zipDownload()">压缩下载</button>
+                            </div>
+                            <div class="btn-group">
+                                <button id="adduser_btn" class="btn btn-default btn-delete" onclick="cleanUp()">强制清除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button id="adduser_btn" class="btn btn-default btn-add" onclick="appendEweb()">插入</button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--     <select id="fileType" class="form-control">
+                                        <option value="">全部</option>
+                                        #foreach($tp in ${DICT})
+                                            <option value="$!tp.value">$!tp.key</option>
+                                        #end
+                                    </select>-->
+                                    <input type="datetime" id="startDate" ms-duplex="" class="form-control w160" placeholder="开始日期"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                                    <input type="datetime" id="endDate" ms-duplex="" class="form-control w160" placeholder="结束日期"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control w120" placeholder="关键词">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                                <div style="float:right;" title="视图切换" class="hand ml8" id="showStatus">
+                                    <img height="34" width="74" src="$!{sysStaticPath}/assets/images/showList.png"/>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="doc-manage clearfix">
+                    <div id="doc_list_body" class="clearfix">
+                    </div>
+                    <div id="pagination" class="pagination pull-right mr22"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/fileCenter/file_list.js"></script>
+<script type="text/javascript">
+    mini.parse();
+
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID
+    }
+    $(document).ready(function () {
+        file_manage.showStatus = 1;
+        file_manage.init();
+    })
+
+    function msOver(id) {
+        $("#tr_" + id).find("#opr_" + id).removeClass("hide");
+    }
+
+    function msOut(id) {
+        $("#tr_" + id).find("#opr_" + id).addClass("hide");
+    }
+
+    function itemLink(e) {
+        var link = "";
+        var rec = e.record;
+        link = '<a href="javascript:;" onclick="dictItemList(' + rec.dictId + ');"><u>' + rec.name + '</u></a>';
+        return link;
+    }
+
+    function downloadFile(mongoId) {
+        $('#download_frame').attr("src", "/fileCenter/download/" + mongoId);
+    }
+
+    function checkFile(id) {
+        var tips = Ls.tips("正在检测...", {icons: "loading", autoClose: false});
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/fileCenter/checkFile",
+            success: function (text) {
+                if (text.status == 0) {
+                    tips.hide();
+                    Ls.tipsErr(text.desc);
+                } else {
+                    tips.hide();
+                    Ls.tipsOk(text.data);
+                }
+
+            }
+        });
+    }
+
+    function replace(id) {
+        Ls.uploadFile(function (filePath) {
+            var paths = []
+            for (var i = 0; i < filePath.length; i++) {
+                paths.push(filePath[i].fileName);
+            }
+            getPaths(paths);
+            return true;
+        }, {
+            upload_url: '/fileCenter/updateFile',
+            post_params: {
+                "desc": "文件替换",
+                "id": id
+            }
+        })
+
+    }
+
+    function deleteFile(id) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("确认删除吗？删除后将无法恢复。")) {
+            var tips = Ls.tips("正在删除...", {icons: "loading", autoClose: false});
+            Ls.ajaxGet({
+                data: {
+                    ids: ids
+                },
+                url: "/fileCenter/deleteFile",
+                success: function (text) {
+                    if (text.status == 0) {
+                        tips.hide();
+                        Ls.tipsErr(text.desc);
+                    } else {
+                        tips.hide();
+                        Ls.tipsOk("删除成功");
+                        setTypeImg();
+                        file_manage.getData(cur);
+                    }
+
+                }
+            });
+        }
+    }
+
+    function deletesF() {
+        var rows = [];
+        var hasRef = false;
+        $("input[name='check']:checked").each(function (i, val) {
+            if ($(val).attr("status") == "1") {
+                hasRef = true;
+                return;
+            }
+            rows.push(val.value);
+        });
+        if (hasRef) {
+            Ls.tipsErr("不能删除已引用的文件");
+            return;
+        }
+        if (rows.length > 0) {
+            if (confirm("确认删除吗？删除后将无法恢复。")) {
+                var tips = Ls.tips("正在删除...", {icons: "loading", autoClose: false});
+                Ls.ajaxGet({
+                    data: {
+                        ids: rows
+                    },
+                    url: "/fileCenter/deleteFile",
+                    success: function (text) {
+                        if (text.status == 0) {
+                            tips.hide();
+                            Ls.tipsErr(text.desc);
+                        } else {
+                            tips.hide();
+                            Ls.tipsOk("删除成功");
+                            setTypeImg();
+                            file_manage.getData(cur);
+                        }
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+    function zipDownload() {
+        var rows = [];
+        var ids = "";
+        $("input[name='check']:checked").each(function (i, val) {
+            if (val.id != null && val.id != "") {
+                rows.push(val.id);
+            }
+        })
+        l = rows.length;
+        if (l > 0) {
+            for (var i = 0; i < l - 1; i++) {
+                ids += rows[i] + "_";
+            }
+            ids += rows[l - 1];
+            var form = $("<form>");   //定义一个form表单
+            form.attr('style', 'display:none');   //在form表单中添加查询参数
+            form.attr('target', '');
+            form.attr('method', 'post');
+            form.attr('action', "/fileCenter/zipDownload?date=" + new Date());
+            var input1 = $('<input>');
+            input1.attr('type', 'hidden');
+            input1.attr('name', 'mongoIds');
+            input1.attr('value', ids);
+            $('#download_frame').append(form);  //将表单放置在web中
+            form.append(input1);   //将查询参数控件提交到表单上
+            form.submit();
+            form.remove();
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+    function checkAll() {
+        if ($("#checkAll").is(':checked')) {
+            $("input[name='check']").prop("checked", true);
+            $(".imgBox").removeClass("unCheckImg");
+            $(".imgBox").addClass("checkImg");
+            $(".showCk").removeClass("unCheckFile");
+            $(".showCk").addClass("checkFile");
+            $(".showCk").removeClass("hide");
+            getCheckNum();
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            $(".imgBox").removeClass("checkImg");
+            $(".imgBox").addClass("unCheckImg");
+            $(".showCk").removeClass("checkFile");
+            $(".showCk").addClass("unCheckFile");
+            $(".showCk").addClass("hide");
+            getCheckNum();
+            return;
+        }
+    }
+
+    function setTypeImg() {
+        if (file_manage.showStatus == 2) {
+            imgHtml = "";
+            cur.pageIndex = 0;
+        }
+    }
+
+    function cleanUp() {
+        var rows = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            rows.push(val.value);
+        })
+        if (rows.length > 0) {
+            if (confirm("该操作可能导致引用文件被破坏，请慎重！")) {
+                var tips = Ls.tips("正在删除...", {icons: "loading", autoClose: false});
+                Ls.ajaxGet({
+                    data: {
+                        ids: rows
+                    },
+                    url: "/fileCenter/cleanUp",
+                    success: function (text) {
+                        if (text.status == 0) {
+                            tips.hide();
+                            Ls.tipsErr(text.desc);
+                        } else {
+                            tips.hide();
+                            Ls.tipsOk("清除成功");
+                            setTypeImg();
+                            file_manage.getData(cur);
+                        }
+                    }
+                });
+            }
+
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+    function getMoreImg() {
+        cur.pageIndex += 1;
+        file_manage.getData();
+    }
+
+    function checkImg(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("checkImg");
+            $("#img_" + id).addClass("unCheckImg");
+            $("#" + mongoId).prop("checked", false);
+            $("#showCk_" + id).removeClass("unCheckFile");
+            $("#showCk_" + id).addClass("checkFile");
+            $("#showCk_" + id).addClass("hide");
+        } else {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#" + mongoId).prop("checked", true);
+            $("#showCk_" + id).removeClass("unCheckFile");
+            $("#showCk_" + id).addClass("checkFile");
+        }
+        getCheckNum();
+    }
+
+    function hideCheckBox(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+        } else {
+            $("#img_" + id).removeClass("checkImg");
+            $("#img_" + id).addClass("unCheckImg");
+            $("#showCk_" + id).removeClass("checkFile");
+            $("#showCk_" + id).addClass("unCheckFile");
+            $("#showCk_" + id).addClass("hide");
+        }
+    }
+
+    function showCheckBox(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#showCk_" + id).removeClass("hide");
+        } else {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#showCk_" + id).removeClass("hide");
+        }
+    }
+
+    function getCheckNum() {
+        var rows = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            rows.push(val.value);
+        })
+        if (rows.length > 0) {
+            $("#checkNum").html(" 已选中" + rows.length + "个文件");
+        } else {
+            $("#checkNum").html("");
+        }
+    }
+
+    function search() {
+        cur.fileName = $("#searchKey").val();
+        cur.startDate = $("#startDate").val();
+        cur.endDate = $("#endDate").val();
+        setTypeImg();
+        //  cur.type = $("#fileType").val();
+        file_manage.getData(cur);
+    }
+
+    function palyVideo(id) {
+        Ls.openWin("/fileCenter/playVideo?id=" + id, '550px', '400px', {
+                id: 'palyVideo_fileCenter',
+                title: "视频播放"
+            }
+        )
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        cur.fileName = "";
+        $("#startDate").val("");
+        cur.startDate = "";
+        $("#endDate").val("");
+        cur.endDate = "";
+        cur.pageIndex = 0;
+        setTypeImg();
+        file_manage.getData(cur);
+    }
+
+    function onKeyEnter(e) {
+        search();
+    }
+
+    $("#showStatus").click(function () {
+        if (file_manage.showStatus == 1) {
+            file_manage.showStatus = 2;
+            setTypeImg();
+            file_manage.getData(cur);
+            $("#showStatus").find("img").attr("src", "$!{sysStaticPath}/assets/images/showThumb.png");
+        } else {
+            file_manage.showStatus = 1;
+            setTypeImg();
+            file_manage.getData(cur);
+            $("#showStatus").find("img").attr("src", "$!{sysStaticPath}/assets/images/showList.png");
+        }
+    })
+
+    function appendEweb() {
+        var rows = [];
+        var files = '';
+        $("input[name='check']:checked").each(function (i, val) {
+            rows.push(val.value);
+        })
+        if (rows.length > 0) {
+            switch (cur.type) {
+                case "image":
+                    $("input[name='check']:checked").each(function (i, v) {
+                        files += '<img src="'+ GLOBAL_FILESERVERNAMEPATH  + $(v).data('name') +'" />';
+                    });
+                    break;
+                case "text":
+                    $("input[name='check']:checked").each(function (i, v) {
+                        if (file_manage.showStatus == 2) {
+                            var type = $(v).next().find('img').attr('src').match(/\w+\./ig)[0].match(/[a-z]+/ig)[0];
+                            var name = $(v).parent().find('span').text();
+                        }else {
+                            var type = $(v).parents('td').next().find('img').attr('src').match(/\w+_/ig)[0].match(/[a-z]+/ig)[0];
+                            var name = $(v).parents('td').next().find('a').text();
+                        }
+                        files += '<img border="0" src="/assets/images/files2/'+ type +'.gif"><a href="'+ GLOBAL_FILESERVERNAMEPATH  + $(v).data('name') +'" target="_blank">'+ name +'</a>';
+
+                    });
+                    break;
+                case "video":
+                    $("input[name='check']:checked").each(function (i, v) {
+                        //var name = $(v).parents('td').next().find('a').text();
+                        files += '<div class="video-player" data-url="'+ GLOBAL_FILESERVERNAMEPATH  + $(v).data('name') +'" data-width="500" data-height="400" type="application/x-shockwave-flash" width="500" height="400" quality="high"></div>';
+                    });
+                    break;
+            }
+            Ls.getWin.win.eweb.insertHTML(files);
+            Ls.getWin.dialog.close();
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+</script>

@@ -1,0 +1,18 @@
+#set($target="$!{paramObj.target}")
+#set($columnId="$!{context.columnId}")
+#foreach($eo in $resultObj)
+    #if($!{eo.transWindow}==1)
+        #set($target="_blank")
+    #end
+    #if($!{eo.isStartUrl}==1)
+        #set($link=$!{eo.transUrl})
+    #else
+        #set($link=$!{eo.uri})
+    #end
+    #if($columnId=="$!{eo.indicatorId}")
+    <li class='active'>
+    #else
+    <li>
+    #end
+    <a title="$!{eo.name}" href="$link" target="$target" >$!{eo.name}</a></li>
+#end

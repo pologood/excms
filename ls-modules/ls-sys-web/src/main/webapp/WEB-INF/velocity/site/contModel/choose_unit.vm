@@ -1,0 +1,93 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">已选单位</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">选择单位</a>
+        </li>
+    </ul>
+    <div class="tab-content pt10">
+        <div class="tab-pane active" id="tab_1_1">
+            <ul class="ztree" id="unit_tree" style="overflow: auto; height: 385px;">
+            </ul>
+        </div>
+        <div class="tab-pane" id="tab_1_2">
+            <ul class="ztree" id="unit_tree_all" style="overflow: auto; height: 385px;">
+            </ul>
+        </div>
+    </div>
+</div>
+
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/choose_unit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/choose_unit_all.js"></script>
+
+<script type="text/javascript">
+    mini.parse();
+    var initZtree = {"#tab_1_1": true};
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var recUnitIds = W.curr.vm.recUnitIds;
+    $(document).ready(function () {
+
+        api.button({
+            id: "do_submit",
+            name: "确定",
+            focus: true,
+            callback: function () {
+                doSave();
+                return false;
+            }
+        });
+
+        unitManage.getUnit().done(function () {
+            unitManage_all.getUnit();
+        });
+
+        //绑定标签事件
+        /*$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            if (!initZtree[activeTab]) {
+                Ls.log('加载=====')
+                initZtree[activeTab] = true;
+            }
+        })*/
+    });
+
+
+    function doSave() {
+        var zTree = jQuery.fn.zTree.getZTreeObj("unit_tree");
+        // var  nodes = zTree.getSelectedNodes();
+        var nodes = zTree.getCheckedNodes(true);
+        var newNodes = [];
+        var ids = "";
+        var names = "";
+        if (nodes != null && nodes != "") {
+            if (nodes.length == 1) {
+                ids = nodes[0].organId;
+                names = nodes[0].name;
+            } else {
+                for (var i = 0; i < nodes.length - 1; i++) {
+                    newNodes.add(nodes[i]);
+                    ids += nodes[i].organId + ",";
+                    names += nodes[i].name + ",";
+                }
+                ids += nodes[nodes.length - 1].organId;
+                names += nodes[nodes.length - 1].name;
+            }
+        }
+        var parent = art.dialog.opener;
+        parent.curr.vm.recUnitIds = ids;
+        parent.curr.vm.recUnitNames = names;
+        art.dialog.close();
+    }
+
+    function onCancel() {
+        art.dialog.close();
+    }
+
+</script>
+</body>

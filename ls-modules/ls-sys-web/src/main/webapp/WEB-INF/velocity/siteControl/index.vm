@@ -1,0 +1,69 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/siteControl/getSiteControl" showPager="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" width="50"></div>
+                        <div field="siteName" width="150" align="center" headerAlign="center">站点</div>
+                        <div field="fileName" width="100%" align="center" headerAlign="center" >nginx文件名称</div>
+                        <div width="70" align="center" headerAlign="center" renderer="status">启用状态</div>
+                        <div width="110" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid')
+    }
+
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 0);
+        cur.grid.load();
+    })
+
+
+    function active(siteId,status,text) {
+        if(confirm("确认" + text + "站点?")) {
+            Ls.ajax({
+                type: "POST",
+                url: "/siteControl/updateSiteControl",
+                data: {
+                    siteIds:siteId,
+                    status:status
+                }
+            }).done(function (resp) {
+                if (resp.status == 0) {
+                    Ls.tipsErr(resp.desc);
+                } else {
+                    Ls.tipsOk(resp.desc);
+                    cur.grid.load();
+                }
+            });
+        }
+    }
+
+    function status(obj) {
+        var rec = obj.record;
+        return rec.status == 1?'<span style="color: green">已启动</span>':'<span style="color: red">未启动</span>';
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var result = "";
+        if(record.status == 1) {
+            result += '<button type="button" class="btn btn-default btn-sm btn-add" onclick="active('+record.siteId+',2,\'禁用\')">禁用</button> ';
+        } else {
+            result += '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="active('+record.siteId+',1,\'启用\')">启用</button> ';
+        }
+        result += '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="active('+record.siteId+',1,\'重启\')">重启</button> ';
+        return  result;
+    }
+</script>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+      http://www.springframework.org/schema/context  
+      http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+      http://www.springframework.org/schema/mvc  
+      http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+      http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<import resource="/beans/encryptKey.xml"/>
+	<context:annotation-config />
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<bean class="cn.lonsun.core.util.SpringContextHolder" />
+	<!-- 注解扫描的包 -->	
+	<context:component-scan base-package="cn.lonsun" />
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="false" />
+		<property name="locations">
+			<list>
+				<value>classpath*:/db-config.properties</value>
+				<value>classpath*:/velocity.properties</value>
+				<value>classpath*:/jedis-config.properties</value>
+				<value>classpath*:/mq-config.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 静态资源访问，方案1 -->
+	<mvc:resources location="/assets/" mapping="/assets/**" />
+	<mvc:resources location="/app/" mapping="/app/**" />
+	<mvc:resources location="/upload/" mapping="/upload/**" />
+	<mvc:resources location="/demo/" mapping="/demo/**" />
+	<mvc:resources location="/" mapping="/*.xml" />
+	<!-- SWF上传组件跨域上传的授权配置文件 -->
+
+	<!-- 启动SpringMVC的注解功能，它会自动注册HandlerMapping、 HandlerAdapter、ExceptionResolver的相关实例 -->
+	<!-- 解决spring3 mvc @ResponseBody String返回值类型的中文乱码 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">		    			 
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+               <constructor-arg value="UTF-8"/>
+			</bean>
+	   </mvc:message-converters>
+    </mvc:annotation-driven>
+		
+	<!-- 任务异步执行器 -->
+	<bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<!-- 线程池维护线程的最少数量 -->
+		<property name="corePoolSize" value="5" />
+		<!-- 线程池维护线程的最大数量 -->
+		<property name="maxPoolSize" value="20" />
+		<!-- 线程池所使用的缓冲队列 -->
+		<property name="queueCapacity" value="40" />
+		<!-- 线程池维护线程所允许的空闲时间-秒 -->
+		<property name ="keepAliveSeconds" value ="300"/>
+	</bean>
+
+	<!-- 日志服务 -->
+	<bean id="logClientService" class="cn.lonsun.webservice.log.impl.LogClientServiceImpl"></bean>
+	
+	<!-- 配置数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="url" value="${hibernate.connection.url}" />
+		<property name="username" value="${hibernate.connection.username}" />
+		<property name="password" value="${hibernate.connection.password}" />
+		<property name="maxActive" value="256" />
+		<property name="initialSize" value="16" />
+		<property name="maxWait" value="60000" />
+		<property name="minIdle" value="16" />
+		<property name="timeBetweenEvictionRunsMillis" value="3000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1 FROM DUAL" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<!-- mysql 不支持 poolPreparedStatements <property name="poolPreparedStatements" 
+			value="true" /> <property name="maxPoolPreparedStatementPerConnectionSize" 
+			value="20" /> -->
+		<!-- 配置过滤器：wall——防注入攻击(WallFilter默认的防注入配置，也可以自己另外配置),stat-监控统计功能 -->
+		<!-- <property name="filters" value="wall,stat" /> -->
+	</bean>
+
+	<!-- 配置hibernate SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="namingStrategy" ref="customNamingStrategy" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.default_schema">${hibernate.default_schema}</prop>
+				<prop key="hibernate.show_sql">${hibernate.connection.show_sql}</prop>
+				<prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
+				<prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+				<prop key="hibernate.hbm2ddl.auto">none</prop>
+				<prop key="hiberante.format_sql">${hibernate.connection.format_sql}</prop>
+				<!-- 二级缓存EhCache配置 -->
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<!-- 项目启动时初始化CurrentSessionContext，用于获取session(sessionFactory.getCurrentSession()) -->
+				<!-- <prop key="hibernate.current_session_context_class">${hibernate.current_session_context_class}</prop> -->
+			</props>
+		</property>
+		<property name="packagesToScan" value="cn.lonsun.**.entity" />
+	</bean>
+	
+<!-- 	<util:properties id="_globalVars" location="classpath:/global-vars.properties" />
+	<bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+		<property name="velocityEngine" ref="velocityEngine"></property>
+	</bean>
+	
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="${velocity.resourceLoaderPath}" />
+		<property name="velocityProperties">
+	        <props>
+	        	<prop key="input.encoding">UTF-8</prop>
+				<prop key="output.encoding">UTF-8</prop>
+				<prop key="userdirective">${velocity.userdirective}</prop>
+	        
+	            <prop key="spring.resource.loader.cache">${velocity.cache}</prop>
+	            <prop key="file.resource.loader.cache">${velocity.cache}</prop>
+	            <prop key="class.resource.loader.cache">${velocity.cache}</prop>
+	        </props>
+	    </property>
+	</bean>
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+		<property name="cache" value="${velocity.cache}" />
+		<property name="prefix" value="${velocity.prefix}" />
+		<property name="suffix" value="${velocity.suffix}" />
+		<property name="contentType" value="${velocity.contentType}" />
+		<property name="exposeSpringMacroHelpers" value="true" />
+		<property name="requestContextAttribute" value="rc" />
+		<property name="attributes" ref="_globalVars" />
+	</bean> -->
+	
+<!-- 	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+      	<property name="maxTotal" value="${redis.pool.maxTotal}"/>
+      	<property name="maxIdle" value="${redis.pool.maxIdle}"/>
+      	<property name="minIdle" value="${redis.pool.minIdle}"/>
+      	<property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
+      	<property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+    </bean> -->
+    
+    <!-- redis的连接池pool，不是必选项：timeout/password  -->
+<!--     <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+      	<constructor-arg index="0" ref="jedisPoolConfig"/>
+      	<constructor-arg index="1" value="${redis.host}"/>
+      	<constructor-arg index="2" value="${redis.port}" type="int"/>
+    </bean> -->
+	
+	<!-- 事务管理器 -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" propagation="REQUIRED" />
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+	<tx:annotation-driven transaction-manager="txManager"/>
+	<aop:config expose-proxy="true">
+		<aop:advisor advice-ref="txAdvice" pointcut="execution(* cn.lonsun..service..*(..))" />
+	</aop:config>
+	
+	<!-- AOP操作日志管理 -->
+<!-- 	<bean id="logUtil" class="cn.lonsun.system.systemlog.aoputil.LogUtil"></bean> 将日志类注入到bean中。  
+       <aop:config>  
+           <aop:aspect id="b" ref="logUtil">调用日志类  
+           配置切点
+           <aop:pointcut id="log" expression="execution(* cn.lonsun..service..save*(..)) or execution(* cn.lonsun..service..update*(..)) or execution(* cn.lonsun..service..delete*(..))"/>  
+           <aop:after-returning method="recLog" returning="returnObj" pointcut-ref="log"/>
+           <aop:after-throwing method="catchException" throwing="throwEx" pointcut-ref="log"/>
+  	  	   </aop:aspect>
+  	   </aop:config>  -->
+
+</beans>  

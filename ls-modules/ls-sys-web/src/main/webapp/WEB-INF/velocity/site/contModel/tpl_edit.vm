@@ -1,0 +1,144 @@
+#set($_title="EX8智慧云站群")
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="portlet light">
+  <div class="portlet-body form">
+
+    <div id="datagrid1" class="mini-datagrid" style="height:470px;" allowResize="true"
+         idField="id" url="/modelTpl/getPage?modelId=${mId}"
+    >
+      <div property="columns">
+        <div width="180" name="action" headerAlign="center" align="center" renderer="onActionRenderer" cellStyle="padding:0;">操作</div>
+        <div field="tplId" name="tplId" headerAlign="center" allowSort="true">ID
+          <input property="editor" class="mini-textbox" style="width:100%;"/>
+        </div>
+        <!--ComboBox：远程数据-->
+        #*<div type="comboboxcolumn" name="modelTypeCode" field="modelTypeCode" headerAlign="center">栏目类别
+          <input property="editor" class="mini-combobox" style="width:100%;" url="/contentModel/getModelType" textField="key" valueField="code"
+                 emptyText="请选择..." allowInput="false"/>
+        </div>*#
+        <div width="100%" type="comboboxcolumn" name="articalTempId" field="articalTempId" headerAlign="center">文章页模板
+          <input property="editor" class="mini-combobox" style="width:100%;" url="/contentModel/getTemplate?type=2" textField="name" valueField="id"
+                 emptyText="请选择..." nullItemText="请选择..." allowInput="false" showNullItem="true"/>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+  var cur = {}
+  $(window).load(function () {
+
+    mini.parse();
+    cur.grid = mini.get("datagrid1");
+    cur.grid.reload();
+    cur.grid.hideColumn (cur.grid.getColumn (1));
+
+  })
+
+  var mId =${mId};
+  function onActionRenderer(e) {
+    //var grid = e.sender;
+    var length = cur.grid.getData().length;
+    var record = e.record;
+    var uid = record._uid;
+    var rowIndex = e.rowIndex;
+    var s = "";
+    if (rowIndex == 0) {
+      s = '<a class="button" href="javascript:newRow()">新增</a>'
+    } else {
+      s = '<a class="New_Button" href="javascript:newRow()">新增</a>'
+        + '&nbsp;<a class="New_Button" href="javascript:editRow(\'' + uid + '\')">编辑</a>'
+        + '&nbsp; <a class="Delete_Button" href="javascript:delRow(\'' + uid + '\')">删除</a>'
+        + '&nbsp;<a class="New_Button" href="javascript:saveRow(\'' + uid + '\')">保存</a>';
+
+    }
+    return s;
+  }
+
+  function newRow() {
+    var row = {};
+    cur.grid.addRow(row, cur.grid.getData().length);
+    // grid.cancelEdit();
+    cur.grid.beginEditRow(row);
+  }
+
+
+  function delRow(uid) {
+    var row = cur.grid.getRowByUID(uid);
+    if (row) {
+      if (confirm("确定删除此记录？")) {
+        if (row.tplId == null) {
+          cur.grid.removeRow (row, true);
+          return;
+        }
+        //grid.loading("删除中，请稍后......");
+        Ls.ajax({
+          type: "POST",
+          url: "/modelTpl/delEO?tplId=" + row.tplId,
+          data: {}
+        }).done(function (text) {
+          if(!text.status){
+            Ls.tipsErr(text.desc);
+            return;
+          }else {
+            cur.grid.removeRow (row, true);
+            Ls.tipsOk("删除成功");
+          }
+        });
+      }
+    }
+  }
+
+  function editRow(uid) {
+    var row = cur.grid.getRowByUID(uid);
+    if (row) {
+      cur.grid.cancelEdit();
+      cur.grid.beginEditRow(row);
+    }
+  }
+
+  function saveRow(uid) {
+    var row = cur.grid.getRowByUID(uid);
+    cur.grid.commitEditRow (row);
+
+    var tplId = row.tplId;
+   // var modelTypeCode = row.modelTypeCode;
+    var articalTempId = row.articalTempId;
+
+   /* if (modelTypeCode == null || modelTypeCode == "") {
+      mini.alert("模型类别不能为空");
+      cur.grid.beginEditRow(row);
+      return;
+    }*/
+        Ls.ajax({
+          url: "/modelTpl/saveEO",
+          type: 'post',
+          data: {tplId: tplId, modelId: mId, articalTempId: articalTempId},
+        }).done(function (text) {
+          if(!text.status){
+            cur.grid.removeRow (row, true);
+            Ls.tips(text.desc,{icons:"info"});
+            return;
+          }
+          if (text.data == '1') {
+            Ls.tipsOk("保存成功");
+            cur.grid.cancelEdit(row);
+            cur.grid.reload();
+            cur.grid.hideColumn (cur.grid.getColumn (1));
+          }
+        });
+  }
+
+  function addTpl() {
+    var typeId = $("#typeId").clone(true);
+    typeId.insertBefore($("#addId"));
+    var articalId = $("#articalId").clone(true);
+    articalId.insertBefore($("#addId"));
+  }
+</script>
+</body>
+</html>

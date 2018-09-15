@@ -1,0 +1,558 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sAction = URLParams['action'];
+        var sTitle = "";
+        var sColor = "";
+        var oSelection;
+        var oControl;
+        var sRangeType;
+        var sFieldFlag = "";
+
+
+        switch (sAction) {
+            case "forecolor":
+                sTitle = lang["DlgSelCorForecolor"];
+                sColor = EWEB.EditorDocument.queryCommandValue("forecolor");
+                if (sColor) {
+                    if (EWEBBrowser.IsIE) {
+                        sColor = N2Color(sColor);
+                    } else {
+                        sColor = _RGB2HEX(sColor);
+                    }
+                }
+
+                break;
+            case "backcolor":
+                sTitle = lang["DlgSelCorBackcolor"];
+
+                var s_QueryBackColor = "backcolor";
+                if (!EWEBBrowser.IsIE && !EWEBBrowser.IsChrome) {
+                    s_QueryBackColor = "hiliteColor";
+                }
+                sColor = EWEB.EditorDocument.queryCommandValue(s_QueryBackColor);
+                if (sColor) {
+                    if (EWEBBrowser.IsIE) {
+                        sColor = N2Color(sColor);
+                    } else {
+                        sColor = _RGB2HEX(sColor);
+                    }
+                }
+                break;
+            case "bgcolor":
+                sTitle = lang["DlgSelCorBgcolor"];
+                if (EWEBSelection.GetType() == "Control") {
+                    oControl = EWEBSelection.GetSelectedElement();
+                    if (oControl.tagName != "TABLE") {
+                        oControl = null;
+                    }
+                } else {
+                    oControl = _GetParent(EWEBSelection.GetParentElement());
+                }
+                if (oControl) {
+                    switch (oControl.tagName) {
+                        case "TD":
+                            sTitle += " - " + lang["DlgComTableCell"];
+                            break;
+                        case "TR":
+                        case "TH":
+                            sTitle += " - " + lang["DlgComTableRow"];
+                            break;
+                        default:
+                            sTitle += " - " + lang["DlgComTable"];
+                            break;
+                    }
+                    sColor = oControl.style.backgroundColor;
+                } else {
+                    sTitle += " - " + lang["DlgComBody"];
+                }
+                break;
+            default:
+                sFieldFlag = URLParams['returnfieldflag'];
+                sColor = ParentDialog.$("d_" + sFieldFlag).value;
+                break;
+        }
+
+        var sCaption = lang["DlgSelCor"] + "(" + sTitle + ")";
+        document.write("<title>" + sCaption + "</title>");
+
+        if (!sColor) {
+            sColor = "#000000"
+        }
+        ;
+
+
+        function _GetParent(obj) {
+            while (obj != null && obj.tagName != "TD" && obj.tagName != "TR" && obj.tagName != "TH" && obj.tagName != "TABLE") {
+                obj = obj.parentElement;
+            }
+            return obj;
+        }
+
+
+        function N2Color(s_Color) {
+            s_Color = s_Color.toString(16);
+            switch (s_Color.length) {
+                case 1:
+                    s_Color = "0" + s_Color + "0000";
+                    break;
+                case 2:
+                    s_Color = s_Color + "0000";
+                    break;
+                case 3:
+                    s_Color = s_Color.substring(1, 3) + "0" + s_Color.substring(0, 1) + "00";
+                    break;
+                case 4:
+                    s_Color = s_Color.substring(2, 4) + s_Color.substring(0, 2) + "00";
+                    break;
+                case 5:
+                    s_Color = s_Color.substring(3, 5) + s_Color.substring(1, 3) + "0" + s_Color.substring(0, 1);
+                    break;
+                case 6:
+                    s_Color = s_Color.substring(4, 6) + s_Color.substring(2, 4) + s_Color.substring(0, 2);
+                    break;
+                default:
+                    s_Color = "";
+            }
+            return '#' + s_Color;
+        }
+
+        function _FillZero(s) {
+            if (s.length == 1) {
+                return "0" + s;
+            } else {
+                return s;
+            }
+        }
+
+        function _RGB2HEX(s_Color) {
+            var o_Digits = /(.*?)rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/.exec(s_Color);
+            if (o_Digits == null) {
+                return "";
+            }
+
+            var n_Red = parseInt(o_Digits[2]);
+            var n_Green = parseInt(o_Digits[3]);
+            var n_Blue = parseInt(o_Digits[4]);
+            var s_Hex = _FillZero(n_Red.toString(16)) + _FillZero(n_Green.toString(16)) + _FillZero(n_Blue.toString(16));
+            return '#' + s_Hex.toUpperCase();
+        }
+
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+            $("Table_ShowColor").bgColor = sColor;
+            $("Span_RGB").innerHTML = sColor;
+            $("D_SelColor").value = sColor;
+
+            var s_BoxID = "cbox_" + sColor.substr(1);
+            var o_Box = $(s_BoxID);
+            if (o_Box) {
+                _BoxClick(o_Box);
+            }
+
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+
+        var SelRGB = sColor;
+        var DrRGB = '';
+        var SelGRAY = '120';
+
+        var hexch = new Array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F');
+
+        function ToHex(n) {
+            var h, l;
+
+            n = Math.round(n);
+            l = n % 16;
+            h = Math.floor((n / 16)) % 16;
+            return (hexch[h] + hexch[l]);
+        }
+
+        function DoColor(c, l) {
+            var r, g, b;
+
+            r = '0x' + c.substring(1, 3);
+            g = '0x' + c.substring(3, 5);
+            b = '0x' + c.substring(5, 7);
+
+            if (l > 120) {
+                l = l - 120;
+
+                r = (r * (120 - l) + 255 * l) / 120;
+                g = (g * (120 - l) + 255 * l) / 120;
+                b = (b * (120 - l) + 255 * l) / 120;
+            } else {
+                r = (r * l) / 120;
+                g = (g * l) / 120;
+                b = (b * l) / 120;
+            }
+
+            return '#' + ToHex(r) + ToHex(g) + ToHex(b);
+        }
+
+        function EndColor() {
+            var i;
+
+            if (DrRGB != SelRGB) {
+                DrRGB = SelRGB;
+                for (i = 0; i <= 30; i++)
+                    $("Table_Gray").rows[i].bgColor = DoColor(SelRGB, 240 - i * 8);
+            }
+
+            var s_Color = DoColor($("Span_RGB").innerHTML, $("Span_GRAY").innerHTML);
+            $("D_SelColor").value = s_Color
+            $("Table_ShowColor").bgColor = s_Color;
+
+            var s_BoxID = "cbox_" + s_Color.substr(1);
+            var o_Box = $(s_BoxID);
+            if (o_Box) {
+                _BoxClick(o_Box, true);
+            } else {
+                if (s_CurrBoxID) {
+                    $(s_CurrBoxID).className = "boxNormal";
+                    s_CurrBoxID = ""
+                }
+            }
+
+        }
+
+        var s_CurrBoxID = "";
+
+        function BoxMouseOut(obj) {
+            if (obj.id == s_CurrBoxID) {
+                obj.className = "boxSelected";
+            } else {
+                obj.className = "boxNormal";
+            }
+        }
+
+        function BoxMouseOver(obj) {
+            if (obj.id == s_CurrBoxID) {
+                obj.className = "boxSelected";
+            } else {
+                obj.className = "boxOver";
+            }
+        }
+
+        function _BoxClick(o_Box, b_NotSel) {
+            if (o_Box.id == s_CurrBoxID) {
+                return;
+            }
+
+            if (s_CurrBoxID) {
+                $(s_CurrBoxID).className = "boxNormal";
+            }
+
+            s_CurrBoxID = o_Box.id;
+            o_Box.className = "boxSelected";
+
+            var s_Color = "#" + s_CurrBoxID.substr(5);
+            if (!b_NotSel) {
+                SelRGB = s_Color;
+            }
+            $("D_SelColor").value = s_Color;
+            $("Table_ShowColor").bgColor = $("D_SelColor").value;
+        }
+
+
+        function ok() {
+            sColor = $("D_SelColor").value;
+            if (!IsColor(sColor)) {
+                alert(lang["ErrColorInvalid"]);
+                return;
+            }
+
+            switch (sAction) {
+                case "forecolor":
+                    if (EWEBBrowser.IsIE) {
+                        EWIN.formatFont('color', sColor);
+                    } else {
+                        EWIN.formatFont('foreColor', sColor);
+                    }
+                    break;
+                case "backcolor":
+                    if (EWEBBrowser.IsIE) {
+                        EWIN.format('BackColor', sColor);
+                    } else {
+                        EWIN.format('hiliteColor', sColor);
+                    }
+                    break;
+                case "bgcolor":
+                    if (oControl) {
+                        oControl.style.backgroundColor = sColor;
+                    } else {
+                        EWIN.setHTML("<table border=0 cellpadding=0 cellspacing=0 width='100%' height='100%'><tr><td valign=top bgcolor='" + sColor + "'>" + EWIN.getHTML() + "</td></tr></table>", true);
+                    }
+                    break;
+                default:
+                    ParentDialog.$("d_" + sFieldFlag).value = sColor;
+                    ParentDialog.$("s_" + sFieldFlag).style.backgroundColor = sColor;
+                    break;
+            }
+            parent.Ok();
+        }
+
+
+        function _TableGrayMouseOver(e) {
+            var o_Target = (EWEBBrowser.IsIE) ? window.event.srcElement : e.target;
+            $("Span_GRAY").innerHTML = o_Target.title;
+            EndColor();
+        }
+
+        function _TableGrayMouseOut(e) {
+            $("Span_GRAY").innerHTML = SelGRAY;
+            EndColor();
+        }
+
+        function _TableGrayClick(e) {
+            SelGRAY = event.srcElement.title;
+            EndColor();
+        }
+
+        function _TableColorMouseOver(e) {
+            var o_Target = (EWEBBrowser.IsIE) ? window.event.srcElement : e.target;
+            $("Span_RGB").innerHTML = o_Target.bgColor;
+            EndColor();
+        }
+
+        function _TableColorMouseOut(e) {
+            $("Span_RGB").innerHTML = SelRGB;
+            EndColor();
+        }
+
+        function _TableColorClick(e) {
+            var o_Target = (EWEBBrowser.IsIE) ? window.event.srcElement : e.target;
+            SelRGB = o_Target.bgColor;
+            EndColor();
+        }
+
+
+    </script>
+
+
+    <style>
+        .boxNormal {
+            border: 1px solid #d4d0c8
+        }
+
+        .boxOver {
+            border-width: 1px;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            border-style: solid
+        }
+
+        .boxSelected {
+            border-width: 1px;
+            border-color: #000000 #ffffff #ffffff #000000;
+            border-style: inset
+        }
+    </style>
+
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr valign=top>
+                    <td>
+                        <table border=0 cellpadding=0 cellspacing=10>
+                            <tr>
+                                <td>
+                                    <table id=border=0 cellpadding=3 cellspacing=0>
+                                        <tr>
+                                            <td id="cbox_000000" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#000000"></td>
+                                            <td id="cbox_993300" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#993300"></td>
+                                            <td id="cbox_333300" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#333300"></td>
+                                            <td id="cbox_003300" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#003300"></td>
+                                            <td id="cbox_003366" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#003366"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_000080" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#000080"></td>
+                                            <td id="cbox_333399" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#333399"></td>
+                                            <td id="cbox_333333" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#333333"></td>
+                                            <td id="cbox_800000" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#800000"></td>
+                                            <td id="cbox_FF6600" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FF6600"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_808000" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#808000"></td>
+                                            <td id="cbox_008000" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#008000"></td>
+                                            <td id="cbox_008080" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#008080"></td>
+                                            <td id="cbox_0000FF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#0000FF"></td>
+                                            <td id="cbox_666699" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#666699"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_808080" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#808080"></td>
+                                            <td id="cbox_FF0000" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FF0000"></td>
+                                            <td id="cbox_FF9900" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FF9900"></td>
+                                            <td id="cbox_99CC00" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#99CC00"></td>
+                                            <td id="cbox_339966" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#339966"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_33CCCC" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#33CCCC"></td>
+                                            <td id="cbox_3366FF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#3366FF"></td>
+                                            <td id="cbox_800080" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#800080"></td>
+                                            <td id="cbox_999999" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#999999"></td>
+                                            <td id="cbox_FF00FF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FF00FF"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_FFCC00" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FFCC00"></td>
+                                            <td id="cbox_FFFF00" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FFFF00"></td>
+                                            <td id="cbox_00FF00" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#00FF00"></td>
+                                            <td id="cbox_00FFFF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#00FFFF"></td>
+                                            <td id="cbox_00CCFF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#00CCFF"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_993366" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#993366"></td>
+                                            <td id="cbox_C0C0C0" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#C0C0C0"></td>
+                                            <td id="cbox_FF99CC" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FF99CC"></td>
+                                            <td id="cbox_FFCC99" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FFCC99"></td>
+                                            <td id="cbox_FFFF99" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FFFF99"></td>
+                                        </tr>
+                                        <tr>
+                                            <td id="cbox_CCFFCC" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#CCFFCC"></td>
+                                            <td id="cbox_CCFFFF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#CCFFFF"></td>
+                                            <td id="cbox_99CCFF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#99CCFF"></td>
+                                            <td id="cbox_CC99FF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#CC99FF"></td>
+                                            <td id="cbox_FFFFFF" onmouseover="BoxMouseOver(this)" onmouseout="BoxMouseOut(this)" onclick="_BoxClick(this)" class="boxNormal"><img
+                                                src="../sysimage/space.gif" width=16 height=16 style="border:1px solid gray;background-color:#FFFFFF"></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+
+                    <td>
+
+                        <table border=0 cellPadding=0 cellSpacing=10 align=center>
+                            <tr>
+                                <td>
+                                    <table border=0 cellPadding=0 cellSpacing=0 id=Table_Color style="CURSOR: hand" onmouseover="_TableColorMouseOver(event)"
+                                           onmouseout="_TableColorMouseOut(event)" onclick="_TableColorClick(event)">
+                                        <script type="text/javascript">
+                                            function wc(r, g, b, n) {
+                                                r = ((r * 16 + r) * 3 * (15 - n) + 0x80 * n) / 15;
+                                                g = ((g * 16 + g) * 3 * (15 - n) + 0x80 * n) / 15;
+                                                b = ((b * 16 + b) * 3 * (15 - n) + 0x80 * n) / 15;
+
+                                                document.write('<td BGCOLOR=#' + ToHex(r) + ToHex(g) + ToHex(b) + ' height=8 width=8></td>');
+                                            }
+
+                                            var cnum = new Array(1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0);
+
+                                            for (i = 0; i < 16; i++) {
+                                                document.write('<tr>');
+                                                for (j = 0; j < 30; j++) {
+                                                    n1 = j % 5;
+                                                    n2 = Math.floor(j / 5) * 3;
+                                                    n3 = n2 + 3;
+
+                                                    wc((cnum[n3] * n1 + cnum[n2] * (5 - n1)),
+                                                        (cnum[n3 + 1] * n1 + cnum[n2 + 1] * (5 - n1)),
+                                                        (cnum[n3 + 2] * n1 + cnum[n2 + 2] * (5 - n1)), i);
+                                                }
+
+                                                document.writeln('</tr>');
+                                            }
+                                        </script>
+
+                                    </table>
+                                </td>
+
+                                <td>
+                                    <table border=0 cellPadding=0 cellSpacing=0 id=Table_Gray style="CURSOR: hand" onmouseover="_TableGrayMouseOver(event)"
+                                           onmouseout="_TableGrayMouseOut(event)" onclick="_TableGrayClick(event)">
+                                        <script type="text/javascript">
+                                            for (i = 255; i >= 0; i -= 8.5)
+                                                document.write('<tr BGCOLOR=#' + ToHex(i) + ToHex(i) + ToHex(i) + '><td TITLE=' + Math.floor(i * 16 / 17) + ' height=4 width=20></td></tr>');
+                                        </script>
+
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                        <table border=0 cellPadding=0 cellSpacing=10 align=center>
+                            <tr>
+                                <td noWrap align=middle rowSpan=2><span lang=DlgSelCorSel></span>
+                                    <table border=1 cellPadding=0 cellSpacing=0 height=30 id=Table_ShowColor width=40 bgcolor="">
+                                        <tbody>
+                                        <tr>
+                                            <td></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td noWrap rowSpan=2><span lang=DlgSelCorBase></span>: <span id=Span_RGB></span><br><span lang=DlgSelCorLight></span>: <span id=Span_GRAY>120</span><br><span
+                                    lang=DlgSelCorCode></span>: <input id=D_SelColor size=7 value=""></td>
+                                <td><input id="btn_ok" type=submit class="dlgBtnCommon dlgBtn" lang=DlgBtnOK value="" onclick="ok()"></td>
+                            </tr>
+                            <tr>
+                                <td noWrap><input type=button class="dlgBtnCommon dlgBtn" onclick="parent.Cancel();" lang=DlgBtnCancel value=""></td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+            </table>
+
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

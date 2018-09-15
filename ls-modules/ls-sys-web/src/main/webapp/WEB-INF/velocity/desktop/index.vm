@@ -1,0 +1,565 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div style="margin: 25px 20px 10px 20px;">
+
+            <h3 class="page-title"> 待办事项统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <div class="dashboard-stat red">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="todo_todayPublish">0</span>
+                            </div>
+                            <div class="desc"> 今日发布</div>
+                        </div>
+                        <a class="more todolink" data-code="todayPublish" data-type="todayPublish"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <div class="dashboard-stat blue">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="todo_guestBook">0</span>
+                            </div>
+                            <div class="desc"> 待回复留言</div>
+                        </div>
+                        <a class="more todolink" data-code="guestBook" data-type="guestBook"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+
+
+
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <div class="dashboard-stat purple">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="todo_articleNews_pictureNews">0</span>
+                            </div>
+                            <div class="desc"> 待发布图文+文字内容</div>
+                        </div>
+                        <a class="more todolink" data-code="articleNews" data-type="info"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            #*<div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                <div class="dashboard-stat green">
+                    <div class="visual">
+                        <i class="fa fa-shopping-cart"></i>
+                    </div>
+                    <div class="details">
+                        <div class="number">
+                            <span id="todo_pictureNews">0</span>
+                        </div>
+                        <div class="desc"> 待发布图文内容</div>
+                    </div>
+                    <a class="more todolink" data-code="pictureNews" data-type="info"> 查看更多>>
+                        <i class="m-icon-swapright m-icon-white"></i>
+                    </a>
+                </div>
+            </div>*#
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6">
+                    <div class="dashboard-stat yellow">
+                        <div class="visual">
+                            <i class="fa fa-globe"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="todo_videoNews">0</span>
+                            </div>
+                            <div class="desc">待发布视频内容</div>
+                        </div>
+                        <a class="more todolink" data-code="videoNews" data-type="info"> 查看更多>>
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <!-- END DASHBOARD STATS 1-->
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日访问地区分析图</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">全站关键词搜索排行
+                                    <!--</span> &nbsp; <span style="font-size:14px;color:red">(数据来自搜索引擎统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_b" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日流量分析图</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_c" style="height: 365px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <div class="portlet light tasks-widget bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">当日流量趋势统计</span> &nbsp;
+                                <!--<span style="font-size:14px;color:red">(数据来自cnzz.com站长统计)</span>-->
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_d" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    mini.parse();
+    var cur = {
+        echartArr:[]
+    };
+    var cnzzData = {};
+    $(document).ready(function () {
+        var load_chart_a = function(ec) {
+            Ls.ajax({
+                type: "GET",
+                data: {
+                    scope:0
+                },
+                url: "/siteChartIndex/index",    // "/charts/getData",
+                success: function (text) {
+                    if (text.status == 1) {
+                        cnzzData.provList = text.data.cityList;
+                        cnzzData.proNumList = text.data.cityData;
+                        cnzzData.option_a = {
+                            grid: {
+                                x: 50,
+                                x2: 20,
+                                y: 50
+                            },
+                            title: {
+                                text: '',
+                                subtext: ''
+                            },
+                            tooltip: {
+                                trigger: 'item'
+                            },
+                            legend: {
+                                show: false,
+                                data: ['访问量']
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    magicType: {show: true, type: ['line', 'bar']},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'category',
+                                    axisLabel: {
+                                        interval: 0
+                                    },
+                                    data: cnzzData.provList
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value'
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '访问量',
+                                    type: 'bar',
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true,
+                                                position: 'top'
+                                            }
+                                        }
+                                    },
+                                    data: cnzzData.proNumList
+
+                                }
+                            ]
+                        };
+                        cur.chart_a = ec.init(document.getElementById('statistics_a'));
+                        cur.chart_a.setOption(cnzzData.option_a);
+                    }
+                }
+            }).done(function () {
+                var echartArr = [cur.chart_a];
+                var echartResize = function () {
+                    $.each(cur.echartArr, function (i, v) {
+                        setTimeout(function () {
+                            v.resize();
+                        }, 300)
+                    })
+                }
+                App.initEchartsResize(echartResize); //hehe
+            });
+        }
+
+        var load_chart_b = function(ec) {
+            Ls.ajax({
+                type: "GET",
+                data: {
+                    scope:1
+                },
+                url: "/siteChartIndex/index",    // "/charts/getData",
+                success: function (text) {
+                    if (text.status == 1) {
+                        cnzzData.kwList = text.data.kwList;
+                        cnzzData.kwNumList = text.data.kwNumList;
+                        cnzzData.option_b = {
+                            grid: {
+                                x: 80,
+                                x2: 40,
+                                y: 50
+                            },
+                            title: {
+                                show: false,
+                                text: '',
+                                subtext: ''
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}次)"
+                            },
+                            legend: {
+                                show: false,
+                                data: ['关键词搜索']
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    magicType: {show: true, type: ['line', 'bar']},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'value',
+                                    boundaryGap: [0, 0.01]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'category',
+                                    data: cnzzData.kwList
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '关键词搜索',
+                                    type: 'bar',
+                                    data: cnzzData.kwNumList
+                                }
+                            ],
+                            color: [
+                                '#1790cf', '#1bb2d8', '#99d2dd', '#88b0bb',
+                                '#1c7099', '#038cc4', '#75abd0', '#afd6dd'
+                            ]
+                        }
+
+                        cur.chart_b = ec.init(document.getElementById('statistics_b'));
+                        cur.chart_b.setOption(cnzzData.option_b);
+                    }
+                }
+            }).done(function () {
+                var echartArr = [cur.chart_b];
+                var echartResize = function () {
+                    $.each(cur.echartArr, function (i, v) {
+                        setTimeout(function () {
+                            v.resize();
+                        }, 300)
+                    })
+                }
+                App.initEchartsResize(echartResize); //hehe
+            });
+        }
+
+        var load_chart_c = function(ec) {
+            Ls.ajax({
+                type: "GET",
+                data: {
+                    scope:2
+                },
+                url: "/siteChartIndex/index",    // "/charts/getData",
+                success: function (text) {
+                    if (text.status == 1) {
+                        cnzzData.fwlyList = text.data.innerVisitSource;
+                        cnzzData.ssyqList = text.data.outVisitSource;
+                        cnzzData.syList = text.data.syList;
+                        var inner = [0, 85];
+                        var outer = [110, 150];
+                        if (cnzzData.ssyqList == "") {
+                            inner = [0, 140];
+                            outer = [];
+                        }
+
+                        cnzzData.option_c = {
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}%)"
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                x: 'left',
+                                data: cnzzData.syList
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    magicType: {
+                                        show: true,
+                                        type: ['pie', 'funnel']
+                                    },
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: false,
+                            series: [
+                                {
+                                    name: '访问来源',
+                                    type: 'pie',
+                                    selectedMode: 'single',
+                                    radius: inner,
+
+                                    x: '20%',
+                                    width: '40%',
+                                    funnelAlign: 'right',
+                                    // max: 1548,
+
+                                    itemStyle: {
+                                        emphasis: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    },
+                                    data: cnzzData.fwlyList
+                                },
+                                {
+                                    name: '访问来源',
+                                    type: 'pie',
+                                    radius: outer,
+
+                                    x: '60%',
+                                    width: '35%',
+                                    funnelAlign: 'left',
+                                    max: 1048,
+
+                                    data: cnzzData.ssyqList
+                                }
+                            ]
+                        };
+                        cur.chart_c = ec.init(document.getElementById('statistics_c'));
+                        cur.chart_c.setOption(cnzzData.option_c);
+                    }
+                }
+            }).done(function () {
+                var echartArr = [cur.chart_c];
+                var echartResize = function () {
+                    $.each(cur.echartArr, function (i, v) {
+                        setTimeout(function () {
+                            v.resize();
+                        }, 300)
+                    })
+                }
+                App.initEchartsResize(echartResize); //hehe
+            });
+        }
+
+        var load_chart_d = function(ec) {
+            Ls.ajax({
+                type: "GET",
+                data: {
+                    scope:3
+                },
+                url: "/siteChartIndex/index",    // "/charts/getData",
+                success: function (text) {
+                    if (text.status == 1) {
+                        cnzzData.llList = text.data.trendData;
+                        cnzzData.option_d = {
+                            grid: {
+                                x: 50,
+                                x2: 20,
+                                y: 50
+                            },
+                            tooltip: {
+                                trigger: 'item'
+                            },
+                            legend: {
+                                show: false,
+                                data: ['访问次数']
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    magicType: {
+                                        show: true,
+                                        type: ['line', 'bar']
+                                    },
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'category',
+                                    boundaryGap: false,
+                                    data: ['00:59-01:00', '01:59-02:00', '02:59-03:00', '03:59-04:00', '04:59-05:00', '05:59-06:00', '06:59-07:00',
+                                        '07:59-08:00', '08:59-09:00', '09:59-10:00', '10:59-11:00', '11:59-12:00', '12:59-13:00', '13:59-14:00', '14:59-15:00',
+                                        '15:59-16:00', '16:59-17:00', '17:59-18:00', '18:59-19:00', '19:59-20:00', '20:59-21:00', '21:59-22:00', '22:59-23:00', '23:59-00:00']
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value'
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '访问次数',
+                                    type: 'line',
+                                    stack: '次数',
+                                    data: cnzzData.llList
+                                }
+                            ]
+                        };
+                        cur.chart_d = ec.init(document.getElementById('statistics_d'));
+                        cur.chart_d.setOption(cnzzData.option_d);
+                    }
+                }
+            }).done(function () {
+                var echartArr = [cur.chart_d];
+                var echartResize = function () {
+                    $.each(cur.echartArr, function (i, v) {
+                        setTimeout(function () {
+                            v.resize();
+                        }, 300)
+                    })
+                }
+                App.initEchartsResize(echartResize); //hehe
+            });
+        }
+
+        Ls.parseEcharts(function () {
+            require([
+                    'echarts',
+                    'echarts/chart/line',
+                    'echarts/chart/bar',
+                    'echarts/chart/pie',
+                    'echarts/chart/funnel'
+                ], function (ec) {
+                    load_chart_a(ec);
+                    load_chart_b(ec);
+                    load_chart_c(ec);
+                    load_chart_d(ec);
+                }
+            );
+        })
+
+    })
+
+
+
+    var get_todoNumber = function () {
+        Ls.ajaxGet({
+            url: "/todolist/loadTodoList/",
+            data: {
+                shows: "articleNews,pictureNews,videoNews,messageBoard,todayPublish"
+            }
+        }).done(function (d) {
+            var d = d.data,
+                typeCode = {};
+            for (var i = 0, l = d.length; i < l; i++) {
+                $("#todo_" + d[i].typeCode).text(d[i].count);
+                typeCode[d[i].typeCode] = d[i].count;
+            }
+            $("#todo_articleNews_pictureNews").text((typeCode.articleNews == null ? 0:typeCode.articleNews) + (typeCode.pictureNews == null ? 0:typeCode.pictureNews));
+        })
+    }()
+
+    $(document).ready(function () {
+        $(".todolink").on('click', function () {
+            var _this = $(this),
+                code = _this.data("code"),
+                type = _this.data("type");
+            App.getContentHtml("/todolist/index?typeCode=" + code + "&showType=" + type);
+        })
+    })
+
+</script>

@@ -1,0 +1,32 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-fit">
+  <div class="mini-fit">
+    <ul class="ztree" id="petition_user_tree"></ul>
+  </div>
+</div>
+<div class="mini-toolbar" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+  <a class="mini-button" id="transmit" style="width:60px;" >确定</a>
+  <span style="display:inline-block;width:25px;"></span>
+  <a class="mini-button" style="width:60px;" onclick="onCancel()">取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/petition_choose_user.js"></script>
+<script type="text/javascript">
+  mini.parse();
+  var columnId="${columnId}";
+  var recType="${recType}";
+  var petitionId1="${petitionId}";
+  $(document).ready(function(){
+    userManage.getUser();
+  });
+
+
+  function onCancel() {
+    art.dialog.close();
+  }
+
+</script>
+</body>

@@ -1,0 +1,41 @@
+<script id="public_info_list_http_query_list_$!{paramObj.resultDivId}" type="text/html">
+    <? for(var i=0,l=datas.length; i<l; i++){ ?>
+    <? var el = datas[i] ?>
+    <? var title = el.title; if(title && title.length > $!{paramObj.length}) {title = title.substring(0,$!{paramObj.length}) + "..."} ?>
+    <li>
+        <a href="http://zwgk.mas.gov.cn/openness/detail/content/<?=el._id ?>.html" title="<?=el.title ?>"
+           target="_blank"><?=title ?></a>
+        <span class="right date"><?=Ls.dateFormat(el.openness_date, "$!{paramObj.dateFormat}")?></span>
+    </li>
+    <? } ?>
+</script>
+<script>
+    function queryHttpServiceData_$!{paramObj.resultDivId}() {
+        Ls.ajaxGet({
+            url: "/httpService/get?$!{paramObj.params}",
+            data: {
+                url: "$!{paramObj.url}"
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                if (data.aid == 0) {
+                    $("#$!{paramObj.resultDivId}").html(data.error);
+                    return;
+                }
+                var datas = data.datas;
+                if (datas.length > $!{paramObj.num}) {//截取
+                    data.datas = datas.slice(0, $!{paramObj.num});
+                }
+                var content = Ls.template("public_info_list_http_query_list_$!{paramObj.resultDivId}", d.data);
+                $("#$!{paramObj.resultDivId}").html(content);
+            } else {
+                $("#$!{paramObj.resultDivId}").html(d.desc);
+            }
+        });
+    }
+    $(document).ready(function () {
+        // 查询
+        queryHttpServiceData_$!{paramObj.resultDivId}();
+    });
+</script>

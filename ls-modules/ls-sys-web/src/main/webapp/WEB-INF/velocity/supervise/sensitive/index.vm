@@ -1,0 +1,226 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">敏感词</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="table-toolbar" style="margin-bottom: 10px">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="pdr10">
+                                    <button class="btn btn-default btn-add" onclick="editOrAddSensitiveEO('add')"> 新增
+                                    </button>
+                                    <button class="btn btn-default btn-excel-import" onclick="importExcel('sensitive')">
+                                        导入
+                                    </button>
+                                    <button class="btn btn-default btn-excel-export" onclick="exportExcel('sensitive')">
+                                        导出
+                                    </button>
+
+                                    <button class="btn btn-default btn-check-all" onclick="checkAll('sensitive')">
+                                        全局检测
+                                    </button>
+
+                                    <button class="btn btn-default btn-excel-export" onclick="synWords()">
+                                        词库更新
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+
+                                <form class="form-inline tr search-toolbar" role="form">
+                                    <div class="form-group">
+                                        <input type="text" id="ser_sensitive" name="searchKey" class="form-control" placeholder="关键词">
+                                    </div>
+                                    <button type="button" class="btn btn-default btn-search" onclick="search('sensitive')">搜索</button>
+                                    <button type="button" class="btn btn-default btn-show-all" onclick="showAll('sensitive')">显示全部</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div id="datagrid1" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/words/sensitive/getPageEOList" sizeList="[5,10,20,50]" pageSize="20"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div type="indexcolumn"></div>
+                            <div field="words" width="50%" align="center" headerAlign="center">敏感词</div>
+                            <div field="replaceWords" width="50%" align="center" headerAlign="center">替换词</div>
+                            <div field="createDate" width="130" align="center" headerAlign="center" allowSort="true" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                            <div width="115" align="center" headerAlign="center" allowSort="true" renderer="sensitiveDeal">操作</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        gridSensitive: mini.get("datagrid1"),
+        dialog: Ls.getWin.dialog
+    };
+    $(document).ready(function () {
+        cur.gridSensitive.load();
+
+        /*
+        * grid高度渲染
+        * */
+        Ls.mini_datagrid_height(cur.gridSensitive, 70);
+
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.gridSensitive.load();
+            }
+        });
+    })
+
+    /*
+    * 热词链接打开方式映射
+    * */
+    function openType(obj) {
+        if (!Ls.isEmpty(obj)) {
+            var record = obj.record;
+            switch (record.openType) {
+                case 0 :
+                    return "新窗口";
+                    break;
+                case 1 :
+                    return "当前窗口";
+                    break;
+            }
+        }
+    }
+
+    function editOrAddSensitiveEO(type,id) {
+        var url = '/words/sensitive/addOrEdit';
+        cur.dialog.data('type', type);
+        var title = "添加敏感词";
+        if (type == 'add') {
+            url = '/words/sensitive/addOrEdit?type=add';
+        } else {
+            var node = getSelectedNode('sensitive',id);
+            cur.dialog.data('node', node);
+            title = "修改敏感词";
+        }
+        Ls.openWin(url, '500px', '270px', {
+            title: title
+        });
+    }
+
+    function sensitiveDeal(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editOrAddSensitiveEO(\'edit\','+record.id+')">修 改</button> ' +
+            '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delByType(\'sensitive\','+record.id+')">删 除</button>';
+        return diyDom;
+    }
+
+    function delByType(type,id) {
+        var node = getSelectedNode(type,id);
+        var url = "/words/sensitive/delEO";
+
+        if(confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: url,
+                data: {
+                    id: node.id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.gridSensitive.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        };
+    }
+
+    function search(type) {
+        var keyValue = $("#ser_" + type).val();
+        cur.gridSensitive.load({keys: 'words,replaceWords', keyValue: keyValue});
+    }
+
+    function showAll(type) {
+        $("#ser_" + type).val('');
+        search(type);
+    }
+
+    function importExcel(type) {
+
+        var url = '/words/sensitive/excel';
+        var title = "导入敏感词";
+        cur.excelgrid = cur.gridSensitive;
+        Ls.openWin(url, '400px', '350px', {
+            title: title
+        });
+    }
+
+    function upload_success() {
+        Ls.tips("上传成功!", {times: 2});
+    }
+
+    function upload_error(msg) {
+        Ls.tips(msg, {times: 3});
+    }
+
+    function exportExcel(type) {
+        var keys = "words,replaceWords";
+        var keyValue = $("#ser_" + type).val();
+        $("#download_frame").attr("src", "$!{rc.contextPath}/words/" + type + "/import?keys=" + keys + "&keyValue=" + keyValue);
+    }
+
+    function getSelectedNode(type,id) {
+        return cur.gridSensitive.findRow(function(row){
+            if(row.id == id) return true;
+        });
+    }
+
+    function success_save_callback(type,msg) {
+        cur.gridSensitive.load();
+        Ls.tips(msg, {times: 2});
+    }
+
+    function checkAll(type) {
+        var title = '全局敏感词检测';
+        Ls.openWin("/words/" + type + "/checkAll", '900px', '560px', {
+            title: title,
+            init: function () {
+                indexMgr.winName = this.iframe.contentWindow;
+            }
+        });
+    }
+
+    function synWords() {
+        var tips = Ls.tips("同步中",{icons:'loading',autoClose:false});
+        Ls.ajaxGet({
+            url: "/words/sensitive/synWords",
+            data: {},
+            success: function (resp) {
+                tips.hide();
+                if(resp.status == 1) {
+                    Ls.tips(resp.desc);
+                    cur.gridSensitive.load();
+                } else {
+                    Ls.tips(resp.desc,{icons:"error"});
+                }
+            },
+            error: function(e) {
+                tips.hide();
+                Ls.tips("系统错误!",{icons:"error"});
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,31 @@
+<div class="xzmnlist list1">
+	<ul>
+	#set($xxgkData=$resultObj.data)
+	#if($xxgkData && $xxgkData.size() > 0)
+		#foreach($vo in $xxgkData)
+			<li><a href="$!{vo.link}" target="_blank" title="$!{vo.title}">$!{vo.title}</a></li>
+		#end
+	#else
+    	<li><font color="red">暂无数据</font></li>
+	#end
+    </ul>
+</div>
+#if($!{resultObj.pageCount} > 1)
+	<div id="page_$!{paramObj.type}" class="pagination">分页</div>
+	<script>
+		Ls.pagination("#page_$!{paramObj.type}", function (pageIndex) {
+            Ls.ajax({
+                dataType: "html",
+                url: '$!{resultObj.linkPrefix}&pageIndex=' + pageIndex
+            }).done(function (d) {
+                $("#btr$!{paramObj.type}").html(d);
+            })
+
+		}, {
+			currPage: ($!{resultObj.pageIndex}+1),
+			pageCount:$!{resultObj.pageCount},
+			param: "pageSize=$!{paramObj.pageSize}"
+		});
+	</script>
+<div class="clear"></div>
+#end

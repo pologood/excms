@@ -1,0 +1,60 @@
+#parse("_header.vm")
+<body class="page-body-white">
+    #parse("_footer.vm")
+<script>
+    var content_mgr= {
+        indicatorId:'$!{indicatorId}',
+        node:$!{node}
+    }
+</script>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        #parse("/content/message_board_modify.vm")
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        siteId: Ls.getWin.dialog.data('siteId')
+    }
+
+    cur.api.button(
+            {id:'save',className:'btn-save',name:'保存',callback:function(){saveData();return false;}},
+//            {id:'saveAndPublish',className:'btn-save-release',name:'保存并发布',callback:function(){saveAndPublish();return false;}},
+            {id:'back',className:'btn-back',name:'返回',callback:function(){back();return false;}}
+    );
+
+    function saveData() {
+        var content=$("#messageBoardContent").val();
+        curr.vm.messageBoardContent = editor.html();
+        if (content.length > 1999) {
+            Ls.tipsInfo("留言内容的字数长度应为1～1999");
+            return;
+        }
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            url: "/messageBoard/modifySave",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("修改成功");
+                cur.win.callBack("修改成功!");
+                Ls.winClose();
+            }
+        })
+    }
+
+    function saveAndPublish() {
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

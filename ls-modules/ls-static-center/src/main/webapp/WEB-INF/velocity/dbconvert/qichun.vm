@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+
+<body>
+<form id="formDB" action="/qichun/db/toNews" method="post">
+    #if("$!{type}"=="0")
+        <table>
+            <tbody>
+            <tr>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+                <td align="left">
+                </td>
+            </tr>
+            <tr>
+                <td>原栏目ID：</td>
+                <td>
+                    <select name="oldColumnId" size="30">
+                        #foreach($v in $list)
+                            <option value="${v.columnid}">
+                                $v.columnname - (${v.columnid})
+                            </option>
+                        #end
+                    </select>
+                </td>
+                <td>现栏目ID：</td>
+                <td>
+                    <select name="curColumdId" size="30">
+                        #foreach($v2 in $indicat)
+                            <option value="${v2.indicatorId}">${v2.name} - (${v2.indicatorId})</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4" align="center">
+                    <button id="doSub" type="button" style="height: 40px; ">提交</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    #else
+
+    #end
+</form>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#doSub").on('click', function () {
+            var _this = $(this);
+            _this.attr("disabled", true).text("数据正在导入,请耐心等待(请勿关闭浏览器)。");
+            $("#formDB").submit();
+        });
+    });
+
+</script>
+</body>
+</html>

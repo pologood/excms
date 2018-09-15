@@ -1,0 +1,68 @@
+#if("$!{eo.picPath}"!= "")
+    #set($picPath="$!{eo.picPath}")
+    #if($picPath.indexOf("http://") >= 0)
+        #set($imageLink="$!{eo.picPath}")
+    #elseif($picPath.indexOf(".") >= 0)
+        #set($imageLink="$!{fileServerNamePath}$!{eo.picPath}")
+    #else
+        #set($imageLink="$!{fileServerPath}$!{eo.picPath}")
+    #end
+#else
+    #set($imageLink="/assets/images/no_photo.jpg")
+#end
+<div>
+<table class="tb1">
+    <tbody>
+    <tr>
+        <th>代表照片：</th>
+        <td><img class="video-thumb" border="0" src="$imageLink" width="200" height="150" title="$!{eo.picName}"/>
+        </td>
+    </tr>
+    <tr>
+        <th>代表姓名：</th>
+        <td>$!{eo.name}</td>
+    </tr>
+    <tr>
+        <th>性别：</th>
+        <td>$!{eo.sex}</td>
+    </tr>
+    <tr>
+        <th>民族：</th>
+        <td>
+            #foreach($vo in $nationList)
+                #if($!{eo.nation}==$vo.code)
+                   $vo.key
+                #end
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>籍贯：</th>
+        <td>$!{eo.birthPlace}</td>
+    </tr>
+    <tr>
+        <th>代表团：</th>
+        <td>
+            #foreach($vo in $delegationList)
+                #if($!{eo.delegation}==$vo.code)
+                   $vo.key
+                #end
+            #end
+        </td>
+    </tr>
+    <tr>
+        <th>学历：</th>
+        <td>
+            #foreach($vo in $educationList)
+                #if($!{eo.education}==$vo.code)
+                    $vo.key
+                #end
+            #end
+    </tr>
+    <tr>
+        <th>工作单位：</th>
+        <td>$!{eo.workUnit}</td>
+    </tr>
+    </tbody>
+</table>
+</div>

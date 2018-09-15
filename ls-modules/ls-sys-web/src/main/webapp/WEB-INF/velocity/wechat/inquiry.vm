@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>留言搜索</title>
+    <link href="$!{sysStaticPath}/assets/css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/weui.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <style>
+        body {
+            background-color: #fbf9fe
+        }
+
+        .page.cell .page_title {
+            color: #225fba;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="page slideIn cell">
+<form action="/webAuth/inquiry" id="iForm">
+    <div class="weui_panel weui_panel_access" id="wxCtrl" ms-controller="wxCtrl">
+        <div class="page slideIn cell" id="form">
+            <div class="hd">
+                <h1 class="page_title">搜索</h1>
+            </div>
+            <input type="hidden" value="$!{siteId}" name="siteId"/>
+            <div class="bd">
+                <div class="weui_cells_title">标题</div>
+                <div class="weui_cells">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <input class="weui_input" type="text" placeholder="请输入查询的标题" name="title" id="title">
+                        </div>
+                    </div>
+                </div>
+                <div class="weui_cells_title">开始日期</div>
+                <div class="weui_cells">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <input type="date" value="" class="weui_input" id="st" name="st" placeholder="请输入开始日期">
+                        </div>
+                    </div>
+                </div>
+                <div class="weui_cells_title">结束日期</div>
+                <div class="weui_cells">
+                    <div class="weui_cell">
+                        <div class="weui_cell_bd weui_cell_primary">
+                            <input type="date" value="" class="weui_input" id="ed" name="ed" placeholder="请输入结束日期">
+                        </div>
+                    </div>
+                </div>
+                <div class="weui_btn_area">
+                    <a class="weui_btn weui_btn_primary" href="javascript:" id="showTooltips" onclick="doSub()">确定</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/avalon.mobile-min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/pages/wechartweb/wx_mgr.js"></script>
+<script>
+    var siteId =$!{siteId};
+    $(document).ready(function () {
+
+    });
+
+    function doSub() {
+        $("#iForm").submit();
+    }
+</script>
+</html>

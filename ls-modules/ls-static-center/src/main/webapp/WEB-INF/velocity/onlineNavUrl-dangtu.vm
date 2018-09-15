@@ -1,0 +1,21 @@
+    #set($Integer=0)
+    #set($length="$!{paramObj.length}")
+    #set($length=$Integer.parseInt($length))
+    <ul>
+    #foreach($eo in $!{resultObj})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="")
+        #end
+            <li>
+                <p class="p1">$!{eo.CaseID}</p>
+                <p class="p2">
+                   $!{eo.WorkItemName}
+                </p>
+                <p class="p3">#cut_date_format($!{eo.CreateDate},"yyyy-MM-dd","$!{paramObj.dateFormat}")</p>
+
+                <p class="p4">$!{eo.State}</p>
+
+            </li>
+    #end
+    </ul>

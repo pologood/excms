@@ -1,0 +1,80 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .collect_div {
+        margin: 0px auto;
+        border: 1px solid #D3D3D3;
+        background-color: #F7F7F7
+    }
+</style>
+</head>
+<body class="page-body-white" style="padding: 10px">
+<div id="ui_layout" class="mini-layout" style="width: 100%;height: 100%;">
+    <div class="collect_div" title="north" region="north" height="54" showHeader="false">
+        <table id="scan_table" class="table table-bordered article-table" style="margin-bottom: 0px;">
+            <tr>
+                <th>成功数:</th>
+                <td>
+                    <input type="text" id="numberSuccess" style="width: 100px" name="numberSuccess" class="form-control readonly" readonly>
+                </td>
+                <th>失败数:</th>
+                <td>
+                    <input type="text" id="numberFail" style="width: 100px" name="numberFail" class="form-control readonly" readonly>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="collect_div" title="成功" region="center" showHeader="true" showCollapseButton="false">
+        <div id="collect_log_success" style="padding:10px;width: 100%;height: 100%"></div>
+    </div>
+    <div class="collect_div" title="失败" region="east" width="400" showHeader="true" showCollapseButton="false">
+        <div id="collect_log_fail" style="padding:10px;width: 100%;height: 100%"></div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/dwr/util.js"></script>
+<script src="$!{rc.contextPath}/dwr/engine.js"></script>
+<script>
+    mini.parse();
+    var tips = Ls.tipsLoading("采集初始化中", {autoClose: false});
+    var success_num = 1;
+    var fail_num = 1;
+    var exception = null;
+    var cur = {
+        api: Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+    };
+
+    $(function () {
+        cur.api.button(
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '关闭',
+                callback: function () {
+                    back();
+                    return false;
+                }
+            }
+        );
+        dwr.engine.setActiveReverseAjax(true);
+    });
+
+    function collectSuccess(content) {
+        tips.hide();
+        $("#collect_log_success").append(content);
+        $("#numberSuccess").val(success_num++);
+    }
+
+    function collectFail(content) {
+        tips.hide();
+        $("#collect_log_fail").append(content);
+        $("#numberFail").val(fail_num++);
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

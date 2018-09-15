@@ -1,0 +1,29 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($dateType="$!{paramObj.dateType}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+<li>
+    #set($title=$!{eo.title})
+    <a href="#if("$!{eo.isTimeOut}"=="2")$!{eo.linkUrl}#else$!{eo.viewUrl}#end" target="$!{paramObj.target}" title="${title}" class="left">
+        #cutstr($title,$length)
+    </a>
+    #if($isDate == "true")
+        #if("${dateType}"=="1")
+            <span class="right date">#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</span>
+        #else
+            <span class="right date">$!{eo.timeStr}</span>
+        #end
+    #end
+    #if("$!{eo.isTimeOut}" == "1")
+        <span class="nostart">未开始</span>
+    #elseif("$!{eo.isTimeOut}" == "2")
+        <span class="starting">进行中</span>
+    #elseif("$!{eo.isTimeOut}" == "3")
+        <span class="over">已结束</span>
+    #else
+    #end
+</li>
+#end

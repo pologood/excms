@@ -1,0 +1,131 @@
+<style>
+    .thumb img {
+        max-width: 140px;
+        max-height: 30px;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="editMaterial()">添加素材</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/specialMaterial/getPagination?dataFlag=1" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                        <div field="name" width="100%" align="center" headerAlign="center">素材名称</div>
+                        <div width="150" align="center" headerAlign="center" renderer="renderImg">图片</div>
+                        <div field="width" width="80" align="center" headerAlign="center">宽度</div>
+                        <div field="height" width="80" align="center" headerAlign="center">高度</div>
+                        <div width="110" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        name: $("#name"),
+        grid: mini.get('datagrid'),
+        dialog: Ls.getWin.dialog,
+        url: {
+            specialMaterialEdit: '/specialMaterial/specialMaterialEdit'
+        }
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    })
+
+    /*
+    * 添加
+    * */
+    function editMaterial(id) {
+        var url = cur.url.specialMaterialEdit;
+        var title = '添加素材';
+        if (id) {
+            url = url + '?id=' + id;
+            title = '编辑素材';
+        }
+        Ls.openWin(url, '700px', '500px', {
+            title: title
+        });
+    }
+
+    function deleteSpecialMaterial(id) {
+        if (confirm('是否确定删除?')) {
+            Ls.ajax({
+                type: "POST",
+                data: {ids: id},
+                url: "/specialMaterial/deleteSpecialMaterial",
+                success: function (json) {
+                    if (json.status == 1) {
+                        Ls.tipsOk("操作成功", function () {
+                            search()
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editMaterial(' + record.id + ')">修改</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="deleteSpecialMaterial(' + record.id + ')">删 除</button>';
+        return edit + del;
+    }
+
+    function renderImg(obj) {
+        var record = obj.record;
+        var str = '';
+        if (!Ls.isEmpty(record.imgPath)) {
+            var path = "";
+            if(record.imgPath.indexOf(".") == -1){
+                path = GLOBAL_FILESERVERPATH + record.imgPath;
+            }else{
+                path = GLOBAL_FILESERVERNAMEPATH + record.imgPath;
+            }
+            str = '<div class="thumb"><img src="' + path + '" /></div>'
+        }
+        return str;
+    }
+
+    function search() {
+        var name = cur.name.val();
+        cur.grid.load({name: name});
+    }
+
+    function showAll() {
+        cur.name.val('');
+        search();
+    }
+</script>

@@ -1,0 +1,2 @@
+##网站访问白名单，全部输出
+var whitelist = [#foreach($eo in $resultObj)#if($velocityCount>1),#end"$!{eo.redirectLink}"#end];

@@ -1,0 +1,87 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+    <div class="portlet light">
+        <div class="portlet-body">
+
+            <div id="refered_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+                 sizeList="[10,20,50]" pageSize="10" idField="id" multiSelect="true" url="/articleNews/getReferedDetailPage?dataFlag=1">
+                <div property="columns">
+                    <div field="personName" width="100" headerAlign="center" allowSort="flase" align="center">操作人员</div>
+                    <div field="organName" width="80" headerAlign="center" align="center" allowSort="flase" >单位</div>
+                    <div width="80" headerAlign="center" align="center" allowSort="flase" renderer="referedStatus">状态</div>
+                    <div width="100%" headerAlign="center" align="center" allowSort="flase" renderer="remark">备注</div>
+                    <div field="createDate" width="150" headerAlign="center" align="center" allowSort="flase"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">操作时间</div>
+                    <div width="80" headerAlign="center" align="center" allowSort="flase" renderer="renderOp">操作</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id:$!{id},
+        refered_datagrid:null
+    }
+
+    $(document).ready(function(){
+        // 初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.refered_datagrid = mini.get("refered_datagrid");
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.refered_datagrid);
+
+        reload();
+    })
+
+    function reload() {
+        // 加载grid数据
+        cur.refered_datagrid.load({
+            causeById: cur.id
+        });
+    }
+
+    function referedStatus(e) {
+        return "被引用";
+    }
+
+    function remark(e){
+        var rec = e.record;
+        var referModelCode = rec.referModelCode;
+        if(referModelCode!=null&&referModelCode!=""&&referModelCode=="PUBLIC"){
+            return '引用到"'+rec.referName+'"目录';
+        }else{
+            return '引用到"'+rec.referName+'"栏目';
+        }
+    }
+
+
+    function renderOp(e) {
+        var rec = e.record;
+        var str = '<button type="button" class="btn btn-default btn-sm" onclick="cancelRefer(' + rec.referId + ')">撤销引用</button>';
+        return str;
+    }
+
+    function cancelRefer(referId){
+        var check = [];
+        check.push(referId);
+        Ls.ajaxGet({
+            data: {
+                ids: check
+            },
+            url: "/articleNews/delete",
+            success: function (text) {
+                if (text.status) {
+                    Ls.tipsOk("撤销引用成功")
+                    reload();
+                } else {
+                    Ls.tipsErr(text.desc);
+                }
+
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,199 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <div class="tab-content">
+                <form id="member_role_form" role="form" ms-controller="member_role_form" autocomplete="off">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <table class="table table-bordered bbs-c-table">
+                                <tbody>
+                                <tr>
+                                    <th>头衔名称：</th>
+                                    <td>
+                                        <input type="text" name="name" ms-duplex="name" class="form-control w100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>星星数：</th>
+                                    <td>
+                                        <input type="text" name="starNumber" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="1" ms-duplex="starNumber" class="form-control w100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>积分需求：</th>
+                                    <td>
+                                        <input type="text" name="riches" onkeyup="this.value=this.value.replace(/\D/g,'')" maxlength="10" ms-duplex="riches" class="form-control w100">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>允许发表新主题：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="canThread" value="1" ms-duplex-string="canThread">是</label>
+                                            <label class="radio-inline"><input type="radio" name="canThread" value="0" ms-duplex-string="canThread">否</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>允许发表新回复：</th>
+                                    <td>
+                                        <label class="radio-inline"><input type="radio" name="canPost" value="1" ms-duplex-string="canPost">是</label>
+                                        <label class="radio-inline"><input type="radio" name="canPost" value="0" ms-duplex-string="canPost">否</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>允许直接发帖：</th>
+                                    <td>
+                                        <label class="radio-inline"><input type="radio" name="needConfirm" value="0" ms-duplex-string="needConfirm">全部需要审核</label>
+                                        <label class="radio-inline"><input type="radio" name="needConfirm" value="1" ms-duplex-string="needConfirm">发新回复不需要审核</label>
+                                        <label class="radio-inline"><input type="radio" name="needConfirm" value="2" ms-duplex-string="needConfirm">发新主题不需要审核</label>
+                                        <label class="radio-inline"><input type="radio" name="needConfirm" value="3" ms-duplex-string="needConfirm">全部不需要审核</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>允许下载/查看附件：</th>
+                                    <td>
+                                        <label class="radio-inline"><input type="radio" name="canDownload" value="1" ms-duplex-string="canDownload">是</label>
+                                        <label class="radio-inline"><input type="radio" name="canDownload" value="0" ms-duplex-string="canDownload">否</label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>允许发布附件：</th>
+                                    <td>
+                                        <label class="radio-inline"><input type="radio" name="canUpload" value="1" ms-duplex-string="canUpload">是</label>
+                                        <label class="radio-inline"><input type="radio" name="canUpload" value="0" ms-duplex-string="canUpload">否</label>
+                                    </td>
+                                </tr>   <tr>
+                                    <th>高级特权：</th>
+                                    <td>
+                                        <label class="radio-inline"><input type="checkbox" id="canRemove" name="canRemove" value="0">删除帖子</label>
+                                        <label class="radio-inline"><input type="checkbox" id="canConfirm" name="canConfirm" value="0">审核帖子</label>
+                                        <label class="radio-inline"><input type="checkbox" id="canSetGood" name="canSetGood" value="0">设置精华贴</label>
+                                        <label class="radio-inline"><input type="checkbox" id="canSetChannelTop" name="canSetChannelTop" value="0">设置贴子频道</label>
+                                        <label class="radio-inline"><input type="checkbox" id="canSetTop" name="canSetTop" value="0">置顶贴子总置顶</label>
+                                        <label class="radio-inline"><input type="checkbox" id="canSetLock" name="canSetLock" value="0">锁定贴子</label>
+                                    </td>
+                                <tr>
+                                    <th></th>
+                                    <td colspan="2">
+                                        <div class="form-actions noborder">
+                                            <button class="btn btn-default btn-save" type="button" onclick="save();"> 保 存</button>
+                                            <button class="btn btn-default btn-back" type="button" onclick="goBack();"> 返 回</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    var cur = {
+        siteId: GLOBAL_SITEID,
+        canRemove:$("#canRemove"),
+        canConfirm:$("#canConfirm"),
+        canSetGood:$("#canSetGood"),
+        canSetChannelTop:$("#canSetChannelTop"),
+        canSetTop:$("#canSetTop"),
+        canSetLock:$("#canSetLock")
+    }
+    var memberRoleId ="$!{memberRoleId}";
+    $(document).ready(function () {
+        Ls.ajaxGet({
+            url: "/memberRole/getBbsMemberRole",
+            data: {
+                id: memberRoleId,
+                siteId:cur.siteId
+            }
+        }).done(function (d) {
+            data = d.data;
+            cur.$id = "member_role_form";
+            //初始化表单字段
+            cur.init = Ls.initFORM(cur.$id, data);
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[cur.$id];
+            if (!cur.vm) {
+                cur.vm = avalon.define(cur.init);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan($("#member_role_form").get(0),cur.vm);
+            if(data.id != null && data.id !="") {
+                if (data.canRemove == 1) {
+                    cur.canRemove.attr("checked", true);
+                }
+                if (data.canConfirm == 1) {
+                    cur.canConfirm.attr("checked", true);
+                }
+                if (data.canSetGood == 1) {
+                    cur.canSetGood.attr("checked", true);
+                }
+                if (data.canSetChannelTop == 1) {
+                    cur.canSetChannelTop.attr("checked", true);
+                }
+                if (data.canSetTop == 1) {
+                    cur.canSetTop.attr("checked", true);
+                }
+                if (data.canSetLock == 1) {
+                    cur.canSetLock.attr("checked", true);
+                }
+            }
+        });
+    })
+
+    var save = function () {
+        $('#member_role_form').submit();
+    }
+
+    $('#member_role_form').validator({
+        fields: {
+            'name': '头衔名称:required;length[1~100]',
+            'starNumber': '星星数:required;length[1~50]',
+            'riches': '积分需求:required;length[1~50]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = cur.vm.$model;
+        data = Ls.toJSON(data);
+        if(data.starNumber>5){
+            Ls.tipsErr("星星数不能大于5");
+            return;
+        }
+        if(cur.canRemove.is(":checked")){data.canRemove = 1;}else{data.canRemove = 0;}
+        if(cur.canConfirm.is(":checked")){data.canConfirm = 1;}else{data.canConfirm = 0;}
+        if(cur.canSetGood.is(":checked")){data.canSetGood = 1;}else{data.canSetGood = 0;}
+        if(cur.canSetChannelTop.is(":checked")){data.canSetChannelTop = 1;}else{data.canSetChannelTop = 0;}
+        if(cur.canSetTop.is(":checked")){data.canSetTop = 1;}else{data.canSetTop = 0;}
+        if(cur.canSetLock.is(":checked")){data.canSetLock = 1;}else{data.canSetLock = 0;}
+        Ls.ajax({
+            url: "/memberRole/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    var goBack = function (){
+        App.getContentHtml("/memberRole/list","");
+    }
+
+</script>

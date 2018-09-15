@@ -1,0 +1,224 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .sp_result_area {
+        width: 412px;
+    }
+</style>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                #parse("/public/catalog/form.vm")
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/selectPage/selectpage.min.js"></script>
+<script>
+    var cur = {
+        id: "catalog_form",//表单
+        vm: null,//模型
+        query_url: "/public/catalog/getPublicCatalog",//查询url
+        save_url: "/public/catalog/saveOrUpdate",//保存url
+        public_catalog_url: "/public/catalog/getPublicCatalogSelectWithOrgan",//保存url
+        W: Ls.getWin.win,
+        data: null//数据
+    };
+    //选择目录
+    var relCatIds_select = function () {
+        Ls.openWin(cur.public_catalog_url, '400px', '400px', {
+            id: 'public_catalog_select',
+            title: '关联目录',
+            padding: 0,
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                var data = iframe.cur.ok();
+                if (data != null) {
+                    cur.vm.relCatIds = data.selectIds;
+                    cur.vm.relCatNames = data.selectNames;
+                }
+            }
+        });
+    }
+
+    function getReferColumn() {
+//        var isReferColumn = cur.vm.isReferColumn;
+//        if(isReferColumn!=null&&isReferColumn!=""&&isReferColumn==1){
+//            Ls.tipsInfo("当前目录信息引用自其他栏目，不能再次引用到别的栏目", {times: 2});
+//            return ;
+//        }
+
+        var referColumnIds = $("#referColumnIds").val();
+        var url = '/siteMain/getReferColumns?siteId=' + cur.W.GLOBAL_SITEID + '&synColumnIds='
+                + referColumnIds + '&contentModelCode=&indicatorId=';
+        Ls.openWin(url, '400px', '500px', {
+            id: 'refer_column',
+            title: '引用信息到栏目',
+            padding: 0,
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.doOk();
+                if (data != null) {
+                    cur.vm.referColumnIds = data.ids;
+                    cur.vm.referColumnNames = data.names;
+                }
+            }
+        });
+    }
+
+    function getReferOrganCat() {
+//        var isReferColumn = cur.vm.isReferColumn;
+//        if(isReferColumn!=null&&isReferColumn!=""&&isReferColumn==1){
+//            Ls.tipsInfo("当前目录信息引用自其他栏目，不能再次引用到别的栏目", {times: 2});
+//            return ;
+//        }
+
+        var referOrganCatIds = $("#referOrganCatIds").val();
+        var url = '/public/catalog/getReferOrganCats?referOrganCatIds='
+                + referOrganCatIds + '&catId='+cur.W.cur.node.id;
+
+        Ls.openWin(url, '400px', '500px', {
+            id: 'refer_organ_cat',
+            title: '引用信息到信息公开',
+            padding: 0,
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                var data = iframe.cur.ok();
+                if (data != null) {
+                    cur.vm.referOrganCatIds = data.selectIds;
+                    cur.vm.referOrganCatNames = data.selectNames;
+                    console.log(data.selectIds);
+                    console.log(data.selectNames);
+                }
+            }
+        });
+
+    }
+
+    // 获取栏目
+    function getColumnClass() {
+        Ls.ajaxGet({
+            url: "/columnType/getList",
+            data: {}
+        }).done(function (text) {
+            var str = '<option value="">请选择栏目类别</option>';
+            if (text != null && text.data != null) {
+                var data = text.data,
+                        val = '';
+                console.log(data);
+                $('#columnTypeId').attr('value', cur.vm.columnTypeIds)
+
+            }
+            if ($('.sp_result_area').length > 0) $('.sp_result_area').remove();
+            $('#columnTypeId').selectPage({
+                showField : 'typeName',
+                keyField : 'id',
+                orderBy : ['id desc'],
+                data : data,
+                listSize : 15,
+                selectOnly : true,
+                pagination : false,
+                multiple : true,
+                eSelect : function(data){
+                    cur.vm.columnTypeIds = $("#columnTypeId").val();
+                    $("#columnTypeId").trigger("hidemsg");
+                },
+                eTagRemove:function(data){
+                    cur.vm.columnTypeIds = $("#columnTypeId").val();
+                }
+            });
+        });
+    }
+
+
+    $(document).ready(function () {
+        var node = cur.W.cur.node;
+        var id = cur.W.cur.type == 1 ? "" : node.id;//判断是新增删除
+
+        //加载数据
+        cur.W.catalogManage.loadData(cur.query_url, {"id": id, "organId": cur.W.cur.organId}, function (data) {
+            data.$id = cur.id;
+            //判断目录
+            if (cur.W.cur.selectOrgan) {// 选择部门
+                data.type = 2;// 私有目录
+                data.organId = cur.W.cur.organId;
+            } else {
+                data.type = 1;// 公有目录
+            }
+
+            // 判断父子关系
+            if (cur.W.cur.type == 1) {
+                data.siteId = cur.W.GLOBAL_SITEID;// 站点id
+                data.parentId = node.id;
+                // 给默认序号
+                var children = cur.W.cur.node.children;
+                if (!children || children.length == 0) {
+                    data.sortNum = 1;
+                } else {
+                    data.sortNum = parseInt(children[children.length - 1].sortNum) + 2;
+                }
+            }
+
+            // 如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[data.$id];
+            if (!cur.vm) {
+                // 绑定模型
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan($("#" + cur.id).get(0), cur.vm);
+
+            getColumnClass();
+        })
+
+
+
+        //验证
+        $('#' + cur.id).validator({
+            target: function(elem){
+                var selectP = $(elem).parent(),
+                        msgbox = selectP.find('span.msg-box');
+                if (!msgbox.length) {
+                    if (selectP.hasClass('sp_container')) {
+                        msgbox = $('<span class="msg-box"></span>').prependTo(selectP);
+                    }else {
+                        msgbox = $(elem).before('<span class="msg-box"></span>');
+                    }
+
+                }
+                return msgbox;
+            },
+            fields: {
+                'name': '名称:required;length(~40)',
+                //'code' : '编码:required;',
+                'sortNum': '排序号:range[1~9999]'//,
+                //'columnTypeId': 'required'
+            },
+            valid: function () {
+                cur.vm.columnTypeIds = $("#columnTypeId").val();
+                cur.W.catalogManage.loadData(cur.save_url, Ls.toJSON(cur.vm.$model), function (d) {
+                    if (d.status == 1) {
+                        // 关闭弹框
+                        cur.data = d.data;
+                        Ls.getWin.api.close();
+                    } else {
+                        Ls.tips(d.desc, {icons: "error"});
+                    }
+                });
+            }
+        });
+
+        Ls.getWin.api.button({
+            name: '确定',
+            className: "aui_state_highlight",
+            callback: function () {
+                $('#' + cur.id).submit();
+                return false;
+            }
+        });
+    });
+</script>

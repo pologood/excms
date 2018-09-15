@@ -1,0 +1,258 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn" onclick="batchRecovery()"><a href="javascript:;">批量恢复</a></li>
+                                    <li class="publishBtn" onclick="batchRealDelete()"><a href="javascript:;">批量彻底删除</a></li>
+                                </ul>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('articleNews')">文章新闻</a></li>
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('pictureNews')">图片新闻</a></li>
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('videoNews')">视频新闻</a></li>
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('messageBoard')">留言管理</a></li>
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('leaderInfo')">领导之窗</a></li>
+                                    <li><a href="javascript:;" onclick="searchByTypeCode('knowledgeBase')">问答知识库</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+
+                            <form class="form-inline tr" role="form">
+                                <div class="form-group">
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()"> 搜 索</button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:640px;" onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/recycle/getPageRecycle" sizeList="[5,10,20,50]" pageSize="15"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                        <div field="columnName" width="140" headerAlign="center" align="center">所属栏目</div>
+                        <div field="" width="100%" headerAlign="center" renderer="goLink">标题</div>
+                        <div field="createDate" width="160" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                        <div field="" width="195" headerAlign="center" renderer="renderOpr" align="center">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get("datagrid1"),
+        dialog: Ls.getWin.dialog
+    }
+
+    var gridParam = {
+        dataFlag: 1,
+        pageIndex: 0,
+        pageSize: 15
+    };
+
+    $(document).ready(function () {
+        cur.grid.load(gridParam);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+    });
+
+    //操作
+    function renderOpr(e) {
+        var str = "";
+        var rec = e.record;
+        if(rec.columnName=="该栏目已被删除"){
+            str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="details(' + rec.id + ',\'' + rec.typeCode + '\',' + rec.columnId + ')">详 情</button> '
+            + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="batchRealDelete(' + rec.id + ',\'' + rec.typeCode + '\')">彻底删除</button> ';
+        }else{
+            str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="details(' + rec.id + ',\'' + rec.typeCode + '\',' + rec.columnId + ')">详 情</button> '
+                    + '<button id="_p" class="btn btn-default btn-sm btn-publish" onclick="batchRecovery(' + rec.id + ')">恢 复</button> '
+                    + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="batchRealDelete(' + rec.id + ',\'' + rec.typeCode + '\')">彻底删除</button> ';
+        }
+        return str;
+    }
+
+    function goLink(e) {
+        var rec = e.record
+        var str = "";
+//        if (rec.redirectLink != null) {
+//            str = '<a target="_blank" href="' + rec.redirectLink + '"><u>' + rec.title + '</u></a>';
+//        } else {
+//            str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.id + '"><u>' + rec.title + '</u></a>';
+//        }
+        str = '<a href="javascript:void(0)" onclick="details(' + rec.id + ',\'' + rec.typeCode + '\',' + rec.columnId + ')" ><u>' + rec.title + '</u></a>';
+
+        return str;
+    }
+
+    //属性筛选
+    function searchByTypeCode(typeCode) {
+        cur.typeCode = typeCode;
+        gridParam.typeCode = typeCode;
+        cur.grid.load(gridParam);
+    }
+
+    //标题搜索
+    function search() {
+        var title = $("#searchKey").val();
+        gridParam.title = title;
+        cur.grid.load(gridParam);
+    }
+
+    //显示全部
+    function showAll() {
+        $("#searchKey").val("");
+        gridParam.title = "";
+        gridParam.typeCode = "";
+        cur.grid.load(gridParam);
+    }
+
+    function batchRecovery(id) {
+        var ids = [];
+        if (id != null) {
+            ids.push(id);
+        }
+        var rows = cur.grid.getSelecteds();
+        if (ids.length <= 0 && rows.length <= 0) {
+            Ls.tipsInfo("请至少选择一项操作");
+            return;
+        }
+        for (var i = 0, l = rows.length; i < l; i++) {
+            if(rows[i].columnName!="该栏目已被删除"){
+                ids.push(rows[i].id);
+            }
+        }
+        if(ids==null||ids.length==0){
+            Ls.tipsInfo("请至少选择一项操作,不包含栏目已被删除的内容");
+        }else{
+            if (confirm("确定恢复所选项？")) {
+                Ls.ajaxGet({
+                    type: "POST",
+                    data: {
+                        ids: ids
+                    },
+                    url: "/recycle/batchRecovery",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            Ls.tips(text.desc);
+                            cur.grid.load(gridParam);
+                        } else {
+                            Ls.tips(text.desc, {icons: 'error'});
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    function batchRealDelete(id, typeCode) {
+        var articleIds = [];
+        var pictureIds = [];
+        var videoIds = [];
+        var guestBookIds = [];
+        var messageBoardIds=[];
+        var leaderInfoIds = [];
+        var knowledgeIds = [];
+        if (id != null) {
+            if (typeCode == 'articleNews') {
+                articleIds.push(id);
+            } else if (typeCode == 'pictureNews') {
+                pictureIds.push(id);
+            } else if (typeCode == 'videoNews') {
+                videoIds.push(id);
+            } else if (typeCode == 'guestBook') {
+                guestBookIds.push(id);
+            } else if (typeCode == 'messageBoard') {
+                messageBoardIds.push(id);
+            }else if (typeCode == 'leaderInfo') {
+                leaderInfoIds.push(id);
+            }else if (typeCode == 'knowledgeBase') {
+                knowledgeIds.push(id);
+            }
+        } else {
+            var rows = cur.grid.getSelecteds();
+            if (rows.length <= 0) {
+                Ls.tipsInfo("请至少选择一项操作");
+                return;
+            }
+            for (var i = 0, l = rows.length; i < l; i++) {
+                if (rows[i].typeCode == 'articleNews') {
+                    articleIds.push(rows[i].id);
+                } else if (rows[i].typeCode == 'pictureNews') {
+                    pictureIds.push(rows[i].id);
+                } else if (rows[i].typeCode == 'videoNews') {
+                    videoIds.push(rows[i].id);
+                } else if (rows[i].typeCode == 'guestBook') {
+                    guestBookIds.push(rows[i].id);
+                } else if (rows[i].typeCode == 'messageBoard') {
+                    messageBoardIds.push(rows[i].id);
+                }  else if (rows[i].typeCode == 'leaderInfo') {
+                    leaderInfoIds.push(rows[i].id);
+                }   else if (rows[i].typeCode == 'knowledgeBase') {
+                    knowledgeIds.push(rows[i].id);
+                }
+            }
+        }
+
+        if (confirm("确定删除所选项？")) {
+            Ls.ajaxGet({
+                type: "POST",
+                data: {
+                    articleIds: articleIds,
+                    pictureIds: pictureIds,
+                    videoIds: videoIds,
+                    guestBookIds: guestBookIds,
+                    messageBoardIds:messageBoardIds,
+                    leaderInfoIds: leaderInfoIds,
+                    knowledgeIds:knowledgeIds
+                },
+                url: "/recycle/batchRealDelete",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tips(text.desc);
+                        cur.grid.load(gridParam);
+                    } else {
+                        Ls.tips(text.desc, {icons: 'error'});
+                    }
+                }
+            });
+        }
+    }
+
+    //打开详情窗口
+    function details(id, typeCode, columnId) {
+        cur.typeCode = typeCode;
+        cur.dialog.data('siteId', GLOBAL_SITEID);
+        var height = $(window).height() - 100;
+        height > 650 ? height = 650 : height = height;
+        Ls.openWin('/recycle/showDetail?typeCode=' + typeCode + '&columnId=' + columnId + '&id=' + id, '1100px', height, {
+            id: 'record',
+            title: '内容详情',
+            padding: 0,
+            lock: true,
+        });
+    }
+
+    function callBack(msg) {
+        Ls.tips(msg);
+        cur.grid.load();
+    }
+</script>

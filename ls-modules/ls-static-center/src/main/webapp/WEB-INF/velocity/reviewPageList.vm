@@ -1,0 +1,32 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($length=$Integer.parseInt($length))
+#if($!{paramObj.action} == "isShow")
+    #parse("reviewInfo_save.vm")
+#else
+    #if($resultObj.data.size()>0)
+    <ul class="review-list list-$!{context.columnId}">
+        #foreach($eo in $resultObj.data)
+            <li>
+                #set($title=$!{eo.title})
+                <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="${title}" class="left">
+                    #cutstr($title,$length)
+                </a>
+                #if($isDate == "true")
+                    <span class="right date">$!{eo.timeStr}</span>
+                #end
+            </li>
+        #end
+    </ul>
+        #if($!{resultObj.pageCount}>1)
+        <div id="reviewPage" class="pagination"></div>
+        <script>
+            Ls.pagination("#reviewPage", function (pageIndex) {
+                location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex;
+            }, {currPage: ($!{resultObj.pageIndex}+1), pageCount:$!{resultObj.pageCount}, param: "pageSize=$!{paramObj.pageSize}"})
+        </script>
+        #end
+    #end
+#end

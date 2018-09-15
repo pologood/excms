@@ -1,0 +1,101 @@
+<form id="attrForm" class="sui-form form-horizontal sui-validate" style="padding: 10px;">
+
+    <sui-control-group title="标题类型">
+        <sui-radio-group v-model="conf.type">
+            <sui-radio label="text">文字</sui-radio>
+            <sui-radio label="image">图片</sui-radio>
+        </sui-radio-group>
+    </sui-control-group>
+
+    <div v-bind:class="[conf.type=='image' ? '' : 'dn' ]">
+        <div class="control-group">
+                <label class="control-label">LOGO：</label>
+                <div class="controls">
+                    <a id="addLogoBtn" href="javascript:void(0);" class="sui-btn btn-xlarge">添加图片</a>
+                    <a href="javascript:;" class="sui-btn btn-xlarge " v-on:click="downloadFile" >下载</a>
+                    <iframe src="" id="logoImg" frameborder="0" name="logoImg" style="display: none;" border="0"></iframe>
+
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label"></label>
+                <div class="controls">
+                    <div class="sui-row-fluid">
+                        <div class="span10 logo-img">
+                            <img :src="conf.imgLogoSrc" alt="" >
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+    </div>
+
+    <div v-bind:class="[conf.type=='text' ? '' : 'dn' ]">
+        <div class="control-group">
+
+                <div class="controls">
+                    <div class="sui-msg msg-tips">
+                        <div class="msg-con">字体大小单位为px，介于20px至100px之间</div>
+                        <s class="msg-icon"></s>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+
+                <div class="controls">
+
+                    <div class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a id="selectFont" role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle">
+                                <input v-model="conf.fontFamily" name="fontFamily" type="hidden"><i class="caret"></i><span>字体</span>
+                            </a>
+                            <ul class="sui-dropdown-menu">
+                                <li><a tabindex="-1" href="javascript:void(0);" value="SimSun" style="font-family: SimSun">宋体</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="NSimSun" style="font-family: NSimSun">新宋体</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="FangSong" style="font-family: FangSong">仿宋</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="KaiTi" style="font-family: KaiTi">楷体</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="SimHei" style="font-family: SimHei">黑体</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="Microsoft YaHei" style="font-family: Microsoft YaHei">微软雅黑</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="Arial" style="font-family: Arial">Arial</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="Arial Black" style="font-family: Arial Black">Arial Black</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="Times New Roman" style="font-family: Times New Roman">Times New Roman</a></li>
+                                <li><a tabindex="-1" href="javascript:void(0);" value="Courier New" style="font-family: Courier New">Courier New</a></li>
+                                <!--<li role="presentation" class="divider"></li>-->
+                            </ul>
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="controls">
+
+                    <input type="text" name="fontSize" class="input-default w30" v-model="conf.fontSize" data-rules="required|number|lt=100|gt=20" title="字体大小">
+
+                </div>
+
+                <div class="controls">
+                    <input id="fontColor" type="hidden" />
+                </div>
+
+
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <div class="sui-row-fluid">
+                    <div class="span12">
+                    <textarea rows="5" id="logotext" name="logotext" v-model="conf.logotext" placeholder="请填写专题标题" style="width:360px;"></textarea>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+
+
+
+
+
+</form>

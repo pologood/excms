@@ -1,0 +1,170 @@
+/* 常用颜色的简化样式 */
+.bg-navy{background-color:#001f3f}.bg-blue{background-color:#0074d9}.bg-aqua{background-color:#7fdbff}.bg-teal{background-color:#39cccc}.bg-olive{background-color:#3d9970}.bg-green{background-color:#2ecc40}.bg-lime{background-color:#01ff70}.bg-yellow{background-color:#ffdc00}.bg-orange{background-color:#ff851b}.bg-red{background-color:#ff4136}.bg-fuchsia{background-color:#f012be}.bg-purple{background-color:#b10dc9}.bg-maroon{background-color:#85144b}.bg-white{background-color:#fff}.bg-gray{background-color:#aaa}.bg-silver{background-color:#ddd}.bg-black{background-color:#111}
+
+.navy{color:#001f3f}.blue{color:#0074d9}.aqua{color:#7fdbff}.teal{color:#39cccc}.olive{color:#3d9970}.green{color:#2ecc40}.lime{color:#01ff70}.yellow{color:#ffdc00}.orange{color:#ff851b}.red{color:#ff4136}.fuchsia{color:#f012be}.purple{color:#b10dc9}.maroon{color:#85144b}.white{color:#fff}.silver{color:#ddd}.gray{color:#aaa}.black{color:#111}
+
+.border--navy{border-color:#001f3f}.border--blue{border-color:#0074d9}.border--aqua{border-color:#7fdbff}.border--teal{border-color:#39cccc}.border--olive{border-color:#3d9970}.border--green{border-color:#2ecc40}.border--lime{border-color:#01ff70}.border--yellow{border-color:#ffdc00}.border--orange{border-color:#ff851b}.border--red{border-color:#ff4136}.border--fuchsia{border-color:#f012be}.border--purple{border-color:#b10dc9}.border--maroon{border-color:#85144b}.border--white{border-color:#fff}.border--gray{border-color:#aaa}.border--silver{border-color:#ddd}.border--black{border-color:#111}
+
+
+/* 字体图标样式 */
+.aicon{text-decoration:none!important;display:inline-block;padding:0 5px;cursor:pointer;}
+.aicon:hover{/*background:#666;color:#fff;text-decoration:none!important;*/color:#F60;}
+
+/* 顶部位置导航样式 */
+.page-header35{margin-bottom:10px;border-bottom:1px solid #eeeeee;background:#F7F7F7;height:35px;line-height:35px;width:100%;*width:auto; overflow:hidden}
+.page-header35 span{ display:inline-block}
+.page-header35 .aicon{padding:0 5px; vertical-align:middle;}
+
+/* 重置girddata标题栏样式 */
+.mini-grid-headerCell, .mini-grid-topRightCell{height:35px!important;line-height:35px!important; font-weight:bold!important; }
+.mini-grid-row{height:30px!important;line-height:30px!important; }
+.mini-grid-headerCell-inner{font-size:14px!important;}
+.datagrid-header-row{height:35px!important;line-height:35px!important; font-weight:bold!important; }
+
+/* 全屏griddata样式 grid-full*/
+.grid-full{width:100%;_width:98%;height:100%;}
+
+/* 标准页面中主内容区域样式 */
+.main-con{ margin-left:30px; margin-right:30px;}
+
+/* gird列表页面的主内容区域样式 */
+.grid-con{ margin-left:30px; margin-right:30px;}
+
+/* 表单页面的主内容区域样式 */
+.form-con{margin-left:15px; padding-top:20px; margin-right:15px;}
+
+/* 展开收缩图标样式 */
+.nav-toolbar{ position:absolute; top:200px; right:0; width:13px;}
+
+
+/* 页面顶部通用样式 */
+.header{ height:55px;  overflow:hidden;  background:url(imgs/bg_3.png?v=2) repeat-y; position:relative}
+.header-logo{ width:32px; height:32px; overflow:hidden; display:inline-block; background-size:100%; position:absolute; top:13px; left:20px;}	
+.header-title{ font-family:"黑体";font-size:20px; color:#275586; position:absolute; top:12px; left:60px;}
+
+/* 信息公开Logo图标 */
+.header-logo-xxgk{background: url(imgs/el_xtgl.jpg) no-repeat;}
+
+/* 附件列表样式 */
+.attach-list{}
+.attach-list li{ list-style:none; background:url(imgs/fj.gif) 0 0 no-repeat; padding-left:20px; line-height:150%;}
+
+/* 模块主页左导航上面标题样式 */
+.left-header{ height:80px;line-height:80px;background:url(imgs/left_top_bg.png) repeat-x;border-bottom:#A4BED4 solid 1px; text-align:center;}
+.left-logo{ width:32px; height:32px; overflow:hidden; display:inline-block; background-size:100%; vertical-align:middle}	
+.left-title{ font-family:"黑体";font-size:20px; color:#275586;*display: table-cell; *vertical-align: middle;*height:80px; *line-height:80px; _position:absolute; _top:22px;_left:10px;}
+.top-title{ font-family:"黑体";font-size:20px; color:#275586;*display: table-cell; *vertical-align: middle;*height:80px; *line-height:80px; _position:absolute; _top:22px;_left:10px;}
+/*.left-title img{ vertical-align:middle}*/
+
+
+/* 页面工具栏 */
+.toolbar{ height:35px; line-height:35px;}
+
+/* 模块主页左导航用于显示和隐藏的图标样式 */
+.leftNavCollspanExpendIco{
+	cursor:pointer
+}
+
+/* 模板文件列表样式 */
+.docList{}
+.docList li{ line-height:32px; font-size:14px;}
+
+
+/* 页面加载的loading */
+/*遮罩层*/
+.ls-loading{z-index:65530;display:block;cursor:default;background:#FFF;width:100%;height:100%;position:absolute;top:0;left:0}
+.ls-loading-img
+{
+    position: absolute;z-index: 65531;  top:40%; left:50%; overflow:hidden;
+    background:url('imgs/bigloading.gif') no-repeat 0px 0px;width:48px; height:48px; 
+    display:block;
+}
+
+/* 重置fieldset样式 */
+.fieldset{ border: #EEE solid 1px; }
+.fieldset legend{color:#AAA; padding:0 4px; }
+
+/* fix textarea的宽度 */
+.mini-textbox-input{width:98%}
+
+/* fix 按钮在IE6,7或兼容模式下的空隙 */
+.mini-button{*margin-right:5px;}
+
+/* 上传组件样式 */
+.webuploader{ padding:20px;}
+/* 选择文件的容器 */
+.webuploader-container{position:relative; display:inline-block; width:80px;}
+/* 选择文件的容器 */
+.webuploader-element-invisible{position:absolute!important;clip:rect(1px 1px 1px 1px);clip:rect(1px,1px,1px,1px)}
+.webuploader-pick,.webuploader-btn{ display:inline-block; margin-right:10px;}
+/* 选择文件 */
+/*.webuploader-pick{position:relative;display:inline-block;cursor:pointer;background:#00b7ee;padding:2px 5px;color:#fff;text-align:center;border-radius:3px;overflow:hidden}
+*/
+/* 选择文件 hover */
+/*.webuploader-pick-hover{background:#00a2d4}*/
+/* 选择文件 禁用 */
+.webuploader-pick-disable{opacity:.6;pointer-events:none}
+
+.webuploader-pick,.skin-gray .webuploader-pick{display:inline-block;font-family:Simsun\9;_overflow-y:hidden;margin:0;text-align:center;text-decoration:none;vertical-align:middle;cursor:default;-moz-user-select:none;-webkit-user-select:none;border-radius:3px;border-radius:0\9\0;*border-radius:0 !important;*margin-right:3px;height:22px;line-height:19px;/*firefox*/line-height:22px \9;/*all ie*/line-height:23px \9\0;*line-height:21px;padding:0 12px;*padding:0 6px;border:1px solid #888;color:#000000!important;background:#F3F3F3;background:-moz-linear-gradient(top,#ffffff 0%,#ebebeb 90%,#F3F3F3 100%);background:-webkit-linear-gradient(top,#ffffff 0%,#ebebeb 90%,#F3F3F3 100%);background:-o-linear-gradient(top,#ffffff 0%,#ebebeb 90%,#F3F3F3 100%);background:-ms-linear-gradient(top,#ffffff 0%,#ebebeb 90%,#F3F3F3 100%);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff',endColorstr='#d7d7d7',GradientType=0 );background:linear-gradient(top,#ffffff 0%,#ebebeb 90%,#F3F3F3 100%);}	
+.webuploader-pick-hover,.skin-gray .webuploader-pick-hover{border-color:#7e7e7e;background:#F3F3F3;background:-moz-linear-gradient(top,#ebebeb,#F3F3F3);background:-webkit-linear-gradient(top,#ebebeb,#F3F3F3);background:-o-linear-gradient(top,#ebebeb,#F3F3F3);background:-ms-linear-gradient(top,#ebebeb,#F3F3F3);filter:progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebebeb',endColorstr='#F3F3F3',GradientType=0 );background:linear-gradient(top,#ebebeb,#F3F3F3);}
+
+
+
+/* 上传按钮 */
+.webuploader-btn{position:relative;display:inline-block;cursor:pointer;background:#ff6633;padding:2px 5px;color:#fff;text-align:center;border-radius:3px;overflow:hidden}
+/* 上传按钮 hover */
+.webuploader-btn-hover{background:#FF531A}
+/* 上传按钮 禁用 */
+.webuploader-btn-disable{opacity:.6;pointer-events:none}
+
+/* 上传文件列表容器 */
+.uploader-list{ margin-bottom:20px;}
+/* 上传文件列表容器 */
+.uploader-list .item{ clear:both; font-size:12px; font-weight:normal; display:block;}
+/* 待上传文件名样式 */
+.uploader-list .item .info{ color:#333}
+.uploader-list .item .state{ display:inline-block; padding:0 10px; color:gray}
+
+/*进度条样式*/
+.progress {position:relative;width:80px;display:inline-block;}
+.percentage {position: absolute;right: 4px;bottom: 0px;left: 4px;height: 10px;overflow: hidden;z-index: 15;margin:0;padding: 0;border-radius: 0;background: transparent; width:100%;
+}
+.progress .percentage  .bar {
+    display: block;overflow: hidden;width: 0;height: 100%;
+    background: #d14 url(imgs/progress.png) repeat-x;
+    -webit-transition: width 200ms linear;
+    -moz-transition: width 200ms linear;
+    -o-transition: width 200ms linear;
+    -ms-transition: width 200ms linear;
+    transition: width 200ms linear;
+    -webkit-animation: progressmove 2s linear infinite;
+    -moz-animation: progressmove 2s linear infinite;
+    -o-animation: progressmove 2s linear infinite;
+    -ms-animation: progressmove 2s linear infinite;
+    animation: progressmove 2s linear infinite;
+    -webkit-transform: translateZ(0);
+}
+/*重传按钮样式*/
+.retry{color: blue; text-decoration: underline; cursor: pointer;}
+
+
+#topNav .icon_reload2{ margin-left:6px!important;}
+#help-tip{	
+	width:24px;
+	font: 12px Arial, Helvetica, sans-serif;
+	color: #666;
+ 	top:0px;
+	right: 0px;
+	text-align:center;
+	padding:2px;
+	z-index:1000; 
+	position:fixed;
+	
+}
+#help-tip a{ font-size:13px; display:block; height:24px;text-indent:46px; text-align:left; line-height:24px; background:url(/app/common/imgs/help.png?20150423003) no-repeat center center;}
+*html div#help-tip { /*--IE6 Hack - Fixed Positioning to the Bottom--*/
+	margin-top: -1px; /*--Prevents IE6 from having an infinity scroll bar - due to 1px border on #footpanel--*/
+	position: absolute;
+	/*top:expression(eval(document.compatMode &&document.compatMode=='CSS1Compat') ?documentElement.scrollTop+(documentElement.clientHeight-this.clientHeight) : document.body.scrollTop +(document.body.clientHeight-this.clientHeight));*/
+}
+

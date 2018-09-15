@@ -1,0 +1,114 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+
+<div id="layout1" class="mini-layout" style="width: 100%; height: 100%; border: none;">
+    <div title="center" region="center" style="border:0;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <form id="labelForm" role="form" ms-controller="labelForm">
+                    <div class="form-body">
+
+                        <div class="form-group">
+                            <label>标签名称</label>
+                            <input type="text" name="labelName" id="labelName" class="form-control" ms-duplex="labelName" placeholder="" maxlength="30">
+                        </div>
+
+                        <div class="form-group">
+                            <label>描述</label>
+                            <textarea class="form-control" name="labelNotes" ms-duplex="labelNotes" rows="3" placeholder=""></textarea>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+
+    var cur = {
+        id: ${id},
+        pid: ${pid},
+        formId: "labelForm",
+        actionType: Ls.url.get("actionType")
+    }
+
+    var dialog = art.dialog, W = dialog.opener, api = dialog.open.api;
+
+    $(document).ready(function () {
+
+        var data = Ls.initFORM(cur.formId, {
+            labelName: (cur.actionType == "copy" ? "copy_$!{labelName}" : "$!{labelName}"),
+            labelNotes: Ls.str2Json('$!{labelNotes}'),
+        })
+
+        data.\$id = cur.formId;
+
+        cur.vm = avalon.define(data);
+        avalon.scan($("#" + cur.formId).get(0), cur.vm);
+
+        $('#' + cur.formId).validator({
+            fields: {
+                'labelName': '标签名称:required;'
+            },
+            valid: function () {
+                saveData();
+            }
+        });
+
+        api.button({
+            name: '保存',
+            callback: function () {
+                $("#" + cur.formId).submit();
+                return false;
+            }
+        })
+
+    })
+
+    //保存数据
+    function saveData() {
+        var data = Ls.toJSON(cur.vm);
+        data.id = cur.id;
+        data.parentId = cur.pid;
+
+        var url;
+        if (cur.actionType == "copy") {
+            url = "/label/copyLabel";
+        } else {
+            url = "/label/" + (cur.id == 0 ? "saveLabel" : "editLabel");
+        }
+        if(cur.id == 0){
+            data.id = '';
+        }
+
+        Ls.ajax({
+            url: url,
+            data: data,
+            success: function (d) {
+                if (d.status) {
+                    if (cur.id == 0 || cur.actionType == "copy") {
+                        var node = W.label_mgr.ztree.getNodeByParam("id", cur.pid, null);
+                        W.label_mgr.ztree.reAsyncChildNodes(node, "refresh");
+                    } else {
+                        var node = W.label_mgr.ztree.getNodeByParam("id", cur.id, null);
+                        node.name = data.labelName;
+                        node.description = data.labelNotes;
+                        W.label_mgr.ztree.updateNode(node);
+                    }
+                    api.close();
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

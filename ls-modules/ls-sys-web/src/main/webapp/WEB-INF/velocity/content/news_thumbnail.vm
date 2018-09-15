@@ -1,0 +1,90 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>美图秀秀</title>
+</head>
+<style type="text/css">
+    body {
+        margin: 0px;
+        padding: 0px !important;
+    }
+</style>
+<body class="page-body-white">
+
+<div id="flashEditorOut">
+    <div id="altContent2">
+    </div>
+    <div id="drap" class="drap" style="display:none">
+        <input id="file" type="file" accept="image/*"/>
+    </div>
+</div>
+
+</body>
+<script src="http://open.web.meitu.com/sources/xiuxiu.js"></script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script type="text/javascript">
+
+    var dialog = Ls.getWin.dialog, W = Ls.getWin.win, api = Ls.getWin.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        var imgLink = dialog.data("imgPath");
+        var siteId = dialog.data("siteId");
+        var columnId = dialog.data("columnId");
+        var contentId = dialog.data("contentId");
+        var width = dialog.data("width");
+        var heigth = dialog.data("heigth");
+        if (width != null) {
+            xiuxiu.setLaunchVars("maxFinalWidth", width);
+        }
+        if (heigth != null) {
+            xiuxiu.setLaunchVars("maxFinalHeight", heigth);
+        }
+        xiuxiu.setLaunchVars("titleVisible", 0);
+
+
+        xiuxiu.embedSWF("altContent2", 1, "100%", "100%", "lite");
+
+        xiuxiu.onInit = function (id) {
+            xiuxiu.setUploadURL(Ls.getDomain + "/content/uploadAttachment?siteId=" + siteId + "&columnId=" + columnId + "&contentId=" + contentId + "&imgLink=" + imgLink);
+            xiuxiu.setUploadType(2);
+            xiuxiu.setUploadDataFieldName("Filedata");
+            if (imgLink != null && imgLink != "") {
+                var imgPath = "";
+                if(imgLink.indexOf('.') != -1){
+                    imgPath = '$!{fileServerNamePath}' + imgLink;
+                }else{
+                    imgPath = '$!{fileServerPath}' + imgLink;
+                }
+                xiuxiu.loadPhoto(imgPath, false);
+            }
+        }
+
+        xiuxiu.onBeforeUpload = function (data, id) {
+            return true;
+        }
+
+        xiuxiu.onUploadResponse = function (d) {
+            W.changeImg(d);
+            api.close();
+        }
+
+        xiuxiu.onDebug = function (data) {
+            alert("错误响应" + data);
+        }
+
+        xiuxiu.onClose = function (id) {
+            api.close();
+        }
+
+    }
+
+    $(document).ready(function () {
+    })
+
+</script>
+</html>

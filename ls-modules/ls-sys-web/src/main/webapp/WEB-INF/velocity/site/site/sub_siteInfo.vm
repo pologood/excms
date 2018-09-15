@@ -1,0 +1,289 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">站点信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="sub_siteInfo" role="form" ms-controller="sub_siteInfo">
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_1_1">
+                            <div class="form-body">
+                                <div class="form-group hide">
+                                    <label>ID</label>
+                                    <input type="text" name="indicatorId" ms-duplex="indicatorId" class="form-control" placeholder=""
+                                           disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>PID</label>
+                                    <input type="text" name="parentId" ms-duplex="parentId" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>IsParent</label>
+                                    <input type="text" name="isParent" ms-duplex="isParent" class="form-control" placeholder="" disabled>
+                                </div>
+                                <div class="form-group hide">
+                                    <label>站点配置ID</label>
+                                    <input type="text" name="siteConfigId" ms-duplex="siteConfigId" class="form-control" placeholder=""
+                                           disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点简称</label>
+                                    <input type="text" name="name" class="form-control" ms-duplex="name" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点全称</label>
+                                    <input type="text" name="siteTitle" class="form-control" ms-duplex="siteTitle" placeholder="" maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label>站点序号</label>
+                                    <input type="number" min="0" max="9999" name="sortNum" class="form-control" ms-duplex="sortNum"
+                                           placeholder="用于站点排序，按从小到大排序">
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定单位（用于站点栏目选择单位的范围）</label>
+                                    <div class="input-group">
+                                        <div id="menuContent"
+                                             style="display:none;position: absolute; top: 34px;height:300px; left: 0px;z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: hidden;background-color: InactiveBorder">
+                                            <ul id="treeDemo" class="ztree"></ul>
+                                        </div>
+                                        <input type="text" name="unitIds" class="form-control hide" ms-duplex="unitIds">
+                                        <input type="text" id="unitNames" placeholder="请选择单位" ms-duplex="unitNames" class="form-control readonly" onclick="showUnitTree()">
+                                        <span class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showUnitTree()">
+                                              <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>绑定公共栏目</label>
+                                    <select class="form-control" name="comColumnId" id="comColumnId" ms-duplex="comColumnId"
+                                            placeholder="请选择公共栏目">
+##                                      <option value="">请选择公共栏目</option>
+##                                        #foreach($s in $comList)
+##                                          <option value="$!{s.indicatorId}">$!{s.name}</option>
+##                                        #end
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>站点模板</label>
+                                    <select class="form-control" name="siteTempId" id="siteTempId" ms-duplex="siteTempId"
+                                            placeholder="请选择站点模板">
+                                      <option value="">请选择站点模板</option>
+                                            #foreach($s in $tplObj)
+                                              <option value="$!{s.id}">$!{s.name}</option>
+                                            #end
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>关键词</label>
+                  <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3"
+                            placeholder="站点关键字，建议100字以内有利搜索引擎抓取"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>描述</label>
+                  <textarea class="form-control" name="description" ms-duplex="description" rows="3"
+                            placeholder="站点描述，建议1000字以内有利搜索引擎抓取"></textarea>
+                                </div>
+
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save" id="doSave">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/site_unit.js"></script>
+<script>
+    mini.parse();
+    var curr = {
+        vm: {},
+      comColumnList:{},
+      comColumnStr:'',
+      length: 0
+    }
+
+    curr.$id = "sub_siteInfo";
+
+    var data = {
+        $id:curr.$id,
+        indicatorId:null,
+        parentId:null,
+        isParent:0,
+        siteConfigId:null,
+        name:'',
+        siteTitle:'',
+        sortNum:null,
+        unitIds:null,
+        unitNames:'',
+        comColumnId:'',
+        siteTempId:'',
+        keyWords:'',
+        description:''
+
+    }
+    curr.vm = avalon.vmodels[data.$id];
+    if (!curr.vm) {
+        curr.vm = avalon.define(data);
+    }
+
+    $(document).ready(function () {
+      getComColumn();
+    });
+
+
+    function getComColumn() {
+      Ls.ajaxGet({
+        url: "/comColumn/getLevComColumn",
+        data: {siteId: GLOBAL_SITEID}
+      }).done(function (text) {
+        var str1 = '<option value=""> 请选择公共栏目 </option> ';
+        var str = "";
+        if (text.data != null) {
+          var data = text.data;
+          curr.comColumnList=data;
+          curr.length = data.length;
+          if (curr.length > 0) {
+            for (i = 0; i < curr.length; i++) {
+              str += ' <option value=' + data[i].indicatorId + '>' + data[i].name + '</option> ';
+            }
+          }
+        }
+        curr.comColumnStr=str1+str;
+        getEO();
+        //  $("#comColumnId").append(str1 + str);
+
+      });
+    }
+
+    $('#sub_siteInfo').validator({
+        /*  rules: {
+         mobile: [/^1[3458]\d{9}$/, '请检查手机号格式']
+         },*/
+        fields: {
+            'name': '站点简称:required;length[1~20]',
+            'siteTitle': '站点全称:length[0~128]',
+            'comColumnId': '公共栏目:required;',
+            'sortNum': '站点序号:required;',
+            'siteTempId': '站点模板:required;',
+            'keyWords': '关键词:length[0~300];',
+            'description': '描述:lenth[0~1000];'
+            //'optionsRadios': '单选框:checked;'
+        },
+        valid: function () {
+            doSave();
+        }
+    });
+
+
+    function doSave() {
+        if (curr.vm.keyWords != null && Ls.strLen(curr.vm.keyWords) > 300) {
+            Ls.tipsInfo("关键词的字数长度应小于300个字符");
+            return;
+        }
+        if (curr.vm.description != null && Ls.strLen(curr.vm.description) > 1000) {
+            Ls.tipsInfo("描述的字数长度应小于1000个字符");
+            return;
+        }
+        if (curr.vm.comColumnId == null) {
+            Ls.tipsInfo("绑定公共栏目不能为空");
+            return;
+        }
+
+        if (curr.vm.siteTempId == null) {
+            Ls.tipsInfo("站点模板不能为空");
+            return;
+        }
+
+        var name = curr.vm.name;
+        var pId = curr.vm.parentId;
+        var indicatorId = curr.vm.indicatorId;
+        //检查站点名称是否重复
+        Ls.ajaxGet({
+            url: "/siteConfig/checkSiteNameExist",
+            data: {
+                siteName: name,
+                parentId: pId,
+                indicatorId: indicatorId
+            }
+        }).done(function (text) {
+            if (text.data) {
+                saveSiteConfigEO();
+            } else {
+                Ls.tipsInfo("站点名称已存在");
+                return;
+            }
+        });
+    }
+
+    /**
+     * 保存站点信息
+     */
+    function saveSiteConfigEO() {
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            type: "POST",
+            url: "/subSite/saveSiteConfigEO",
+            data: value
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            } else {
+                Ls.tipsOk("保存成功");
+                var tt = text.data;
+                siteManage.indicatorId = tt.indicatorId;
+                flag = 1;
+                tree.reAsyncChildNodes(null, "refresh");
+                return;
+            }
+
+        });
+    }
+
+    function getEO() {
+        Ls.ajaxGet({
+            url: "/siteConfig/getSiteEO",
+            data: {indicatorId: GLOBAL_SITEID}
+        }).done(function (text) {
+            data = text.data;
+            data.comColumnId = Ls.isEmpty(data.comColumnId) ? "" : data.comColumnId;
+            data.siteTempId = Ls.isEmpty(data.siteTempId) ? "" : data.siteTempId;
+
+          if (!data.isHave) {
+            var cStr = "";
+            for (i = 0; i < curr.length; i++) {
+              if (curr.comColumnList[i].indicatorId == data.comColumnId) {
+                cStr += ' <option  value=' + curr.comColumnList[i].indicatorId + '>' + curr.comColumnList[i].name + '</option> ';
+                break;
+              }
+            }
+            $("#comColumnId").html('');
+            $("#comColumnId").append(cStr);
+          } else {
+            $("#comColumnId").html('');
+            $("#comColumnId").append(curr.comColumnStr);
+          }
+          //初始化表单字段
+          Ls.assignVM(curr.vm, data);
+          //扫描模型
+          avalon.scan($("#sub_siteInfo").get(0), curr.vm);
+          Ls.log(curr.vm.comColumnId);
+        });
+    }
+
+
+</script>

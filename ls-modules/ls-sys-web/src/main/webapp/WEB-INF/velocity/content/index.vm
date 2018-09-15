@@ -1,0 +1,76 @@
+<div id="content_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="200"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+
+        <div style="padding: 5px;">
+            <ul id="content_tree" class="ztree" style="padding-bottom: 12px;"></ul>
+        </div>
+        <div id="hidebtn" style=""></div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="content_body">
+            <div class="portlet light">
+                <div class="portlet-body" id="portlet_body">
+
+                #*<h3 class="page-title"> 全站搜索
+                    <small></small>
+                </h3>*#
+
+                    #*<div class="note note-info">
+                        <h4 class="block">温馨提示：</h4>
+                        <p>1、搜索的结果是当前站点的文字信息；</p>
+                    </div>
+
+                    <form role="form" name="content_search_form" id="content_search_form">
+                        <div class="chat-form">
+                        ##input-xlarge
+                            <div class="input-group input-group-lg ">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn blue dropdown-toggle" data-toggle="dropdown" aria-expanded="false">文字信息
+                                        <i class="fa fa-angle-right"></i>
+                                    </button>
+                                *##*<ul class="dropdown-menu">
+                                    <li>
+                                        <a href="javascript:;"> Action </a>
+                                    </li>
+                                </ul>*##*
+                                </div>
+                                <!-- /btn-group -->
+                                <input type="text" class="form-control" name="content_search_words" id="content_search_words" placeholder="请输入关键词...">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn blue" id="content_search_submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                                <!-- /btn-group -->
+                            </div>
+
+                        </div>
+                    </form>*#
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+<div id="hidebtn2" style=""></div>
+<script>
+    var columnTypeCode = "$!{columnTypeCode}";
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/content_mgr.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/global_search.js"></script>
+<script>
+    $(document).ready(function () {
+        content_mgr.init();
+
+
+        /*$('#page_content').css({
+            'background-position-x': '0px'
+        })*/
+
+
+    })
+</script>

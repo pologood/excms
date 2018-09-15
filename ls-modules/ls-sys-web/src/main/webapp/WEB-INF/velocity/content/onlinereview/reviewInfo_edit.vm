@@ -1,0 +1,397 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">评议管理</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form id="formReview" role="form" ms-controller="formReview" autocomplete="off">
+                <table class="table table-bordered article-table">
+                    <tbody>
+                    <tr>
+                        <th>评议标题：</th>
+                        <td>
+                            <input type="text" name="title" id="title" ms-duplex="title" class="form-control" placeholder="评议标题不能为空">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>排序时间：</th>
+                        <td>
+                            <input type="datetime" name="sortNum" id="sortNum" ms-duplex="sortNum" class="form-control readonly" placeholder="排序时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>开始时间：</th>
+                        <td>
+                            <input type="datetime" name="startTime" id="startTime" ms-duplex="startTime" class="form-control hand readonly" placeholder="开始时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate:'%y-%M-%d',maxDate: '#F{$dp.$D(\'endTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>结束时间：</th>
+                        <td>
+                            <input type="datetime" id="endTime" name="endTime" ms-duplex="endTime" class="form-control readonly" placeholder="结束时间不能为空"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate: '#F{$dp.$D(\'startTime\')}'})">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>结果可见：</th>
+                        <td>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isVisible" value="1" ms-duplex-string="isVisible">是</label>
+                                <label class="radio-inline"><input type="radio" name="isVisible" value="0" ms-duplex-string="isVisible">否</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>限制规则：</th>
+                        <td>
+                            <label class="checkbox-inline pl0">
+                                <select id="ipLimit" class="form-control" name="ipLimit"
+                                        ms-duplex="ipLimit" placeholder="请选择内容模型">
+                                    <option value="1">总共</option>
+                                    <option value="0">每天</option>
+                                </select>
+                            </label>
+                            <label class="checkbox-inline pl0">
+                                <input name="ipDayCount" class="form-control w90" placeholder="" ms-duplex="ipDayCount">
+                            </label>
+                            <label class=" pl0 txt-readonly">
+                                &nbsp;&nbsp; 每IP允许投票次数。
+                            </label>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>评议对象：</th>
+                        <td id="reviewObject">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>评议类型：</th>
+                        <td id="reviewType">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">评议说明：</th>
+                        <td colspan="2">
+                            <textarea name="content" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <div class="form-actions noborder">
+                                <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                                <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var cur = {
+        columnId: content_mgr.indicatorId,
+        siteId: GLOBAL_SITEID,
+        themeId: '$!{themeId}',
+        typeCode: 'reviewInfo',
+        editor: '',
+        ipLimitStatus: '1',
+        isLink: '',
+        clickBtn: ''
+    };
+    var article ={
+        videoStatus : ''
+    };
+    var eweb;
+    $(document).ready(function () {
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.columnId});
+        /*cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: '/survey/theme?action=uploadFiles',//上传文件
+            fileManagerJson: '/rpc-kindeditor/?action=fileManager',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId:cur.columnId,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });*/
+
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/reviewInfo/getSurveyTheme",
+                data: {
+                    id: cur.themeId,
+                    siteId: cur.siteId,
+                    columnId: cur.columnId,
+                    type: cur.type
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formReview"
+                data.$id = cur.$id;
+                data.columnId = cur.columnId;
+                data.siteId = cur.siteId;
+                data.typeCode = cur.typeCode;
+                data.ipDayCount = data.ipDayCount || 1;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+                cur.isLink = data.isLink;
+                /*cur.editor.html(data.content);*/
+                eweb.setHtml(data.content);
+                try{
+                    if(data.themeId == null || data.themeId == ''){
+                        data.sortNum = parseInt(new Date().getTime()/1000);
+                    }
+                    if(data.sortNum != null && data.sortNum != ""){
+                        var d = new Date();
+                        d.setTime(data.sortNum * 1000);
+                        $("#sortNum").val(d.format('yyyy-MM-dd h:m:s'));
+                    }
+                }catch (e){
+                }
+                getReviewObject(data.objectIds, data.hasClild)
+                getReviewType(data.typeIds, data.hasClild)
+            })
+        };
+        getData();
+
+    })
+
+    $('#formReview').validator({
+        rules: {
+            myRule: function (el, param, field) {
+                var isTrue = (cur.isLink == '1' ? true : false);
+                return isTrue;
+            }
+        },
+        fields: {
+            'title': '标题:required;length[2~50]',
+            'sortNum': '排序:required;',
+            'startTime': '开始时间:required;',
+            'endTime': '结束时间:required;',
+            'ipDayCount': '票数限制:integer;range[1~50]',
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    $("#saveArticle").click(function () {
+        cur.clickBtn = 0;
+        $('#formReview').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        cur.clickBtn = 1;
+        cur.vm.isPublish = 1;
+        $('#formReview').submit();
+    })
+
+    var addPost = function () {
+        var rvobjectIds = [];
+        var rvobjectNames = [];
+        var rvtypeIds = [];
+        var rvtypeNames = [];
+        $("input[name='objectValue']").each(function (i, val) {
+            if (val.checked) {
+                rvobjectIds.push($(this).val())
+                rvobjectNames.push($(this).attr("attrs"))
+            }
+        })
+        $("input[name='typeValue']").each(function (i, val) {
+            if (val.checked) {
+                rvtypeIds.push($(this).val())
+                rvtypeNames.push($(this).attr("attrs"))
+            }
+        })
+        if (rvtypeIds.length == 0) {
+            Ls.tipsInfo("请选择评议类型")
+            return;
+        }
+        if (rvobjectIds.length == 0) {
+            Ls.tipsInfo("请选择评议对象")
+            return;
+        }
+        var data = Ls.toJSON(cur.vm.$model);
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+        }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        data.isLink = cur.isLink;
+        /*var content = cur.editor.html();*/
+        var content = eweb.getHtml();
+        data.typeIds = rvtypeIds.join(",")
+        data.objectIds = rvobjectIds.join(",")
+        data.typeNames = rvtypeNames.join(",")
+        data.objectNames = rvobjectNames.join(",")
+        data.questions = []
+        data.content = content;
+        data.videoStatus = article.videoStatus;
+        Ls.ajax({
+            url: "/reviewInfo/saveReview",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "保存并发布成功！" : "保存成功！", {
+                    icons: "success", callback: function () {
+                        goBack();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function goBack() {
+        content_mgr.getContentApp("/reviewInfo/index?indicatorId=&pageIndex=");
+    }
+
+
+    function getReviewObject(objectIds, isUpdate) {
+        Ls.ajaxGet({
+            url: "/reviewObject/getReviewObjects",
+            data: {
+                columnId: cur.columnId,
+                siteId: cur.siteId
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var json = d.data;
+                var str = '<a style="color:blue" onclick="checkAll(1)">（全选）</a>'
+                var objectValueIds = objectIds == null ? "" : objectIds.split(",");
+                var disabled = '';
+                if (isUpdate == '1') {
+                    disabled = 'disabled'
+                }
+                for (var i = 0; i < json.length; i++) {
+                    var isCheckd = "";
+                    if (objectValueIds != "") {
+                        for (var j = 0; j < objectValueIds.length; j++) {
+                            if (objectValueIds[j] == json[i].objectId) {
+                                isCheckd = 'checked';
+                                break;
+                            }
+                        }
+                    }
+                    str += '<label class="checkbox-inline"><input type="checkbox" ' + isCheckd + ' ' + disabled + ' name="objectValue" attrs="' + json[i].name + '" value="' + json[i].objectId + '">  ' + json[i].name + '</label>'
+                }
+                $("#reviewObject").html(str);
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+    function getReviewType(typeIds, isUpdate) {
+        Ls.ajaxGet({
+            url: "/reviewType/getReviewTypes",
+            data: {
+                columnId: cur.columnId,
+                siteId: cur.siteId
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var json = d.data;
+                var str = '<a style="color:blue" onclick="checkAll(0)">（全选）</a>';
+                var objectTypeIds = typeIds == null ? "" : typeIds.split(",");
+                var disabled = '';
+                if (isUpdate == '1') {
+                    disabled = 'disabled'
+                }
+                for (var i = 0; i < json.length; i++) {
+                    var isCheckd = "";
+                    if (objectTypeIds != "") {
+                        for (var j = 0; j < objectTypeIds.length; j++) {
+                            if (objectTypeIds[j] == json[i].typeId) {
+                                isCheckd = 'checked';
+                                break;
+                            }
+                        }
+                    }
+                    str += '<label class="checkbox-inline"><input type="checkbox" ' + isCheckd + ' ' + disabled + ' attrs="' + json[i].name + '" name="typeValue"  value="' + json[i].typeId + '" onclick="">  ' + json[i].name + '</label>'
+                }
+                $("#reviewType").html(str);
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+
+    }
+
+    var c = 0;
+    var c1 = 0;
+    function checkAll(t) {
+        if (t == 1) {
+            if (c == 0) {
+                $("input[name='objectValue']").prop("checked", true);
+                c = 1;
+                return;
+            } else {
+                $("input[name='objectValue']").prop("checked", false);
+                c = 0;
+                return;
+            }
+        } else {
+            if (c1 == 0) {
+                $("input[name='typeValue']").prop("checked", true);
+                c1 = 1;
+                return;
+            } else {
+                $("input[name='typeValue']").prop("checked", false);
+                c1 = 0;
+                return;
+            }
+        }
+
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+</script>

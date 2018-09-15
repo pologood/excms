@@ -1,0 +1,230 @@
+<style>
+    .spl {
+        color: #4DF2F5;
+        margin: 0 10px 0 0;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div id="" style="margin:10px 30px">
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">受访页面</span> &nbsp;
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-group form-inline ">
+                                    <select id="searchKey" class="form-control w160">
+                                        <option value="pv">浏览量(PV)</option>
+                                        <option value="sv">来访量(SV)</option>
+                                    </select>
+                                    <input type="text" name="st" id="st_m" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" name="ed" id="ed_m" class="form-control w160"
+                                           placeholder="${TODAY}" onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <button type="button" class="btn btn-default btn-search" onclick="searchLocation()">查询</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClearLocation()">清除条件</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12" style="height:460px" id="v_page_s"></div>
+                                    <div class="col-md-8 col-sm-12" style="height:460px" id="v_page_t"></div>
+                                </div>
+                                <div style="margin-top:15px;" id="psPage">
+                                </div>
+                                <div id="pagination" class="pagination text-right mr22"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/system/sitechart/v_targetPage.js"></script>
+<script>
+
+    mini.parse();
+
+    var cur = {
+        pageSize: 15,
+        pageIndex: 0,
+        dataFlag: 1
+    };
+
+    $(document).ready(function () {
+
+        v_tp.init();
+
+        Ls.parseEcharts(function () {
+            require([
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie',
+                'echarts/chart/map',
+                'echarts/chart/funnel'
+            ], function (ec) {
+                searchLocation();
+            })
+        })
+
+    })
+
+    function searchLocation() {
+        var cmm = {};
+        cur.st = cmm.st = $("#st_m").val();
+        cur.ed = cmm.ed = $("#ed_m").val();
+        cmm.key = $("#searchKey").val();
+        cur.pageIndex = 0;
+        v_tp.getData(cur);
+        Ls.ajaxGet({
+            url: "/visitSource/getTargetPage",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    if (d.trendName.length > 0 && d.timeList.length > 0 && d.trendData.length > 0) {
+                        var v_page_t = getOptionP(d.trendName, d.timeList, d.trendData)
+                        var chart_a1 = require('echarts').init(document.getElementById('v_page_t'));
+                        chart_a1.setOption(v_page_t);
+                    } else {
+                        $("#v_page_t").html("暂无数据");
+                    }
+                    if (d.pageSourceMenu.length > 0 && d.pageSource.length > 0) {
+                        var v_page_s = getOptionSourceC(d.pageSourceMenu, d.pageSource, "");
+                        var chart_a2 = require('echarts').init(document.getElementById('v_page_s'));
+                        chart_a2.setOption(v_page_s);
+                    } else {
+                        $("#v_page_s").html("暂无数据");
+                    }
+                }
+            }
+        });
+
+    }
+
+    function searchClearLocation() {
+        $("#st_m").val("");
+        $("#ed_m").val("");
+        $("#searchKey").val("pv");
+        searchLocation();
+    }
+
+    function getOptionP(trendName, timeList, data) {
+        option = {
+            title: {
+                text: '',
+                x: 'bottom'
+
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: trendName
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['line', 'bar']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                start: 0,
+                end: 100
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: timeList
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: data,
+        };
+        return option;
+    }
+
+
+    function getOptionSourceC(pageSourceMenu, pageSource, text) {
+        option = {
+            title: {
+                text: text,
+                x: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel']
+                    },
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                x: 'left',
+                data: pageSourceMenu
+            },
+            series: [
+                {
+                    name: text,
+                    type: 'pie',
+                    radius: '55%',
+                    center: ['50%', '60%'],
+                    selectedMode: 'single',
+                    data: pageSource,
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        return option;
+    }
+</script>

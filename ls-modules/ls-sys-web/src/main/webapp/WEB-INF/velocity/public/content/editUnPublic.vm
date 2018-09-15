@@ -1,0 +1,252 @@
+<style>
+    #public_content_form span.required {
+        color: #da1202;
+    }
+</style>
+#set($hasEdit=$shiro.hasPublicButton("edit"))
+#set($hasPublish=$shiro.hasPublicButton("publish"))
+<div id="public_synMsgCat_content"
+     style="display:none;position: absolute; z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: hidden;background-color: InactiveBorder">
+    <ul id="public_synMsgCat_tree" class="ztree"></ul>
+</div>
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">文章信息</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+            <form role="form" id="public_content_form" ms-controller="public_content_form">
+                <table class="table table-bordered public-info-table">
+                    <tbody>
+                    <tr>
+                        <th><span class="required">*</span>标题：</th>
+                        <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control"></td>
+                    </tr>
+                    <tr ms-if="DRIVING_PUBLIC">
+                        <th><span class="required">*</span>所属分类：</th>
+                        <td>
+                            <div class="input-group">
+                                <div id="public_class_content"
+                                     style="display:none; position: absolute; top:34px; left:0px; height: 300px; z-index: 10000; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                                    <ul id="public_class_tree" class="ztree"></ul>
+                                </div>
+
+                                <input id="public_classIds" type="hidden" name="classIds" ms-duplex="classIds"
+                                       class="form-control"/>
+                                <input id="public_classParentIds" type="hidden" name="parentClassIds"
+                                       ms-duplex="parentClassIds" class="form-control"/>
+                                <input id="public_classNames" type="text" ms-duplex="classNames"
+                                       class="form-control readonly" readonly onclick="showTree('public_class')"/>
+
+                                <div class="input-group-btn">
+                                    <button id="public_class_btn" class="btn btn-default btn-default-upload"
+                                            type="button" onclick="showTree('public_class')"><i class="fa fa-caret-down"></i></button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr ms-if="DRIVING_PUBLIC">
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 索引号：</th>
+                        <td><input type="text" name="indexNum" ms-duplex="indexNum" class="form-control readonly"
+                                   readonly></td>
+                    </tr>
+                    <tr ms-if="DRIVING_PUBLIC">
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 文号：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="文号:required;length(~100)"
+                                   data-msg-length="文号最多填写100个字符" #end name="fileNum" ms-duplex="fileNum"
+                                   class="form-control"></td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 关键词：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="关键词:required;length(~300)"
+                                   data-msg-length="关键字最多填写300个字符" #end name="keyWords" ms-duplex="keyWords"
+                                   id="keyWords" class="form-control"></td>
+                    </tr>
+                    #*
+                    <tr>
+                        <th>内容概述：</th>
+                        <td><textarea class="form-control" name="summarize" ms-duplex="summarize" id="summarize" rows="3" placeholder="内容概述"></textarea></td>
+                    </tr>
+                    *#
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 作者：</th>
+                        <td>
+                            <input type="text"#if("$!{verify}" == "0")data-rule="作者:required;length(~10)"
+                                   data-msg-length="作者最多填写10个字符" #end name="author" ms-duplex="author"
+                                   class="form-control" placeholder="" maxlength="20"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 来源：</th>
+                        <td>
+                            <div class="input-group" id="resMark">
+                                <input type="text"#if("$!{verify}" == "0")data-rule="来源:required;length(~30)"
+                                       data-msg-length="来源最多填写30个字符" #end id="resources" name="resources"
+                                       ms-duplex="resources" class="form-control"
+                                       onclick="publicContentEdit.getResource()" maxlength="80"/>
+                                <div class="input-group-btn">
+                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                            onclick="publicContentEdit.getResource()">
+                                        <i class="fa fa-caret-down" id="select_icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 发文日期：</th>
+                        <td><input type="datetime" name="publishDate" ms-duplex="publishDate"
+                                   class="form-control readonly" #if("$!{verify}" == "0")
+                                   data-rule="发布日期:required;" #end
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/></td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 生效日期：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="生效日期:required;length(~100)"
+                                   data-msg-length="生效日期最多填写100个字符"#end name="effectiveDate" ms-duplex="effectiveDate"
+                                   class="form-control"/></td>
+                    </tr>
+                    <tr>
+                        <th>#if("$!{verify}" == "0")<span class="required">*</span>#end 废止日期：</th>
+                        <td><input type="text"#if("$!{verify}" == "0")data-rule="废止日期:required;length(~100)"
+                                   data-msg-length="废止日期最多填写100个字符" #end name="repealDate" ms-duplex="repealDate"
+                                   class="form-control"/></td>
+                    </tr>
+
+                    <tr id="checkWords" #if("$!{isLink}" == "true") class="hide" #end>
+                        <th>内容过滤：</th>
+                        <td>
+                            <button class="btn btn-default btn-reset" id="errorWords" type="button"
+                                    onclick="contentCheck('EASYERR')">易错词检测
+                            </button>
+                            <button class="btn btn-default btn-reset" id="senWords" type="button"
+                                    onclick="contentCheck('SENSITIVE')">敏感词检测
+                            </button>
+                            <button class="btn btn-default btn-reset" id="hotWords" type="button"
+                                    onclick="contentCheck('HOT')">热词检测
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="edit_content" #if("$!{isLink}" == "true") class="hide" #end>
+                        <th style="vertical-align: top;"><span class="required">*</span>内容：</th>
+                        <td colspan="2">
+                            <textarea id="public-info-content" name="content" ms-duplex="content"
+                                      style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            #if($hasPublish && $hasEdit)
+                                <button class="publishBtn btn btn-default btn-save-release" type="button"
+                                        id="saveAndPublish">保存并发布
+                                </button>
+                            #end
+                            #if($hasEdit)
+                                <button class="editBtn btn btn-default btn-save" type="button" id="savePublicContent">保 存</button>
+                            #end
+                            <button class="btn btn-default btn-reset" type="button" onclick="goBackToUnPublic()">返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/public/class_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_content_edit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/contentCheck.js"></script>
+<script>
+    // 检查内容模型
+    function checkContentMode() {
+        if (cur.contentModel.config.isSensitiveWord == 1 && cur.contentModel.config.isEasyWord == 1 && cur.contentModel.config.isHotWord == 1) {
+            $("#checkWords").addClass("hide");
+        } else {
+            $("#checkWords").removeClass("hide");
+        }
+        if (cur.contentModel.config.isSensitiveWord == 1) {
+            $("#senWords").remove();
+        } else {
+            $("#senWords").show();
+        }
+        if (cur.contentModel.config.isEasyWord == 1) {
+            $("#errorWords").remove();
+        } else {
+            $("#errorWords").show();
+        }
+        if (cur.contentModel.config.isHotWord == 1) {
+            $("#hotWords").remove();
+        } else {
+            $("#hotWords").show();
+        }
+    }
+
+    function goBackToUnPublic() {
+        getContentApp("/public/content/toUnPublic");
+    }
+
+    $(document).ready(function () {
+
+        //渲染表单对象
+        Ls.ajaxGet({
+            url: "/public/content/getPublicContentByContentId?contentId=$!{contentId}"
+        }).done(function (d) {
+            var data = d.data;
+            cur.redirectLink = data.redirectLink;
+            data.$id = cur.id;
+
+            data.DRIVING_PUBLIC = (data.type == 'DRIVING_PUBLIC');
+
+            // 如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[data.$id];
+            if (!cur.vm) {
+                // 绑定模型
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            avalon.scan($("#" + cur.id).get(0), cur.vm);
+            //初始化编辑器，包括敏感词检测
+            publicContentEdit.init();
+            //加载分类
+            class_select_tree.init('public_class', data.classIds);
+            //内容检测
+            Ls.ajaxGet({
+                url: "/public/content/getContentModelByOrganId?organId=" + data.organId
+            }).done(function (ddd) {
+                if (ddd.status == 1) {
+                    cur.contentModel = ddd.data;
+                    checkContentMode();
+                } else {
+                    Ls.tipsErr(ddd.desc);
+                }
+            });
+        });
+
+        //验证
+        $('#' + cur.id).validator({
+            rules: {
+                classIds: function (element, param, field) {
+                    return cur.class_select_tree_root_ids.length ==
+                            $("#public_classParentIds").val().split(",").length || '各分类每一项都必须选择至少一个';
+                }
+            },
+            fields: {
+                'title': '标题:required;length[~200]',
+                'content': '内容:required;',
+                'classIds': '所属分类:required;'
+            },
+            valid: function () {
+                /*editor.sync();*/
+                eweb.update();
+                publicContentEdit.save(function () {
+                    goBackToUnPublic();
+                });
+            }
+        });
+    });
+</script>

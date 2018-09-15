@@ -1,0 +1,16 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+	<div class="hide">
+	<form id="form2" action="http://new.cnzz.com/v1/login.php?t=login&siteid=${cnzzSite}" method="post">
+    <input type="text" name="password" value="${password}"></input>
+	<input type="submit" value="提交"/>
+	</form>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script >
+	$(document).ready(function () {
+    	//$("#form2").submit();
+		Cookie:PHPSESSID=blro5cd915muqie0ren2q406q1; path=/
+	})
+</script>

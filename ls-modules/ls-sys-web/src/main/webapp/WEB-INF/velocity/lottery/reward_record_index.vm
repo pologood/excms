@@ -1,0 +1,148 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+
+            <div class="portlet-body">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-5">
+                        </div>
+                        <div class="col-md-7">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="name" name="name" class="form-control" placeholder="姓名">
+                                    <input type="text" id="phone" name="phone" class="form-control" placeholder="电话">
+                                    <input type="datetime" id="date" ms-duplex="" class="form-control w160" placeholder="抽奖时间"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly/>
+                                </div>
+                                <button type="button"  class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/lotteryRewardRecord/getRewardRecord" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div field="name" width="80" headerAlign="center" allowSort="false" align="center">姓名</div>
+                        <div field="phone" width="80" headerAlign="center" allowSort="flase"  align="center"  >联系电话</div>
+                        <div field="rewardName" width="120" headerAlign="center" allowSort="flase"  align="center"   >奖品名称</div>
+                        <div field="rewardPrice" width="50" headerAlign="center" allowSort="flase"  align="center" >奖品金额</div>
+                        <div field="createDate" width="150" headerAlign="center" allowSort="flase" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" >抽奖时间</div>
+                        <div field="status" width="40" headerAlign="center" allowSort="flase"  align="center" renderer="renderStatues">状态</div>
+                        <div field="" width="105" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID,
+
+    }
+    var grid;
+
+
+    $(document).ready(function () {
+        mini.parse();
+        grid = mini.get("datagrid1");
+        grid.load(cmm);
+
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid);
+
+    })
+
+
+
+    function renderStatues(e){
+        var rec = e.record;
+        var str="";
+        if(0 == rec.status){
+            str="未发放";
+        } else if(1 == rec.status)  {
+            str="已发放";
+
+        }
+        return str;
+
+    }
+
+
+    //操作加载
+    function renderOp(e) {
+        var rec = e.record;
+        var dis="";
+        if( rec.status==1||null==rec.rewardId||''==rec.rewardId){
+            dis="disabled";
+        }
+        var str='<button '+dis+'   class=" btn btn-default btn-sm btn-edit" onclick="edit(' + rec.id + ')"> 确认领取 </button> ';
+        return str;
+    }
+
+    function edit(id) {
+        if(confirm("确定已领取？")){
+            Ls.ajax({
+                type: "POST",
+                data: {'id':id},
+                url: "/lotteryRewardRecord/sureStatus",
+                success: function (text) {
+                    if(text.status==0){
+                        Ls.tipsErr(text.desc);
+                        return;
+                    }
+                    Ls.tipsOk("操作成功");
+                    Ls.getWin.win.grid.reload();
+                    Ls.winClose();
+
+                }
+            })
+
+        }
+
+    }
+
+
+
+
+    function search() {
+        var name =    $("#name").val();
+
+        var phone = $("#phone").val();
+        var date = $("#date").val();
+        grid.load({name: name, dataFlag: 1,phone:phone,date:date});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#name").val("");
+        $("#phone").val("");
+        $("#date").val("");
+
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+
+
+
+
+
+
+</script>

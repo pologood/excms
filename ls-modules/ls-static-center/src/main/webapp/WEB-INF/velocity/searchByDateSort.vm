@@ -1,0 +1,12 @@
+#if($!{paramObj.url}&&$!{paramObj.url}!="")
+    #set($url = $!{paramObj.url})
+#else
+    #set($url = "/site/search/$!{siteId}")
+#end
+#set($baseurl="$!url?columnId=$!{columnId}&columnIds=$!{columnIds}&typeCode=$!{typeCode}&fromCode=$!{fromCode}&keywords=$!{keywords}&excColumns=$!{excColumns}&datecode=$!{datecode}&type=$!{type}&tableColumnId=$!{tableColumnId}&beginDate=$!{beginDate}&endDate=$!{endDate}&indexNum=$!{indexNum}&fileNum=$!{fileNum}&flag=false&searchType=$!{searchType}&searchTplId=$!{searchTplId}")
+<li>
+    <a href="$baseurl&sort=asc" target="_self" #if("$!{sort}" == "asc") class="active" #end>按时间升序</a>
+</li>
+<li>
+    <a href="$baseurl&sort=desc" target="_self" #if("$!{sort}" == "desc") class="active" #end>按时间降序</a>
+</li>

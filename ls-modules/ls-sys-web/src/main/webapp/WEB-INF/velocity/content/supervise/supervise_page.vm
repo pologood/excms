@@ -1,0 +1,920 @@
+<style>
+    .row .chartsName {
+        text-align: center;
+        font-size: 16px;
+        color: #6b6b6b;
+    }
+
+    body .mini-grid-headerCell-nowrap {
+        font-size: 14px;
+    }
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form class="form-inline search-toolbar" role="form" data-type="0">
+                            <div class="form-group">
+                                <span style="margin: 0 5px 0 10px;">数据源</span>
+                                <select id="sourceColumn" name = "sourceColumn" class="form-control w130"
+                                        placeholder="默认统计所有">
+                                </select>
+                                <span style="margin: 0 5px 0 10px;">留言类别</span>
+                                <select id="classCode" name = "classCode" class="form-control w130" placeholder="默认统计所有类别">
+                                </select>
+                                <span style="margin: 0 5px 0 10px;">受理单位</span>
+                                <select id="recUnitId" name="recUnitId" class="form-control w160" name="acceptUnitId"
+                                        placeholder="默认统计所有单位">
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <form class="form-inline tr" role="form">
+                            <div class="form-group">
+                                <input type="datetime" id="startTime" class="form-control w105" placeholder="开始时间" value = "$!{startDate}"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endTime\')}',readOnly:true})" readonly>
+                                <input type="datetime" id="endTime" class="form-control w105" placeholder="结束时间" value = "$!{endDate}"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startTime\')}',readOnly:true})" readonly>
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                查询
+                            </button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                显示全部
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">按留言类别统计</a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_2" data-toggle="tab">按受理单位统计</a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_3" data-toggle="tab">按受理人统计</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 10px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="row">
+                        <div class="col-md-4" style="padding-left: 5px;">
+                            <div id="typePie" style="height: 365px;"></div>
+                            <p class="chartsName">信件满意度</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div id="typeBar" style="height: 365px;"></div>
+                            <p class="chartsName">按留言类别统计</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb20 mt20">
+                        <div class="col-md-7">
+                            <div class="pdr10">
+
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="button" class="btn btn-default btn-excel-export" style="float: right;"
+                                    onclick="exportDoc('excel')"> 导出(excel)
+                            </button>
+                        #*<button type="button" class="btn btn-default btn-excel-import" style="float: right;margin-right: 5px;"
+                                onclick="exportDoc('word')"> 导出(word)
+                        </button>*#
+                        </div>
+                    </div>
+
+                    <div id="datagrid1" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/supervise/getPage" sizeList="[5,10,20,50]" pageSize="20"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div field="name" width="50%" align="center" headerAlign="center" renderer="nameRender">留言类别</div>
+                            <div field="ok" width="200" align="center" headerAlign="center" renderer="satisfy">满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="no" width="200" align="center" headerAlign="center" allowSort="true" renderer="unsatisfy">不满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="satisfyPr" width="200" align="center" headerAlign="center" allowSort="true" renderer="radioRender">满意率&nbsp;<span style="font-size: 12px;color: #999999;">(仅供参考)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab_1_2">
+                    <div class="row">
+                        <div class="col-md-4" style="padding-left: 5px;">
+                            <div id="typePie1" style="height: 365px;"></div>
+                            <p class="chartsName">信件满意度</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div id="typeBar1" style="height: 365px;"></div>
+                            <p class="chartsName">按受理单位统计</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb20 mt20">
+                        <div class="col-md-7">
+                            <div class="pdr10">
+
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="button" class="btn btn-default btn-excel-export" style="float: right;"
+                                    onclick="exportDoc('excel')"> 导出(excel)
+                            </button>
+                        #*<button type="button" class="btn btn-default btn-excel-import" style="float: right;margin-right: 5px;"
+                                onclick="exportDoc('word')"> 导出(word)
+                        </button>*#
+                        </div>
+                    </div>
+
+                    <div id="datagrid2" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/supervise/getPage" sizeList="[5,10,20,50]" pageSize="20"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div field="name" width="50%" align="center" headerAlign="center" renderer="nameRender">单位</div>
+                            <div field="ok" width="200" align="center" headerAlign="center" renderer="satisfy">满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="no" width="200" align="center" headerAlign="center" allowSort="true" renderer="unsatisfy">不满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="satisfyPr" width="200" align="center" headerAlign="center" allowSort="true" renderer="radioRender">满意率&nbsp;<span style="font-size: 12px;color: #999999;">(仅供参考)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab_1_3">
+                    <div class="row">
+                        <div class="col-md-4" style="padding-left: 5px;">
+                            <div id="typePie2" style="height: 365px;"></div>
+                            <p class="chartsName">信件满意度</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div id="typeBar2" style="height: 365px;"></div>
+                            <p class="chartsName">按受理人统计</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb20 mt20">
+                        <div class="col-md-7">
+                            <div class="pdr10">
+
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <button type="button" class="btn btn-default btn-excel-export" style="float: right;"
+                                    onclick="exportDoc('excel')"> 导出(excel)
+                            </button>
+                        #*<button type="button" class="btn btn-default btn-excel-import" style="float: right;margin-right: 5px;"
+                                onclick="exportDoc('word')"> 导出(word)
+                        </button>*#
+                        </div>
+                    </div>
+
+                    <div id="datagrid3" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/supervise/getPage" sizeList="[5,10,20,50]" pageSize="20"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div field="name" width="50%" align="center" headerAlign="center" renderer="nameRender">单位</div>
+                            <div field="ok" width="200" align="center" headerAlign="center" renderer="satisfy">满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="no" width="200" align="center" headerAlign="center" allowSort="true" renderer="unsatisfy">不满意&nbsp;<span style="font-size: 12px;color: #999999;">(点击数字查看详情)</span></div>
+                            <div field="satisfyPr" width="200" align="center" headerAlign="center" allowSort="true" renderer="radioRender">满意率&nbsp;<span style="font-size: 12px;color: #999999;">(仅供参考)</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<iframe id="download" style="display: none"></iframe>
+
+
+<script>
+    mini.parse();
+    var cur = {
+        tabIndex:1,
+        columnId:"",
+        param:{},//查询参数--只在点击查询后刷新该参数
+        grid1:mini.get("datagrid1"),
+        grid2:mini.get("datagrid2"),
+        grid3:mini.get("datagrid3"),
+        chartBMap:{},
+        chartDMap:{},
+        columnMap:{},//来源map
+        codeMap:{},//类别map
+        codeArray:[],
+        unitMap:{},//单位map
+        unitArray:[]
+    };
+
+
+    //统一属性
+    var labelTop = {
+        normal: {
+            color: '#ff7f50',
+            label: {
+                show: true,
+                /*position : 'center',*/
+                formatter: function (params) {
+                    return params.name + '\n' + parseInt(params.value) + '\n' + parseInt(params.percent).toFixed(1) +'%'
+                }
+            }
+        }
+    };
+    var labelFromatter = {
+        normal: {
+            label: {
+                formatter: function (params) {
+                    return 100 - params.value + '%'
+                },
+                textStyle: {
+                    baseline: 'top'
+                }
+            },
+            labelLine: {
+                length: 5
+            }
+        },
+    }
+    var labelBottom = {
+        normal: {
+            color: '#87cefa',
+            label: {
+                show: true,
+                formatter: function (params) {
+                    return params.name + '\n' + parseInt(params.value) + '\n' + parseInt(params.percent).toFixed(1) +'%'
+                }
+            }
+        },
+        emphasis: {
+            color: 'rgba(0,0,0,0)'
+        }
+    };
+
+    var radius = ['50%', '70%'];
+
+    var chart_a = function (ec) {
+        var option = {
+            legend: {
+                x: 'center',
+                y: 'top',
+                data: [
+                    '满意', '不满意'
+                ]
+            },
+            title: {
+                text: '',
+                x: 'center',
+                y: 'center'
+            },
+            series: [
+                {
+                    type: 'pie',
+                    center: ['51%', '50%'],
+                    radius: radius,
+                    itemStyle: labelFromatter,
+                    data: [
+                        {name: '不满意', value: 0, itemStyle: labelBottom},
+                        {name: '满意', value: 0, itemStyle: labelTop}
+                    ]
+                }
+            ]
+        };
+
+        if (document.getElementById('typePie')) {
+            cur.chart_a = ec.init(document.getElementById('typePie'));
+            cur.chart_a.setOption(option);
+        }
+
+    }
+
+    var chart_b = function (ec) {
+        var option = {
+            tooltip: {
+                show: true,
+                trigger: 'item',
+                formatter : function (params) {
+                    return params.name + '-' + params.seriesName + '<br/>' + cur.chartBMap[params.name][params.seriesIndex] + '，' + params.value + '%';
+                }
+            },
+            grid:{
+                x2:25
+            },
+            legend: {
+                data: ['满意', '不满意']
+            },
+            xAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'category',
+                    data: ['我要咨询', '我要投诉', '我要举报', '我要建议', '其他']
+                }
+            ],
+            yAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'value',
+                    /*name: '百分比',*/
+                    max: 100,
+                    axisLabel: {formatter: '{value} %'}
+                }
+            ],
+            series: [
+                {
+                    name: '满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#87cefa'
+                        }
+                    }
+                    // barWidth : 30
+                },
+                {
+                    name: '不满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#ff7f50'
+                        }
+                    }
+                    // barWidth : 30
+                }
+            ]
+        };
+        if (document.getElementById('typeBar')) {
+            cur.chart_b = ec.init(document.getElementById('typeBar'));
+            cur.chart_b.setOption(option);
+        }
+    }
+
+    var chart_c = function (ec) {
+        var option = {
+            legend: {
+                x: 'center',
+                y: 'top',
+                data: [
+                    '满意', '不满意'
+                ]
+            },
+            title: {
+                text: '',
+                x: 'center',
+                y: 'center'
+            },
+            series: [
+                {
+                    type: 'pie',
+                    center: ['51%', '50%'],
+                    radius: radius,
+                    itemStyle: labelFromatter,
+                    data: [
+                        {name: '不满意', value: 0, itemStyle: labelBottom},
+                        {name: '满意', value: 0, itemStyle: labelTop}
+                    ]
+                }
+            ]
+        };
+
+        if (document.getElementById('typePie1')) {
+            cur.chart_c = ec.init(document.getElementById('typePie1'));
+            cur.chart_c.setOption(option);
+        }
+    }
+
+    var chart_d = function (ec) {
+        var option = {
+            tooltip: {
+                show: true,
+                trigger: 'item',
+                formatter : function (params) {
+                    return params.name + '-' + params.seriesName + '<br/>' + cur.chartDMap[params.name][params.seriesIndex] + '，' + params.value + '%';
+                }
+            },
+            grid:{
+                x2:25
+            },
+            legend: {
+                data: ['满意', '不满意']
+            },
+            xAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'category',
+                    data: ['我要咨询', '我要投诉', '我要举报', '我要建议', '其他']
+                }
+            ],
+            yAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'value',
+                    /*name: '百分比',*/
+                    max: 100,
+                    axisLabel: {formatter: '{value} %'}
+                }
+            ],
+            series: [
+                {
+                    name: '满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#87cefa'
+                        }
+                    }
+                    // barWidth : 30
+                },
+                {
+                    name: '不满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#ff7f50'
+                        }
+                    }
+                    // barWidth : 30
+                }
+            ]
+        };
+
+        if (document.getElementById('typeBar1')) {
+            cur.chart_d = ec.init(document.getElementById('typeBar1'));
+            cur.chart_d.setOption(option);
+        }
+
+    }
+
+    var chart_e = function (ec) {
+        var option = {
+            legend: {
+                x: 'center',
+                y: 'top',
+                data: [
+                    '满意', '不满意'
+                ]
+            },
+            title: {
+                text: '',
+                x: 'center',
+                y: 'center'
+            },
+            series: [
+                {
+                    type: 'pie',
+                    center: ['51%', '50%'],
+                    radius: radius,
+                    itemStyle: labelFromatter,
+                    data: [
+                        {name: '不满意', value: 0, itemStyle: labelBottom},
+                        {name: '满意', value: 0, itemStyle: labelTop}
+                    ]
+                }
+            ]
+        };
+
+        if (document.getElementById('typePie2')) {
+            cur.chart_c = ec.init(document.getElementById('typePie2'));
+            cur.chart_c.setOption(option);
+        }
+    }
+
+    var chart_f = function (ec) {
+        var option = {
+            tooltip: {
+                show: true,
+                trigger: 'item',
+                formatter : function (params) {
+                    return params.name + '-' + params.seriesName + '<br/>' + cur.chartDMap[params.name][params.seriesIndex] + '，' + params.value + '%';
+                }
+            },
+            grid:{
+                x2:25
+            },
+            legend: {
+                data: ['满意', '不满意']
+            },
+            xAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'category',
+                    data: ['我要咨询', '我要投诉', '我要举报', '我要建议', '其他']
+                }
+            ],
+            yAxis: [
+                {
+                    splitLine:{
+                        lineStyle: {
+                            color: '#efecec'
+                        }
+                    },
+                    type: 'value',
+                    /*name: '百分比',*/
+                    max: 100,
+                    axisLabel: {formatter: '{value} %'}
+                }
+            ],
+            series: [
+                {
+                    name: '满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#87cefa'
+                        }
+                    }
+                    // barWidth : 30
+                },
+                {
+                    name: '不满意',
+                    type: 'bar',
+                    barMaxWidth: 60,
+                    data: [0, 0, 0, 0, 0],
+                    itemStyle: {
+                        normal: {
+                            color: '#ff7f50'
+                        }
+                    }
+                    // barWidth : 30
+                }
+            ]
+        };
+
+        if (document.getElementById('typeBar2')) {
+            cur.chart_d = ec.init(document.getElementById('typeBar2'));
+            cur.chart_d.setOption(option);
+        }
+
+    }
+
+    $(document).ready(function () {
+        //获取数据源，留言类别，受理单位
+        getRecUnitOrUser();
+
+//        setTimeout(function(){
+        tabEcharts1();
+//        }, 500);
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            var id = e.currentTarget.hash;
+
+            if (id == '#tab_1_2') {
+                cur.tabIndex = 2;
+                if (cur.chart_c == null) {
+                    tabEcharts2();
+                }
+            } else if (id == '#tab_1_3') {
+                cur.tabIndex = 3;
+                tabEcharts3();
+            }else {
+                cur.tabIndex = 1;
+            }
+            search();
+        });
+    });
+
+    //获取留言类别，受理单位
+    function getRecUnitOrUser() {
+        //先获取数据源
+        Ls.ajax({
+            type: "POST",
+            async:false,
+            url: "/supervise/getColumns",
+            data: {typeCode: "messageBoard"}
+        }).done(function (list) {
+            var str = "<option value=''> 默认统计所有 </option> ";
+            if (list != null && list.length > 0) {
+                for (i = 0; i < list.length; i++) {
+                    cur.columnMap[list[i].indicatorId] = list[i].name;
+                    str += ' <option value=' + list[i].indicatorId + '>' + list[i].name + '</option> ';
+                }
+            }
+            $("#sourceColumn").append(str);
+
+            Ls.ajax({
+                type: "POST",
+                async:false,
+                url: "/supervise/getRec",
+                data: {columnId: cur.columnId}
+            }).done(function (map) {
+                var recList = map.recList;
+                var codeList = map.codeList;
+                cur.unitArray = recList;
+                cur.codeArray = codeList;
+                if (recList != null && recList.length > 0) {
+                    var str1 = '<option value=""> 受理单位 </option> ';
+                    for (i = 0; i < recList.length; i++) {
+                        var rec = recList[i];
+                        if (rec.recUnitId != null && rec.recUnitId != '') {
+                            cur.unitMap[rec.recUnitId] = rec.recUnitName;
+                            str1 += ' <option value=' + rec.recUnitId + '>' + rec.recUnitName + '</option> ';
+                        }
+                    }
+                    $("#recUnitId").empty();
+                    $("#recUnitId").append(str1);
+                }
+
+                if (codeList != null && codeList.length > 0 ) {
+                    var str2 = '<option value=""> 留言类别 </option> ';
+                    for (i = 0; i < codeList.length; i++) {
+                        var code = codeList[i];
+                        if (code.classCode != null && code.classCode != '') {
+                            cur.codeMap[code.classCode] = code.className;
+                            str2 += ' <option value=' + code.classCode + '>' + code.className + '</option> ';
+                        }
+                    }
+                    $("#classCode").empty();
+                    $("#classCode").append(str2);
+                }
+            });
+        });
+    }
+
+    //搜索方法
+    function search() {
+        cur.param = getParam();
+
+        Ls.ajax({
+            type: "POST",
+            url: "/supervise/getAllData",
+            data: cur.param
+        }).done(function (data) {
+//                console.log(data);
+//                console.log(cur.codeMap);
+//                console.log(cur.unitMap);
+            cur.chartBMap = {};
+            cur.chartDMap = {};
+            if (cur.tabIndex == 1) {//按类型
+                var optionA = cur.chart_a.getOption();
+                var ok = 0;
+                var no = 0;
+                //计算总的满意和不满意数
+                for (var i in data) {
+                    var odata = data[i];
+                    ok += odata['ok'];
+                    no += odata['no'];
+                }
+
+                optionA.series[0].data[0].name = "满意";
+                optionA.series[0].data[0].value = ok;
+                optionA.series[0].data[1].name = "不满意";
+                optionA.series[0].data[1].value = no;
+                optionA.title.text = (no+ok)+"条总评价数"
+                cur.chart_a.clear();
+                cur.chart_a.setOption(optionA);
+
+                var optionB = cur.chart_b.getOption();
+                var codeName = [],okArray = [],noArray = [];
+                //遍历种类
+                for (var i = 0 ; i < cur.codeArray.length ; i++) {
+                    var code = cur.codeArray[i]['classCode'];
+                    //如果添加了类别限制，则过滤别的类型
+                    if (!Ls.isEmpty(cur.param.classCode) && code != cur.param.classCode) continue;
+                    codeName.push(cur.codeMap[code]);
+                    var tok = data[code] == null ? 0 : data[code]['ok'];
+                    var tno = data[code] == null ? 0 : data[code]['no'];
+                    //组建map，用于tooltip显示个数
+                    cur.chartBMap[cur.codeMap[code]] = [tok,tno];
+                    var total = tok + tno;
+                    if (total == 0) {
+                        okArray.push(0);
+                        noArray.push(0);
+                    }else {
+                        okArray.push((tok/total * 100).toFixed(1));
+                        noArray.push((tno/total * 100).toFixed(1));
+                    }
+                }
+                optionB.xAxis[0].data = codeName;
+                optionB.series[0].data = okArray;
+                optionB.series[1].data = noArray;
+                cur.chart_b.clear();
+                cur.chart_b.setOption(optionB);
+
+                cur.grid1.load(cur.param);
+            }else if(cur.tabIndex == 3){ //按人
+
+                cur.grid3.load(cur.param);
+            } else {//按单位
+                var optionC = cur.chart_c.getOption();
+                var ok = 0;
+                var no = 0;
+                //计算总的满意和不满意数
+                for (var i in data) {
+                    var odata = data[i];
+                    ok += odata['ok'];
+                    no += odata['no'];
+                }
+
+                optionC.series[0].data[0].name = "满意";
+                optionC.series[0].data[0].value = ok;
+                optionC.series[0].data[1].name = "不满意";
+                optionC.series[0].data[1].value = no;
+                optionC.title.text = (no+ok)+"条总评价数"
+                cur.chart_c.clear();
+                cur.chart_c.setOption(optionC);
+
+                var optionD = cur.chart_d.getOption();
+                var unitName = [],okArray = [],noArray = [];
+                //遍历种类
+                for (var i = 0 ; i < cur.unitArray.length ; i++) {
+                    var code = cur.unitArray[i]['recUnitId'];
+                    //如果添加了单位限制，则过滤别的单位
+                    if (!Ls.isEmpty(cur.param.receiveUnitId) && code != cur.param.receiveUnitId) continue;
+                    unitName.push(cur.unitMap[code]);
+                    var tok = data[code] == null ? 0 : data[code]['ok'];
+                    var tno = data[code] == null ? 0 : data[code]['no'];
+                    //组建map，用于tooltip显示个数
+                    cur.chartDMap[cur.unitMap[code]] = [tok,tno];
+                    var total = tok + tno;
+                    if (total == 0) {
+                        okArray.push(0);
+                        noArray.push(0);
+                    }else {
+                        okArray.push((tok/total * 100).toFixed(1));
+                        noArray.push((tno/total * 100).toFixed(1));
+                    }
+                }
+                optionD.xAxis[0].data = unitName;
+                optionD.series[0].data = okArray;
+                optionD.series[1].data = noArray;
+                cur.chart_d.clear();
+                cur.chart_d.setOption(optionD);
+
+                cur.grid2.load(cur.param);
+            }
+
+        });
+    }
+
+    //显示全部
+    function showAll(){
+        var options = $(".search-toolbar").find('select');
+        options.eq(1).val("");
+        options.eq(2).val("");
+        $("#startTime").val("");
+        $("#endTime").val("");
+    }
+
+    //名称渲染
+    function nameRender(e) {
+        var code = e.record.name;
+        if (cur.codeMap[code] != null) {
+            return cur.codeMap[code];
+        }
+        if (cur.unitMap[code] != null) {
+            return cur.unitMap[code];
+        }
+    }
+
+    function radioRender(e) {
+        return e.record.satisfyPr+"%";
+    }
+
+    function getParam() {
+        var options = $(".search-toolbar").find('select>option:selected');
+        var columnId = options.eq(0).val();
+        var classCode = options.eq(1).val();
+        var recUnitId = options.eq(2).val();
+        var startTime =$("#startTime").val();
+        var endTime = $("#endTime").val();
+
+        return {
+            classCode : classCode,
+            receiveUnitId : recUnitId,
+            st : startTime,
+            ed : endTime,
+            tabIndex : cur.tabIndex,
+            columnId: columnId
+        };
+    }
+
+    //到处方法
+    function exportDoc(type) {
+        var param = cur.param;
+        var str = "";
+        for (var o in param) {
+            str += (o + "=" + param[o] + "&");
+        }
+        str = str.substr(0,str.length-1);
+        $("#download").attr("src", "/supervise/exportExcel?"+str);
+    }
+
+    function tabEcharts1() {
+        Ls.parseEcharts(function () {
+            require([
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar',
+                        'echarts/chart/pie',
+                        'echarts/chart/funnel'
+                    ], function (ec) {
+                        chart_a(ec);
+                        chart_b(ec);
+                        search();
+                    }
+            );
+        })
+    }
+
+    function tabEcharts2() {
+        Ls.parseEcharts(function () {
+            require([
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar',
+                        'echarts/chart/pie',
+                        'echarts/chart/funnel'
+                    ], function (ec) {
+                        chart_c(ec);
+                        chart_d(ec);
+                    }
+            );
+        })
+    }
+
+    function tabEcharts3() {
+        Ls.parseEcharts(function () {
+            require([
+                        'echarts',
+                        'echarts/chart/line',
+                        'echarts/chart/bar',
+                        'echarts/chart/pie',
+                        'echarts/chart/funnel'
+                    ], function (ec) {
+                        chart_e(ec);
+                        chart_f(ec);
+                    }
+            );
+        })
+    }
+
+    function satisfy(obj) {
+        var record = obj.record;
+        var str = '<a style="color:#CC3300;cursor: pointer;" onclick="details(1,\''+ record.name +'\')">'+ record.ok +'</a>';
+        return str;
+    }
+
+    function unsatisfy(obj) {
+        var record = obj.record;
+        var str = '<a style="color:#CC3300;cursor: pointer;" onclick="details(2,\''+ record.name +'\')">'+ record.no +'</a>';
+        return str;
+    }
+
+    function details(type, name) {
+        var param = cur.param;
+        if (cur.tabIndex == 1) {
+            param.classCode = name;
+            //param.receiveUnitId = '';
+        }else {
+            //param.classCode = '';
+            param.receiveUnitId = name;
+        }
+        //满意/不满意
+        param.satisfactoryType = type;
+
+        art.dialog.data('param',param);
+//        var str = "";
+//        for (var o in param) {
+//            str += (o + "=" + param[o] + "&");
+//        }
+//        str = str.substr(0,str.length-1);
+        Ls.openWin("/supervise/details?", '1200px', '600px',{
+            id: 'detailsPage',
+            title: type == 1 ? '满意详情' : '不满意详情'
+        });
+
+    }
+</script>

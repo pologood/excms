@@ -1,0 +1,1227 @@
+#parse("_page_layout/_header.vm")
+</head>
+<style>
+    #detailWrap {
+        position: relative;
+    }
+
+    #detailWrap .score {
+        font-weight: bold;
+        font-size: 42px;
+    }
+
+    .portlet.light.item {
+        background: #f1f4f7;
+    }
+
+    .item-wrap .portlet.light > .portlet-title > .caption {
+        float: none;
+    }
+
+    .item-wrap .portlet-bottom {
+        min-height: 20px;
+    }
+
+    #detailWrap .export {
+        line-height: 0;
+    }
+
+    .item-wrapper {
+        margin-top: 20px;
+    }
+
+    .item-wrapper:nth-of-type(2) {
+        margin-top: 60px;
+    }
+
+    .item-wrap {
+        position: relative;
+        margin-top: 30px;
+    }
+
+    .item-wrap:nth-of-type(2) {
+        margin-top: 60px;
+    }
+
+    .item-wrap > h4 {
+        width: 1em;
+        position: absolute;
+        left: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .item-wrap .caption-subject {
+        color: #333;
+    }
+
+    .item-wrap .col-sm-2 {
+        padding: 0;
+        margin: 0 7px;
+        position: relative;
+    }
+
+    .item-wrap .col-sm-2:nth-of-type(1) {
+        margin-left: 8.33333% !important;
+    }
+    /*@media (max-width: 1300px) {
+        .item > h3 {
+            margin: 10px;
+        }
+    }*/
+
+    @media (min-width: 768px) {
+        .item-wrapper .col-sm-2:nth-of-type(1) {
+            margin-left: 8.33333% !important;
+        }
+    }
+
+    .up-date {
+        display: none;
+        position: absolute;
+        top: 9px;
+        left: 123px;
+        width: 120px;
+    }
+
+    #tab2 > .center {
+        margin-top: 30px;
+    }
+
+    #tab2 > .center > h3 {
+        color: #666;
+        text-indent: 16px;
+        margin-top: 0;
+    }
+
+    #tab2 .count {
+        margin-bottom: 20px;
+    }
+
+    #tab2 .survey {
+        padding: 0px 80px;
+    }
+
+    #tab2 .survey > form {
+        margin-bottom: 20px;
+    }
+</style>
+<body class="page-body-white">
+<style>
+    #detailWrap {
+        position: relative;
+    }
+
+    #detailWrap .score {
+        font-weight: bold;
+        font-size: 42px;
+    }
+
+    .portlet.light.item {
+        background: #f1f4f7;
+        height: 250px;
+    }
+
+    .item-wrap .portlet.light > .portlet-title > .caption {
+        float: none;
+    }
+
+    .item-wrap .portlet-bottom {
+        min-height: 20px;
+    }
+
+    #detailWrap .export {
+        line-height: 0;
+    }
+
+    .item-wrapper {
+        margin-top: 20px;
+    }
+
+    .item-wrapper:nth-of-type(2) {
+        margin-top: 60px;
+    }
+
+    .item-wrap {
+        position: relative;
+        margin-top: 30px;
+    }
+
+    .item-wrap:nth-of-type(2) {
+        margin-top: 60px;
+    }
+
+    .item-wrap > h4 {
+        width: 1em;
+        position: absolute;
+        left: 5%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .item-wrap .caption-subject {
+        color: #333;
+    }
+
+    .item-wrap .col-sm-2 {
+        padding: 0;
+        margin: 0 7px;
+        position: relative;
+    }
+
+    .item-wrap .col-sm-2:nth-of-type(1) {
+        margin-left: 8.33333% !important;
+    }
+
+    .mybox {
+        height: 100px;
+        overflow: auto;
+    }
+
+    /*@media (max-width: 1300px) {
+        .item > h3 {
+            margin: 10px;
+        }
+    }*/
+
+    @media (min-width: 768px) {
+        .item-wrapper .col-sm-2:nth-of-type(1) {
+            margin-left: 8.33333% !important;
+        }
+    }
+
+    .up-date {
+        display: none;
+        position: absolute;
+        top: 9px;
+        left: 123px;
+        width: 120px;
+    }
+
+    #tab2 > .center {
+        margin-top: 30px;
+    }
+
+    #tab2 > .center > h3 {
+        color: #666;
+        text-indent: 16px;
+        margin-top: 0;
+    }
+
+    #tab2 .count {
+        margin-bottom: 20px;
+    }
+
+    #tab2 .survey {
+        padding: 0px 80px;
+    }
+
+    #tab2 .survey > form {
+        margin-bottom: 20px;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style="margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab1" data-toggle="tab">当前站点监测报告</a>
+                </li>
+                <li>
+                    <a href="#tab2" data-toggle="tab">全站监测报告</a>
+##                    <span class="up-date text-danger">本报告每月15日更新</span>
+                </li>
+            </ul>
+
+            <div class="tab-content" style="padding-top: 0;">
+                <div class="tab-pane active" id="tab1">
+                    <div id="detailWrap">
+                        <h1 class="score total_score text-center"></h1>
+                        <a href="javascript:void(0)" class="export pull-right" onclick="exportLog()">导出报告</a>
+                        <div class="item-wrapper">
+                            <div class="item-wrap row">
+                                <h4>单项否决项</h4>
+
+                                <div class="col-sm-2" id="siteVisitDiv">
+                                    #站点访问
+                                </div>
+
+                                <div class="col-sm-2" id="indexNotUpdateDiv">
+                                    #网站不更新
+                                </div>
+
+                                <div class="col-sm-2" id="columnNotUpdateDiv">
+                                    #栏目不更新
+                                </div>
+
+                                <div class="col-sm-2" id="seriousErrorDiv">
+                                    #严重错误
+                                </div>
+
+                                <div class="col-sm-2" id="badInteractDiv">
+                                    #互动回应差
+                                </div>
+
+                            </div>
+
+                            <div class="item-wrap row">
+                                <h4>综合评分项</h4>
+                                <div class="col-sm-2" id="hrefUseableDiv">
+                                    #严重错误
+                                </div>
+                                <div class="col-sm-2" id="indexColumnDiv">
+                                    #首页栏目更新情况
+                                </div>
+
+                                <div class="col-sm-2" id="columnBaseInfoDiv">
+                                    #基本信息栏目更新情况
+                                </div>
+
+                                <div class="col-sm-2" id="interactInfoDiv">
+                                    #互动回应情况
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <div region="center" style="border:none; overflow:auto;">
+                        <div class="portlet light">
+                            <div class="portlet-body form">
+                                <div class="table-toolbar">
+                                   #* <div class="row">
+                                        <div class="col-md-12">
+                                            <form class="form-inline tr search-toolbar" role="form">
+                                                <div class="form-group">
+                                                    <select id="status" name="status" class="form-control">
+                                                        <option value=""> 请选择状态 </option>
+                                                        <option value="0"> 未采用 </option>
+                                                        <option value="1"> 已退回 </option>
+                                                        <option value="2"> 已采用 </option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="text" id="tempName" name="tempName" class="form-control"
+                                                           placeholder="报送单位名称">
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                                           placeholder="标题">
+                                                </div>
+                                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                                    搜索
+                                                </button>
+                                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                                    显示全部
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>*#
+                                </div>
+                                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                                     url="/monitor/index/manage/getSiteStatisPage?dataFlag=1" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="true"
+                                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                                >
+                                    <div property="columns">
+                                        <div field="siteName" width="100%" align="center" headerAlign="center">站点名称</div>
+                                        <div width="70" align="center" headerAlign="center" renderer="score">得分</div>
+                                        <div field="siteDeny" width="80" align="center" headerAlign="center" renderer="indexStatus">站点无法访问</div>
+                                        <div field="siteUpdate" width="80" align="center" headerAlign="center" renderer="indexStatus">站点更新</div>
+                                        <div field="columnUpdate" width="80" align="center" headerAlign="center" renderer="indexStatus">栏目更新</div>
+                                        <div field="error" width="80" align="center" headerAlign="center" renderer="indexStatus">严重错误</div>
+                                        <div field="reply" width="80" align="center" headerAlign="center" renderer="indexStatus">互动回应差</div>
+                                        <div field="siteUse" width="80" align="center" headerAlign="center">网站可用性</div>
+                                        <div renderer="indexInfoUpdate" width="80" align="center" headerAlign="center">首页栏目更新</div>
+                                        <div renderer="infoUpdate" width="80" align="center" headerAlign="center">基本信息更新</div>
+                                        <div renderer="replyScope" width="80" align="center" headerAlign="center">互动回应</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+
+<script type="template" id="siteVisit">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold">站点无法访问</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center " style="margin: 0 0 20px;">
+                <?if(data.isOk==0){?>
+                    不合格
+                <?} else {?>
+                    合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">总访问数：<?=data.total?>次</p>
+                <p class="">可访问占比：<?=data.successRate?>%，不可访问占比：<?=data.failRate?>%</p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="siteVisitDetail()">查看详情&gt;</a>
+        </div>
+    </div>
+</script>
+
+<script type="template" id="seriousError">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 严重错误</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center " style="margin: 0 0 20px;">
+                <?if(data > 0){?>
+                    不合格
+                <?} else {?>
+                    合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">存在<?==data?>个疑似错别字</p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="seriousErrorDetail()">查看详情&gt;</a>
+        </div>
+    </div>
+</script>
+
+<script type="template" id="hrefUseable">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold">网站可用性</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center  text-danger" style="margin: 0 0 20px;">
+                <?if(data.score > 0){?>
+                    -<?=data.score?>分
+                <?} else {?>
+                    合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">首页错误链接：<?=data.indexCount?></p>
+                <p class="">其他页面错误链接：<?=data.otherCount?></p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="hrefUseableDetail()">查看详情&gt;</a>
+        </div>
+    </div>
+</script>
+<script type="template" id="indexNotUpdate">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold">网站不更新</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center " style="margin: 0 0 20px;">
+                <?if(data.isOk==0){?>
+                不合格
+                <?} else {?>
+                合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">首页更新量：<?=data.updateCounts?></p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="indexNotUpdateDetail()">查看详情&gt;</a>
+        </div>
+    </div>
+</script>
+
+<script type="template" id="columnNotUpdate">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 栏目不更新</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center " style="margin: 0 0 20px;">
+                <?if(data.isOk==0){?>
+                不合格
+                <?} else {?>
+                合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">动态、要闻类栏目，<?=data.dtywCounts?>个未按时更新</p>
+                <p class="">通知公告、政策文件类栏目，<?=data.tzzcCounts?>个未按时更新</p>
+                <p class=""><?=data.updateCounts?>个应更新栏目未按时更新</p>
+                <p class=""><?=data.blankCounts?>个空白栏目</p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="columnNotUpdateDetail()">查看详情&gt;</a>
+
+        </div>
+    </div>
+</script>
+
+<script type="template" id="badInteract">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 互动回应差</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center " style="margin: 0 0 20px;">
+                <?if(data.isOk==0){?>
+                不合格
+                <?} else {?>
+                合格
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class=""><?=data.unreplayCounts?>件超过三个月未回复的信件</p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="badInteractDetail()">查看详情&gt;</a>
+
+        </div>
+    </div>
+</script>
+
+<script type="template" id="indexColumn">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 首页栏目更新情况</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center text-danger" style="margin: 0 0 20px;">
+                <?if(data.score==0){?>
+                -0分
+                <?} else {?>
+                <?=data.score?>分
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class=""><p class="">首页更新量：<?=data.updateCounts?></p></p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="indexColumnDetail()">查看详情&gt;</a>
+
+        </div>
+    </div>
+</script>
+
+<script type="template" id="columnBaseInfo">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 基本信息栏目更新情况</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center text-danger" style="margin: 0 0 20px;">
+                <?if(data.score==0){?>
+                -0分
+                <?} else {?>
+                <?=data.score?>分
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <p class="">动态、要闻类栏目，<?=data.dtywCounts?>个未按时更新</p>
+                <p class="">通知公告、政策文件类栏目，<?=data.tzzcCounts?>个未按时更新</p>
+                <p class="">人事、规划计划类栏目，<?=data.rsghCounts?>个应更新栏目未按时更新</p>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="columnBaseInfoDetail()">查看详情&gt;</a>
+
+        </div>
+    </div>
+</script>
+
+<script type="template" id="interactInfo">
+    <div class="portlet light item">
+        <div class="portlet-title text-center">
+            <div class="caption">
+                <span class="caption-subject bold"> 互动回应情况</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <h3 class="text-center  text-danger" style="margin: 0 0 20px;">
+                <?if(data.score==0){?>
+                -0分
+                <?} else {?>
+                <?=data.score?>分
+                <?}?>
+            </h3>
+            <div class="mybox">
+                <?if(data.columnType_ZWZX==0){?>
+                <p class="">未开设政务咨询类栏目</p>
+                <?} else if(data.columnType_ZWZX==1){?>
+                <p class="">政务咨询类栏目:无有效信件、留言</p>
+                <?} else if(data.columnType_ZWZX==2){?>
+                <p class="">政务咨询类栏目:开展次数少于规定次数</p>
+                <?}?>
+
+                <?if(data.columnType_DCZJ==0){?>
+                <p class="">未开设调查征集类栏目</p>
+                <?} else if(data.columnType_DCZJ==1){?>
+                <p class="">调查征集类栏目:未开展调查征集活动</p>
+                <?} else if(data.columnType_DCZJ==2){?>
+                <p class="">调查征集类栏目:开展次数少于规定次数</p>
+                <?}?>
+
+                <?if(data.columnType_HDFT==0){?>
+                <p class="">未开设互动访谈类栏目</p>
+                <?} else if(data.columnType_HDFT==1){?>
+                <p class="">互动访谈类栏目:未开展互动访谈活动</p>
+                <?} else if(data.columnType_HDFT==2){?>
+                <p class="">互动访谈类栏目:开展次数少于规定次数</p>
+                <?}?>
+            </div>
+        </div>
+        <div class="portlet-bottom">
+
+            <a href="javascript:void (0)" class="more text-danger pull-right" onclick="interactInfoDetail()">查看详情&gt;</a>
+
+        </div>
+    </div>
+</script>
+<script type="template" id="count">
+    <? for(var i=0,l=data.length; i<l; i++){
+            var el = data[i] ?>
+    <div class="item-wrap row">
+        <h4><?=el.topName?></h4>
+        <? for(var j=0,L=el.child.length; j<L; j++){
+                        var ch = el.child[j] ?>
+        <div class="col-sm-2">
+            <div class="portlet light item">
+                <div class="portlet-title text-center">
+                    <div class="caption">
+                        <span class="caption-subject bold"> <?=ch.typeName?></span>
+                    </div>
+                </div>
+                <div class="portlet-body">
+                    <h3 class="text-center <? if(ch.unqualified==1){?> text-danger<?}?>"
+                        style="margin: 0 0 20px;"><?=ch.qualified?></h3>
+                    <div class="mybox">
+                        <p class="<? if(ch.danger==1){?> text-danger<?}?>"><?=ch.msg1?></p>
+                        <p class="<? if(ch.danger==1){?> text-danger<?}?>"><?=ch.msg2?></p>
+                        <p class="<? if(ch.danger==1){?> text-danger<?}?>"><?=ch.msg3?></p>
+                    </div>
+                </div>
+                <div class="portlet-bottom">
+                    <? if(ch.more){?>
+                    <a href="javascript:void (0)" class="more text-danger pull-right"
+                       onclick="f1(<?=ch.num?>)">查看详情&gt;</a>
+                    <?}?>
+                </div>
+            </div>
+        </div>
+        <?}?>
+    </div>
+    <?}?>
+</script>
+<script src="$!{rc.contextPath}/assets/js/plugins/echarts/echarts.min.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        baseUrl:'/monitor/index/manage/',
+        grid: mini.get("datagrid1"),
+        dialog: Ls.getWin.dialog,
+        grid: mini.get('datagrid'),
+        params: {
+            taskId:Ls.getWin.dialog.data("taskId")
+        }
+    };
+
+    $(function () {
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            var id = e.currentTarget.hash;
+            if (id == '#tab2') {
+                tabEvent.init();
+                $(".up-date").toggle();
+            } else {
+                $(".up-date").toggle();
+            }
+        });
+        cur.grid.load();
+        //获取站点访问统计数据
+        getSiteVisitStatis();
+        //获取严重错误统计数据
+        getSeriousErrorStatis();
+        //获取错误链接统计数据
+        getHrefUseableStatis();
+        //网站不更新
+        getIndexNotUpdateStatis();
+        //栏目不更新
+        getColumnNotUpdateStatis();
+        //互动回应差
+        getBadInteractStatis();
+        //综合评分项-首页栏目
+        getIndexColumnStatis();
+        //综合评分项-基本信息
+        getColumnBaseInfoStatis();
+        //综合评分项-基本信息
+        getInteractInfoStatis();
+        //总分统计
+        getTotalScore()
+    });
+
+    function getTotalScore() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getTotalScore",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                var text;
+                var r = resp.data;
+                if(r.siteDeny == 0 || r.siteUpdate == 0 || r.columnUpdate == 0 || r.error == 0 || r.reply == 0) {
+                    text = "<font color='red'>不合格</font>";
+                } else {
+                    var score =  r.score;
+                    if(parseInt(score) < 60) {
+                        text = "<font color='red'>不合格</font>";
+                    } else {
+                        text = score + "分";
+                    }
+                }
+                $(".total_score").html(text);
+            }
+        });
+    }
+
+    function getSiteVisitStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getSiteVisitStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#siteVisitDiv").html(Ls.template('siteVisit', resp));
+            }
+        });
+    }
+
+    function getSeriousErrorStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getSeriousErrorStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#seriousErrorDiv").html(Ls.template('seriousError', resp));
+            }
+        });
+    }
+
+    function getHrefUseableStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getHrefUseableStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#hrefUseableDiv").html(Ls.template('hrefUseable', resp));
+            }
+        });
+    }
+
+    function getIndexNotUpdateStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getIndexNotUpdateStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#indexNotUpdateDiv").html(Ls.template('indexNotUpdate', resp));
+            }
+        });
+    }
+
+    function getColumnNotUpdateStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getColumnNotUpdateStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#columnNotUpdateDiv").html(Ls.template('columnNotUpdate', resp));
+            }
+        });
+    }
+
+    function getBadInteractStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getBadInteractStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#badInteractDiv").html(Ls.template('badInteract', resp));
+            }
+        });
+    }
+
+    function getIndexColumnStatis(){
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getIndexColumnStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#indexColumnDiv").html(Ls.template('indexColumn', resp));
+            }
+        });
+    }
+
+    function getColumnBaseInfoStatis(){
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getColumnBaseInfoStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#columnBaseInfoDiv").html(Ls.template('columnBaseInfo', resp));
+            }
+        });
+    }
+
+    function getInteractInfoStatis() {
+        Ls.ajax({
+            type: "POST",
+            url: cur.baseUrl + "getInteractInfoStatis",
+            data: {
+                taskId: cur.params.taskId
+            }
+        }).done(function (resp) {
+            if (resp.status == 0) {
+                Ls.tipsErr(resp.desc);
+            } else {
+                $("#interactInfoDiv").html(Ls.template('interactInfo', resp));
+            }
+        });
+    }
+
+    function siteVisitDetail() {
+        cur.dialog.data("taskId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/siteVisitDetail", '800px', '390px', {
+            id:cur.params.taskId + "_siteVisit",
+            title: "站点访问详情"
+        });
+    }
+
+    function seriousErrorDetail() {
+        cur.dialog.data("taskId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/seriousErrorDetail", '800px', '390px', {
+            id:cur.params.taskId + "_seriousError",
+            title: "严重错误详情"
+        });
+    }
+
+    function hrefUseableDetail() {
+        cur.dialog.data("taskId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/hrefUseableDetail", '850px', '390px', {
+            id:cur.params.taskId + "_hrefUseable",
+            title: "错误链接详情"
+        });
+    }
+
+    function indexNotUpdateDetail() {
+        cur.dialog.data("monitorId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/indexNotUpdateDetail", '800px', '390px', {
+            id:cur.params.taskId + "_indexNotUpdate",
+            title: "网站不更新详情"
+        });
+    }
+
+    function columnNotUpdateDetail() {
+        cur.dialog.data("taskId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/columnNotUpdateDetail", '800px', '390px', {
+            id:cur.params.taskId + "_columnNotUpdate",
+            title: "栏目不更新详情"
+        });
+    }
+
+    function badInteractDetail() {
+        cur.dialog.data("monitorId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/badInteractDetail", '800px', '390px', {
+            id:cur.params.taskId + "_badInteract",
+            title: "互动回应差详情"
+        });
+    }
+
+    function indexColumnDetail() {
+        cur.dialog.data("monitorId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/indexColumnDetail", '800px', '390px', {
+            id:cur.params.taskId + "_indexColumn",
+            title: "首页栏目更新情况详情"
+        });
+    }
+
+    function columnBaseInfoDetail() {
+        cur.dialog.data("monitorId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/columnBaseInfoDetail", '800px', '390px', {
+            id:cur.params.taskId + "_columnBaseInfo",
+            title: "基本信息栏目更新情况详情"
+        });
+    }
+
+    function interactInfoDetail() {
+        cur.dialog.data("monitorId",cur.params.taskId);
+        Ls.openWin("/monitor/index/manage/interactInfoDetail", '800px', '390px', {
+            id:cur.params.taskId + "_interactInfo",
+            title: "互动回应情况详情"
+        });
+    }
+
+    function score(e) {
+        var r = e.record;
+        if(r.siteDeny == 0 || r.siteUpdate == 0 || r.columnUpdate == 0 || r.error == 0 || r.reply == 0) {
+            return "不合格";
+        }
+        var score =  r.score;
+        if(parseInt(score) < 60) {
+            return "不合格";
+        } else {
+            return score;
+        }
+    }
+
+    function indexStatus(e) {
+        if (e.value == 0)
+            return '<span style="color: red">单项否决</span>';
+        else if (e.value == 1)
+            return '<span style="color: green">合格</span>';
+        else
+            return "";
+    }
+
+    /*echart*/
+    function echart() {
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: '$!{rc.contextPath}/assets/js/plugins/echarts'
+            }
+        });
+        // 使用
+        require(
+                [
+                    'echarts',
+                    'echarts/chart/bar.min',
+                    'echarts/chart/line.min',
+                    'echarts/chart/pie.min',
+                    'echarts/chart/funnel.min'
+                ],
+                function (ec) {
+                    Ls.ajaxGet({
+                        url: '/assets/js/pages/demoDate/echrats1.json'
+                    }).done(function (d) {
+                        d.option1.result1.forEach(function (v, i, arr) {
+                            arr[i] = v- d.option1.result2[i];
+                        })
+                        var option1 = {
+                            title: {
+                                subtext: d.option1.subtext
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                    type: 'shadow',        // 默认为直线，可选为：'line' | 'shadow'
+                                    shadowStyle: {
+                                        color: 'rgba(255, 99, 71, 0)'
+                                    }
+                                },
+                                formatter: function (params) {
+                                    return params[0].name + '<br/>'
+                                            + '合格率' + ' : ' + (params[1].value / (params[0].value + params[1].value)).toFixed(2) * 100 + '%<br/>'
+                                            + '总监测站点' + ' : ' + (params[1].value + params[0].value);
+                                }
+                            },
+                            legend: {
+                                selectedMode: false,
+                                data: ['合格数', '监测站点数']
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    dataView: {show: true, readOnly: false},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'category',
+                                    data: d.option1.xdata
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                    boundaryGap: [0, 0.1]
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '监测站点数',
+                                    type: 'bar',
+                                    stack: 'sum',
+                                    barCategoryGap: '50%',
+                                    itemStyle: {
+                                        normal: {
+                                            color: '#FFF',
+                                            barBorderColor: 'tomato',
+                                            barBorderWidth: 6,
+                                            barBorderRadius: 0,
+                                            label: {
+                                                show: true,
+                                                position: 'inside',
+                                                textStyle: {
+                                                    color: 'red',
+                                                    fontSize: 20
+                                                }
+                                            }
+                                        },
+                                        emphasis: {
+                                            color: 'rgba(255, 99, 71, 0)',//控制下侧的
+                                            label: {
+                                                show: true,
+                                                textStyle: {
+                                                    color: 'rgba(0, 0, 0, 0)'
+                                                }
+                                            }
+                                        }
+
+                                    },
+                                    data: d.option1.result2
+                                },
+                                {
+                                    name: '合格数',
+                                    type: 'bar',
+                                    stack: 'sum',
+                                    itemStyle: {
+                                        normal: {
+                                            color: 'tomato',
+                                            barBorderColor: 'tomato',
+                                            barBorderWidth: 6,
+                                            barBorderRadius: 0,
+                                            label: {
+                                                show: true,
+                                                position: 'top',
+                                                formatter: function (params) {
+                                                    for (var i = 0, l = option1.xAxis[0].data.length; i < l; i++) {
+                                                        if (option1.xAxis[0].data[i] == params.name) {
+                                                            return option1.series[0].data[i] + params.value;
+                                                        }
+                                                    }
+                                                },
+                                                textStyle: {
+                                                    color: 'tomato',
+                                                    fontSize: 20
+                                                }
+                                            }
+                                        },
+                                        emphasis: {
+                                            color: 'rgba(255, 99, 71, 0)',
+                                            label: {
+                                                show: true,
+                                                textStyle: {
+                                                    color: 'rgba(0, 0, 0, 0)'
+                                                }
+                                            }
+                                        }
+                                    },
+                                    data: d.option1.result1
+                                }
+                            ]
+                        };
+
+                        var option2 = {
+                            title: {
+                                x: 'left'
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}%)"
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                x: 'left',
+                                y: 'top',
+                                data: d.option2.legendData
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    dataView: {show: true, readOnly: false},
+                                    magicType: {
+                                        show: true,
+                                        type: ['pie', 'funnel'],
+                                        option: {
+                                            funnel: {
+                                                x: '25%',
+                                                width: '50%',
+                                                funnelAlign: 'left',
+                                                max: 60
+                                            }
+                                        }
+                                    },
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            series: [
+                                {
+                                    name: '问题分析',
+                                    type: 'pie',
+                                    radius: '55%',
+                                    center: ['60%', '50%'],
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: false
+                                            },
+                                            labelLine: {
+                                                show: false
+                                            }
+                                        }
+                                    },
+                                    data: d.option2.result
+                                }
+                            ]
+                        };
+
+                        var myChart1 = ec.init(document.getElementById('echrat1'));
+                        myChart1.setOption(option1);
+
+                        var myChart2 = ec.init(document.getElementById('echrat2'));
+                        myChart2.setOption(option2);
+                    })
+                }
+        );
+
+    }
+
+    var tabEvent = (function () {
+        //
+        var diaDate = function () {
+            cur.grid.load();
+            Ls.mini_datagrid_height(cur.grid, 70);
+        };
+
+        var init = function () {
+//            echart();
+            diaDate();
+        };
+
+        return {
+            init: init
+        }
+    })();
+
+    function exportLog() {
+    }
+
+    //条件查询
+    var search = function () {
+        var key = $("#searchKey").val();
+        cur.grid.load({key: key, dataFlag: 1});
+    }
+
+    //清除条件
+    var searchClear = function () {
+        $("#searchKey").val('');
+        cur.grid.load({dataFlag: 1});
+    }
+
+    function indexInfoUpdate(e) {
+        var rec = e.record;
+        if(rec.indexInfoUpdate == 0) {
+            return '-0';
+        } else {
+            return rec.indexInfoUpdate;
+        }
+    }
+
+    function infoUpdate(e) {
+        var rec = e.record;
+        if(rec.infoUpdate == 0) {
+            return '-0';
+        } else {
+            return rec.infoUpdate;
+        }
+    }
+
+    function replyScope(e) {
+        var rec = e.record;
+        if(rec.replyScope == 0) {
+            return '-0';
+        } else {
+            return rec.replyScope;
+        }
+    }
+</script>

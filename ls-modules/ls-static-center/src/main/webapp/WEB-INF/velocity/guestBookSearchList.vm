@@ -1,0 +1,82 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+###set($action="$!{paramObj.action}")
+#set($isHit="$!{paramObj.isHit}")
+
+#if($resultObj.data.size()>0)
+<div class="guestbook-table guestbook-table_1">
+  <div class="guestbook_bt"><span>信件列表</span></div>
+  <ul class="guestbook_title">
+    <li class="t1">主题</li>
+    <li class="t3">发布时间</li>
+    <li class="t2">回复单位</li>
+    <li class="t4">受理状态</li>
+      #if($isHit== 'true')
+        <li class="t5">浏览次数</li>
+      #end
+  </ul>
+    #foreach($eo in $resultObj.data)
+        #set($title=$!{eo.title})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+      <ul class="$!{css}">
+        <li class="t1">
+          <a href="$!{eo.link}" title="${title}" target="_blank">
+            <font>#cutstr($title,$length)</font>
+          </a></li>
+        <li class="t2">[#date_format("$!{eo.addDate}","$!{paramObj.dateFormat}")]</li>
+        <li class="t3">$!{eo.replyUnitName}</li>
+        <li class="t4">
+            #if($!{eo.statusName})
+              <span class="s1">【$!{eo.statusName}】</span>
+            #else
+              <span class="s2">【未办理】</span>
+            #end
+        </li>
+          #if($isHit== 'true')
+            <li class="t5" data-id="$!{eo.baseContentId}" id="hit_$!{eo.baseContentId}">$!{eo.hit}</li>
+          #end
+      </ul>
+    #end
+
+</div>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+      Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+        location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+      }, {
+        currPage: ($!{resultObj.pageIndex}+1),
+        pageCount:$!{resultObj.pageCount}
+      });
+    </script>
+    #end
+#else
+    $!{msgPage}
+#end
+
+#if($isHit== 'true')
+<script>
+
+  var ids = $(".guestbook-table_1").find("li[data-id]").map(function () {
+    var $this = $(this);
+    return $this.data("id");
+  }).get().join(',');
+  $(document).ready(function () {
+    return Ls.ajax({
+      url: "/frontGuestBook/getHit",
+      data:{ids:ids}
+    }).done(function (d) {
+      if(d.status){
+        var data=d.data;
+        for(var i=0;i<data.length;i++){
+          $("#hit_"+data[i].id).html(data[i].count);
+        }
+      }
+    });
+  });
+</script>
+#end

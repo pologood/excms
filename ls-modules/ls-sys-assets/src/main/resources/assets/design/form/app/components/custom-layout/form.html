@@ -1,0 +1,38 @@
+<style>
+    .demoRow{ height: 80px;border: 1px solid #00a2d4; border-right:0}
+    .demoCol .demoModule{ height: 80px; background: #e5f4f9; border-right: 1px solid #00a2d4}
+    .sui-form input[disabled], .sui-form select[disabled], .sui-form textarea[disabled], .sui-form input[readonly], .sui-form select[readonly], .sui-form textarea[readonly]{background-color:#999!important}
+</style>
+
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10 " style="padding-top: 10px;">
+
+    <fieldset>
+        <legend>24列布局定义</legend>
+        <sui-control-group title="列数">
+            <sui-input v-model="layoutCount" rules="required|digits|gt=-1|lt=25"  errmsg="大于等于0且小于等于24的整数" size="mini" > </sui-input>
+        </sui-control-group>
+        <sui-control-group title="所占比例">
+            <span v-for="(el,index) in layoutItems">
+                <sui-input v-model="el.col" rules="required|digits|gt=-1|lt=25" :readonly="el.isLast" :disabled="el.isLast" errmsg="大于等于0且小于等于24的整数" size="mini" style="margin-right: 5px" > </sui-input>
+
+            </span>
+        </sui-control-group>
+        <sui-control-group title="">
+            <span class="sui-msg msg-info">当前列总和： {{ colCount }} </span> <br>
+            <span class="sui-msg msg-error" v-if="isValidCol">列总和必须等于 24，{{ errMessage }} </span>
+        </sui-control-group>
+
+
+    </fieldset>
+
+    <fieldset>
+        <legend>效果演示</legend>
+        <div class="demoRow">
+            <div v-for="(el,index) in layoutItems" :class="'demoCol col-'+el.col+'-24'">
+                <div class="demoModule">
+
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>

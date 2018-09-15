@@ -1,0 +1,44 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row">
+				<div class="col-md-1">
+                    <button id="addButton_btn" class="btn btn-default btn-add" onclick="add()">新 增</button>
+                </div>
+				
+                <div class="col-md-11">
+					<form class="form-inline tr search-toolbar" role="form">
+                        <input type="text" name="leadersName" class="form-control" placeholder="姓名"/>
+						<input type="text" name="organName" class="form-control" placeholder="单位"/>
+    					<button type="button" class="btn btn-default btn-search" onclick="publicWorksManage.search(this.form)">查询</button>
+                        <button type="button" class="btn btn-default" onclick="publicWorksManage.searchClear(this.form)">显示全部</button>
+					</form>
+                </div>
+            </div>
+        </div>
+
+        <div id="works_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/public/works/getMgrPage">
+            <div property="columns">
+				<div type="indexcolumn" width="40" headerAlign="center" allowSort="flase" align="center">序号</div>
+                <div field="leaders.leadersName" width="100" headerAlign="center" allowSort="flase" align="center">姓名</div>
+				<div field="leaders.post" width="130" headerAlign="center" allowSort="flase" align="center">职务</div>
+                <div field="jobContent" width="100%" headerAlign="center" allowSort="flase" align="left">工作动态</div>
+				<div field="workDate" width="80" headerAlign="center" allowSort="flase" format="yyyy-MM-dd" align="center">添加日期</div>
+				<div width="40" headerAlign="center" renderer="renderEnable" allowSort="flase" align="center">状态</div>
+                <div width="160" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/public/publicWorks_manage.js"></script>
+<script>
+var cur = {
+    id : null,
+	edit_url : "/public/works/editMgr",
+	grid : null
+}
+$(document).ready(function() {
+	publicWorksManage.init();
+});
+</script>

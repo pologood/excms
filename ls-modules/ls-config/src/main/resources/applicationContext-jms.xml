@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:jms="http://www.springframework.org/schema/jms"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+      		http://www.springframework.org/schema/jms
+      		http://www.springframework.org/schema/jms/spring-jms.xsd" >
+	<!-- 配置connectionFactory -->
+	<bean id="mqMessageJmsFactory" class="org.apache.activemq.pool.PooledConnectionFactory"
+		destroy-method="stop">
+		<property name="connectionFactory">
+			<bean class="org.apache.activemq.ActiveMQConnectionFactory">
+				<property name="brokerURL" value="failover://(${jms.broker.url})?initialReconnectDelay=100" />
+				<property name="useAsyncSend" value="true" />
+			</bean>
+		</property>
+		<property name="maxConnections" value="${jms.maxConnections}"></property>
+	</bean>
+
+	<!-- Spring Caching连接工厂 -->
+	<!-- Spring用于管理真正的ConnectionFactory的ConnectionFactory -->
+	<bean id="messageJmsFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+		<!-- 目标ConnectionFactory对应真实的可以产生JMS Connection的ConnectionFactory -->
+		<property name="targetConnectionFactory" ref="mqMessageJmsFactory"></property>
+		<!-- Session缓存数量 -->
+		<property name="sessionCacheSize" value="10" />
+	</bean>
+
+	<!-- Spring JMS Template -->
+	<bean name="messageJmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="messageJmsFactory" />
+		<!-- 区别它采用的模式为false是p2p为true是订阅 -->
+		<property name="pubSubDomain" value="false" />
+	</bean>
+
+	<!--终止生成静态消息队列-->
+	<bean id="staticCancelQueue" class="org.apache.activemq.command.ActiveMQQueue" >
+		<constructor-arg name="name" value="EX8.STATIC.CANCEL.QUEUE" />
+	</bean>
+
+	<!--取消生成消息队列-->
+	<bean id="staticCancelMessageSender" class="cn.lonsun.activemq.MqMessageSender" >
+		<property name="jmsTemplate" ref="messageJmsTemplate" />
+		<property name="destination" ref="staticCancelQueue" />
+	</bean>
+
+	<!--生成静态消息队列-->
+	<bean id="staticGenerateQueue" class="org.apache.activemq.command.ActiveMQQueue" >
+		<constructor-arg name="name" value="EX8.STATIC.GENERATE.QUEUE" />
+	</bean>
+	<!--生成消息队列-->
+	<bean id="staticGenerateMessageSender" class="cn.lonsun.activemq.MqMessageSender" >
+		<property name="jmsTemplate" ref="messageJmsTemplate" />
+		<property name="destination" ref="staticGenerateQueue" />
+	</bean>
+
+	<!--系统消息队列-->
+	<bean id="systemMessage" class="org.apache.activemq.command.ActiveMQQueue" >
+		<constructor-arg name="name" value="EX8.MESSAGE.QUEUE" />
+	</bean>
+	<!--系统消息队列-->
+	<bean id="systemMessageSender" class="cn.lonsun.activemq.MqMessageSender" >
+		<property name="jmsTemplate" ref="messageJmsTemplate" />
+		<property name="destination" ref="systemMessage" />
+	</bean>
+
+</beans>

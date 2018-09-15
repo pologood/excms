@@ -1,0 +1,167 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<form role="form" id="materiaForm" ms-controller="materiaForm">
+    <table class="table table-bordered video-table">
+        <tbody>
+        <tr>
+            <th>奖品总金额：</th>
+            <td>
+                <input type="hidden" id="hideSum" name="hideSum" ></input>
+                <table class="w100p">
+                    <tbody>
+                    <tr>
+                        <td colspan="3"><input style="width:300px" type="text" name="configSum" id="configSum" ms-duplex="configSum" maxlength="100" class="form-control"></td>
+                        <td rowspan="5" class="w300">
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+
+        </tr>
+        <tr>
+            <th>每日发放金额：</th>
+            <td>
+                <div class="form-group">
+                    <div class="input-group mb0" style="width:300px">
+                        <input type="text" id="daySum" name="daySum" ms-duplex="daySum"
+                               class="form-control" >
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>剩余金额：</th>
+            <td>
+                <input type="hidden" id="hideLeft" name="hideLeft" ></input>
+                <div class="form-group">
+                    <div class="input-group mb0" style="width:300px">
+                        <input disabled type="text" id="leftDum" name="leftDum" ms-duplex="leftDum"
+                               class="form-control" >
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+
+        </tbody>
+    </table>
+</form>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var curr = {
+        vm: "",
+        id:"$!{configId}",
+        opt: []
+    };
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    $(document).ready(function (){
+         $("#configSum").bind("change keyup", function() {
+             $("#leftDum").val($("#hideLeft").val());
+//             $("#configSum").val($("#hideSum").val());
+
+                 var hide = $("#hideSum").val();
+                 var sum  = $("#configSum").val();
+                  var left = $("#leftDum").val();
+                if(hide>sum){
+
+                    $("#leftDum").val(left-parseInt(hide)+parseInt(sum));
+
+                } else{
+
+                    $("#leftDum").val(parseInt(left)+parseInt(sum)-hide);
+                }
+
+         });
+
+
+
+
+
+
+        Ls.ajax({
+            type: "GET",
+            url: "/lotteryConfig/getConfig",
+            data: {'configId': curr.id},
+            success:function (d) {
+                var data= d.data;
+                $("#hideSum").val(data.configSum);
+                $("#hideLeft").val(data.leftDum);
+                //初始化表单字段
+                curr.init = Ls.initFORM("materiaForm",data);
+                //如果模型已经绑定，不再绑定
+                curr.vm = avalon.vmodels["materiaForm"];
+                curr.vm = avalon.define(curr.init);
+                //avalon.scan(document.body, curr.vm);
+                avalon.scan($("#materiaForm").get(0), curr.vm);
+
+            }
+        });
+        api.button(
+                {
+                    name: '保存',
+                    callback: function () {
+                        $("#materiaForm").submit();
+                        return false;
+                    },
+                    focus: true
+                }
+        )
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+    $('#materiaForm').validator({
+        fields: {
+            'configSum': '奖品总金额:required;range[1~];',
+            'daySum': '每日发放金额:required;range[1~];',
+            'leftDum':'剩余金额:required;range[1~]'
+        },
+        valid: function () {
+            doSave();
+        },
+        timely:1,
+        msgClass: "n-right"
+    });
+
+    function doSave() {
+
+        var value = curr.vm;
+        value = Ls.toJSON(value);
+
+
+        Ls.ajax({
+            type: "POST",
+            url: "/lotteryConfig/saveConfig",
+            data: value
+        }).done(function (text) {
+            if (text.status!=1) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+
+            Ls.tipsOk("保存成功",function(){
+                Ls.getWin.win.grid.reload();
+                Ls.winClose();
+
+            });
+
+        });
+
+    }
+
+
+
+</script>

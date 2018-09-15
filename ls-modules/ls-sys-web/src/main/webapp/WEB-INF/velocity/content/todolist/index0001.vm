@@ -1,0 +1,642 @@
+<style>
+    .form-control {
+        display: inline;
+    }
+
+    caption {
+        font-size: 14px;
+        color: #000000;
+    }
+
+    .table > tfoot > tr > td {
+        vertical-align: middle;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box">
+            <ul class="sidebar-nav sidebar-nav2">
+                <li class="title"><a href="javascript:void(0)">单项否决项</a></li>
+                <li class="active"><a href="javascript:void(0)">站点无法访问</a></li>
+                <li><a href="javascript:void(0)">网站不更新</a></li>
+                <li><a href="javascript:void(0)">栏目不更新</a></li>
+                <li><a href="javascript:void(0)">严重错误</a></li>
+                <li><a href="javascript:void(0)">互动回应差</a></li>
+                <li class="divider"></li>
+                <li class="title"><a href="javascript:void(0)">综合评分项</a></li>
+                <li><a href="javascript:void(0)">网站可用性</a></li>
+                <li><a href="javascript:void(0)">信息更新情况</a></li>
+                <li><a href="javascript:void(0)">互动回应情况</a></li>
+                <li><a href="javascript:void(0)">服务实用情况</a></li>
+            </ul>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">站点信息</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="row">
+                    <div class="col-md-8">
+                        <form id="siteForm" role="form" ms-controller="siteForm">
+                            <input type="hidden" name="themeId" id="themeId" ms-duplex="themeId">
+                            <div class="tab-content">
+                                <!-- 综合评分项-互动回应情况 -->
+                                <div class="tab-pane active" id="tab_1_1">
+                                    <div class="form-body">
+
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>政策咨询类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    扣
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    &nbsp;分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>调查征集类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td class="w70">
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    未开展活动
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    扣
+                                                </th>
+                                                <td colspan="3">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    &nbsp;分
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    开展 < <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    次
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    扣
+                                                </th>
+                                                <td colspan="3">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    &nbsp;分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>互动访谈类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td class="w70">
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    未开展活动
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    扣
+                                                </th>
+                                                <td colspan="3">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    &nbsp;分
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    开展 < <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    次
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th></th>
+                                                <th>
+                                                    扣
+                                                </th>
+                                                <td colspan="3">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                    &nbsp;分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="form-actions noborder">
+                                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                            <button type="submit" class="btn btn-default btn-sync">同 步</button>
+                                            <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 综合评分项-信息更新情况 -->
+                                <div class="tab-pane" id="tab_1_1">
+                                    <div class="form-body">
+
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>首页栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测周期：</th>
+                                                <th class="w160">
+                                                    监测点开始后
+                                                </th>
+                                                <td class="w80">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th>
+                                                    更新信息数量 <
+                                                </th>
+                                                <td>
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 篇
+                                                </td>
+                                                <td>
+                                                    扣 <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 分
+                                                    （更新总量为0时，直接列入单项否决项“网站不更新”）
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>动态新闻类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th>
+                                                    未更新栏目数量 x
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>通知公告、政策文件类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th>
+                                                    未更新栏目数量 x
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>人事、规划计划类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>扣分方式：</th>
+                                                <th>
+                                                    未更新栏目数量 x
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 分
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="form-actions noborder">
+                                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                            <button type="submit" class="btn btn-default btn-sync">同 步</button>
+                                            <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 网站不更新 -->
+                                <div class="tab-pane" id="tab_1_1">
+                                    <div class="form-body">
+
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>动态新闻类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <th>
+                                                    未更新栏目数量 >=
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 个
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <table class="table table-bordered article-table">
+                                            <caption>通知公告、政策文件类栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <th class="w160">
+                                                    监测开始前
+                                                </th>
+                                                <td class="w60">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <th>
+                                                    未更新栏目数量 >=
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 个
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table table-bordered article-table">
+                                            <caption>应更新栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <th class="w160">
+                                                    未更新栏目数量 >=
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 个
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <table class="table table-bordered article-table">
+                                            <caption>空白栏目</caption>
+                                            <tbody>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <th class="w160">
+                                                    空白栏目数 >=
+                                                </th>
+                                                <td colspan="2">
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly class="form-control readonly w40"/> 个
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="form-actions noborder">
+                                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                            <button type="submit" class="btn btn-default btn-sync">同 步</button>
+                                            <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 网站不更新 -->
+                                <div class="tab-pane" id="tab_1_3">
+                                    <div class="form-body">
+
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered article-table">
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <td class="w150">
+                                                    监测点开始后 <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                                  class="form-control readonly w40"/>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control w60" name="commentTempId" id="commentTempId" ms-duplex="commentTempId">
+                                                        <option value="day">天</option>
+                                                        <option value="week">周</option>
+                                                        <option value="month">月</option>
+                                                        <option value="year">年</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <td colspan="2">
+                                                    更新信息数量 < <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                                    class="form-control readonly w40"/> 篇
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="form-actions noborder">
+                                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                            <button type="submit" class="btn btn-default btn-sync">同 步</button>
+                                            <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 站点无法访问 -->
+                                <div class="tab-pane" id="tab_1_2">
+                                    <div class="form-body">
+
+                                        <div class="note note-info">
+                                            <h4 class="block">普查考核指标</h4>
+                                            <p>
+                                                <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                            </p>
+                                        </div>
+
+                                        <table class="table table-bordered article-table">
+                                            <tbody>
+                                            <tr>
+                                                <th>监测方式：</th>
+                                                <td>
+                                                    监测点开始后 <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                                  class="form-control readonly w40"/> 周 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                           class="form-control readonly w40"/> 次/天
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>否决标准：</th>
+                                                <td>
+                                                    >= <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                              class="form-control readonly w40"/> 秒 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    网站打不开占比 >= <input type="text" id="author" ms-duplex="author" placeholder="" maxlength="2" readonly
+                                                                      class="form-control readonly w40"/> %
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="alert alert-info">
+                                            本配置项，由龙讯云平台提供并进行监测，用户不可修改。
+                                        </div>
+                                        <div class="form-actions noborder">
+                                            <button type="submit" class="btn btn-default btn-save" id="doSave">保 存</button>
+                                            <button type="button" class="btn btn-default btn-reset" id="doReset">重 置</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="template" id="todo_nav">
+    <ul class="sidebar-nav">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <li>
+            <a href="javascript:;" data-code="<?==el.typeCode?>"> <?==el.typeName?>
+                <span id="badge_<?==el.typeCode?>" class="badge badge-info"><?==el.count?></span>
+            </a>
+        </li>
+        <?}?>
+    </ul>
+
+</script>
+
+<script>
+    mini.parse();
+
+    var cur = {
+        grid: mini.get("datagrid1"),
+    }
+
+    var gridParam = {
+        dataFlag: 1,
+        pageIndex: 0,
+        pageSize: 20
+    };
+
+    $(document).ready(function () {
+
+        //cur.grid.load(gridParam);
+        //重置 datagrid 高度
+
+        Ls.mini_datagrid_height(cur.grid);
+
+        var todoMenu;
+        todoMenu = $('.sidebar-nav').on('click', 'li:not(.title)>a', function () {
+            var _this = $(this),
+                code = _this.data("code");
+            _this.parent('li').addClass('active').siblings().removeClass('active');
+//            searchByTypeCode(code);
+//            cur.typeCode = code;
+        })
+
+        if (cur.typeCode) {
+            todoMenu.find('a[data-code="' + cur.typeCode + '"]').trigger('click');
+        } else {
+            todoMenu.find('a:first').trigger('click');
+        }
+
+
+    });
+    
+</script>

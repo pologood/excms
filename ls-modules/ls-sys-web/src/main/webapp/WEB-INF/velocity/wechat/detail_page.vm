@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>留言详情</title>
+    <link href="$!{rc.contextPath}/assets/css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{rc.contextPath}/assets/css/weui.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <style>
+        body {
+            background-color: #fbf9fe
+        }
+
+        .page.cell .page_title {
+            color: #225fba;
+            text-align: center;
+        }
+
+        section {
+            padding: 10px;
+        }
+
+        section h2 {
+            font-weight: 700 !important;
+        }
+
+        .reply {
+            background-color: #ffffff;
+        }
+
+        .spacing {
+            padding: 0 15px;
+            margin-bottom: 10px;
+        }
+
+        .f_color {
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page slideIn cell">
+    <div class="hd">
+        <h1 class="page_title">留言详情</h1>
+    </div>
+    <div class="bd">
+
+        <article class="weui_article">
+            <section>
+                <section>
+                    <h2 class="title" id="title"></h2>
+                    <p id="gbc"></p>
+                    <div class="f_color">提交人：<span id="rp"></span></div>
+                    <div class="f_color">提交日期：<span id="ad"></span> | <span id="ft"></span></div>
+                </section>
+                <section class="reply" id="reply">
+                    <p id="rpc"></p>
+                    <div class="f_color">
+                        <p>回复单位：<span id="rn"></span></p>
+                        <p>回复日期：<span id="rd"></span></p>
+                    </div>
+                </section>
+            </section>
+        </article>
+
+    </div>
+    <div class="bd spacing">
+        <a href="javascript:history.back(-1);" class="weui_btn weui_btn_default">返回</a>
+    </div>
+</div>
+
+</body>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/avalon.mobile-min.js"></script>
+<script>
+    var id = '$!{id}';
+    $(document).ready(function () {
+        if (id != '') {
+            getDetail();
+        }
+    });
+
+    //拉取数据
+    function getDetail() {
+        jQuery.ajax({
+            url: "/webAuth/getDetail",
+            dataType: "json",
+            data: {
+                id: id
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                data = d.data;
+                $("#title").html(data.title);
+                $("#ft").html(data.className);
+                $("#gbc").html(data.guestBookContent);
+                $("#rp").html(data.personName);
+                $("#ad").html(data.addDate);
+                if (data.isResponse == 0) {
+                    $("#reply").html("暂无办理情况")
+                } else {
+                    $("#rpc").html(data.responseContent);
+                    $("#rn").html(data.receiveName);
+                    $("#rd").html(data.replyDate);
+                }
+            }
+        }).done(function () {
+        });
+    }
+    ;
+</script>
+</html>

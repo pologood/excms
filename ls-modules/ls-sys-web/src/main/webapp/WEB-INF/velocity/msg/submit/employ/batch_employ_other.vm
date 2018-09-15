@@ -1,0 +1,78 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" style="background-color: #fdfdfd">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="ui_tree" class="ztree"></div>
+            </div>
+        </div>
+    </div>
+    <div title="south" region="south" showSplit="false" showHeader="false" height="57" showSplitIcon="false" splitSize="2">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-reset" onclick="saveData()">确 定</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">关 闭</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/msg/submit/other_column.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        win: Ls.getWin.win
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        other_column.init();
+    })
+
+    function saveData() {
+        var columnIds = [];
+        var cSiteIds = [];
+        var nodes = cur.treeObj.getCheckedNodes(true);
+
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node.isParent) {
+                columnIds.push(nodes[i].indicatorId);
+                cSiteIds.push(nodes[i].siteId);
+            }
+        }
+
+        var records = art.dialog.data("records");
+        var msgIds = [];
+        for (var i = 0; i < records.length; i++) {
+            msgIds.push(records[i].id);
+        }
+
+        Ls.ajaxGet({
+            url: "/msg/employ/batchEmploy",
+            data: {
+                msgIds: msgIds.join(","),
+                columnIds: columnIds.join(","),
+                cSiteIds:cSiteIds.join(","),
+                type: 3 //批量采用到其他栏目
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.batch_employ_other_callback(resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>
+</body>
+</html>

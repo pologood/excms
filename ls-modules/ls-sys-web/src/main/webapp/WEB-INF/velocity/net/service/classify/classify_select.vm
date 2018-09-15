@@ -1,0 +1,117 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .vztree li span.button.switch {
+        margin-right: 5px
+    }
+
+    .vztree li ul {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    .vztree ul ul li {
+        display: inline-block;
+        white-space: normal
+    }
+
+    .vztree > li > ul > li {
+        display: inline-block;
+        padding: 2px
+    }
+
+    .vztree > li {
+        padding: 3px 10px;
+    }
+
+    .vztree li {
+        white-space: normal !important
+    }
+
+    .vztree > li > a > span {
+        font-size: 15px;
+        font-weight: 700
+    }
+
+    .vztree li span.button.chk.checkbox_true_full {
+        background-position: -15px 3px;
+    }
+
+    .vztree li span.button.chk.checkbox_true_full_focus {
+        background-position: -15px -21px;
+    }
+
+    .vztree li span.button.chk.checkbox_false_full_focus {
+        background-position: 0px -20px;
+    }
+
+    .vztree li a.curSelectedNode {
+        border: none;
+        height: auto;
+        background: none;
+        padding-top: 1px;
+    }
+</style>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="ui_tree" class="ztree vztree"></div>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" onclick="ok()">确 定</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">取 消</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/classify_select_tree.js"></script>
+<script>
+    var cur = {
+        cIds: art.dialog.data('cIds'),
+        typeCode: art.dialog.data('typeCode'),
+        win: Ls.getWin.win,
+        columnId:art.dialog.data('columnId'),
+        columnName:''
+    };
+
+    mini.parse();
+
+    $(document).ready(function () {
+        classify_select_tree.init();
+    })
+
+    function ok() {
+        console.info(cur);
+        var cIds = cur.columnId;
+        var cNames = cur.columnName;
+        var nodes = cur.treeObj.getCheckedNodes(true);
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node.isParent) {
+                if (cIds == null) {
+                    cIds = node.indicatorId;
+                    cNames = node.name;
+                } else {
+                    cIds += "," + node.indicatorId;
+                    cNames += "," + node.name;
+                }
+            }
+        }
+
+        cur.win.res_call_back(cIds, cNames);
+        Ls.winClose();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+
+<ul class="active" id="ctab1">
+    <li class="list_top">
+        <p class="p1">建设单位</p>
+        <p class="p2">项目名称</p>
+        <p class="p3">发证文号</p>
+        <p class="p4">发证日期</p>
+    </li>
+    #foreach($eo in $resultObj["10334863"])
+        <li class="list">
+            <p class="p1"><a href="/content/article/$!{eo.contentId}?projectInfoId=$!{eo.id}" target="$!{paramObj.target}">#cutstr($!{eo.buildUnitName},$length)</a></p>
+            <p class="p2">#cutstr($!{eo.projectName},$length)</p>
+            <p class="p3">$!{eo.certificationNum}</p>
+            <p class="p4">#date_format("$!{eo.certificationDate}","$!{paramObj.dateFormat}")</p>
+        </li>
+    #end
+</ul>
+<ul id="ctab2">
+    <li class="list_top">
+        <p class="p1">建设单位</p>
+        <p class="p2">项目名称</p>
+        <p class="p3">发证文号</p>
+        <p class="p4">发证日期</p>
+    </li>
+    #foreach($eo in $resultObj["10334870"])
+        <li class="list">
+            <p class="p1"><a href="/content/article/$!{eo.contentId}?projectInfoId=$!{eo.id}" target="$!{paramObj.target}">#cutstr($!{eo.buildUnitName},$length)</a></p>
+            <p class="p2">#cutstr($!{eo.projectName},$length)</p>
+            <p class="p3">$!{eo.certificationNum}</p>
+            <p class="p4">#date_format("$!{eo.certificationDate}","$!{paramObj.dateFormat}")</p>
+        </li>
+    #end
+</ul>
+<ul id="ctab3">
+    <li class="list_top">
+        <p class="p1">建设单位</p>
+        <p class="p2">项目名称</p>
+        <p class="p3">发证文号</p>
+        <p class="p4">发证日期</p>
+    </li>
+    #foreach($eo in $resultObj["10334874"])
+        <li class="list">
+            <p class="p1"><a href="/content/article/$!{eo.contentId}?projectInfoId=$!{eo.id}" target="$!{paramObj.target}">#cutstr($!{eo.buildUnitName},$length)</a></p>
+            <p class="p2">#cutstr($!{eo.projectName},$length)</p>
+            <p class="p3">$!{eo.certificationNum}</p>
+            <p class="p4">#date_format("$!{eo.certificationDate}","$!{paramObj.dateFormat}")</p>
+        </li>
+    #end
+</ul>
+<ul id="ctab4">
+    <li class="list_top">
+        <p class="p1">建设单位</p>
+        <p class="p2">项目名称</p>
+        <p class="p3">发证文号</p>
+        <p class="p4">发证日期</p>
+    </li>
+    #foreach($eo in $resultObj["10334881"])
+        <li class="list">
+            <p class="p1"><a href="/content/article/$!{eo.contentId}?projectInfoId=$!{eo.id}" target="$!{paramObj.target}">#cutstr($!{eo.buildUnitName},$length)</a></p>
+            <p class="p2">#cutstr($!{eo.projectName},$length)</p>
+            <p class="p3">$!{eo.certificationNum}</p>
+            <p class="p4">#date_format("$!{eo.certificationDate}","$!{paramObj.dateFormat}")</p>
+        </li>
+    #end
+</ul>

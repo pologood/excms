@@ -1,0 +1,14 @@
+<html>
+<head>
+    <script type="text/javascript" src="$!{sysStaticPath}/assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+</head>
+<script type="text/javascript">
+    $(document).ready(function() {
+        window.open('${url}','_self');
+    })
+</script>
+<body>
+
+</body>
+</html>

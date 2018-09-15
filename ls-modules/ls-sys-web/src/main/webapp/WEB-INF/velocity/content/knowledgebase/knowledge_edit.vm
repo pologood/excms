@@ -1,0 +1,606 @@
+<style>
+    #knowledge_content {
+        background: #dae6f0 !important;
+    }
+
+    ul.vztree li span.button.switch {
+        margin-right: 5px
+    }
+
+    ul.vztree li ul {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
+
+    ul.vztree ul ul li {
+        display: inline-block;
+        white-space: normal
+    }
+
+    ul.vztree > li > ul > li {
+        display: inline-block;
+        padding: 5px
+    }
+
+    ul.vztree > li {
+        padding: 3px 10px;
+    }
+
+    ul.vztree li {
+        white-space: normal !important
+    }
+
+    ul.vztree > li > a > span {
+        font-size: 15px;
+        font-weight: 700
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full {
+        background-position: -15px 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_true_full_focus {
+        background-position: -15px -21px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full {
+        background-position: 0 3px;
+    }
+
+    ul.vztree li span.button.chk.checkbox_false_full_focus {
+        background-position: 0px -20px;
+    }
+
+    ul.vztree li a.curSelectedNode {
+        border: none;
+        height: auto;
+        background: none;
+        padding-top: 1px;
+    }
+
+</style>
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">问题信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+
+            <form role="form" id="formKnowledge" ms-controller="formKnowledge">
+                <table class="table table-bordered survey-table">
+                    <tbody>
+                    <tr>
+                        <th>标题：</th>
+                        <td>
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td>
+                                <textarea class="form-control" id="title" name="title" style="height: 55px;"
+                                          placeholder=""></textarea>
+                                    ##                                <input type="text" name="title" id="title" ms-duplex="title" class="form-control" maxlength="200">
+                                    </td>
+
+                                    <td class="w150 text-center">
+                                        <button type="button" id="colorpicker" class="btn btn-default btn-font" title="字体颜色"><i
+                                                class="fa fa-font"></i>
+                                        </button>
+                                        <input type="hidden" id="mycolor" class="colorPicker evo-cp0"/>
+                                        <button type="button" id="bold" class="btn btn-default btn-bold" title="加粗"><i
+                                                class="fa fa-bold"></i></button>
+                                        <button type="button" id="tilt" class="btn btn-default btn-italic" title="倾斜"><i
+                                                class="fa fa-italic"></i>
+                                        </button>
+                                        <button type="button" id="underline" class="btn btn-default btn-underline" title="下划线">
+                                            <i class="fa fa-underline"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>副标题：</th>
+                        <td>
+                        ##                    <input type="text" id="subTitle" ms-duplex="subTitle" class="form-control" placeholder="" maxlength="300">
+                            <textarea class="form-control" id="subTitle" name="subTitle" style="height: 50px;"
+                                      placeholder=""></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>作者：</th>
+                        <td>
+                            <input type="text" id="author" ms-duplex="author" class="form-control" placeholder=""
+                                   maxlength="20"/>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>发布日期：</th>
+                        <td>
+                            <input type="datetime" name="publishDate" id="publishDate" ms-duplex="publishDate" class="form-control readonly" placeholder="发布日期"
+                                   readonly onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>所属分类：</th>
+                        <td>
+                            <div class="input-group">
+                                <div id="knowledge_content"
+                                     style="display:none; position: absolute; top:34px; left:0px; height: 300px; z-index: 10000; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                                    <ul id="knowledge_tree" class="ztree vztree"></ul>
+                                </div>
+                                <input id="knowledgeIds" type="hidden" name="classIds" ms-duplex="classIds"
+                                       class="form-control"/>
+                                <input id="knowledgeParentIds" type="hidden" name="parentClassIds"
+                                       ms-duplex="parentClassIds" class="form-control"/>
+                                <input id="knowledgeNames" type="text" ms-duplex="classNames" name="classNames"
+                                       class="form-control readonly" readonly onclick="showTree('knowledge')"/>
+
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default btn-default-upload"
+                                            type="button" onclick="showTree('knowledge')"><i
+                                            class="fa fa-caret-down"></i></button>
+                                </div>
+                            </div>
+                        </td>
+##                        <th>所属分类：</th>
+##                        <td><input type="text" name="categoryCode" id="categoryCode" ms-duplex="categoryCode" class="form-control" placeholder=""></td>
+                    </tr>
+
+                    <tr>
+                        <th>属性：</th>
+                        <td colspan="2">
+                            <label class="checkbox-inline publishBtn">
+                                <input type="checkbox" id="isLink" class="publishBtn" value="1">是否跳转
+                            </label>
+                            <label class="checkbox-inline publishBtn">
+                                <input type="checkbox" id="isTop" class="publishBtn" value="1"> 置顶
+                            </label>
+                            <label class="checkbox-inline publishBtn">
+                                <input type="checkbox" id="isNew" class="publishBtn" value="1"> 加新
+                            </label>
+                            <label class="checkbox-inline publishBtn">
+                                <input type="checkbox" id="isTitle" class="publishBtn" value="1"> 标题新闻
+                            </label>
+                            <label id="isComment" class="checkbox-inline">
+                                <input type="checkbox" id="isAllowComments" class="publishBtn" value="1"> 允许评论
+                            </label>
+                            <label class="checkbox-inline publishBtn">
+                                <input type="checkbox" id="isJob" class="publishBtn" value="1"> 定时发布
+                            </label>
+                            <label class="checkbox-inline">
+                                <button id="btn_extend_knowledge" type="button" class="btn btn-default btn-xs btn-article-extend">
+                                    扩展信息
+                                    <i class="fa fa-angle-double-down"></i>
+                                </button>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr id="OutLink" class="hide">
+                        <th>跳转地址：</th>
+                        <td>
+                            <input type="text" id="redirectLink" ms-duplex="redirectLink" class="form-control"
+                                   placeholder="请输入地址">
+                        </td>
+                    </tr>
+                    <tr id="TopDate" class="hide">
+                        <th>置顶有效期：</th>
+                        <td>
+                            <input type="datetime" id="topValidDate" placeholder="空值代表永久有效" ms-duplex="topValidDate"
+                                   class="form-control readonly publishBtn"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'new Date()'})" readonly/>
+                        </td>
+                    </tr>
+                    <tr id="JobDate" class="hide">
+                        <th>定时发布：</th>
+                        <td>
+                            <input type="datetime" id="jobIssueDate" placeholder="定时发布时间，空值代表无需定时发布" ms-duplex="jobIssueDate"
+                                   class="form-control readonly publishBtn"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate:'new Date()'})" readonly/>
+                        </td>
+                    </tr>
+                        #if(${toolbar} == 'hide')
+                        #else
+                        <tr id="checkWords" class="knowledge_attr_ext hide">
+                            <th>内容过滤：</th>
+                            <td>
+                                <button class="btn btn-default btn-reset" id="errorWords" type="button"
+                                        onclick="contentCheck('EASYERR')">易错词检测
+                                </button>
+                                <button class="btn btn-default btn-reset" id="senWords" type="button"
+                                        onclick="contentCheck('SENSITIVE')">敏感词检测
+                                </button>
+                                #*<button class="btn btn-default btn-reset" id="hotWords" type="button"
+                                        onclick="contentCheck('HOT')">热词检测
+                                </button>*#
+                            </td>
+                        </tr>
+                        #end
+
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td>
+                            <textarea name="content" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th style="vertical-align: top;">答复内容：</th>
+                        <td>
+                            <textarea name="replyContent" style="width: 100%;height:300px; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td>
+                            <button class="btn btn-default btn-save-release" type="button" id="saveAndPublish">保存并发布</button>
+                            <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                            <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/content/knowledgebase/class_tree.js"></script>
+<script>
+    var cur = {
+        columnId: content_mgr.indicatorId,
+        siteId: GLOBAL_SITEID,
+        knowledgeBaseId: '$!{knowledgeBaseId}',
+        contentId:'$!{contentId}',
+        typeCode: 'knowledgeBase',
+        title:'',
+        subTitle:'',
+        author:GLOBAL_PERSON.name,
+        publishDate:'',
+        categoryCode:'',
+        categoryName:'',
+        content:'',
+        replyContent:'',
+        //======
+        redirectLink: '',
+        isNew: 0,
+        isTop: 0,
+        topValidDate: '',
+        isBold: 0,
+        isUnderline: 0,
+        isTilt: 0,
+        titleColor: ""
+    };
+    var eweb,replyEweb;
+    $(document).ready(function () {
+        //加载部分组件
+        $("#mycolor").colorpicker({
+            color: "#000",
+            hideButton: true,
+            strings: " , , 无颜色 , , , , "
+        }).on('change.color', function (evt, color) {
+            $('#title').css('color', color);
+            cur.titleColor = color;
+        });
+
+        $("#colorpicker").on("click", function (evt) {
+            evt.stopImmediatePropagation();
+            $("#mycolor").colorpicker("showPalette");
+        });
+        eweb = Ls.editor("content", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.columnId});
+        replyEweb = Ls.editor("replyContent", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.columnId});
+
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/knowledgeBase/getKnowLedgeBaseById",
+                data: {
+                    knowledgeBaseId: cur.knowledgeBaseId,
+                    siteId: cur.siteId,
+                    columnId: cur.columnId,
+                    typeCode: cur.typeCode
+                }
+            }).done(function (d) {
+                var ac = d.data;
+                cur.createOrganId = ac.createOrganId;
+                cur.siteId = ac.siteId;
+                if (Ls.isEmpty(cur.columnId)) {
+                    cur.columnId = ac.columnId;
+                }
+                $("#title").val(ac.title);
+                if (ac.isBold == 1) {
+                    $("#title").css("font-weight", "bold");
+                    cur.isBold = 1;
+                }
+                if (ac.isTilt == 1) {
+                    $("#title").css("font-style", "italic");
+                    cur.isTilt = 1;
+                }
+                $("#resources").val(ac.resources);
+                if (ac.isUnderline == 1) {
+                    cur.isUnderline = ac.isUnderline;
+                    $("#title").css("text-decoration", "underline");
+                }
+                if (ac.titleColor != null) {
+                    $("#title").css("color", ac.titleColor);
+                    cur.titleColor = ac.titleColor;
+                }
+                $("#subTitle").val(ac.subTitle);
+                $("#redirectLink").val(ac.redirectLink);
+                if (ac.redirectLink != null && ac.redirectLink != "") {
+                    $("#isLink").val(ac.isLink == 1).prop("checked", true);
+                    $("#redirectLink").val(ac.redirectLink);
+                    $("#OutLink").removeClass("hide");
+                    $("#edit_content").addClass("hide");
+                }
+                $("#author").val(ac.author);
+
+                if (ac.publishDate != null) $("#publishDate").val(ac.publishDate);
+                if (ac.isTop == 1) {
+                    $("#isTop").prop("checked", true);
+                    if (ac.topValidDate != null) {
+                        $("#topValidDate").val(ac.topValidDate);
+                    }
+                    $("#TopDate").removeClass("hide");
+                }
+                if (ac.isJob == 1) {
+                    $("#isJob").prop("checked", true);
+                    if (ac.jobIssueDate != null)
+                        $("#jobIssueDate").val(Ls.dateFormat(ac.jobIssueDate, "yyyy-MM-dd hh:mm"));
+                    $("#JobDate").removeClass("hide");
+                }
+                if (ac.isNew == 1) $("#isNew").prop("checked", true);
+                if (ac.isTitle == 1) $("#isTitle").prop("checked", true);
+                if (ac.isAllowComments == 1) $("#isAllowComments").prop("checked", true);
+                eweb.setHtml(ac.content);
+                replyEweb.setHtml(ac.replyContent);
+
+                var title_new=ac.title;
+                if(title_new.indexOf("<br>")!= -1){
+                    title_new=title_new.replace("<br>","\n");
+                }
+                ac.title=title_new;
+                $("#title").val(ac.title);
+
+                var title_new=ac.title;
+                if(title_new.indexOf("<br>")!= -1){
+                    title_new=title_new.replaceAll("<br>","\n");
+                }
+                ac.title=title_new;
+                $("#title").val(ac.title);
+
+                cur.categoryCode = ac.categoryCode;
+                //加载分类
+                class_select_tree.init('knowledge', cur.categoryCode);
+            })
+        };
+        if (cur.knowledgeBaseId != null && cur.knowledgeBaseId != '') {
+            getData();
+        }else {
+            //加载分类
+            class_select_tree.init('knowledge', cur.categoryCode);
+        }
+
+        var expand = 0;
+        //拓展信息添加监听
+        $("#btn_extend_knowledge").click(function () {
+            var AE = $(".knowledge_attr_ext");
+            if (expand == 0) {
+                AE.removeClass("hide");
+                expand = 1;
+            } else {
+                AE.addClass("hide");
+                expand = 0;
+            }
+        });
+
+        //标题样式监听
+        $("#bold").click(function () {
+            var T = $("#title");
+            if (cur.isBold == 0) {
+                T.css("font-weight", "bold");
+                cur.isBold = 1;
+            } else {
+                T.css("font-weight", "normal");
+                cur.isBold = 0;
+            }
+        });
+        $("#tilt").click(function () {
+            var T = $("#title");
+            if (cur.isTilt == 0) {
+                T.css("font-style", "italic");
+                cur.isTilt = 1;
+            } else {
+                T.css("font-style", "normal");
+                cur.isTilt = 0;
+            }
+        });
+        $("#underline").click(function () {
+            var T = $("#title");
+            if (cur.isUnderline == 0) {
+                T.css("text-decoration", "underline");
+                cur.isUnderline = 1;
+            } else {
+                T.css("text-decoration", "none");
+                cur.isUnderline = 0;
+            }
+        });
+        //置顶点击事件
+        $("#isTop").click(function () {
+            if ($("#isTop").is(':checked')) {
+                $("#TopDate").removeClass("hide");
+            } else {
+                $("#TopDate").addClass("hide");
+            }
+        });
+
+        //跳转点击事件
+        $("#isLink").click(function () {
+            if ($("#isLink").is(':checked')) {
+                $("#OutLink").removeClass("hide");
+                $("#edit_content").addClass("hide");
+            } else {
+                $("#OutLink").addClass("hide");
+                $("#edit_content").removeClass("hide");
+            }
+        });
+
+        //定时发送事件
+        $("#isJob").click(function () {
+            if ($("#isJob").is(':checked')) {
+                $("#JobDate").removeClass("hide");
+            } else {
+                $("#JobDate").addClass("hide");
+            }
+
+        })
+
+        $('#formKnowledge').validator({
+            rules: {
+            },
+            fields: {
+                'title': '标题:required;length[2~50]'
+            },
+            valid: function () {
+                addPost();
+            }
+        })
+
+    })
+
+
+    $("#saveArticle").click(function () {
+        cur.clickBtn = 0;
+        $('#formKnowledge').submit();
+    })
+    $("#saveAndPublish").click(function () {
+        cur.clickBtn = 1
+        cur.isPublish = 1;
+        $('#formKnowledge').submit();
+    })
+
+    function saveContent() {
+        cur.title = $("#title").val();
+
+        if (cur.title == "") {
+            Ls.tipsInfo("标题不能为空");
+            return 0;
+        } else {
+            if (cur.title.trim().length > 200) {
+                Ls.tipsInfo("标题长度不能超过200");
+                return 0;
+            }
+        }
+        cur.title = cur.title.trim();
+        cur.subTitle = $("#subTitle").val();
+        if (cur.subTitle != "") {
+            if (cur.subTitle.trim().length > 200) {
+                Ls.tipsInfo("副标题长度不能超过200");
+                return 0;
+            }
+        }
+
+        cur.author = $("#author").val();
+
+        //所属分类
+        cur.categoryCode = $("#knowledgeIds").val();
+        //分类名称
+        cur.categoryName = $("#knowledgeNames").val();
+
+        cur.resources = $("#resources").val();
+        cur.redirectLink = $("#redirectLink").val();
+        cur.publishDate = $("#publishDate").val();
+        if ($("#isTop").is(':checked')) {
+            cur.isTop = 1;
+            cur.topValidDate = $("#topValidDate").val();
+        }
+        if ($("#isLink").is(':checked')) {
+            cur.isLink = 1;
+            if (cur.redirectLink == "") {
+                Ls.tipsInfo("跳转地址不能为空!");
+                return 0;
+            }else{
+                var reg=/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
+                if(!reg.test(cur.redirectLink)){
+                    Ls.tipsInfo("请输入正确的网址!");
+                    return 0;
+                }
+            }
+        } else {
+            cur.isLink = 0;
+            cur.redirectLink = "";
+        }
+        if ($("#isJob").is(':checked')) {
+            cur.isJob = 1;
+            cur.jobIssueDate = $("#jobIssueDate").val();
+            if (cur.jobIssueDate != null && cur.jobIssueDate != "") {
+
+            } else {
+                cur.isJob = 0;
+            }
+
+        }
+        if ($("#isNew").is(':checked')) cur.isNew = 1;
+        if ($("#isTitle").is(':checked')) cur.isTitle = 1;
+        if ($("#isAllowComments").is(':checked')) cur.isAllowComments = 1;
+        cur.content = eweb.getHtml();
+        cur.replyContent = replyEweb.getHtml();
+        /**************/
+        return 1;
+    }
+
+    var addPost = function () {
+        if (saveContent() == 1) {
+            Ls.ajax({
+                url: "/knowledgeBase/save",
+                data: cur
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                        icons: "success", callback: function () {
+                            goBack();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            });
+        }
+    }
+
+    function goBack() {
+        content_mgr.getContentApp("/knowledgeBase/index?indicatorId=&pageIndex=");
+    }
+
+    Date.prototype.format = function(format) {
+        var dateParse = {
+            "M+": this.getMonth() + 1,
+            "d+": this.getDate(),
+            "h+": this.getHours(),
+            "m+": this.getMinutes(),
+            "s+": this.getSeconds(),
+            "q+": Math.floor((this.getMonth() + 3) / 3),
+            "S+": this.getMilliseconds()
+        };
+        if (/(y+)/i.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+        }
+        for (var k in dateParse) {
+            if (new RegExp("(" + k + ")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1
+                        ? dateParse[k] : ("00" + dateParse[k]).substr(("" + dateParse[k]).length));
+            }
+        }
+        return format;
+    }
+</script>

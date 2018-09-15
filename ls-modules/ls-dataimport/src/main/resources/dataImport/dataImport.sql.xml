@@ -1,0 +1,51 @@
+<root>
+    <ex7 url="jdbc:sqlserver://192.168.15.160;DatabaseName=shucheng_ex7;useLOBs=false;" user="sa" password="1q!">
+
+        <selectEx7PublicCatalog>
+            SELECT t.catalogId AS id, t.catalogPid AS parentId, t.catalogCode AS code, t.catalogTitle AS name,
+            t.orderId AS sortNum, 1 AS type, 'Normal' AS recordStatus,
+            <!--(CASE WHEN t.isChild = 0 THEN 1  ELSE 0 END) AS isParent,-->
+            t.isChild AS isParent, t.unitsId as organId,
+            (CASE WHEN t.isHide = 0 THEN 1 ELSE 0 END) AS isShow, t.LinkUrl as link
+            FROM tb_xxgk_catalog t where t.isHide = 0
+        </selectEx7PublicCatalog>
+
+        <selectEx7PrimaryCatalog>
+            SELECT v.catalogId AS catId, v.catalogTitle AS name,v.unitsId AS organId, v.LinkUrl AS link,
+            (CASE WHEN v.isHide = 0 THEN 1 ELSE 0 END) AS isShow, c.catalogpid as parentId
+            FROM tb_xxgk_catalog_view v left join tb_xxgk_catalog c on v.catalogId = c.catalogId
+        </selectEx7PrimaryCatalog>
+
+        <selectCatalogOrganConfig>
+            select t.unitsId as organId, t.orderId as sortNum, t.catalogId as catId, t.unitsCode as organCode from
+            tb_common_units t
+        </selectCatalogOrganConfig>
+
+        <getXxgkApply>
+            SELECT * FROM tb_xxgk_apply t where t.unitsId = ?
+        </getXxgkApply>
+
+        <getXxgkClass>
+            select * from tb_xxgk_class
+        </getXxgkClass>
+
+        <getXxgkContentClassRe>
+            select * from tb_xxgk_contents_class_re
+        </getXxgkContentClassRe>
+
+        <getXxgkContentByDocTypeUnit>
+            SELECT * FROM tb_xxgk_contents t where t.docType = ? and t.docUnitsID = ? and t.docIsDel = 0
+        </getXxgkContentByDocTypeUnit>
+
+        <getXxgkContentByCatIdUnit>
+            SELECT t.* FROM tb_xxgk_contents t where t.docCatalogID = ? and t.docUnitsID = ? and t.docIsDel = 0
+        </getXxgkContentByCatIdUnit>
+    </ex7>
+
+    <!--其他平台-->
+    <otherplatform url="jdbc:sqlserver://192.168.15.160;DatabaseName=shucheng_ex7;useLOBs=false;" user="sa" password="1q!">
+
+
+    </otherplatform>
+
+</root>

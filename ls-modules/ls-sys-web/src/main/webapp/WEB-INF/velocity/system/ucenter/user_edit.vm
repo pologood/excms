@@ -1,0 +1,198 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <div class="portlet-body form">
+
+                <form id="user_form" role="form" ms-controller="user_form" autocomplete="off">
+                    <div class="form-body">
+
+                        <input name="organId" class="form-control" ms-duplex="organId" type="hidden"></input>
+                        <input name="personId" class="form-control" ms-duplex="personId" type="hidden"></input>
+                        <input name="userId" class="form-control" ms-duplex="userId" type="hidden"></input>
+
+                        <div class="form-group">
+                            <label>所属部门</label>
+                            <input name="organName" class="form-control" placeholder="" ms-attr-disabled="true" ms-duplex="organName">
+                        </div>
+                        <div class="form-group">
+                            <label>排序号</label>
+                            <input name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                        </div>
+
+                        <div class="form-group">
+                            <label>名称</label>
+                            <input name="name" id="name" type="text" onblur="createUid()" class="form-control" placeholder="姓名不能为空" ms-duplex="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>帐号</label>
+                            <input name="uid" id="uid" type="text" class="form-control" placeholder="帐号不能为空" ms-duplex="uid">
+                        </div>
+
+                        <div class="form-group">
+                            <label>密码</label>
+                            <input name="password" id="password" type="password" class="form-control" placeholder="密码不能为空">
+                        </div>
+                        <div class="form-group">
+                            <label>重复密码：</label>
+                            <input name="rePass" id="rePass" type="password" class="form-control" placeholder="重复密码不能为空">
+                        </div>
+
+                        <div class="form-group">
+                            <label>职务</label>
+                            <input name="positions" type="text" class="form-control" placeholder="" ms-duplex="positions">
+                        </div>
+
+                        <div class="form-group">
+                            <label>手机</label>
+                            <input name="mobile" type="text" class="form-control" placeholder="" ms-duplex="mobile">
+                        </div>
+
+                        <div class="form-group">
+                            <label>办公电话</label>
+                            <input name="officePhone" type="text" class="form-control" placeholder="" ms-duplex="officePhone">
+                        </div>
+
+                        <div class="form-group">
+                            <label>办公地址</label>
+                            <input name="officeAddress" type="text" class="form-control" placeholder="" ms-duplex="officeAddress">
+                        </div>
+                        <div class="form-group">
+                            <label>角色</label>
+                            <textarea name="roleNames" class="form-control" rows="3" readonly placeholder="" ms-duplex="roleNames" ms-click="getRoles()"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions noborder">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- END SAMPLE FORM PORTLET-->
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        personId: '$!{personId}',
+        organId: '$!{organId}',
+        srcUid: '',
+        roleIds: '',
+        roleNames: ''
+    };
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/ldap/getPerson",
+                data: {
+                    organId: cur.organId,
+                    personId: cur.personId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                data.$id = "user_form";
+
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0), cur.vm);
+            })
+        };
+
+        getData();
+
+        $('#user_form').validator({
+            rules: {
+                myRule: function (el, param, field) {
+                    var isTrue = (cur.personId == "" ? true : false);
+                    if (!isTrue) {
+                        isTrue = ($("#password").val() == "" ? false : true);
+                    }
+                    return isTrue;
+                }
+            },
+            fields: {
+                'name': '名称:required;length[2~18]',
+                'sortNum': '排序号:required;integer;range[0~99999]',
+                'uid': '账号:required;length[2~20]',
+                'password': '密码:required(myRule);length[3~30]',
+                'rePass': "确认密码:required(myRule);match(password);length[3~30]",
+                'positions': '职务:length[~30]',
+                'mobile': '手机:length[~13]',
+                'officePhone': '办公电话:length[~20]',
+                'officeAddress': '办公地址:length[~60]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            data.password = $("#password").val();
+            var url = "/person/updatePersonAndUser";
+            if (cur.personId == '') url = "/person/savePersonAndUser";
+            Ls.ajax({
+                url: url,
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        icons: "success", callback: function () {
+                            var data = d.data;
+                            data.nodeType = "Person";
+                            data.icon = "assets/images/person.gif";
+                            try {
+                                parent.editNodeAfterFn(data);
+                            } catch (e) {
+                            }
+
+                            Ls.winClose();
+
+                        }
+                    })
+
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+
+    function getRoles() {
+        var url = '/person/addRoles?roleIds=' + cur.vm.roleIds;
+        Ls.openWin(url, '400px', '400px', {
+            id: 'user_addRoles',
+            title: '添加角色',
+            padding: 0
+        });
+    }
+
+    function createUid() {
+        if (cur.srcUid != null && cur.srcUid.length > 0) {
+            return;
+        }
+        var name = $("#name").val();
+        if (name == null || name.trim().length <= 0) {
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/createUid",
+            data: {
+                name: name
+            }
+        }).done(function (d) {
+            cur.vm.uid = d.data;
+        })
+    }
+</script>
+</body>
+</html>

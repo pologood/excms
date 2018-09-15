@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+</head>
+
+<body>
+<form action="/lixin/dbConvert" method="post">
+    <table>
+        <tbody>
+        <tr>
+            <td>原目录：</td>
+            <td>
+                <select name="typeId" multiple="multiple" style="height: 700px;">
+                    #foreach($v in $list)
+                        <option value="$!{v.E_typeid}">
+                            $!v.E_typename - ($!{v.E_typeid})
+                        </option>
+                    #end
+                </select>
+            </td>
+            <td>现目录：</td>
+            <td>
+                <select name="columnId" multiple="multiple" style="height: 700px;">
+                    #foreach($v2 in $indicat)
+                        <option value="${v2.indicatorId}">${v2.name} - (${v2.indicatorId})</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center">
+                <button type="submit" style="height: 40px; width: 100px;">提交</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+</html>

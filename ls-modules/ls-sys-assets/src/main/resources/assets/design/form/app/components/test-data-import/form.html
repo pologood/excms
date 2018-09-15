@@ -1,0 +1,36 @@
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10" style="padding-top: 10px;">
+    <table class="sui-table">
+        <thead>
+        <tr>
+            <th>名称</th>
+            <th>待复制的数据</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(el,index) in items ">
+            <td>{{ el.name }}</td>
+            <td>
+                <sui-checkbox-group v-model="el.nodeIds">
+                    <span v-for="item in dataNodes">
+                         <sui-checkbox :name="'c'+el.id"
+                                       :label="item.value">{{ item.name }}({{ item.count }})</sui-checkbox>
+                    </span>
+                </sui-checkbox-group>
+            </td>
+            <td>
+                <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="copyRefer(el)">复制</a>
+            </td>
+
+        </tr>
+
+        </tbody>
+    </table>
+
+
+</form>
+
+
+
+
+

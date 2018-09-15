@@ -1,0 +1,611 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+
+        <div style="margin: 25px 20px 10px 20px;">
+
+            <h3 class="page-title"> 报送统计
+                <small></small>
+            </h3>
+            <!-- BEGIN DASHBOARD STATS 1-->
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-line-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_today">0</span>
+                            </div>
+                            <div class="desc"> 今日报送</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_yesterday">0</span>
+                            </div>
+                            <div class="desc"> 昨日报送</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_week">0</span>
+                            </div>
+                            <div class="desc"> 本周报送</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-area-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_month">0</span>
+                            </div>
+                            <div class="desc">本月报送</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                    <div class="dashboard-stat grey">
+                        <div class="visual">
+                            <i class="fa fa-pie-chart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span id="count_history">0</span>
+                            </div>
+                            <div class="desc">历史报送</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <h3 class="page-title">
+                信息报送详细列表
+                <small></small>
+            </h3>
+            <div>
+                <div class="portlet">
+                    <div class="portlet-body">
+                        <div class="table-toolbar">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="btn-group">
+                                        <button type="button" id="adduser_btn" class="btn btn-default btn-export" onclick="exportList()"> 导 出
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <form class="form-inline tr search-toolbar" role="form">
+                                        <div class="form-group">
+                                            <label></label>
+                                            <select class="form-control" type="text" id="selectOne" name="selectOne" onchange="changeSelect()">
+                                                <option value="1">按照单位名称统计</option>
+                                                <option value="2">按照部门名称统计</option>
+                                                <option value="3" selected="selected">按照用户名称统计</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="organSearch">
+                                            <label></label>
+                                            <input type="text" id="organName" class="form-control" placeholder="单位名称">
+                                        </div>
+                                        <div style="display: none" id="bmSearch" class="form-group">
+                                            <label></label>
+                                            <input type="text" id="bmName" class="form-control" placeholder="部门名称">
+                                        </div>
+                                        <div style="display: none" id="personSearch" class="form-group">
+                                            <label></label>
+                                            <input type="text" id="personName" class="form-control" placeholder="用户名称">
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" id="yearAndMonth" class="form-control"
+                                                   placeholder="按年月份统计"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM',readOnly:true})" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" id="startDate" class="form-control"
+                                                   placeholder="起始时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label></label>
+                                            <input type="datetime" id="endDate" class="form-control" placeholder="结束时间"
+                                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly>
+                                        </div>
+                                        <button type="button" class="btn btn-default btn-search" onclick="searchList()">查询</button>
+                                        <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="datagrid1" class="mini-datagrid" allowResize="true" align="center"
+                             url="/statistics/getSubmitPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                             onlyCheckSelection="true"
+                             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;height:500px"
+                        >
+                            <div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                                <div field="organId" width="100" headerAlign="center" align="center">单位ID</div>
+                                <div field="organName" width="100%" headerAlign="center" align="center">单位名称</div>
+                                <div field="count" width="100" headerAlign="center" align="center">报送</div>
+                                <div field="employCount" width="100" headerAlign="center" align="center" renderer="renderOp1">采用</div>
+                                <div field="unEmployCount" width="100" headerAlign="center" align="center">未采用</div>
+                                <div field="rate" width="100" headerAlign="center" align="center">采用率(%)</div>
+                            </div>
+                        </div>
+                        <div style="display:none; width:100%;height:500px" id="datagrid2" class="mini-datagrid" allowResize="true" align="center"
+                             url="/statistics/getSubmitPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                             onlyCheckSelection="true"
+                             idField="id" multiSelect="false" showColumnsMenu="true"
+                        >
+                            <div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                                <div field="organId" width="100" headerAlign="center" align="center">部门ID</div>
+                                <div field="organName" width="100%" headerAlign="center" align="center">部门名称</div>
+                                <div field="count" width="100" headerAlign="center" align="center">报送</div>
+                                <div field="employCount" width="100" headerAlign="center" align="center" renderer="renderOp2">采用</div>
+                                <div field="unEmployCount" width="100" headerAlign="center" align="center">未采用</div>
+                                <div field="rate" width="100" headerAlign="center" align="center">采用率(%)</div>
+                            </div>
+                        </div>
+                        <div style="display:none; width:100%;height:500px" id="datagrid3" class="mini-datagrid" allowResize="true" align="center"
+                             url="/statistics/getSubmitPage" sizeList="[5,10,20,50]" pageSize="15" allowCellSelect="false"
+                             onlyCheckSelection="true"
+                             idField="id" multiSelect="false" showColumnsMenu="true"
+                        >
+                            <div property="columns">
+                                <div type="indexcolumn" width="50" headerAlign="center" align="center">序号</div>
+                                <div field="personName" width="100" headerAlign="center" align="center">用户名称</div>
+                                <div field="organName" width="100%" headerAlign="center" align="center">单位名称</div>
+                                <div field="count" width="100" headerAlign="center" align="center">报送</div>
+                                <div field="employCount" width="100" headerAlign="center" align="center" renderer="renderOp3">采用</div>
+                                <div field="unEmployCount" width="100" headerAlign="center" align="center">未采用</div>
+                                <div field="rate" width="100" headerAlign="center" align="center">采用率(%)</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <!-- END DASHBOARD STATS 1-->
+            <div>
+                <div class="radio-group">
+                    <label></label>
+                    <select style="height: 34px;width:140px; font-size: 14px" type="text" id="orderType" name="orderType" onchange="changeType()">
+                        <option value="1" selected="selected">按照单位统计</option>
+                        <option value="2">按照部门统计</option>
+                        <option value="3">按照用户统计</option>
+                    </select>
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <label>
+                        <input type="radio" name="chartsTime" value="today" checked="checked" onclick="changeCharts('today')"> 今日
+                    </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="yesterday" onclick="changeCharts('yesterday')"> 昨日 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="week" onclick="changeCharts('week')"> 本周 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="month" onclick="changeCharts('month')"> 本月 </label>
+                    <label>
+                        <input type="radio" name="chartsTime" value="history" onclick="changeCharts('history')"> 历史 </label>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold"> 信息报送排行TOP 10</span>
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_a" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+                <div class="col-md-6 col-sm-6">
+                    <!-- BEGIN PORTLET-->
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">信息被采编排行TOP 10</span>
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div id="statistics_b" style="height: 365px;">
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END PORTLET-->
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    mini.parse();
+    var chartsData = [];
+    var chartsUnit = [];
+    var chartsTime = 'today';
+    var orderType = 1;
+    var empData = [];
+    var empUnit = [];
+    var grid = null;
+    var grid2 = null;
+    var grid3 = null;
+
+    $(document).ready(function () {
+        mini.parse();
+        grid = mini.get("datagrid1");
+        grid2 = mini.get("datagrid2");
+        grid3 = mini.get("datagrid3");
+        //grid.load({selectOne:3});
+        changeSelect();
+
+        var get_todoNumber = function () {
+            Ls.ajaxGet({
+                url: "/statistics/getSubmitCount/",
+                data: {}
+            }).done(function (d) {
+                var d = d.data;
+                for (var i = 0, l = d.length; i < l; i++) {
+                    $("#count_" + d[i].chartsTime).text(d[i].count);
+                }
+            });
+        }();
+
+        Ls.parseEcharts(function () {
+            doChange();
+        })
+    })
+
+    function doChange() {
+        // 使用
+        require([
+            'echarts',
+            'echarts/chart/line',
+            'echarts/chart/bar',
+            'echarts/chart/pie'
+        ], function (ec) {
+            Ls.ajaxGet({
+                url: "/statistics/getChartsList/",
+                data: {chartsTime: chartsTime, typeCode: '', type: 'submit', orderType: orderType}
+            }).done(function (d) {
+                var d = d.data;
+                chartsData = [];
+                chartsUnit = [];
+                if (d != null && d.length > 0) {
+                    for (var i = 0, l = d.length; i < l; i++) {
+                        chartsData[i] = d[i].count;
+                        chartsUnit[i] = d[i].organName;
+                    }
+                }
+
+                option_a = {
+                    grid: {
+                        x: 50,
+                        x2: 20,
+                        y: 50
+                    },
+                    title: {
+                        text: '',
+                        subtext: ''
+                    },
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    legend: {
+                        show: false,
+                        data: ['报送数量']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            magicType: {show: true, type: ['line', 'bar']},
+                            restore: {show: true},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    calculable: true,
+                    xAxis: [
+                        {
+                            type: 'category',
+                            axisLabel: {
+                                interval: 0
+                            },
+                            data: chartsUnit
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value'
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '报送数量',
+                            type: 'bar',
+                            color: '1bb2d8',
+                            itemStyle: {
+                                normal: {
+                                    label: {
+                                        show: true,
+                                        position: 'top',
+                                        color: '#88b0bb'
+                                    }
+                                }
+                            },
+                            data: chartsData
+
+                        }
+                    ],
+                    color: [
+                        '#FF8C00', '#1bb2d8', '#99d2dd', '#88b0bb', '#88b0bb',
+                        '#1c7099', '#038cc4', '#75abd0', '#afd6dd', '#88b0bb'
+                    ]
+                };
+
+                var chart_a = ec.init(document.getElementById('statistics_a'));
+                chart_a.setOption(option_a);
+
+
+            });
+
+            Ls.ajaxGet({
+                url: "/statistics/getChartsList/",
+                data: {chartsTime: chartsTime, typeCode: '', type: 'submitEmp', orderType: orderType}
+            }).done(function (d) {
+                        var d = d.data;
+                        empData = [];
+                        empUnit = [];
+                        if (d != null && d.length > 0) {
+                            for (var i = 0, l = d.length; i < l; i++) {
+                                empData[i] = d[i].count;
+                                empUnit[i] = d[i].organName;
+                            }
+                        }
+                        var option_b = {
+                            grid: {
+                                x: 80,
+                                x2: 40,
+                                y: 50
+                            },
+                            title: {
+                                show: false,
+                                text: '',
+                                subtext: ''
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}篇)"
+                            },
+                            legend: {
+                                show: false,
+                                data: ['被采用']
+                            },
+                            toolbox: {
+                                show: true,
+                                feature: {
+                                    magicType: {show: true, type: ['line', 'bar']},
+                                    restore: {show: true},
+                                    saveAsImage: {show: true}
+                                }
+                            },
+                            calculable: true,
+                            xAxis: [
+                                {
+                                    type: 'value',
+                                    boundaryGap: [0, 0.01]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'category',
+                                    data: empUnit
+                                }
+                            ],
+                            series: [
+                                {
+                                    name: '被采用',
+                                    type: 'bar',
+                                    data: empData,
+                                    itemStyle: {
+                                        normal: {
+                                            label: {
+                                                show: true,
+                                                position: 'right',
+                                                color: '#88b0bb'
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            color: [
+                                '#1790cf', '#1bb2d8', '#99d2dd', '#88b0bb',
+                                '#1c7099', '#038cc4', '#75abd0', '#afd6dd'
+                            ]
+                        }
+                        var chart_b = ec.init(document.getElementById('statistics_b'));
+                        chart_b.setOption(option_b);
+
+
+                    }
+            );
+        });
+    }
+
+    function changeType() {
+        orderType = $("#orderType").val();
+        doChange();
+    }
+
+    function changeCharts(time) {
+        chartsTime = time;
+        doChange();
+    }
+
+    function searchList() {
+        var yearAndMonth = $("#yearAndMonth").val();
+        var selectOne = $("#selectOne").val();
+        var startDate = $("#startDate").val();
+        var endDate = $("#endDate").val();
+        if (selectOne == 1) {
+            var organName = $("#organName").val() == null ? '' : $("#organName").val();
+            grid.load({yearAndMonth:yearAndMonth,selectOne: selectOne, organName: organName, startDate: startDate, endDate: endDate});
+        } else if (selectOne == 2) {
+            var organName = $("#bmName").val() == null ? '' : $("#bmName").val();
+            grid2.load({yearAndMonth:yearAndMonth,selectOne: selectOne, organName: organName, startDate: startDate, endDate: endDate});
+        } else {
+            var personName = $("#personName").val() == null ? '' : $("#personName").val();
+            grid3.load({yearAndMonth:yearAndMonth,selectOne: selectOne, personName: personName, startDate: startDate, endDate: endDate});
+        }
+    }
+
+    function searchClear() {
+        var selectOne = $("#selectOne").val();
+        $("#yearAndMonth").val('');
+        $("#startDate").val('');
+        $("#endDate").val('');
+        if (selectOne == 1) {
+            $("#organName").val('');
+            grid.load();
+        } else if (selectOne == 2) {
+            $("#bmName").val('');
+            grid2.load({selectOne: selectOne});
+        } else {
+            $("#personName").val('');
+            grid3.load({selectOne: selectOne});
+        }
+
+    }
+
+    function exportList() {
+        var selectOne = $("#selectOne").val();
+        var startDate = $("#startDate").val() == null ? '' : $("#startDate").val();
+        var endDate = $("#endDate").val() == null ? '' : $("#endDate").val();
+        var yearAndMonth = $("#yearAndMonth").val() == null ? '' : $("#yearAndMonth").val();
+        var params = "";
+        if (selectOne == 1) {
+            var organName = $("#organName").val() == null ? '' : $("#organName").val();
+            params = "yearAndMonth" + yearAndMonth + "&selectOne=" + selectOne + "&startDate=" + startDate + "&endDate=" + endDate + "&organName=" + organName;
+        } else if (selectOne == 2) {
+            var organName = $("#bmName").val() == null ? '' : $("#bmName").val();
+            params = "yearAndMonth" + yearAndMonth +"&selectOne=" + selectOne + "&startDate=" + startDate + "&endDate=" + endDate + "&organName=" + organName;
+        } else {
+            var personName = $("#personName").val() == null ? '' : $("#personName").val();
+            params = "yearAndMonth"+ yearAndMonth + "&selectOne=" + selectOne + "&startDate=" + startDate + "&endDate=" + endDate + "&personName=" + personName;
+        }
+        $('#download_frame').attr("src", "/statistics/exportSubmitList?" + params);
+    }
+
+    function changeSelect() {
+        var selectOne = $("#selectOne").val();
+        var startDate = $("#startDate").val() == null ? '' : $("#startDate").val();
+        var endDate = $("#endDate").val() == null ? '' : $("#endDate").val();
+        var yearAndMonth = $("#yearAndMonth").val() == null ? '' : $("#yearAndMonth").val();
+        if (selectOne == 1) {
+            $("#datagrid2").hide();
+            $("#datagrid3").hide();
+            $("#personSearch").hide();
+            $("#bmSearch").hide();
+            $("#datagrid1").show();
+            $("#organSearch").show();
+            var organName = $("#organName").val() == null ? '' : $("#organName").val();
+            grid.load({yearAndMonth:yearAndMonth,selectOne: selectOne, organName: organName, startDate: startDate, endDate: endDate});
+        } else if (selectOne == 2) {
+            $("#datagrid1").hide()
+            $("#datagrid3").hide();
+            $("#organSearch").hide()
+            $("#personSearch").hide();
+            $("#datagrid2").show();
+            $("#bmSearch").show();
+            var organName = $("#bmName").val() == null ? '' : $("#bmName").val();
+            grid2.load({yearAndMonth:yearAndMonth,selectOne: selectOne, organName: organName, startDate: startDate, endDate: endDate});
+        } else {
+            $("#datagrid1").hide()
+            $("#datagrid2").hide();
+            $("#organSearch").hide();
+            $("#bmSearch").hide()
+            $("#datagrid3").show();
+            $("#personSearch").show();
+            var personName = $("#personName").val() == null ? '' : $("#personName").val();
+            grid3.load({yearAndMonth:yearAndMonth,selectOne: selectOne, personName: personName, startDate: startDate, endDate: endDate});
+        }
+
+    }
+
+    function renderOp1(e) {
+        var rec = e.record;
+        var str = rec.employCount;
+        Ls.log("0000" + rec.employCount)
+        if (rec.employCount > 0) {
+            Ls.log(rec.employCount);
+            var uName = "createUnitId";
+            str = '<a onclick="getDetailPage(' + rec.organId + ',\'' + uName + '\')"> ' + '<p style="color:blue">' + rec.employCount + '</p> </a> ';
+        }
+        return str;
+    }
+
+    function renderOp2(e) {
+        var rec = e.record;
+        var str = rec.employCount;
+        if (rec.employCount > 0) {
+            var uName = "createOrganId";
+            str = '<a onclick="getDetailPage(' + rec.organId + ',\'' + uName + '\')"> ' + '<p style="color:blue">' + rec.employCount + '</p> </a> ';
+
+        }
+        return str;
+    }
+
+    function renderOp3(e) {
+        var rec = e.record;
+        var str = rec.employCount;
+        if (rec.employCount > 0) {
+            var uName = "createUserId";
+            str = '<a onclick="getDetailPage(' + rec.userId + ',\'' + uName + '\')"> ' + '<p style="color:blue">' + rec.employCount + '</p> </a> ';
+
+        }
+        return str;
+    }
+
+    function getDetailPage(uId, uName) {
+        Ls.openWin('/statistics/toDetailPage?uId=' + uId + '&&uName=' + uName, '800px', '600px', {
+            id: 'detail_page',
+            title: '详情',
+            padding: 0,
+        });
+
+    }
+</script>

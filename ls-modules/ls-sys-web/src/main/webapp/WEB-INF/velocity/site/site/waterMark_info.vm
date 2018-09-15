@@ -1,0 +1,417 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">水印设置</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1_1">
+
+                    <form id="waterForm" role="form" ms-controller="waterForm" enctype="multipart/form-data" class="col-md-8" style="padding-left: 0;">
+                        <div class="form-body">
+                            <div class="form-group dn">
+                                <label>ID</label>
+                                <input class="form-control" name="id" ms-duplex="id" placeholder="" readonly></input>
+                            </div>
+                            <div class="form-group dn">
+                                <label>站点ID</label>
+                                <input class="form-control" name="siteId" ms-duplex="siteId" placeholder="" readonly></input>
+                            </div>
+                            <div class="form-group">
+                                <label>启用水印</label>
+
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="enableStatus" ms-duplex-number="enableStatus"
+                                                                       value="1"> 启用 </label>
+                                    <label class="radio-inline"><input type="radio" name="enableStatus" ms-duplex-number="enableStatus"
+                                                                       value="0"> 禁用 </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>水印类型</label>
+
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="type" ms-duplex-number="type" value="1"
+                                                                       ms-click="getWaterType()"> 图片类型 </label>
+                                    <label class="radio-inline"><input type="radio" name="type" ms-duplex-number="type" value="0"
+                                                                       ms-click="getWaterType()"> 文字类型 </label>
+                                </div>
+                            </div>
+                            <div class="form-group hide">
+                                <label>图片地址</label>
+                                <input type="text" id="picPath" name="picPath" readonly ms-duplex="picPath" class="form-control">
+                            </div>
+                            <div class="form-group dn pic">
+                                <label>水印图片</label>
+
+                                <div class="input-group">
+                                    <input type="text" id="picName" name="picName" readonly ms-duplex="picName" class="form-control">
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default btn-default-upload" type="button" onclick="fileUpload()">上传
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </button>
+                                        <button class="btn btn-default btn-default-delete" id="delImg" type="button">删除
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    <!-- /btn-group -->
+                                </div>
+                            </div>
+                            <div class="form-group dn pic">
+                                <label>图片高度</label>
+                                <input type="text" class="form-control" placeholder="0～360">
+                            </div>
+                            <div class="form-group dn pic">
+                                <label>图片宽度</label>
+                                <input type="text" class="form-control" placeholder="0～360">
+                            </div>
+                            <div class="form-group dn word">
+                                <label>文字水印内容</label>
+                                <input class="form-control" name="wordContent" id="wordContent" ms-duplex-string="wordContent" rows="3"
+                                       placeholder="请选择文字水印内容"></input>
+                            </div>
+                            <div class="form-group dn word">
+                                <label>文字颜色</label>
+
+                                <div class="input-group">
+                                    <input class="form-control" name="fontColor" ms-duplex="fontColor" rows="3" id="title"
+                                           placeholder="请选择文字颜色"></input>
+
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-default btn-mark-font" id="colorpicker" type="button">
+                                            <i class="fa fa-font"></i>
+                                        </button>
+                                        <input type="hidden" id="mycolor" class="colorPicker evo-cp0" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group dn word">
+                                <label>文字字体</label>
+                                <select class="form-control" name="fontFamily" id="fontFamily" ms-duplex="fontFamily"
+                                        placeholder="请选择字体类型">
+                                </select>
+                            </div>
+                            <div class="form-group dn word">
+                                <label>文字字号</label>
+                                <select class="form-control" name="fontSize" id="fontSize" ms-duplex="fontSize" class="form-control"
+                                        placeholder="请选择字号">
+                                </select>
+                            </div>
+                            <div class="form-group dn word">
+                                <label>是否加粗</label>
+
+                                <div class="radio-group">
+                                    <label class="radio-inline"><input type="radio" name="isBold" ms-duplex-number="isBold" value="1"
+                                                                       ms-click="changeBold(1)"> 是
+                                    </label>
+                                    <label class="radio-inline"><input type="radio" name="isBold" ms-duplex-number="isBold" value="0"
+                                                                       ms-click="changeBold(0)"> 否
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>水印位置</label>
+                                <select class="form-control" name="position" ms-duplex="position" class="form-control"
+                                        palceholder="请选择水印位置">
+                                    <option value="">请选择水印位置</option>
+                                    <option value="1">左上</option>
+                                    <option value="2">上</option>
+                                    <option value="3">右上</option>
+                                    <option value="4">左</option>
+                                    <option value="5">中</option>
+                                    <option value="6">右</option>
+                                    <option value="7">左下</option>
+                                    <option value="8">下</option>
+                                    <option value="9">右下</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>旋转角度</label>
+                                <input type="number" class="form-control" name="rotate" ms-duplex-number="rotate"
+                                       placeholder="旋转角度应为0～360">
+                            </div>
+                            <div class="form-group">
+                                <label>透明度</label>
+                                <input type="text" class="form-control" placeholder="透明度应大于0.0，不大于1.0" name="transparency"
+                                       ms-duplex="transparency">
+                            </div>
+                            <div class="form-actions noborder">
+                                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                <button type="button" class="btn btn-default btn-reset" onclick="resetWater()">重 置</button>
+                                <button type="button" class="btn btn-default btn-reset" onclick="previewWater()">预 览</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        vm: {},
+        fontFamily: ''
+    };
+    var eweb;
+    var siteId = GLOBAL_SITEID;
+    $(document).ready(function () {
+        mini.parse();
+        /*eweb = Ls.editor("remtarks", {cusdir: "/" + GLOBAL_SITEID + "/" + 0});*/
+        /*editor = KindEditor.create('textarea[name="remtarks"]', {
+            uploadJson: '/articleNews/upload',//上传文件
+            fileManagerJson: '',//文件空间
+            allowImageUpload: true,
+            allowFileManager: true,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            resizeType: 1
+        });
+        //取色器
+        var K = KindEditor;
+        var colorpicker;
+        K('#colorpicker').bind('click', function (e) {
+            e.stopPropagation();
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+                return;
+            }
+            var colorpickerPos = K('#colorpicker').pos();
+            colorpicker = K.colorpicker({
+                x: colorpickerPos.x - 99,
+                y: colorpickerPos.y + K('#colorpicker').height(),
+                z: 19811214,
+                selectedColor: 'default',
+                noColor: '无颜色',
+                click: function (color) {
+                    if ($("#wordContent").val() != "") {
+                        K('#wordContent').css('color', color);
+                    }
+                    colorpicker.remove();
+                    cur.vm.fontColor = color;
+                    colorpicker = null;
+                }
+            });
+        });
+        K(document).click(function () {
+            if (colorpicker) {
+                colorpicker.remove();
+                colorpicker = null;
+            }
+        });*/
+        $("#mycolor").colorpicker({
+            color: "#000",
+            hideButton: true,
+            strings: " , , 无颜色 , , , , "
+        }).on('change.color', function(evt, color){
+            $('#title').css('color', color);
+            cur.vm.fontColor = color;
+        });
+        $("#colorpicker").on("click", function (evt) {
+            evt.stopImmediatePropagation();
+            $("#mycolor").colorpicker("showPalette");
+        });
+        getFontSize();
+
+    });
+
+    function getConfigEO() {
+        Ls.ajaxGet({
+            url: "/waterMark/getConfigEO",
+            data: {
+                siteId: siteId
+            }
+        }).done(function (data) {
+            data = data.data;
+            data.fontSize = Ls.isEmpty(data.fontSize) ? "" : data.fontSize;
+            data.fontFamily = Ls.isEmpty(data.fontFamily) ? cur.fontFamily : data.fontFamily;
+            data.position = Ls.isEmpty(data.position) || data.position == 0 ? "" : data.position;
+            cur.$id = "waterForm";
+            data.$id = cur.$id;
+
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[cur.$id];
+            if (!cur.vm) {
+                cur.vm = avalon.define(data);
+            } else {
+                Ls.assignVM(cur.vm, data);
+            }
+            //avalon.scan(document.body, cur.vm);
+            avalon.scan($("#waterForm").get(0), cur.vm);
+            getWaterType();
+            var T = $("#wordContent");
+            if (cur.vm.fontColor != null) {
+                T.css('color', cur.vm.fontColor);
+            }
+            if (cur.vm.isBold == 1) {
+                T.css("font-weight", "bold");
+            }
+        });
+    }
+
+    $('#waterForm').validator({
+        fields: {
+            'position': '水印位置:required;',
+            'type': '水印类型:required;',
+            'transparency': '透明度:required;'
+        },
+        valid: function () {
+            saveWaterEO();
+        }
+    });
+
+    function saveWaterEO() {
+        if (cur.vm.type == 1 && cur.vm.picPath == '') {
+            Ls.tipsInfo("请上传水印图片");
+            return;
+        } else if (cur.vm.type == 0 && cur.vm.wordContent == '') {
+            Ls.tipsInfo("请填写水印文字");
+            return;
+        } else {
+            var value = cur.vm.$model;
+            value = Ls.toJSON(value);
+            Ls.ajax({
+                url: "/waterMark/saveConfigEO",
+                data: value,
+            }).done(function (data) {
+                if (!data.status) {
+                    Ls.tipsErr(data.desc);
+                } else {
+                    if (data.data == 0) {
+                        Ls.tipsOk("保存成功");
+                        return;
+                    } else {
+                        Ls.tipsErr("保存失败");
+                    }
+                }
+            });
+        }
+    }
+
+    function getWaterType() {
+        var type = cur.vm.type;
+        if (type == 1) {//图片
+            $(".dn").hide();
+            $(".pic").show();
+        } else {
+            $(".dn").hide();
+            $(".word").show();
+        }
+    }
+
+    function resetWater() {
+        var id = cur.vm.id;
+        var siteId = cur.vm.siteId;
+        $("#waterForm")[0].reset();
+        cur.vm = {};
+        cur.vm.id = id;
+        cur.vm.siteId = siteId;
+        Ls.assignVM(cur.vm, data);
+    }
+
+    function fileUpload() {
+
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].fileName, filePath[0].fileName);
+            return true;
+        }, {
+            upload_url: '/waterMark/uploadPic',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": siteId,
+                "imgPath": cur.vm.picPath || '',
+                "desc": "上传缩略图",
+                "type": "NotDefined"
+            },
+            file_types: "*.jpg;*.gif;*.bmp;*.jpeg;*.png",
+        });
+
+    }
+
+    function previewWater() {
+        if (cur.vm.position == '') {
+            Ls.tipsInfo("请选择水印位置");
+            return;
+        } else if (cur.vm.type == 1 && Ls.isEmpty(cur.vm.picPath)) {
+            Ls.tipsInfo("请上传水印图片");
+            return;
+        } else if (cur.vm.type == 0 && Ls.isEmpty(cur.vm.wordContent)) {
+            Ls.tipsInfo("请填写水印文字");
+            return
+        } else {
+            Ls.openWin('/waterMark/toPreview', '300px', '300px', {
+                id: 'water_mark',
+                title: '水印预览',
+                padding: 0
+            });
+        }
+    }
+
+    function getFontSize() {
+        var str = '<option value=""> 请选择字号 </option> ';
+        for (i = 8; i <= 72; i += 2) {
+            str += ' <option value=' + i + '>' + i + '</option> ';
+        }
+        $("#fontSize").append(str);
+        getFontFamily();
+    }
+
+    function changeBold(i) {
+        var T = $("#wordContent");
+        if (i == 1) {
+            T.css("font-weight", "bold");
+            cur.vm.isBold = 1;
+        } else {
+            T.css("font-weight", "normal");
+            cur.vm.isBold = 0;
+        }
+    }
+
+    function getFontFamily() {
+        Ls.ajaxGet({
+            url: "/waterMark/getFontFamily",
+        }).done(function (text) {
+            var str = '';
+            if (text != null) {
+                var data = text;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        if (i == 0) {
+                            cur.fontFamily = data[i].value;
+                        }
+                        str += ' <option value=' + data[i].value + '>' + data[i].key + '</option> '
+                    }
+                }
+            }
+            $("#fontFamily").append(str);
+            getConfigEO();
+        });
+    }
+
+    //缩略图路径
+    function changeImg(path, name) {
+        cur.vm.picPath = path;
+        cur.vm.picName = name;
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        cur.vm.picPath = '';
+        cur.vm.picName = '';
+    })
+</script>

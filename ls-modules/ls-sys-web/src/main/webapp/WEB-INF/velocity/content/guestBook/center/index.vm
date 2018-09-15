@@ -1,0 +1,38 @@
+<div class="portlet light">
+    <div class="portlet-body">
+		<div class="table-toolbar">
+			<div class="row">
+				<div class="col-md-5">
+					<button class="editBtn btn btn-default btn-delete" onclick="doDelete()">删 除</button>
+                </div>
+
+                <div class="col-md-7">
+                    <form class="form-inline tr" role="form">
+                        <div class="form-group">
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                            <button type="button" class="btn btn-default btn-search" onClick="searchContent()">搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                        </div>
+                    </form>
+                </div>
+			</div>
+		</div>
+
+        <div id="guestbook_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true" allowCellSelect="false" onlyCheckSelection="true"
+             sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/guestBook/getPage?dataFlag=1">
+            <div property="columns">
+				<div type="checkcolumn" width="40"></div>
+                <div width="100%" headerAlign="center" allowSort="flase" renderer="renderTitle" align="left">标题</div>
+				<div field="columnName" width="200" headerAlign="center" allowSort="flase" align="left">所属栏目</div>
+                <div field="addDate" width="150" headerAlign="center" allowSort="flase" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">添加日期</div>
+                <div width="310" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/guestbook_center_manage.js"></script>
+<script>
+$(document).ready(function () {
+    guestbook_center_manage.init();
+});
+</script>

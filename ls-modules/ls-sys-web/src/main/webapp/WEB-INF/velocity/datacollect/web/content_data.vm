@@ -1,0 +1,158 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/data/collect/getPageDataEOs?taskId=$!{taskId}" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 450px"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="" width="100%" align="left" headerAlign="center" renderer="title">标题</div>
+                        <div field="author" width="100" align="center" headerAlign="center">作者</div>
+                        <div field="fromName" width="100" align="center" headerAlign="center">来源</div>
+                        <div field="clicks" width="100" align="center" headerAlign="center">点击次数</div>
+                        <div field="createTime" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                        <div field="publishDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">发布时间</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        taskId:Ls.getWin.dialog.data("taskId"),
+        columnId:Ls.getWin.dialog.data("columnId"),
+        cSiteId:Ls.getWin.dialog.data("cSiteId")
+    };
+
+    $(document).ready(function () {
+        cur.grid.load({taskId:cur.taskId});
+        cur.api.button(
+            {id:'all',className:'btn-back',name:'引用全部',callback:function(){quoteAll();return false;}},
+            {id:'select',className:'btn-back',name:'引用选中',callback:function(){quoteCheck();return false;}},
+            {id:'back',className:'btn-back',name:'关闭',callback:function(){Ls.winClose();return false;}}
+        );
+    })
+
+    /*
+    * 引用全部
+    * */
+    function quoteAll() {
+        cur.quote = "all";
+        Ls.openWin("/data/collect/quoteColumn?columnId=" + cur.columnId +"&cSiteId=" + cur.cSiteId, '400px', '390px', {
+            title: "引用全部"
+        });
+    }
+
+    /*
+    * 引用选中
+    * */
+    function quoteCheck() {
+        cur.quote = "select";
+        Ls.openWin("/data/collect/quoteColumn?columnId=" + cur.columnId +"&cSiteId=" + cur.cSiteId, '400px', '390px', {
+            title: "引用选中"
+        });
+    }
+
+    /*
+    * 确定引用
+    * */
+    function quoteBack(columnId,cSiteId) {
+        var url = "/data/collect/quoteAll";
+        if(cur.quote == "select") {
+            url = "/data/collect/quoteCheck";
+        }
+        var ids = [];
+        var records = cur.grid.getSelecteds();
+        for (var i = 0; i < records.length; i++) {
+            ids.push(records[i].id);
+        }
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                taskId:cur.taskId,
+                columnId:columnId,
+                cSiteId:cSiteId,
+                "ids[]":ids
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    cur.grid.reload();
+                    Ls.tips(resp.desc, {times: 2});
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function title(obj) {
+        var record = obj.record;
+        var title = '<a id=' + record.id + ' href="javascript:;"  onclick="show_detail(this)"><u>' + record.title + '</u></a>';;
+        return title;
+    }
+
+    function show_detail(obj) {
+        var dom = $(obj);
+        Ls.openWin("/data/collect/scanDetail?id=" + dom.attr('id'), '800px', '420px', {
+            title: "预览"
+        });
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel('+record.id+')">删 除</button>';
+        return edit + del;
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if(id != null && id!= "") {
+            ids.push(id);
+        }
+
+        var records = cur.grid.getSelecteds();
+        if ((null == records || records.length <= 0) && ids.length <= 0) {
+            Ls.tips("请选择一条记录!", {times: 2});
+            return;
+        }
+        for (var i = 0; i < records.length; i++) {
+            ids.push(records[i].id);
+        }
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/data/collect/deleteContentRules",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.reload();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function callback(msg) {
+        Ls.tips(msg, {times: 2});
+        cur.grid.reload();
+    }
+</script>
+</body>
+</html>

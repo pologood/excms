@@ -1,0 +1,270 @@
+<form id="public_apply_query_form">
+    <div class="xxgk_chaxun">
+        <p class="txt">查询编号：</p>
+        <p class="input">
+            <input name="queryCode" data-rule="查询编号:required;" style="width:185px;" type="text">
+        </p>
+        <p class="txt">查询密码：</p>
+        <p class="input">
+            <input name="queryPassword" data-rule="查询密码:required;" style="width:185px;" type="password">
+        </p>
+        <p class="btn">
+            <input value="查询" type="submit"/>
+        </p>
+    </div>
+</form>
+<div class="ysqcx_tit">
+    <p class="p1">序号</p>
+    <p class="p2">申请内容</p>
+    <p class="p3">申请人</p>
+    <p class="p4">受理单位</p>
+    <p class="p5">申请时间</p>
+    <p class="p6">当前状态</p>
+</div>
+<div class="ysqcx_box">
+    <ul id="public_apply_query_content_ul"></ul>
+</div>
+<div id="public_apply_query_pageination" class="pagination"></div>
+<script id="public_apply_query_tpl" type="text/html">
+    <? for(var i=0,l=data.length; i<l; i++){ ?>
+    <? var el = data[i] ?>
+    <li>
+        <p class="p1"><?=pageSize*pageIndex+i+1?></p>
+        <p class="p2"><a href="javascript:void(0)" title="<?=el.content?>" onclick="showApplyDetail('<?=el.id?>')"><?=el.content?></a></p>
+        <p class="p3">
+            <? if(el.type == "person"){ ?>
+            <?=el.name?>
+            <?} else if(el.type == "organ"){ ?>
+            <?=el.organName?>
+            <?}?>
+        </p>
+        <p class="p4"><?=el.receiveOrganName?></p>
+        <p class="p5"><?=Ls.dateFormat(el.applyDate,"yyyy-MM-dd")?></p>
+        <p class="p6"><?=el.replyStatusName?></p>
+    </li>
+    <? } ?>
+</script>
+<script id="public_apply_query_detail_tpl" type="text/html">
+    <div class="xxgk_sqnrbox">
+        <div class="xxgk_sqr yi_area1">申请人信息</div>
+        <div class="xxgk_sqrxx yi_arear">
+            <table style="border:#dddddd 1px solid;border-bottom:0px; border-right:0px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td align="center">
+                        <? if(type == "person"){ ?>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+                                <td class="bor1" height="30" width="100">姓&nbsp;&nbsp;&nbsp;&nbsp;名</td>
+                                <td class="bor2" style="position:relative;" width="253"><?=name?></td>
+                                <td class="bor1" width="100">工作单位</td>
+                                <td class="bor2" width="318"><?=organName?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">证件名称</td>
+                                <td width="253" class="bor2"><?=cardTypeName?></td>
+                                <td width="100" class="bor1">证件号码</td>
+                                <td width="318" class="bor2"><?=cardNum?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">电子邮箱</td>
+                                <td width="253" class="bor2"><?=mail?></td>
+                                <td width="100" class="bor1">邮政编码</td>
+                                <td width="318" class="bor2"><?=postalNum?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">联系电话</td>
+                                <td width="253" class="bor2"><?=phone?></td>
+                                <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+                                <td width="318" class="bor2"><?=fax?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">联系地址</td>
+                                <td colspan="3" class="bor2"><?=address?></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <?} else if(type == "organ"){ ?>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td rowspan="5" class="bor" style="line-height:34px;" align="center" width="44">公<br/>民</td>
+                                <td class="bor1" height="30" width="100">组织机构名称</td>
+                                <td class="bor2" width="253"><?=organName?></td>
+                                <td class="bor1" width="100">组织机构代码</td>
+                                <td width="318" class="bor2"><?=organCode?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">法人代表</td>
+                                <td class="bor2"><?=legalName?></td>
+                                <td width="100" class="bor1">联系人姓名</td>
+                                <td width="318" class="bor2"><?=contactName?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">联系电话</td>
+                                <td class="bor2"><?=contactPhone?></td>
+                                <td width="100" class="bor1">传&nbsp;&nbsp;&nbsp;&nbsp;真</td>
+                                <td width="318" class="bor2"><?=fax?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">联系地址</td>
+                                <td colspan="3" class="bor2"><?=address?></td>
+                            </tr>
+                            <tr>
+                                <td width="100" height="30" class="bor1">&nbsp;</td>
+                                <td colspan="3" class="bor2">&nbsp;</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <?}?>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="xxgk_sqnrbox">
+        <div class="xxgk_sqr1 yi_area2">所需信息情况</div>
+        <div class="xxgk_sqrxx yi_arear">
+            <table style="border-left:#dddddd 1px solid;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td class="bor" align="center" height="104" width="169" style="*width:170px;">所需信息的内容<br/>描述</td>
+                    <td colspan="3" class="bor3" width="708"><?=content?></td>
+                </tr>
+                <tr>
+                    <td width="169" height="104" align="center" class="bor" style="*width:170px;">所需信息的用途</td>
+                    <td colspan="3" class="bor3" width="708"><?=use?></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="bor4" height="23" width="50%">所需信息的指定提供方式（可选）</td>
+                                <td class="bor4" width="50%">获取信息的方式（可选）</td>
+                            </tr>
+                            <tr>
+                                <td class="bor5" height="28" width="36" style="text-align:left;"><?=provideType?></td>
+                                <td class="bor5" style="text-align:left;"><?=receiveType?></td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class="xxgk_sqnrbox">
+        <div class="xxgk_sqr yi_area1">回复情况</div>
+        <div class="xxgk_sqrxx yi_arear">
+            <table style="border-left:#dddddd 1px solid;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tbody>
+                <tr>
+                    <td class="bor" align="center" height="156" width="169" style="*width:170px;">备注</td>
+                    <td colspan="3" class="bor3" width=""><?=replyContent?></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="clear"></div>
+    </div>
+</script>
+<script>
+var applyQueryData = {
+    siteId: "$!{context.siteId}",
+    organId: "$!{context.columnId}",
+    pageSize: "$!{paramObj.pageSize}"
+};
+var loadQueryData = function(data, callback) {
+    // 提交
+    Ls.ajax({
+        url: "/public/applyQuery",
+        data: data
+    }).done(function (d) {
+        if (d.status == 1) {
+        	if (callback) {
+				callback(d.data);
+			} else {
+				var pageCount = d.data.pageCount;
+                var pageIndex = d.data.pageIndex;
+                if (pageCount == 0) {
+    			    $("#public_apply_query_content_ul").html("");
+                } else {
+    			 	var content = Ls.template("public_apply_query_tpl", d.data);
+                    $("#public_apply_query_content_ul").html(content);
+    			    if (pageCount > 1) {
+    					$("#public_apply_query_pageination").show();
+                        setApplyQueryPagination(pageIndex, pageCount);
+                    } 
+                }
+			}
+        } else {
+            // 返回错误信息
+            Ls.tipsErr(d.desc, function(){
+    			if (callback) {callback();}
+			});
+        }
+    });
+}
+
+function setApplyQueryPagination(pageIndex, pageCount){
+	Ls.pagination("#public_apply_query_pageination", function (pageIndex) {
+		applyQueryData.queryCode = "";
+        applyQueryData.queryPassword = "";
+		applyQueryData.pageIndex = pageIndex-1;
+        loadQueryData(applyQueryData);
+    }, {
+        currPage: (pageIndex+1),
+        pageCount : pageCount,
+        param: "pageSize=$!{paramObj.pageSize}"
+    });
+}
+
+function showApplyDetail(id) {
+    // 提交
+    Ls.ajax({
+        url: "/public/applyDetail?id=" + id
+    }).done(function (d) {
+		showQueryDetail(d.data);
+    });
+}
+
+function showQueryDetail(data){
+	public_apply.submit_content = $("#public_apply_submit").html();
+	public_apply.submit_detail = true;
+	$('#public_apply_manage li').removeClass("active");
+	$('#public_apply_manage a[href="#public_apply_submit"]').parent().addClass('active');
+	$('.xxgk_sqcon_sq').removeClass("active");
+	$('#public_apply_submit').addClass('active');
+	$("#public_apply_submit").html(Ls.template("public_apply_query_detail_tpl", data));
+}
+$(document).ready(function() {
+	applyQueryData.pageIndex = 0;
+    loadQueryData(applyQueryData);//查询
+    // 验证
+    using("validator", function () {
+        $('#public_apply_query_form').validator({
+            valid: function (form) {
+                var me = this;
+                // 提交表单之前，hold住表单
+                me.holdSubmit();
+                // 查询
+                var fromData = $(form).serializeObject();
+                applyQueryData.queryCode = fromData.queryCode;
+                applyQueryData.queryPassword = fromData.queryPassword;
+                loadQueryData(applyQueryData, function(d) {
+                    me.holdSubmit(false);
+					if(d){ showQueryDetail(d.data[0]); }
+                });
+            }
+        });
+    });
+});
+</script>

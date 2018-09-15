@@ -1,0 +1,314 @@
+#if(${toolbar} == 'hide')
+#else
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">文章信息</a>
+        </li>
+    </ul>
+
+<div class="tab-content">
+<div class="tab-pane active" id="tab_1_1">
+#end
+    <form role="form" id="article_form" ms-controller="article_form">
+        <table class="table table-bordered article-table">
+            <tbody>
+            <tr>
+                <th>标题：</th>
+                <td>
+                    <table class="w100p">
+                        <tbody>
+                        <tr>
+                            <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control" maxlength="200"></td>
+                            <td class="w150 text-center">
+                                <button type="button" id="colorpicker" class="btn btn-default btn-font"><i class="fa fa-font"></i>
+                                </button>
+                                <button type="button" id="bold" class="btn btn-default btn-bold"><i class="fa fa-bold"></i></button>
+                                <button type="button" id="tilt" class="btn btn-default btn-italic"><i class="fa fa-italic"></i>
+                                </button>
+                                <button type="button" id="underline" class="btn btn-default btn-underline">
+                                    <i class="fa fa-underline"></i></button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </td>
+                <td class="w300" rowspan="8">
+
+                    <div class="thumb_layout">
+                        <div class="thumb">
+                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                        </div>
+                        #if(${uploadBar} == 'hide')
+                        #else
+                            <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                            <div class="thum-upload" id="uploadImg"><i class="fa fa-upload"></i></div>
+                        #end
+                    </div>
+
+                </td>
+            </tr>
+            <tr>
+                <th>副标题：</th>
+                <td><input type="text" id="subTitle" ms-duplex="subTitle" class="form-control" placeholder="" maxlength="300"></td>
+            </tr>
+            <tr>
+                <th>信息员：</th>
+                <td>
+                    <input type="text" id="author" ms-duplex="author" class="form-control" placeholder="" maxlength="20"/>
+                </td>
+            </tr>
+            <tr>
+                <th>责任编辑：</th>
+                <td>
+                    <input type="text" id="responsibilityEditor" ms-duplex="responsibilityEditor" class="form-control" placeholder="" maxlength="20"/>
+                </td>
+            </tr>
+            <tr>
+                <th>来源：</th>
+                <td>
+                    <div class="input-group" id="resMark">
+                        <input type="text" id="resources" ms-duplex="resources" class="form-control" placeholder="" value=""
+                               onclick="articleNews.getResource()" maxlength="80"/>
+                        <div class="input-group-btn">
+                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="articleNews.getResource()">
+                                <i class="fa fa-caret-down" id="select_icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>发布日期：</th>
+                <td>
+                    <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control readonly"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                </td>
+            </tr>
+
+            #*办事办件状态*#
+            #if("$!{typeCode}" == "handleItems")
+                <tr>
+                    <th>办件状态：</th>
+                    <td>
+                        <div class="radio-group" id="handleStatus">
+                            <label class="radio-inline"><input type="radio" checked name="handleStatus" value="0" ms-duplex-string="handleStatus"> 未办结 </label> &nbsp;&nbsp;
+                            <label class="radio-inline"><input type="radio" name="handleStatus" value="1" ms-duplex-string="handleStatus"> 已办结 </label>
+                        </div>
+                    </td>
+                </tr>
+            #end
+
+            <tr >
+                <th>属性：</th>
+                <td colspan="2">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isLink" class="publishBtn hide" value="1">是否跳转
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isTop" class="publishBtn hide" value="1"> 置顶
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isNew" class="publishBtn hide" value="1"> 加新
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isTitle" class="publishBtn hide" value="1"> 标题新闻
+                    </label>
+                    <label id="isComment" class="checkbox-inline hide">
+                        <input type="checkbox" id="isAllowComments" class="publishBtn hide" value="1"> 允许评论
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isJob" class="publishBtn hide" value="1"> 定时发布
+                    </label>
+                    <label class="checkbox-inline">
+                        <button id="btn_extend_article" type="button" class="btn btn-default btn-xs btn-article-extend"> 扩展信息
+                            <i class="fa fa-angle-double-down"></i>
+                        </button>
+                    </label>
+                </td>
+            </tr>
+            <tr id="OutLink" class="hide">
+                <th>跳转地址：</th>
+                <td>
+                    <input type="text" id="redirectLink" ms-duplex="redirectLink" class="form-control" placeholder="请输入地址">
+                </td>
+            </tr>
+            <tr id="TopDate" class="hide">
+                <th>置顶有效期：</th>
+                <td>
+                    <input type="datetime" id="topValidDate" placeholder="空值代表永久有效" ms-duplex="topValidDate" class="form-control readonly publishBtn"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'${nowDate}'})" readonly/>
+                </td>
+            </tr>
+            <tr id="JobDate" class="hide">
+                <th>定时发布：</th>
+                <td>
+                    <input type="datetime" id="jobIssueDate" placeholder="定时发布时间，空值代表无需定时发布" ms-duplex="jobIssueDate" class="form-control readonly publishBtn"
+                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate:'${nowDate}'})" readonly/>
+                </td>
+            </tr>
+            #*
+            #MenuButton(121710,true)
+            #if($_button_code_list_.contains("121710"))
+            <tr class="article_attr_ext hide">
+                <th>同步信息公开：</th>
+                <td>
+                    <div class="input-group">
+
+                        <div id="public_synOrganCat_content"
+                             style="display:none;position: absolute; top:34px; left:0px; height: 300px; z-index: 10000; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                            <ul id="public_synOrganCat_tree" class="ztree"></ul>
+                        </div>
+
+                        <input id="public_synOrganCatIds" type="hidden" name="synOrganCatIds" ms-duplex="synOrganCatIds" class="form-control"/>
+                        <input id="public_synOrganCatNames" type="text" ms-duplex="synOrganCatNames" class="form-control readonly" readonly/>
+
+                        <div class="input-group-btn">
+                            <button id="public_synOrganCat_btn" class="btn btn-default btn-default-upload" type="button" onclick="showTree('public_synOrganCat')"><i
+                                class="fa fa-caret-down"></i></button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            #end
+            #MenuButton(56613,true)
+            #if($_button_code_list_.contains("56613"))
+            <tr class="article_attr_ext hide">
+                <th>同步信息报送：</th>
+                <td>
+                    <select id="synMsgCatIds" name="synMsgCatIds" ms-duplex="synMsgCatIds" class="form-control"></select>
+                </td>
+            </tr>
+            #end
+            *#
+            <tr class="article_attr_ext hide">
+                <th>摘要：</th>
+                <td>
+                    <textarea class="form-control" id="remarks" rows="3" placeholder=""></textarea>
+                </td>
+            </tr>
+                #if(${toolbar} == 'hide')
+                #else
+                <tr id="checkWords" class="article_attr_ext hide">
+                    <th>内容过滤：</th>
+                    <td>
+                        <button class="btn btn-default btn-reset" id="errorWords" type="button" onclick="contentCheck('EASYERR')">易错词检测</button>
+                        <button class="btn btn-default btn-reset" id="senWords" type="button" onclick="contentCheck('SENSITIVE')">敏感词检测</button>
+                        <button class="btn btn-default btn-reset" id="hotWords" type="button" onclick="contentCheck('HOT')">热词检测</button>
+                    </td>
+                </tr>
+                #end
+            <tr id="edit_content">
+                <th style="vertical-align: top;">内容：</th>
+                #if(${type}=="refer")
+                    <td colspan="2" ms-text="content" name="content">
+                    </td>
+                #else
+                <td colspan="2">
+                    <textarea id="article_content" name="content" style="width: 100%; visibility: visible;"></textarea>
+                </td>
+                #end
+            </tr>
+            <tr>
+                <th></th>
+                <td colspan="2">
+                    #if(${toolbar} == 'hide')
+                    #else
+                        <button class="btn btn-default publishBtn btn-save-release hide" type="button" id="saveAndPublish">保存并发布</button>
+                        <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                        <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                    #end
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+    </form>
+#if(${toolbar} == 'hide')
+#else
+</div>
+
+</div>
+
+</div>
+#end
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/article_news_edit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/synPublic.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/contentCheck.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/editHandle.js"></script>
+
+<script>
+    var config = {
+        pageIndex: '$!{pageIndex}'
+    }
+
+    var expand = 0;
+    var article = {
+        id: '$!{articleId}',
+        columnId: '',
+        siteId: GLOBAL_SITEID,
+        title: '',
+        subTitle: '',
+        author: GLOBAL_PERSON.name,
+        responsibilityEditor: GLOBAL_PERSON.name,
+        resources: GLOBAL_PERSON.unitName,
+        redirectLink: '',
+        imageLink: '',
+        isNew: 0,
+        isTop: 0,
+        topValidDate: '',
+        isBold: 0,
+        isUnderline: 0,
+        isTilt: 0,
+        titleColor: "",
+        remarks: '',
+        content: '',
+        isPublish: 0,
+        publishDate: '',
+        typeCode: 'articleNews',
+        isAllowComments: 0,
+        quoteStatus: 0,
+        recordStatus: '$!{recordStatus}' == '' ? 'Normal' : '$!{recordStatus}',
+        workFlowStatus:''
+    }
+
+    $(document).ready(function () {
+
+        /**办事办件状态**/
+        if("$!{typeCode}" == "handleItems") {
+            article.typeCode = "handleItems";
+        }
+
+        articleNews.init();
+        article.columnId = cur.columnId;
+        $("#publishDate").val('${nowDate}');
+        $("#author").val(article.author);
+        $("#responsibilityEditor").val(article.responsibilityEditor);
+        $("#resources").val(article.resources);
+        //getRelation();//同步到信息公开和信息报送
+        getModelConfig();
+
+        //权限控制
+        if (GLOBAL_RIGHTS == "siteAdmin" || GLOBAL_RIGHTS == "superAdmin") {
+            $(".publishBtn").removeClass("hide");
+        } else {
+            for (var i = 0; i < cur.opt.length; i++) {
+                if (cur.opt[i].action == "publish" || cur.opt[i].action == "super") {
+                    $(".publishBtn").removeClass("hide");
+                }
+            }
+        }
+
+        //初始化数据
+        initData();
+        try{
+            cur.processConfig = getProcessConfig(content_mgr.node.contentModelCode);
+            if(!Ls.isEmpty(cur.processConfig) && !Ls.isEmpty(cur.processConfig.processId)){
+                $("#saveAndPublish").hide();
+            }
+        }catch (e){}
+
+    });
+</script>

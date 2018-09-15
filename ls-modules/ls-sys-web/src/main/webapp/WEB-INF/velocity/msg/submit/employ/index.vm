@@ -1,0 +1,356 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="200"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding:5px; overflow: hidden;">
+            <div id="ui_tree" class="ztree"></div>
+        </div>
+
+    </div>
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn"><a href="javascript:batchEmploy();">批量采用</a></li>
+                                    <li class="publishBtn"><a href="javascript:batchOtherEmploy();">批量采用到其他栏目</a></li>
+                                </ul>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 状态 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn"><a href="javascript:changeMsgStatus(0);">未采用</a></li>
+                                    <li class="publishBtn"><a href="javascript:changeMsgStatus(1);">已退回</a></li>
+                                    <li class="publishBtn"><a href="javascript:changeMsgStatus(2);">已采用</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt10">
+                        <div class="col-md-12">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="tempName" name="tempName" class="form-control"
+                                           placeholder="报送单位名称">
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="startDate" id="startDate" class="form-control" placeholder="开始时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="endDate" id="endDate" class="form-control" placeholder="结束时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',startDate:'%y-%M-%d 23:59:59',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/msg/submit/getPageEOs" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="name" width="100%" name="name" cellStyle="min-width: 300px;" align="left" headerAlign="center" renderer="name_diydom">标题</div>
+                        <div field="classifyName" width="200" align="center" headerAlign="center">所属分类</div>
+                    ##                        <div field="fromCode" width="100" align="center" headerAlign="center">来源</div>
+                        <div field="provider" width="100" align="center" headerAlign="center">供稿人</div>
+                    ##                        <div field="author" width="100" align="center" headerAlign="center">作者</div>
+                        <div width="50" align="center" headerAlign="center" renderer="thumbnail">缩略图</div>
+                        <div field="publishDate" width="150" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" headerAlign="center">发布日期</div>
+                        <div field="createUnitName" width="100" align="center" headerAlign="center">发布单位</div>
+                        <div width="80" align="center" headerAlign="center" renderer="status">状态</div>
+                        <div width="80" align="center" headerAlign="center" allowSort="true" renderer="opt">采用记录</div>
+                        <div width="60" align="center" headerAlign="center" allowSort="true" renderer="opt_back">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id=mytips
+     style="position:absolute;width:202;height:50; border: 1px solid #CCCCCC;font-size: 12px;background-color:#265490;color:#FFFFFF;display:none;filter: Alpha(Opacity=60);padding-right: 6px; padding-left: 6px;padding-top: 6px; padding-bottom: 6px;">
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/msg/submit/msg_classify.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/msg/submit/tips.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        startDate: $('#startDate'),
+        endDate: $('#endDate'),
+        dialog: Ls.getWin.dialog,
+        msg_status: "",
+        ser_key: $('#ser_key')//查询关键字
+    };
+
+    // 鼠标移动上面出现提示框
+    var tooltip = function () {
+        var id = 'tt';
+        var top = 3;
+        var left = 3;
+        var maxw = 550;
+        var speed = 10;
+        var timer = 20;
+        var endalpha = 95;
+        var alpha = 0;
+        var tt, t, c, b, h;
+        var ie = document.all ? true : false;
+        return {
+            show: function (v, w) {
+                if (tt == null) {
+                    tt = document.createElement('div');
+                    tt.setAttribute('id', id);
+                    t = document.createElement('div');
+                    t.setAttribute('id', id + 'top');
+                    c = document.createElement('div');
+                    c.setAttribute('id', id + 'cont');
+                    b = document.createElement('div');
+                    b.setAttribute('id', id + 'bot');
+                    tt.appendChild(t);
+                    tt.appendChild(c);
+                    tt.appendChild(b);
+                    document.body.appendChild(tt);
+                    tt.style.opacity = 0;
+                    tt.style.filter = 'alpha(opacity=0)';
+                    document.onmousemove = this.pos;
+                }
+                tt.style.display = 'block';
+                c.innerHTML = v;
+                tt.style.position = "absolute";
+                tt.style.zIndex = 99999;
+                tt.style.width = w ? w + 'px' : 'auto';
+                if (!w && ie) {
+                    t.style.display = 'none';
+                    b.style.display = 'none';
+                    tt.style.width = tt.offsetWidth;
+                    t.style.display = 'block';
+                    b.style.display = 'block';
+                }
+                if (tt.offsetWidth > maxw) {
+                    tt.style.width = maxw + 'px'
+                }
+                h = parseInt(tt.offsetHeight) + top;
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function () {
+                    tooltip.fade(1)
+                }, timer);
+            },
+            pos: function (e) {
+                var u = ie ? event.clientY + document.documentElement.scrollTop : e.pageY;
+                var l = ie ? event.clientX + document.documentElement.scrollLeft : e.pageX;
+                tt.style.top = (u - h) + 'px';
+                tt.style.left = (l + left) + 'px';
+            },
+            fade: function (d) {
+                var a = alpha;
+                if ((a != endalpha && d == 1) || (a != 0 && d == -1)) {
+                    var i = speed;
+                    if (endalpha - a < speed && d == 1) {
+                        i = endalpha - a;
+                    } else if (alpha < speed && d == -1) {
+                        i = a;
+                    }
+                    alpha = a + (i * d);
+                    tt.style.opacity = alpha * .01;
+                    tt.style.filter = 'alpha(opacity=' + alpha + ')';
+                } else {
+                    clearInterval(tt.timer);
+                    if (d == -1) {
+                        tt.style.display = 'none'
+                    }
+                }
+            },
+            hide: function () {
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function () {
+                    tooltip.fade(-1)
+                }, timer);
+            }
+        };
+    }();
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load({siteId: GLOBAL_SITEID});
+        msg_classify_tree.init();
+    })
+
+    function name_diydom(obj) {
+        var record = obj.record;
+        var title = "供稿人:" + (record.provider == null ? "空" : record.provider) + "&nbsp;&nbsp;来源:" + (record.fromCode == null ? "空" : record.fromCode) + "&nbsp;&nbsp;被采用" + record.useCount + "次";
+        var diyDom = '<a id=' + record.id + ' title=' + title + ' data-toggle="tooltip" data-placement="right" employ=' + record.columnName + ' href="javascript:;"  onclick="show_detail(this)"><u>' + record.name + '</u></a>';
+        return diyDom;
+    }
+
+    function show_detail(obj) {
+        var dom = $(obj);
+        Ls.openWin("/msg/employ/msgDetail?id=" + dom.attr('id'), '880px', '440px', {
+            title: "采编到" + dom.attr('employ')
+        });
+    }
+
+    function status(obj) {
+        var record = obj.record;
+        if (record.status == 0) {
+            return "<font color='#deb887'>未采用</font>";
+        } else if (record.status == 1) {
+            return "<font color='red' title='" + record.backReason + "'>已退回</font>";
+        } else {
+            return "<font color='green'>已采用</font>";
+        }
+    }
+
+    function changeMsgStatus(status) {
+        cur.msg_status = status;
+        search();
+    }
+
+    function thumbnail(e) {
+        var rec = e.record;
+        var link = rec.imageLink;
+        if (!link) {
+            return;
+        }
+        var path = /\//.test(link) ? link : (GLOBAL_FILESERVERNAMEPATH + "" + link);
+        var pic = '<a href="' + path + '" target="_blank" onmouseover="tooltip.show(\'<img src=' + path + ' width=150 height=120>\')"'
+        pic += ' onmouseout="tooltip.hide();"><img src="' + path + '" height="20"></a>';
+        return pic;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var diyDom = '';
+        if (record.useCount > 0) {
+            diyDom = '<a id=' + record.id + ' onclick="employ_history(this)"><img src="$!{rc.contextPath}assets/images/show_emply_history.png" border="0" title="采用记录" ></a>';
+        }
+        return diyDom;
+    }
+
+    function opt_back(obj) {
+        var record = obj.record;
+        var opt = "";
+        if (record.status == 0) {
+            opt = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="back_msg(' + record.id + ')">退 回</button> ';
+        }
+        return opt;
+    }
+
+    function back_msg(id) {
+        cur.dialog.data('id', id);
+        Ls.openWin("/msg/employ/backMsg", '500px', '250px', {
+            title: "退回消息"
+        });
+    }
+
+    function employ_history(obj) {
+        var dom = $(obj);
+        Ls.openWin("/msg/employ/employHistory?id=" + dom.attr('id'), '880px', '400px', {
+            title: "采用记录"
+        });
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        var tempName = $('#tempName').val();
+        cur.grid.load({
+            tempName: tempName,
+            status: cur.msg_status,
+            siteId: GLOBAL_SITEID,
+            keys: 'name',
+            keyValue: keyValue,
+            classifyId: cur.classifyId,
+            startDate: cur.startDate.val(),
+            endDate: cur.endDate.val()
+        });
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.classifyId = '';
+        cur.startDate.val('');
+        cur.endDate.val('');
+        cur.treeObj.cancelSelectedNode();
+        cur.msg_status = "";
+        $('#tempName').val('');
+        search();
+    }
+
+    function batchEmploy() {
+        var records = cur.grid.getSelecteds();
+
+        if (null == records || records.length <= 0) {
+            Ls.tipsInfo("请选择一条记录!");
+            return;
+        }
+
+        var msgIds = [];
+        for (var i = 0; i < records.length; i++) {
+            msgIds.push(records[i].id);
+        }
+
+        Ls.ajaxGet({
+            url: "/msg/employ/batchEmploy",
+            data: {
+                msgIds: msgIds.join(","),
+                type: 2 //批量采用到当前对应栏目
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tipsOk(resp.desc);
+                    search();
+                } else {
+                    Ls.tipsErr(resp.desc);
+                }
+            }
+        });
+    }
+
+    function batchOtherEmploy() {
+
+        var records = cur.grid.getSelecteds();
+
+        if (null == records || records.length <= 0) {
+            Ls.tipsInfo("请选择一条记录!");
+            return;
+        }
+
+        art.dialog.data('records', records);
+        Ls.openWin("/msg/employ/batchEmployOther", '380px', '400px', {
+            title: "批量采编到其他栏目"
+        });
+    }
+
+    function batch_employ_other_callback(msg) {
+        Ls.tipsOk(msg);
+        search();
+    }
+
+    function call_back(msg) {
+        Ls.tipsOk(msg);
+        search();
+    }
+
+    function callback(resp) {
+        Ls.tipsOk(resp.desc);
+        search();
+    }
+</script>

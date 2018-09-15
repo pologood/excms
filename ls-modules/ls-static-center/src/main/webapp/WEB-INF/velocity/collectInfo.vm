@@ -1,0 +1,83 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($pageSize="$!{paramObj.pageSize}")
+#set($length=$Integer.parseInt($length))
+<div class="collection-theme">
+##    <div class="collection-theme-toolbar">
+##        <div class="title left">$!{resultObj.title}</div>
+##        <div class="btn-group">
+##            $!{resultObj.content}
+##        </div>
+##    </div>
+    <div id="ideaPageDiv" class="collection-theme-list">
+        <h3 class="collectit">网友意见</h3>
+        <ul id="idea_page">
+        </ul>
+    </div>
+    <div id="collectionpage" class="pagination"></div>
+    <script>
+        var currentPageIndex = 0;
+        setIdeaPage(currentPageIndex);
+        function setIdeaPage(pageIndex) {
+            Ls.ajax({
+                url: "/content/getIdeaPage",
+                data: {
+                    collectInfoId:$!{resultObj.collectInfoId},
+                    pageSize:$!{paramObj.pageSize},
+                    pageIndex: (pageIndex - 1),
+                    dateFormat: "$!{paramObj.dateFormat}"
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    var jsonList = d.data.data;
+                    var pageCount = d.data.pageCount;
+                    var pageIndex = d.data.pageIndex;
+                    $("#collectionpage").hide();
+                    if (pageCount == 0) {
+                        $("#ideaPageDiv").hide();
+                    } else {
+                        $("#ideaPageDiv").show();
+                        var html = '';
+                        for (var i = 0; i < jsonList.length; i++) {
+                            var eo = jsonList[i];
+                            html += '<li><div class="collection-body">';
+                            html += '<div class="collection-tit"><span class="collection-username">' + eo.name + '</span>';
+                            html += '<span class="collection-datetime\">( ' + eo.createWebTime + ' )</span></div>';
+                            html += '<div class="collection-info">' + eo.content + '</div>';
+                            html += '</div>';
+                            html += '</li>';
+                        }
+                        $("#idea_page").html(html);
+
+                        if (pageCount > 1) {
+                            $("#collectionpage").show();
+                            setPagination(pageIndex, pageCount)
+                        }
+                    }
+                } else {
+                    alert(d.desc);
+                }
+            });
+        }
+
+        function setPagination(pageIndex, pageCount) {
+            Ls.pagination("#collectionpage", function (pageIndex) {
+                setIdeaPage(pageIndex);
+            }, {
+                currPage: (pageIndex + 1),
+                pageCount: pageCount,
+                param: "pageSize=$!{paramObj.pageSize}"
+            });
+        }
+
+    </script>
+
+    #if($!{resultObj.isTimeOut} == "2")
+        #if("$!{resultObj.collectInfoId}" == "5335972")
+            #parse("collectInfo_save_dz.vm")
+        #else
+            #parse("collectInfo_save.vm")
+        #end
+    #end
+</div>

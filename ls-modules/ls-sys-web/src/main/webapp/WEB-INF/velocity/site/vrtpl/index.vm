@@ -1,0 +1,257 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+
+        <div style="padding:5px; overflow: hidden;">
+            <div id="ui_tree" class="ztree"></div>
+        </div>
+
+    </div>
+    <div region="center" style="overflow-x:hidden;border:none;">
+        <div id="center_tab" class="tabbable-line" style=" margin:12px 20px 15px; display: none;height: 90%">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">模板信息</a>
+                </li>
+                <li>
+                    <a href="#tab_1_2" data-toggle="tab">历史版本</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="height: 100%; padding-top: 8px;">
+                <div class="tab-pane active" id="tab_1_1" style="width:100%;height: 100%">
+                    <div class="table-toolbar" style="height: 20px">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="pdr10">
+                                    <button type="button" id="btn_save" class="btn btn-default btn-save"
+                                            onclick="saveTpl()">保 存
+                                    </button>
+                                    <button type="button" id="btn_add_label" class="btn btn-default btn-add-label"
+                                            onclick="addLabelBtn()">
+                                        插入标签
+                                    </button>
+                                    <button type="button" id="btn_upload" class="btn btn-default btn-upload"
+                                            onclick="upload()">上 传
+                                    </button>
+                                    <button type="button" id="btn_download" class="btn btn-default btn-download"
+                                            onclick="download()">下
+                                        载
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="label_layout" class="mini-layout" style="width:100%;">
+                        <div boder="1" style="border-left:solid 1px #c5c5c5;" title="标签" visible="false"
+                             borderStyle="border:solid 1px #aaa;" showCloseButton="true" showHeader="true" region="west"
+                             width="200" showSplit="false" showCollapseButton="false">
+                            <div id="label_tree" class="ztree"></div>
+                        </div>
+                        <div title="center" region="center" style="width:100%;height: 100%;">
+                            <textarea id="tplContent" class="form-control" name="tplContent"
+                                      style="width:100%;height: 100%;border: 0"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab_1_2">
+                    <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                         url="/tpl/getHistoryEOByTplId" sizeList="[5,10,20,50]" pageSize="10"
+                         idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                    >
+                        <div property="columns">
+                            <div type="indexcolumn"></div>
+                            <div field="tempName" width="35%" align="center" headerAlign="center" renderer="tempName">
+                                模板名称
+                            </div>
+                            <div width="35%" align="center" headerAlign="center"
+                                 renderer="showDetail">模板内容
+                            </div>
+                            <div field="createDate" width="30%" align="center" headerAlign="center" allowSort="true"
+                                 dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="true">修改时间
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<iframe style="display: none;" id="downLoad"></iframe>
+<script src="$!{rc.contextPath}/assets/js/pages/vrtpl_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/label_select.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        editBtn: $('#btn_edit'),
+        saveBtn: $('#btn_save'),
+        backBtn: $('#btn_back'),
+        addLabelBtn: $('#btn_add_label'),
+        uploadBtn: $('#btn_upload'),
+        downloadBtn: $('#btn_download'),
+        tplContent: $('#tplContent'),
+        label_layout: mini.get('label_layout'),
+        historygrid: mini.get('datagrid'),
+        dialog: Ls.getWin.dialog
+    };
+
+    var rec = null;
+    $(document).ready(function () {
+
+        $("#center_tab").css('display', 'none');
+        tpl_manage.tpl();
+        label_select.label();
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                cur.label_layout.updateRegion('west', null);
+                Ls.mini_datagrid_height(cur.label_layout, 70)
+            }
+            else if (id == '#tab_1_2') {
+                cur.historygrid.load({id: cur.node.id});
+                Ls.mini_datagrid_height(cur.historygrid, 32)
+            }
+        });
+    })
+
+    function upload() {
+        var url = "/vrtpl/uploadTpl?id=" + cur.node.id;
+        Ls.openWin(url, '400px', '100px', {
+            title: '上传模板'
+        });
+    }
+
+    function callback_upload(msg) {
+        fileScan();
+        Ls.tips(msg);
+    }
+
+    function download() {
+        var name = prompt('模板名称', cur.node.name + '.html')
+        if (name != null && name != "") {
+            downloadFile(name);
+        }
+    }
+
+    function downloadFile(fileName) {
+        var node = cur.node;
+        if (Ls.isEmpty(node)) {
+            Ls.tips("选择要下载的模板!", {icon: 'info'});
+            return;
+        }
+
+        $("#downLoad").attr("src", "$!{rc.contextPath}/tpl/downLoad?id=" + cur.node.id + "&fileName=" + fileName);
+    }
+
+    function saveTpl() {
+
+        if (cur.node == null || !cur.node.template) {
+            $('#tplContent').val('');
+            return;
+        }
+
+        Ls.ajax({
+            url: '/tpl/saveTplContent',
+            data: {
+                id: cur.node.id,
+                content: $('#tplContent').val()
+            },
+            success: function (resp) {
+                cur.historygrid.load({id: cur.node.id});
+                Ls.tips(resp.desc, {times: 2});
+            }
+        });
+    }
+
+    function addLabelBtn() {
+        cur.label_layout.updateRegion("west", {visible: true});
+    }
+
+    function closeLabelBtn() {
+        cur.label_layout.updateRegion("west", {visible: false});
+    }
+
+    function tempName() {
+        return cur.node.name;
+    }
+
+    function showDetail(e) {
+        var record = e.record;
+        return '<a href="javascript:;"  onclick="tplDetail(' + record.id + ')"><u>详情</u></a>';
+    }
+
+    /*
+    * 查看历史版本详情
+    * */
+    function tplDetail(id) {
+        var rec = cur.historygrid.findRow(function (row) {
+            if (row.id == id) return true;
+        });
+        cur.dialog.data('rec', rec);
+        var url = "/vrtpl/history?tempId=" + cur.node.id;
+        Ls.openWin(url, '600px', '500px', {
+            title: '历史版本'
+        });
+    }
+
+    function callback_tplDetail() {
+        fileScan();
+        Ls.tips('模板恢复成功!');
+    }
+
+    function fileScan() {
+        Ls.ajaxGet({
+            url: '/tpl/getTplContent',
+            data: {
+                id: cur.node.id
+            },
+            success: function (resp) {
+                $('#tplContent').val(resp.content);
+                cur.historygrid.load({id: cur.node.id});
+            }
+        });
+    }
+
+    function callback_editTpl() {
+        if (cur.tpl_opt_type == 'edit') {
+            if (cur.node_edit != null) {
+                cur.selectNode.name = cur.node_edit.name;
+                cur.treeObj.updateNode(cur.selectNode, true);
+                cur.historygrid.load({id: cur.selectNode.id});
+            }
+        } else {
+            if (cur.node_edit != null) {
+                cur.treeObj.addNodes(cur.selectNode, cur.node_edit);
+            }
+        }
+    }
+
+    function insertAtCursor(myField, myValue) {
+
+        //IE
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+            sel.select();
+        }
+        //MOZILLA/NETSCAPE
+        else if (myField.selectionStart || myField.selectionStart == '0') {
+            var startPos = myField.selectionStart;
+            var endPos = myField.selectionEnd;
+            var restoreTop = myField.scrollTop;
+            myField.value = myField.value.substring(0, startPos) + myValue + myField.value.substring(endPos, myField.value.length);
+            if (restoreTop > 0) {
+                myField.scrollTop = restoreTop;
+            }
+            /*myField.focus(); //解决chrome浏览器光标位置改变问题*/
+            myField.selectionStart = startPos + myValue.length;
+            myField.selectionEnd = startPos + myValue.length;
+        } else {
+            myField.value += myValue;
+            /*myField.focus(); //解决chrome浏览器光标位置改变问题*/
+        }
+    }
+
+</script>

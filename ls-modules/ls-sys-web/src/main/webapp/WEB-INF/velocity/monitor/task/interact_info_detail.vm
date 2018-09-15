@@ -1,0 +1,218 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+        position: relative;
+        padding-bottom: 26px;
+    }
+    .alert-wrapper {
+        height: 78px;
+        overflow: hidden;
+    }
+    .alert .icon {
+        width: 50px;
+        height: 26px;
+        margin-left: -25px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+    }
+    .alert .fa {
+        line-height: 28px;
+        font-size: 22px;
+    }
+    .alert .icon:hover .fa {
+        font-size: 26px;
+    }
+    .mb3 {
+        margin-bottom: 3px;
+    }
+    .alert-wrapper .title {
+        font-size: 14px;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <div class="alert-wrapper">
+                        <div class="mb5"><span class="title">普查扣分细则</span>
+                            <div style="margin-left: 12px;">
+                                <div class="mb3">
+                                    <strong>政务咨询类栏目扣分细则：</strong>
+                                    <div>
+                                        1.未开设栏目的，扣5分；<br>
+                                        2.开设了栏目，但监测时间点前1年内栏目中无任何有效信件、留言的，扣5分。
+                                    </div>
+                                </div>
+                                <div class="mb3">
+                                    <strong>调查征集类栏目扣分细则：</strong>
+                                    <div>
+                                        1.未开设栏目的，扣5分；<br>
+                                        2.开设了栏目，但栏目不可用或监测时间点前1年内未开展调查征集活动的，扣5分；<br>
+                                        3.开设了栏目且监测时间点前1年内开展了调查征集活动，但开展次数较少的（地方政府及国务院各部门门户网站少于6次，其他政府网站少于3次），扣3分。
+                                    </div>
+                                </div>
+                                <strong>互动访谈类栏目扣分细则：</strong>
+                                <div>
+                                    1.开设了栏目，但栏目不可用或监测时间点前1年内未开展互动访谈活动的，扣5分；<br>
+                                    2.开设了栏目且监测时间点前1年内开展了互动访谈活动，但开展次数较少的（地方政府及国务院各部门门户网站少于6次，其他政府网站少于3次），扣3分。
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="title">本站监测扣分细则</span>
+                            <div style="margin-left: 12px;">
+                                <div class="mb3">
+                                    <strong>政务咨询类栏目扣分细则：</strong>
+                                    <div>
+                                        1.未开设栏目的，扣【<span>5</span>】分；<br>
+                                        2.开设了栏目，但监测时间点前【<span>$!{zwzxMonitoredNum}</span>】【<span>$!{zwzxMonitoredTimeType}</span>】内栏目中无任何有效信件、留言的，扣【<span>$!{zwzxNum}</span>】分。
+                                    </div>
+                                </div>
+                                <div class="mb3">
+                                    <strong>调查征集类栏目扣分细则：</strong>
+                                    <div>
+                                        1.未开设栏目的，扣【<span>5</span>】分；<br>
+                                        2.开设了栏目，但栏目不可用或监测时间点前【<span>$!{dczjNoActivityMonitoredNum}</span>】【<span>$!{dczjNoActivityMonitoredTimeType}</span>】内未开展调查征集活动的，扣【<span>$!{dczjNoActivityNum}</span>】分；<br>
+                                        3.开设了栏目且监测时间点前【<span>$!{dczjActivityMonitoredNum}</span>】【<span>$!{dczjActivityMonitoredTimeType}</span>】内开展了调查征集活动，但开展次数少于【<span>$!{dczjActivityLimitNum}</span>】次，扣【<span>$!{dczjActivityNum}</span>】分。
+                                    </div>
+                                </div>
+                                <strong>互动访谈类栏目扣分细则：</strong>
+                                <div>
+                                     1.开设了栏目，但栏目不可用或监测时间点前【<span>$!{hdftNoActivityMonitoredNum}</span>】【<span>$!{hdftNoActivityMonitoredTimeType}</span>】内未开展互动访谈活动的，扣【<span>$!{hdftNoActivityNum}</span>】分；<br>
+                                     2.开设了栏目且监测时间点前【<span>$!{hdftActivityMonitoredNum}</span>】【<span>$!{hdftActivityMonitoredTimeType}</span>】内开展了互动访谈活动，但开展次数少于【<span>$!{hdftActivityLimitNum}</span>】次，扣【<span>$!{hdftActivityNum}</span>】分。
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="icon text-center" onclick="toggle()"><i class="fa fa-angle-double-down"></i></div>
+                </div>
+                <div>小计：<br>
+                    #set($i=1)
+                    #if($zwzxColumnCount == 0||$dczjColumnCount == 0)
+                        （$i）依据监测网站栏目表得出：#if($zwzxColumnCount == 0)未开设政务咨询类栏目，扣<span class="red">5</span>分；#end #if($dczjColumnCount == 0)未开设调查征集类栏目，扣<span class="red">5</span>分；#end<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($zwzxColumnCount>0&&$zwzxUpdateCount==0)
+                        （$i）政务咨询类栏目:监测时间点前$!{zwzxMonitoredNum}$!{zwzxMonitoredTimeType}内栏目中无任何有效信件、留言的，扣<span class="red">$!{zwzxNum}</span>分<br>
+                        #set($i=$i+1)
+                    #end
+
+                    #if($dczjColumnCount>0)
+                        #if($dczjUpdateCount==0)
+                            （$i）调查征集类栏目:监测时间点前$!{dczjNoActivityMonitoredNum}$!{dczjNoActivityMonitoredTimeType}内未开展调查征集活动的，扣<span class="red">$!{dczjNoActivityNum}</span>分<br>
+                            #set($i=$i+1)
+                        #elseif($dczjUpdateCount<$dczjActivityLimitNum)
+                            （$i）调查征集类栏目:监测时间点前$!{dczjNoActivityMonitoredNum}$!{dczjNoActivityMonitoredTimeType}开展次数为<span class="red">$!{dczjUpdateCount}</span>次，少于$!{dczjActivityLimitNum}次，扣<span class="red">$!{dczjActivityNum}</span>分<br>
+                            #set($i=$i+1)
+                        #end
+                    #end
+                    #if($hdftColumnCount>0)
+                        #if($hdftUpdateCount==0)
+                            （$i）互动访谈类栏目:监测时间点前$!{hdftNoActivityMonitoredNum}$!{hdftNoActivityMonitoredTimeType}内未开展互动访谈活动的，扣<span class="red">$!{hdftNoActivityNum}</span>分<br>
+                            #set($i=$i+1)
+                        #elseif($hdftUpdateCount<$hdftActivityLimitNum)
+                            （$i）互动访谈类栏目:监测时间点前$!{hdftNoActivityMonitoredNum}$!{hdftNoActivityMonitoredTimeType}开展次数为<span class="red">$!{hdftUpdateCount}</span>次，少于$!{hdftActivityLimitNum}次，扣<span class="red">$!{hdftActivityNum}</span>分<br>
+                            #set($i=$i+1)
+                        #end
+                    #end
+                    #if($i==1)
+                        暂无扣分项
+                    #end
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getInteractInfoPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="columnType" width="200" align="center" headerAlign="center" renderer="columnType" >栏目类型</div>
+                        <div field="columnName" width="240" align="left" headerAlign="center"  renderer="columnName">栏目名称</div>
+                        <div field="updateCount" width="70" align="center" headerAlign="center"  >更新数量</div>
+                        <div field="" width="80" align="center" headerAlign="center" renderer="unreplyCount">未回复数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({monitorId:cur.params.monitorId});
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_ZWZX': columnTypeName = '政务咨询类栏目';break;
+            case 'columnType_DCZJ': columnTypeName = '调查征集类栏目';break;
+            case 'columnType_HDFT': columnTypeName = '互动访谈类栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+        return columnTypeName;
+
+    }
+
+    function unreplyCount(obj){
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var unreplyCount = rec.unreplyCount;
+        if('columnType_ZWZX'==columnType){
+            return "<a href='javascript:void(0)' title='查看详情' onclick=viewDetail('"+rec.unreplyIds+"') ><font color='red'>"+unreplyCount+"</font></a>";;
+        }else{
+            return "-";
+        }
+    }
+
+    function viewDetail(unreplyIds) {
+        Ls.openWin('/monitor/index/manage/viewUnReplyDetail?contentIds=' + unreplyIds, {
+            id: 'viewBadDetail',
+            title: '超时未回复留言详情',
+            width: '800px',
+            height:'500px'
+        });
+    }
+
+    function columnName(obj) {
+        var rec = obj.record;
+        var columnName = rec.columnName;
+        var columnUrl = rec.columnUrl;
+
+        return "<a target='_blank' href='"+columnUrl+"' title='"+columnName+"' >"+columnName+"</a>";
+
+    }
+
+    function toggle() {
+        var $ele = $(".alert-wrapper");
+        if($ele.hasClass("on")){
+                $ele.removeClass("on").css("height","78px");
+            $(".fa").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+        }else {
+                $ele.addClass("on").css("height","auto");
+            $(".fa").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+        }
+    }
+
+</script>

@@ -1,0 +1,66 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="tabbable-line" style="padding:12px 20px 15px;">
+    <ul class="nav nav-tabs" id="copy_refer_tab">
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">信息公开</a>
+        </li>
+    </ul>
+
+    <div class="tab-content pt10">
+        <div class="tab-pane" id="tab_1_2">
+            <ul class="ztree" id="public_tree">
+                <span style="margin:auto" class="bold font-red-mint">正在加载中<marquee scrolldelay="150"
+                                                                                   width="80">...</marquee></span>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/public/moveNews.js"></script>
+<script>
+    var initZtree = {};
+    var cur = {
+        W: Ls.getWin.win,
+        public_tree: null,
+        type: null,//当前信息公开类型
+        id: null//当前信息公开目录id
+    };
+    $(document).ready(function () {
+
+        cur.type = cur.W.cur.node.type;
+        cur.id = cur.W.cur.node.id;
+        //绑定标签事件
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var activeTab = $(e.target).attr("href");
+            if (!initZtree[activeTab]) {
+                initZtree[activeTab] = true;
+                if (activeTab == "#tab_1_2") {
+                    cur.public_tree = move_mgr.publicInit("public_tree", cur.type, cur.id);
+                }
+            }
+        });
+        $('#copy_refer_tab a:first').tab('show');//显示第一个标签
+        $(".ztree").height("315").css("overflow", "auto");
+    });
+
+    // 获取数据，信息公开选中
+    function ok() {
+        var data = {
+            organId: cur.W.cur.node.organId,
+            originalId: cur.W.cur.node.id
+        };
+        var checks = cur.public_tree.getCheckedNodes(true);
+        if (checks.length > 0) {// 构建信息公开选中节点
+            data.targetId = checks[0].id;
+            data.targetOrganId = checks[0].organId;
+            if (checks[0].isPublish && checks[0].isPublish == true) {
+                data.isPublish = 1;
+            } else {
+                data.isPublish = 0;
+            }
+        }
+        return data;
+    }
+</script>

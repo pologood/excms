@@ -1,0 +1,252 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-toolbar" style="text-align:right;line-height:30px;"
+     borderStyle="border-left:0;border-top:0;border-right:0;">
+  <label>名称：</label>
+  <input id="name" class="mini-textbox" style="width:150px;" onenter="onKeyEnter"/>
+  <a class="mini-button" style="width:60px;" onclick="search()">查询</a>
+  <input id="siteId" class="mini-textbox" style="display:none"/>
+</div>
+<div class="mini-fit">
+  <div class="mini-fit">
+    <ul class="ztree" id="treeview2"></ul>
+  </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+  mini.parse();
+
+  function nodeClick(event, treeId, treeNode) {
+    var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+    if (treeNode.isParent) {
+      zTree.expandNode(treeNode);
+    }
+  }
+
+  var setting = {
+    async: {
+      enable: false
+    },
+    isEdit: true,
+    view: {},
+    check: {
+      enable: true,
+      autoCheckTrigger: false,
+      nocheckInherit : false,
+      chkboxType: {"Y": "p", "N": "p"}
+    },
+    data: {
+      simpleData: {
+        enable: true,
+        idKey: 'indicatorId',
+        pIdKey: 'parentId'
+      }
+    },
+    callback: {
+      /* onCheck: onCheck,*/
+      /* onAsyncSuccess: dataFilter*/
+    }
+  };
+
+  var siteId =${siteId};
+  var flag =${flag};
+  var synColumnIds = '${synColumnIds}';
+  var genePageIds = '${genePageIds}';
+  var columnTypeCode = '${columnTypeCode}';
+  var indicatorId = '${indicatorId}';
+  $(document).ready(function () {
+    var dialog = art.dialog,
+      api = art.dialog.open.api;
+    if (!api) return;
+    // 操作对话框
+    /* api.button(
+       {
+         name: '保存',
+         id: 'saveBtn',
+         focus: true,
+         callback: function () {
+           doOk();
+         }
+       }
+     );*/
+    SetData();
+  });
+
+  function SetData() {
+    if (flag == 0) {//同步到栏目
+      Ls.ajax({
+        url: "/siteMain/getAllColumn",
+        data: {
+          siteId: siteId,
+          columnTypeCode: columnTypeCode
+        },
+      }).done(function (json) {
+        if (!json.status) {
+          Ls.tipsErr(json.desc);
+          return;
+        }
+        if (json.data != null) {
+          Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+        }
+        jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        zTree.expandAll(true);
+        if (indicatorId != "") {
+          var node = zTree.getNodeByParam("indicatorId", indicatorId, null);
+          if (node != null) {
+            //zTree.setChkDisabled(node, true);
+            node.nocheck= true;
+          }
+        }
+        if (zTree.getNodes() != null && zTree.getNodes().length > 0) {
+          var nodes = zTree.transformToArray(zTree.getNodes());
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].isParent == 1 || nodes[i].columnTypeCode != columnTypeCode) {
+              //zTree.setChkDisabled(nodes[i], true);
+             nodes[i].nocheck= true;
+            }
+          }
+        }
+        zTree.refresh();
+        if (synColumnIds != null && synColumnIds != '') {
+          var columnId = synColumnIds.split(",");
+          for (var i = 0; i < columnId.length; i++) {
+            var node = zTree.getNodeByParam("indicatorId", columnId[i], null);
+            zTree.checkNode(node, true, true);
+          }
+        }
+      });
+      return;
+    } else if (flag == 1) {//生成页面
+      Ls.ajaxGet({
+        url: "/siteMain/searchColumnTree",
+        data: {
+          siteId: siteId
+        },
+      }).done(function (json) {
+        if (!json.status) {
+          Ls.tipsErr(json.desc);
+          return;
+        }
+        if (json.data != null) {
+          Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+        }
+        jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        zTree.expandAll(true);
+        if (indicatorId != "") {
+          var node = zTree.getNodeByParam("indicatorId", indicatorId, null);
+          node.nocheck= true;
+          zTree.updateNode(node);
+        }
+        if (genePageIds != null && genePageIds != '') {
+          var genePageId = genePageIds.split(",");
+          for (var i = 0; i < genePageId.length; i++) {
+            var node = zTree.getNodeByParam("indicatorId", genePageId[i], null);
+            if(node!=null){
+              zTree.checkNode(node, true, true);
+            }
+          }
+        }
+      });
+    }
+  }
+
+  function doOk() {
+    var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+    // var  nodes = zTree.getSelectedNodes();
+    var nodes = zTree.getCheckedNodes(true);
+    var newNodes = [];
+    var ids = "";
+    var names = "";
+    if (nodes != null && nodes != "") {
+      for (i = 0; i < nodes.length - 1; i++) {
+        newNodes.add(nodes[i]);
+        ids += nodes[i].indicatorId + ",";
+        names += nodes[i].name + ",";
+      }
+      ids += nodes[nodes.length - 1].indicatorId;
+      names += nodes[nodes.length - 1].name;
+    }
+    var arr = {"ids": ids, "names": names};
+    return arr;
+  }
+
+  function onCancel() {
+    art.dialog.close();
+  }
+  function initSlimScroll() {
+    //添加模拟滚动条
+    var ui_tree = $('#treeview2');
+    var ui_layout = $(".mini-layout-region-body");
+    ui_tree.attr("data-height", ui_layout.height() - 10)
+    App.initSlimScroll(ui_tree);
+  }
+  function search() {
+    var name = mini.get("name").getValue();
+    if (flag == 0) {
+      Ls.ajax({
+        url: "$!{rc.contextPath}/siteMain/getAllColumn",
+        data: {
+          name: name,
+          siteId: siteId,
+          columnTypeCode: columnTypeCode
+        },
+      }).done(function (json) {
+        if (!json.status) {
+          Ls.tipsErr(json.desc);
+          return;
+        }
+        if (json.data != null) {
+          Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+        }
+        jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+        var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+        if (indicatorId != "") {
+          var node = zTree.getNodeByParam("indicatorId", indicatorId, null);
+          if (node != null) {
+            node.nocheck= true;
+          }
+        }
+        if (zTree.getNodes() != null && zTree.getNodes().length > 0) {
+          var nodes = zTree.transformToArray(zTree.getNodes());
+          for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].isParent == 1 || nodes[i].columnTypeCode != columnTypeCode) {
+             nodes[i].nocheck=true;
+            }
+          }
+        }
+        zTree.refresh();
+      });
+    }
+    if (flag == 1) {
+      Ls.ajax({
+        url: "$!{rc.contextPath}/siteMain/searchColumnTree",
+        data: {
+          name: name,
+          siteId: siteId
+        },
+      }).done(function (json) {
+        if (!json.status) {
+          Ls.tipsErr(json.desc);
+          return;
+        }
+        if (json.data != null) {
+          Ls.treeDataFilter(json.data, Ls.treeDataType.SITE);
+        }
+        jQuery.fn.zTree.init($("#treeview2"), setting, json.data);
+        if (indicatorId != "") {
+          var zTree = jQuery.fn.zTree.getZTreeObj("treeview2");
+          var node = zTree.getNodeByParam("indicatorId", indicatorId, null);
+          if (node != null) {
+            node.nocheck=true;
+            zTree.updateNode(node);
+          }
+
+        }
+      });
+    }
+  }
+</script>
+</body>

@@ -1,0 +1,79 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+<div id="div">
+
+</div>
+<script>
+
+    function treeMenu(a) {
+        this.tree = a || [];
+        this.groups = {};
+    };
+
+    treeMenu.prototype = {
+        init: function (pid) {
+            this.group();
+            return this.getDom(this.groups[pid]);
+        },
+        group: function () {
+            for (var i = 0; i < this.tree.length; i++) {
+                if (this.groups[this.tree[i].parentId]) {
+                    this.groups[this.tree[i].parentId].push(this.tree[i]);
+                } else {
+                    this.groups[this.tree[i].parentId] = [];
+                    this.groups[this.tree[i].parentId].push(this.tree[i]);
+                }
+            }
+        },
+        getDom: function (a) {
+            if (!a) {
+                return '';
+            }
+            var ulcls = "";
+            if(a.length > 0) {
+                if(a[0].lev == 3) {
+                    ulcls = "child";
+                } else if(a[0].lev == 4) {
+                    ulcls = "child child3";
+                }
+            }
+            var html = '<ul  class="' + ulcls + '">\n';
+            for (var i = 0; i < a.length; i++) {
+                if(a[i].isShow == 0) {continue;}
+                var licls = '';
+                if(a[i].lev == 2) {
+                    licls = "one_menu";
+                } else if(a[i].lev == 3) {
+                    licls = "chile_menu";
+                } else if(a[i].lev == 4) {
+                    licls = "chile_menu";
+                }
+                var href = '#';
+                if(a[i].isParent == 0) {
+                    if(a[i].isStartUrl) {
+                        href = a[i].transUrl;
+                    } else {
+                        href = "/"+a[i].parentNamesPinyin+"/"+a[i].namePinyin+"/index.html";
+                    }
+                }
+
+                var target = "_self";
+                if(a[i].transWindow == 0) {
+                    target = "_blank";
+                }
+
+                html += '<li><a href="' + href + '" target="' + target + '" class="' + licls + '">' + a[i].name + '</a>';
+                html += this.getDom(this.groups[a[i].indicatorId]);
+                html += '</li>\n';
+            }
+            ;
+            html += '</ul>\n';
+            return html;
+        }
+    };
+    var eos = $resultObj;
+    var html = new treeMenu(eos).init($!{paramObj.columnId});
+    document.getElementById('div').innerHTML = html;
+</script>

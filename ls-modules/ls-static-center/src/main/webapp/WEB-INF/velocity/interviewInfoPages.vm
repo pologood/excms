@@ -1,0 +1,197 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($descLength="$!{paramObj.descLength}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($itype="$!{paramObj.itype}")
+#set($length=$Integer.parseInt($length))
+#set($descLength=$Integer.parseInt($descLength))
+#set($yearNow="$!{resultObj.yearNow}")
+#set($yeara="$!{resultObj.yeara}")
+#set($yearb="$!{resultObj.yearb}")
+#set($yearc="$!{resultObj.yearc}")
+#set($yeard="$!{resultObj.yeard}")
+<div class="wzft_wqhg">
+    <div class="ft_title">
+        <h2>往期回顾</h2>
+        <div class="ft-tab ls-tabs" id="ft_tab">
+            <ul>
+                <li class="#if($yearNow=='')active#end">
+                    <a href="${resultObj.pagination.linkPrefix}#tab">全部</a>
+                </li>
+                <li class="#if($yearNow==$yeara)active#end">
+                    <a href="${resultObj.pagination.linkPrefix}?year=$yeara#tab">$yeara年汇总</a>
+                </li>
+                <li class="#if($yearNow==$yearb)active#end">
+                    <a href="${resultObj.pagination.linkPrefix}?year=$yearb#tab">$yearb年汇总</a>
+                </li>
+                <li class="#if($yearNow==$yearc)active#end">
+                    <a href="${resultObj.pagination.linkPrefix}?year=$yearc#tab">$yearc年汇总</a>
+                </li>
+                <li class="#if($yearNow==$yeard)active#end">
+                    <a href="${resultObj.pagination.linkPrefix}?year=$yeard#tab">$yeard年汇总</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="wzft_listbox active">
+        <a name="tab" id="tab"></a>
+        <ul>
+                #if($resultObj.pagination.data.size()>0)
+                    #foreach($eo in $resultObj.pagination.data)
+                        #if("$!{eo.picUrl}"!= "")
+                            #if($eo.picUrl.indexOf(".")>=0)
+                                #set($imageLink="$!{fileServerNamePath}$!{eo.picUrl}")
+                            #else
+                                #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+                            #end
+                        #else
+                            #set($imageLink="/images/no_photo.jpg")
+                        #end
+                        <li>
+                            <div class="ftpic">
+                                <img src="$imageLink" border="0" height="260" width="346">
+                            ##                            <p><a href="/content/article/2658050#interview_shilu">文字直播</a><a class="img" href="/content/article/2658050#interview_shilu">图片直播</a></p>
+                            </div>
+                            <div class="fttxt">
+                                <p class="tit"><span>访谈主题：</span><a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">#cutstr($!{eo.title},$length)</a></p>
+                                <p><span>访谈时间：</span>$!{eo.time}</p>
+                                <p class="nr"><span>主题描述：</span>
+                                    #if("$!{eo.content}" != "")#cutstr($!{eo.content},$descLength)#end
+                                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">【详细】</a>
+                                </p>
+                            </div>
+                        </li>
+                    #end
+                #end
+            <div class="clear"></div>
+        </ul>
+        #if($!{resultObj.pagination.pageCount} > 1)
+            <div id="interviewInfoPages$!{context.columnId}" class="pagination"></div>
+            <script>
+                Ls.pagination("#interviewInfoPages$!{context.columnId}", function (pageIndex) {
+                    location.href = "$!{resultObj.pagination.linkPrefix}?year=$yearNow&pageIndex=" + pageIndex + "&itype=$!{itype}";
+                }, {
+                    currPage: ($!{resultObj.pagination.pageIndex}+1),
+                    pageCount:$!{resultObj.pagination.pageCount}
+                })
+            </script>
+        #end
+    </div>
+##    <div id="ft_tab2" class="wzft_listbox #if($!{resultObj.yearNow}==$yeara)active#end">
+##        <ul>
+##            #if($yearNow==$yeara)
+##                #if($resultObj.pagination.data.size()>0)
+##                    #foreach($eo in $resultObj.pagination.data)
+##                        #if("$!{eo.picUrl}"!= "")
+##                            #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+##                        #else
+##                            #set($imageLink="/images/no_photo.jpg")
+##                        #end
+##                        <li>
+##                            <div class="ftpic">
+##                                <img src="$imageLink" border="0" height="260" width="346">
+##                            ##                            <p><a href="/content/article/2658050#interview_shilu">文字直播</a><a class="img" href="/content/article/2658050#interview_shilu">图片直播</a></p>
+##                            </div>
+##                            <div class="fttxt">
+##                                <p class="tit"><span>访谈主题：</span><a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">#cutstr($!{eo.title},$length)</a></p>
+##                                <p><span>访谈时间：</span>$!{eo.time}</p>
+##                                <p class="nr"><span>主题描述：</span>
+##                                    #cutstr(${eo.content},$descLength)
+##                                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">【详细】</a>
+##                                </p>
+##                            </div>
+##                        </li>
+##                    #end
+##                #end
+##            #end
+##        </ul>
+##    </div>
+##    <div id="ft_tab3" class="wzft_listbox #if($!{resultObj.yearNow}==$yearb)active#end">
+##        <ul>
+##            #if($yearNow==$yearb)
+##                #if($resultObj.pagination.data.size()>0)
+##                    #foreach($eo in $resultObj.pagination.data)
+##                        #if("$!{eo.picUrl}"!= "")
+##                            #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+##                        #else
+##                            #set($imageLink="/images/no_photo.jpg")
+##                        #end
+##                        <li>
+##                            <div class="ftpic">
+##                                <img src="$imageLink" border="0" height="260" width="346">
+##                            ##                            <p><a href="/content/article/2658050#interview_shilu">文字直播</a><a class="img" href="/content/article/2658050#interview_shilu">图片直播</a></p>
+##                            </div>
+##                            <div class="fttxt">
+##                                <p class="tit"><span>访谈主题：</span><a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">#cutstr($!{eo.title},$length)</a></p>
+##                                <p><span>访谈时间：</span>$!{eo.time}</p>
+##                                <p class="nr"><span>主题描述：</span>
+##                                    #cutstr(${eo.content},$descLength)
+##                                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">【详细】</a>
+##                                </p>
+##                            </div>
+##                        </li>
+##                    #end
+##                #end
+##            #end
+##        </ul>
+##    </div>
+##    <div id="ft_tab4" class="wzft_listbox #if($!{resultObj.yearNow}==$yearc)active#end">
+##        <ul>
+##            #if($yearNow==$yearc)
+##                #if($resultObj.pagination.data.size()>0)
+##                    #foreach($eo in $resultObj.pagination.data)
+##                        #if("$!{eo.picUrl}"!= "")
+##                            #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+##                        #else
+##                            #set($imageLink="/images/no_photo.jpg")
+##                        #end
+##                        <li>
+##                            <div class="ftpic">
+##                                <img src="$imageLink" border="0" height="260" width="346">
+##                            ##                            <p><a href="/content/article/2658050#interview_shilu">文字直播</a><a class="img" href="/content/article/2658050#interview_shilu">图片直播</a></p>
+##                            </div>
+##                            <div class="fttxt">
+##                                <p class="tit"><span>访谈主题：</span><a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">#cutstr($!{eo.title},$length)</a></p>
+##                                <p><span>访谈时间：</span>$!{eo.time}</p>
+##                                <p class="nr"><span>主题描述：</span>
+##                                    #cutstr(${eo.content},$descLength)
+##                                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">【详细】</a>
+##                                </p>
+##                            </div>
+##                        </li>
+##                    #end
+##                #end
+##            #end
+##        </ul>
+##    </div>
+##    <div id="ft_tab5" class="wzft_listbox #if($!{resultObj.yearNow}==$yeard)active#end">
+##        <ul>
+##            #if($yearNow==$yeard)
+##                #if($resultObj.pagination.data.size()>0)
+##                    #foreach($eo in $resultObj.pagination.data)
+##                        #if("$!{eo.picUrl}"!= "")
+##                            #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+##                        #else
+##                            #set($imageLink="/images/no_photo.jpg")
+##                        #end
+##                        <li>
+##                            <div class="ftpic">
+##                                <img src="$imageLink" border="0" height="260" width="346">
+##                            ##                            <p><a href="/content/article/2658050#interview_shilu">文字直播</a><a class="img" href="/content/article/2658050#interview_shilu">图片直播</a></p>
+##                            </div>
+##                            <div class="fttxt">
+##                                <p class="tit"><span>访谈主题：</span><a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">#cutstr($!{eo.title},$length)</a></p>
+##                                <p><span>访谈时间：</span>$!{eo.time}</p>
+##                                <p class="nr"><span>主题描述：</span>
+##                                    #cutstr(${eo.content},$descLength)
+##                                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}">【详细】</a>
+##                                </p>
+##                            </div>
+##                        </li>
+##                    #end
+##                #end
+##            #end
+##        </ul>
+##    </div>
+</div>

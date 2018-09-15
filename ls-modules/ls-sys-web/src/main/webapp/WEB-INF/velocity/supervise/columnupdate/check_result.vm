@@ -1,0 +1,78 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 450px"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div field="siteName" width="130" align="left" headerAlign="center">站点</div>
+                        <div field="columnName" width="100%" align="left" headerAlign="center">栏目名称</div>
+                        <div name="planNum" field="planNum" width="150" align="center" headerAlign="center">计划更新量</div>
+                        <div name="updateNum" field="updateNum" width="150" align="center" headerAlign="center">实际更新量</div>
+                        <div name="guestNum" renderer="guestNum" width="150" align="center" headerAlign="center">未及时回复留言数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        taskId:Ls.getWin.dialog.data("taskId"),
+        taskType:Ls.getWin.dialog.data("taskType")
+    };
+
+    $(document).ready(function () {
+        if(cur.taskType == 'article') {
+            cur.grid.hideColumn("guestNum");
+        } else if(cur.taskType == 'guest') {
+            cur.grid.hideColumn("planNum");
+            cur.grid.hideColumn("updateNum");
+        }
+        if(cur.taskId == null) {
+            cur.taskId = "$!{taskId}";
+        }
+
+        if(cur.taskType == null) {
+            cur.taskType = "$!{taskType}";
+        }
+
+        cur.grid.setUrl("/column/update/getPageResultEOs?taskId=" + cur.taskId + "&taskType=" + cur.taskType + "&siteId=" + "$!{siteId}");
+        cur.grid.reload();
+    })
+
+    function guestNum(obj) {
+        var record = obj.record;
+        if(record.taskType == "guest") {
+            var diy = '<a id=' + record.id + ' href="javascript:;"  onclick="unreplyGuest(' + record.id + ',' + record.columnId + ',' + record.cSiteId + ')"><u>' + record.guestNum + '</u></a>';;
+            return diy;
+        } else {
+            return  record.guestNum;
+        }
+    }
+
+    function unreplyGuest(id,columnId,siteId) {
+        cur.dialog.data("resultId",id);
+        cur.dialog.data("siteId",siteId);
+        cur.dialog.data("columnId",columnId);
+        Ls.openWin("/unreply/guest/index", '850px', '450px', {
+            id:"unreplyGuest",
+            title: "未及时回复留言"
+        });
+    }
+
+</script>
+</body>
+</html>

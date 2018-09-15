@@ -1,0 +1,17 @@
+#set($_title="新闻详情")
+#parse("/mobile/parse_top.vm")
+<body>
+<!-- 正文 -->
+    #parse("/mobile/parse_header.vm")
+<div class="container">
+    <div class="content_title">$!{baseContentEO.title}</div>
+    <div class="content_date">#date_format("$!{baseContentEO.createDate}","yyyy-MM-dd HH:mm:ss")</div>
+    <div class="content_body">
+        $!{baseContentEO.article}
+    </div>
+</div>
+    #parse("/mobile/parse_footer.vm")
+<!--分享 -->
+    #parse("/mobile/parse_share.vm")
+</body>
+</html>

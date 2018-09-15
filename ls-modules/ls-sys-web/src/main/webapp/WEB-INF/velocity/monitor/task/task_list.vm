@@ -1,0 +1,60 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getTaskPage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:340px;">
+                    <div property="columns">
+                        <div field="startDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" >检测时间</div>
+                        <div field="result" width="150" align="center" headerAlign="center" >检测结果</div>
+                        <div field="taskStatus" width="100" align="center" headerAlign="center">状态</div>
+                        <div field="" width="70" align="center" headerAlign="center" renderer="look">结果</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog
+    }
+
+    $(document).ready(function () {
+        cur.grid.load();
+    })
+
+    function status(obj) {
+        var rec = obj.record;
+        var status = rec.taskStatus;
+        if(status == 0) {
+            return '<font style="color:red">未启动</font>';
+        } else if(status == 1) {
+            return '<span style="color: green">正在检测</span>';
+        } else {
+            return '<span style="color: blue">检测完成</span>';
+        }
+    }
+
+    function look(obj) {
+        var record = obj.record;
+        var str = '<a href="javascript:void(0);" onclick="watch(' + record.id + ')">查看</a>';
+        return str;
+    }
+
+    function watch(id) {
+        cur.dialog.data("taskId",id);
+        Ls.openWin("/monitor/index/manage/monitorReport", '1200px', '600px', {
+            id:id,
+            title: "概览"
+        });
+    }
+</script>

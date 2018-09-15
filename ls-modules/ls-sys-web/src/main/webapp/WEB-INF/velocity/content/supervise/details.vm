@@ -1,0 +1,214 @@
+###parse("_page_layout/_header.vm")
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>$!{_title}</title>
+    <link href="$!{sysStaticPath}/assets/css/bootstrap.min.css?v=201807201809" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/js/plugins/miniui/themes/default/miniui.min.css?v=201807201809" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/plugins.min.css?v=201807201809" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/components.min.css?v=201807201809" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/default.min.css?v=201807201809" rel="stylesheet" type="text/css"/>
+    #if($!rightsCode=="root")
+        <style>
+            .page-header.navbar {
+                background-color: #E6434E;
+            }
+
+            .page-header.navbar .hor-menu .navbar-nav > li.active > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.active > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.current > a,
+            .page-header.navbar .hor-menu .navbar-nav > li.current > a {
+                background: #B23939 !important;
+            }
+
+            .page-header.navbar .page-logo {
+                background: #B51520;
+                background: inherit;
+            }
+
+            .page-header.navbar .top-menu .navbar-nav > li.dropdown.open .dropdown-toggle, .page-header.navbar .top-menu .navbar-nav > li.dropdown .dropdown-toggle:hover {
+                background-color: #B51520;
+            }
+
+        </style>
+    #end
+    <!-- END THEME LAYOUT STYLES -->
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <script>
+        //站点ID
+        var GLOBAL_SITEID = "$!{site.indicatorId}";
+        //session ID
+        var GLOBAL_SESSIONID = "$!{sessionId}";
+        //站点名称
+        var GLOBAL_SITENAME = "$!{site.name}";
+        //站点URL
+        var GLOBAL_SITEURI = "$!{site.uri}";
+        //上下文
+        var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERPATH = "$!{fileServerPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERNAMEPATH = "$!{fileServerNamePath}";
+        //静态文件地址
+        var GLOBAL_HTMLFILEPATH = "$!{site.uri}";
+        //静态资源地址
+        var GLOBAL_STATIC_PATH = "$!{sysStaticPath}";
+        //个人信息
+        var GLOBAL_PERSON = #if("$!{person}" != "")$!{person}#else{}#end;
+        //用户角色
+        var GLOBAL_RIGHTS = "$!{rightsCode}";
+        var OPT_SPLIT = "|";
+        //点站类型
+        var GLOBAL_SITETYPE = "$!{site.type}";
+    </script>
+</head>
+
+<style>
+    #datagrid a:hover {
+        color: #0066FF;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/supervise/getDetailPage" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width: 100%;height: 550px;" allowCellWrap="true">
+                    <div property="columns">
+                        <div field="columnName" width="180" align="center" headerAlign="center">栏目名称</div>
+                        <div field="title" width="100%" align="left" headerAlign="center"  renderer="title">留言标题</div>
+                        <div field="replyContent" width="300" align="center" headerAlign="center" renderer="reply">答复内容</div>
+                        <div field="receiveUnitName" width="150" align="center" headerAlign="center" >受理单位</div>
+                        <div field="" width="150" align="center" headerAlign="center" renderer="timeRender">评价时间</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="messageBoardContent"
+             style="position:absolute;display:none;border:1px solid silver;background:#FFFFFF; padding: 5px; line-height: 180%; width: 500px;"></div>
+        <div id="replyContent"
+             style="position:absolute;display:none;border:1px solid silver;background:#FFFFFF; padding: 5px; line-height: 180%; width: 400px;"></div>
+    </div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        grid: mini.get('datagrid'),
+        param:Ls.getWin.dialog.data("param"),
+        timer: null,
+        timer2: null,
+    };
+
+    $(document).ready(function () {
+        cur.grid.load(cur.param);
+
+        $("#messageBoardContent").hover(function () {
+            clearTimeout(cur.timer);
+        },function () {
+            hide();
+        })
+
+        $("#replyContent").hover(function () {
+            clearTimeout(cur.timer2);
+        },function () {
+            hide1();
+        })
+    })
+
+    function timeRender(e) {
+        var rec = e.record;
+        if (rec.replyVOList != null && rec.replyVOList.length > 0) {
+            return Ls.dateFormat(rec.replyVOList[0].updateDate,"yyyy-MM-dd hh:mm");
+        }
+        return "";
+    }
+
+    function title(e) {
+        var rec = e.record;
+        var str = '<a ';
+        str += ' onMouseOver="show(this,' + rec.id + ');" onMouseOut="hide(this)">';
+        str += rec.title + '</a>';
+        return str;
+    }
+
+    function show(obj, id) {
+        clearTimeout(cur.timer);
+        var obj = $(obj),
+                objDiv = $("#messageBoardContent");
+
+        objDiv.show().css({
+            left: obj.offset().left + 150,
+            top: obj.offset().top + 10
+        })
+        var row = cur.grid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+        $(objDiv).html(row.messageBoardContent);
+    }
+
+    function hide(obj) {
+        cur.timer = setTimeout(function () {
+            var objDiv = $("#messageBoardContent");
+            $(objDiv).css("display", "none");
+        }, 100)
+    }
+
+    function reply(e) {
+        var rec = e.record;
+        var str = '<a ';
+        str += ' onMouseOver="show1(this,' + rec.id + ');" onMouseOut="hide1(this)">';
+        str += getReplyContent(rec,1).slice(0, 16) + '...</a>';
+        return str;
+    }
+
+    //获取留言应答信息
+    function getReplyContent(rec,type) {
+        var replyContent = "";
+        if (rec.replyVOList != null && rec.replyVOList.length > 0) {
+            if (type == 1) {
+                replyContent = delHtmlTag(rec.replyVOList[0].replyContent);
+            }else {
+                replyContent = rec.replyVOList[0].replyContent;
+            }
+        }
+        return replyContent;
+    }
+
+    function delHtmlTag(str){
+        return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
+    }
+
+    function show1(obj, id) {
+        clearTimeout(cur.timer2);
+        var obj = $(obj),
+                objDiv = $("#replyContent");
+
+        objDiv.show().css({
+            left: obj.offset().left + 100,
+            top: obj.offset().top + 20
+        })
+        var row = cur.grid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+        $(objDiv).html(getReplyContent(row,0));
+    }
+
+    function hide1() {
+        cur.timer2 = setTimeout(function () {
+            var objDiv = $("#replyContent");
+            $(objDiv).css("display", "none");
+        }, 100)
+    }
+
+</script>

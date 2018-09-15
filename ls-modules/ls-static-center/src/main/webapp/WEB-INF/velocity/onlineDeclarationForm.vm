@@ -1,0 +1,199 @@
+<form action="/frontDeclaration/saveVO" name="declaForm" id="declaForm" xmlns="http://www.w3.org/1999/html">
+    <table border="0" cellpadding="0" cellspacing="0" class="zxsb_table">
+        #if("$!{recType}"=="0")
+            <tr>
+                <th class="sbtit">受理单位</th>
+                <td class="srk">
+                    <select name="recUnitId" class="bm_select">
+                        <option value="">请选择</option>
+                        #foreach($vo in $recList)
+                            #if("$!{eo.recUnitId}"=="$vo.recUnitId")
+                              <option value="$vo.recUnitId" selected>$vo.recUnitName</option>
+                            #else
+                              <option value="$vo.recUnitId">$vo.recUnitName</option>
+                            #end
+                        #end
+                    </select>
+                    <font>*</font>
+                </td>
+            </tr>
+        #end
+        <tr>
+            <th class="sbtit">申请人</th>
+            <td class="srk">
+                <label>
+                    <input name="personName" type="text" class="wb" maxlength="10" value=""><font>*</font>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">单位</th>
+            <td class="srk">
+                <label>
+                    <input name="unitName" type="text" class="wb" maxlength="30" value=""><font>*</font>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">事项名称</th>
+            <td class="srk">
+                <label>
+                    <input name="title" type="text" class="wb" maxlength="50" value=""><font>*</font>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">相关表格</th>
+            </td>
+            <td class="srk">
+                <ul class="zxsblist">
+                    #foreach($eo in $tableList)
+                        <li><a href="#" onclick="downLoad('$!{eo.uploadUrl}')" title="$!{eo.name}">$!{eo.name} </a></li>
+                    #end
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">地址</th>
+            <td class="srk">
+                <label><input type="text" name="address" class="wb" maxlength="50" value=""><font>*</font></label>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">联系方式</th>
+            <td class="srk">
+                <label><input name="phoneNum" type="text" class="wb" maxlength="13" value=""><font>*</font></label>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">附件</th>
+            <td class="srk">
+                <div class="sb_btn">
+                    <input class="ke-input-text readonly" id="attachName" type="text" name="attachName" readonly="readonly"/>
+                    <button class="btn-upload" type="button" id="uploadButton">上 传</button>
+                </div>
+                <span class="cRed zxsb">只允许上传doc,docx,xls,xlsx,txt,zip,rar等格式且大小不超过10MB的附件</span>
+            </td>
+        </tr>
+        <tr>
+            <th class="sbtit">事实和理由</th>
+            <td class="srk"><textarea name="factReason" rows="6" class="wb"></textarea></td>
+        </tr>
+        <tr height="40">
+            <th class="sbtit">验证码</th>
+            <td class="srk yzm"><input class="verification" name="checkCode" id="checkCode" size="6" maxlength="4" type="text">
+                <img class="yzm" id="imgCode" class="imgcode" src="/member/getCode"><font>*</font>
+            </td>
+        </tr>
+        <tr>
+            <th></th>
+            <td class="btn">
+                <label>
+                    <button class="btn-submit" id="btn_submit" type="button">我要申报</button>
+                    <button class="btn-reset" type="reset" name="button">重 填</button>
+                </label>
+            </td>
+        </tr>
+    </table>
+    <input name="attachId" type="hidden" id="attachId" readonly/>
+    <input name="siteId" type="hidden" value="${eo.siteId}"/>
+    <input name="columnId" type="hidden" value="${eo.columnId}"/>
+</form>
+<iframe style="display: none;" id="downLoad"></iframe>
+<script id="decla_tips_tpl" type="text/html">
+    <div class="declaration-tips">
+        <ul>
+            <li>查询编号：<span><?=docNum?></span></li>
+            <li>查询密码：<span><?=randomCode?></span></li>
+        </ul>
+    </div>
+</script>
+
+<script>
+
+    $(document).ready(function () {
+
+        using("validator", function () {
+
+            $("#declaForm").validator({
+                fields: {
+                    #if("$!{recType}"=="0")
+                        recUnitId: "受理单位:required;length[1~150];",
+                    #end
+                    personName: "申请人:required;length[1~150];",
+                    unitName: "单位:required;length[1~150];",
+                    title: "事项名称:required;length[1~200];",
+                    address: "地址:required;length[1~80];",
+                    phoneNum: "联系方式:required;mobile|tel|shortTel;",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            //添加方法
+            var saveData = function () {
+                var declaForm = $("#declaForm");
+                var data = declaForm.getFromJSON();
+                Ls.ajax({
+                    url: "/frontDeclaration/saveVO",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 0) {
+                        Ls.tipsErr(d.desc);
+                    } else {
+                        alert("提交成功！");
+                        declaForm[0].reset();
+                        var resultHtml = Ls.template("decla_tips_tpl", d.data);
+                        using("dialog", function () {
+                            Ls.openWin({
+                                title: '温馨提示',
+                                content: resultHtml,
+                                 width: 420,
+                                 height: 280
+                            }).show();
+                        });
+                    }
+                })
+            };
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#declaForm").trigger("validate");
+        });
+
+        $("#uploadButton").on('click', function () {
+            Ls.uploadFile(function (filePath) {
+                if (filePath != '') {
+                    var serverData = filePath[0];
+                    $("#attachId").val(filePath[0].fileName);
+                    $("#attachName").val(filePath[0].fileName);
+                }
+                return true;
+            }, {
+                post_params: {
+                    "siteId": "2648481"
+                },
+                lock: true,
+                title: '上传附件',
+                file_size_limit: "10 MB",
+                file_types: "*.doc;*.docx;*.xls;*.xlsx;*.txt;*.zip;*.rar",
+                file_upload_limit: 1
+            });
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+    });
+
+    function downLoad(mongdbid) {
+        document.getElementById("downLoad").src = "$!{rc.contextPath}/download/" + mongdbid;
+    }
+</script>

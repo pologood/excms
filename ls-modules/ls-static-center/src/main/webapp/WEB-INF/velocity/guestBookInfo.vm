@@ -1,0 +1,200 @@
+#set($eo=$resultObj)
+#if($msg)
+    $msg
+#else
+<span class="hide"><script src="/content/hit/$!{eo.baseContentId}"></script></span>
+<div class="guestbook-show">
+    <div class="guestbook-title title1"><span>来信信息</span></div>
+    <div class="guestbook-table table1">
+        <table class="tb1">
+            <tbody>
+            <tr>
+                <th>信件编号：</th>
+                <td>$!{eo.docNum}</td>
+            </tr>
+            <tr>
+                <th>信件类型：</th>
+                <td>$!{eo.className}</td>
+            </tr>
+            <tr>
+                <th>来信标题：</th>
+                <td>$!{eo.title}</td>
+            </tr>
+            <tr>
+                <th>来信时间：</th>
+                <td>#date_format("$!{eo.addDate}","$!{paramObj.dateFormat}")</td>
+            </tr>
+            <tr>
+                <th>来信内容：</th>
+                <td>
+                    <div class="content">
+                        $!{eo.guestBookContent}
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    #if("$!{eo.isPublicInfo}"=="1")
+        <div class="guestbook-title title2"><span>来信人详细信息</span></div>
+        <div class="guestbook-table table2">
+            <table class="tb2">
+                <tbody>
+                <tr>
+                    <th>姓 名：</th>
+                    <td>$!{eo.personName}</td>
+                </tr>
+
+                <tr>
+                    <th>联系电话：</th>
+                    #set($personPhone="$!{eo.personPhone}**************")
+                    <td>$personPhone.substring(0,3) **** $personPhone.substring(7,11)</td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    #end
+    #if($eo.dealStatus=="handled"||$eo.dealStatus=="replyed")
+        <div class="guestbook-title title3"><span>回复内容</span></div>
+        <div class="guestbook-table table3">
+            <table class="tb3">
+                <tbody>
+                    #if("$!{eo.recType}"=="0")
+                    <tr>
+                        <th> 收信单位：</th>
+                        <td>$!{eo.receiveName}</td>
+                    </tr>
+                    #end
+                    #if("$!{eo.recType}"=="1")
+                    <tr>
+                        <th> 收信人员：</th>
+                        <td>$!{eo.receiveUserName}</td>
+                    </tr>
+                    #end
+                <tr>
+                    <th>办理时间：</th>
+                    <td>#date_format("$!{eo.replyDate}","$!{paramObj.dateFormat}")</td>
+                </tr>
+                <tr>
+                    <th>回复内容：</th>
+                    <td>
+                        <div class="content">
+                            $!{eo.responseContent}
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        #if($isAssess==1)
+            #if("$!{eo.commentName}"=="")
+                <form role="form" name="guestbook_comment" id="guestbook_comment" method="post" action="/frontGuestBook/saveComment">
+                    <div class="guestbook-title title4"><span>留言评价</span></div>
+                    <div class="guestbook-table table4"  id="myComment">
+                        <table class="tb4">
+                            <tbody>
+                            <tr>
+                                <th>查询密码：</th>
+                                <td><input name="randomCode" id="randomCode" type="text" maxlength="50"></td>
+                            </tr>
+                            <tr>
+                                <th>评价结果：</th>
+                                <td colspan="2">
+                                    #foreach($vo in $commentList)
+                                        #if($!{eo.commentCode}==$vo.code)
+                                            <label>
+                                                <input type="radio" name="commentCode" value="$vo.code" checked="checked"> $vo.key
+                                            </label>
+                                        #else
+                                            <label>
+                                                <input type="radio" name="commentCode" value="$vo.code"> $vo.key
+                                            </label>
+                                        #end
+                                    #end
+                                </td>
+                            </tr>
+                            <tr>
+                                <th align="left">&nbsp;</th>
+                                <td align="left" class="btn_group">
+                                    <input id="btn_submit" class="btn btn-submit" type="button" accesskey="S" value="提交评价(S)">
+                                    <input name="baseContentId" type="hidden" maxlength="50" value="$!{eo.baseContentId}">
+                                    <input name="docNum" type="hidden" maxlength="50" value="$!{eo.docNum}">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            #else
+                <div class="guestbook-title title4"><span>留言评价</span></div>
+                <div class="guestbook-table table4">
+                    <table class="tb4">
+                        <tbody>
+                        <tr>
+                            <th>评价结果：</th>
+                            <td>
+                                $!{eo.commentName}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            #end
+        #end
+    #end
+</div>
+<script type="text/html" id="comment_tpl">
+  <div class="guestbook-table table4">
+    <table class="tb4">
+      <tbody>
+      <tr>
+        <th>评价结果：</th>
+        <td>
+          <?=data?>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</script>
+<script>
+    $(document).ready(function () {
+
+        using("validator", function () {
+            $("#guestbook_comment").validator({
+                fields: {
+                    randomCode: "查询密码:required",
+                    commentCode: "评价结果:required"
+                },
+                valid: function () {
+                    saveData();
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            var saveData = function () {
+                var data = $("#guestbook_comment").getFromJSON();
+                Ls.ajax({
+                    url: "/frontGuestBook/saveComment",
+                    data: data
+                }).done(function (d) {
+                  if (d.status == 0) {
+                    Ls.tipsInfo(d.desc);
+                  } else {
+                    Ls.tipsOk("评价成功!");
+                    var listHtml = template("comment_tpl", d);
+                    $("#myComment").html(listHtml);
+                  }
+                })
+            };
+
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#guestbook_comment").trigger("validate");
+        });
+    });
+</script>
+#end

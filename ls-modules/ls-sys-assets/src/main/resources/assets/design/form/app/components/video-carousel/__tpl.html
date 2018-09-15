@@ -1,0 +1,40 @@
+<div class="panel {{moduleId}}_panel clearfix">
+    <div class="panel-heading clearfix {{conf.isTitle | displayShow}}">
+        <div class="title">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.title}}</a>
+        </div>
+        {{ if conf.isMore }}
+        <div class="more">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.more}}</a>
+        </div>
+        {{/if}}
+    </div>
+    <div class="panel-body">
+
+        <div class="panel-body-inner">
+            {{if conf.panelBodyTop.enable}}
+            <div class="panel-body-top ls-panelBodyTopLabel myfocus-panel">
+                <div id="{{moduleId}}_myFocus">
+                    <div class="pic">
+                        {{#panelBodyTopLabelHtml}}
+                    </div>
+
+                    <script type="text/js">
+                        myFocus.set({id: "{{moduleId}}_myFocus",pattern: "{{conf.pattern}}",height:{{conf.imgHeight}},width:{{ conf.imgWidth}},txtHeight: 0});
+                    </script>
+                </div>
+            </div>
+            {{/if}}
+
+            <div class="panel-body-center">
+                {{#mainLabelHtml}}
+            </div>
+
+        </div>
+    </div>
+    {{if conf.footer.enable}}
+    <div class="panel-footer">
+        {{#footerLabelHtml}}
+    </div>
+    {{/if}}
+</div>

@@ -1,0 +1,261 @@
+<script src="/assets/js/datePicker/WdatePicker-min.js" type="text/javascript"></script>
+<script src="/assets/js/jquery-min.js" type="text/javascript"></script>
+<script src="/assets/js/app-min.js"></script>
+<div class="wp_pos">会员撰稿</div>
+<div class="author-toolbar clearfix">
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-add" onclick="add('')"> 添加</button>
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-delete" onclick="batchDel()">批量删除</button>
+    </div>
+    <form id="reportForm" action="/member/center/4697368" class="form-inline tr search-toolbar" role="form">
+        <div class="form-group">
+            <select id="status" name="status" class="form-control">
+                <option value=""> 请选择状态</option>
+                <option value="0"> 未提交</option>
+                <option value="1"> 已提交</option>
+                <option value="2"> 已退回</option>
+                <option value="3"> 已采用</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <input type="hidden" value="5" name="param" id="param">
+            <input type="datetime" name="startDate" id="startDate" class="form-control" placeholder="开始时间"
+                   onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'endDate\')}',readOnly:true})"
+                   readonly>
+        </div>
+        <div class="form-group">
+            <input type="datetime" name="endDate" id="endDate" class="form-control" placeholder="结束时间"
+                   onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startDate\')}',readOnly:true})"
+                   readonly>
+        </div>
+        <div class="form-group">
+            <input type="text" id="searchKey" name="searchKey" class="form-control"
+                   placeholder="标题">
+        </div>
+        <button type="button" class="btn btn-default btn-search" onclick="search()">
+            搜索
+        </button>
+        <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+            显示全部
+        </button>
+    </form>
+</div>
+<div class="author-table guestbook-table">
+<div class="author-tablebox">
+<div class="author-tablecon">
+    <ul class="guestbook_title">
+        <li class="t0">选择</li>
+        <li class="t1">标题</li>
+        <li class="t2">作者</li>
+        <li class="t3">创建时间</li>
+        <li class="t4">状态</li>
+        <li class="t6">操作</li>
+    </ul>
+    #if($resultObj.page.data.size()>0)
+        #foreach($eo in $resultObj.page.data)
+            #set($title=$!{eo.title})
+            #set($css="even")
+            #if($velocityCount%2 == 1)
+                #set($css="odd")
+            #end
+            <ul class="$!{css}">
+                <li class="t0">
+                    #if("$!{eo.memberConStu}"=="0"||"$!{eo.memberConStu}"=="2")
+                        <input type="checkbox" name="check" value="$!{eo.id}">
+                    #else
+                        <input type="checkbox" name="check" disabled="disabled" value="$!{eo.id}">
+                    #end
+                </li>
+                <li class="t1">
+
+                    <font>#cutstr($title,$length)</font>
+                </li>
+                <li class="t2"><span>$!{eo.author}</span></li>
+
+                <li class="t3">#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</li>
+                <li class="t4">#if("$!{eo.memberConStu}"=="0")
+                    <font color='#deb887'>未提交</font>
+                #elseif("$!{eo.memberConStu}"=="1")
+                    <font color='yellow'>已提交</font>
+                #elseif("$!{eo.memberConStu}"=="2")
+                    <font color='red'>已退回</font>
+                #else
+                    <font color='green'>已采用</font>
+                #end</li>
+                <li class="t6">
+                    #if("$!{eo.memberConStu}"=="0"||"$!{eo.memberConStu}"=="2")
+                        <button type="button" class="btn btn-default btn-add" onclick="add('$!{eo.id}')"> 编辑
+                        </button>
+                        <button type="button" class="btn btn-default btn-add" onclick="put('$!{eo.id}')">提交
+                        </button>
+                        <button type="button" class="btn btn-default btn-delete" onclick="del('$!{eo.id}')">删除
+                        </button>
+                    #else
+                        <button type="button" disabled class="btn btn-default btn-add disabled"
+                                onclick="add('$!{eo.id}')"> 编辑
+                        </button>
+                        <button type="button" disabled class="btn btn-default btn-delete disabled"
+                                onclick="put('$!{eo.id}')">提交
+                        </button>
+                        <button type="button" disabled class="btn btn-default btn-delete disabled"
+                                onclick="del('$!{eo.id}')">删除
+                        </button>
+                    #end
+                </li>
+
+            </ul>
+        #end
+        </div>
+        </div>
+        <div id="page_$!{context.columnId}" class="pagination">分页</div>
+        <script>
+            Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+                location.href = '$!{resultObj.page.linkPrefix}&pageIndex=' + pageIndex;
+            }, {
+                currPage: ($!{resultObj.page.pageIndex}+1),
+                pageCount:$!{resultObj.page.pageCount}
+            });
+        </script>
+
+    #else
+        暂无相关信息
+        $!{msgPage}
+        </div>
+        </div>
+    #end
+</div>
+
+<script id="guestbook_search_tpl" type="text/html">
+    <div class="wenzhang" style="background:#fff;">
+        <div class="contentbox minh500" id="color_printsssss">
+            <h1 class="newstitle"><?=title?></h1>
+            <div class="newsinfo">
+                <span>供稿人：<?=author?></span><span>来源：<?=provider?></span><span>被采用：<?=useCount?></span>次
+            </div>
+            <div id="zoom" class="newscontnet"><?=content?></div>
+        </div>
+    </div>
+</script>
+
+<script>
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+    })
+
+    /**
+     * 添加法规
+     */
+    function add(id) {
+//         console.info(artDialog);
+        App.getContentAjax("/member/addOrEdit?reportId=" + id).done(function (res) {
+            $("#content_body").html(res)
+        });
+    }
+    function put(id) {
+        var ids = []
+        ids.push(id)
+        ids = ids.join(",");
+        if (confirm('确定提交?')) {
+            Ls.ajaxGet({
+                url: "/member/put",
+                data: {
+                    ids: ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        window.location.href = "/member/center/4697368?param=5"
+                    } else {
+                        Ls.tips(resp.desc);
+                    }
+                }
+            });
+        }
+    }
+    function del(id) {
+        var ids = []
+        ids.push(id)
+        ids = ids.join(",");
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/member/delete",
+                data: {
+                    ids: ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        window.location.href = "/member/center/4697368?param=5"
+
+                    } else {
+                        Ls.tips(resp.desc);
+                    }
+                }
+            });
+        }
+    }
+
+    function batchDel() {
+        var records = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            records.push(val.value);
+        });
+        if (null == records || records.length <= 0) {
+            Ls.tips("请选择一条记录!");
+            return;
+        }
+        var ids = [];
+        for (var i = 0; i < records.length; i++) {
+            ids.push(records[i]);
+        }
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/member/delete",
+                data: {
+                    ids: ids.join(",")
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips(resp.desc, {times: 2});
+                        window.location.href = "/member/center/4697368?param=5"
+                    } else {
+                        Ls.tips(resp.desc, {icons: 'error', times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function detail(title, author, provider, content, title, useCount) {
+        var data = {};
+        data.title = title;
+        data.author = author;
+        data.provider = provider;
+        data.content = content;
+        data.useCount = useCount;
+        using("dialog", function () {
+            Ls.openWin({
+                title: '详情',
+                height: '600px',
+                width: '800px',
+                content: Ls.template("guestbook_search_tpl", data)
+            }).show();
+        });
+    }
+
+    function search() {
+        $("#reportForm").submit();
+    }
+
+    function showAll() {
+
+        $("#status").val('');
+        $("#startDate").val('');
+        $("#startDate").val('');
+        $("#searchKey").val('');
+        $("#reportForm").submit();
+    }
+</script>

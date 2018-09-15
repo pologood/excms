@@ -1,0 +1,30 @@
+<div class="right_conlist">
+	<ul>
+		#foreach($eo in $pagination.data)
+            <li>
+				<a href="$!{eo.link}" target="_blank" title="$!{eo.title}" style="float:left;">$!{eo.title}</a>
+				<span style="float:right"><font color="#999999">#date_format("$!{eo.createDate}")</font></span>
+			</li>
+		#end
+    </ul>
+	#if($!{page.pageCount} > 1)
+    	<div>
+    		<div class="pagenav">
+				#set($max=5)
+				#set($nums=[1 .. $!{page.pageCount}])
+				#if($!{page.pageCount} > $max)
+					#set($nums=[1 .. $max])
+				#end
+    			#foreach($count in $nums)
+    				<a #if("$!{page.pageIndex}" == "$!{count}") href="javascript:void(0)" class="current" #else href="$!{page.linkPrefix}_$!{count}.html" #end>$!{count}</a>
+				#end
+				#if($!{page.pageCount} > $max)
+					<a href="">更多</a>
+				#end
+        		<a href="javascript:void(0)" class="text">共<i>$!{page.totalSize}</i>条</a>
+        	</div>
+    		<div class="clear"></div>
+    	</div>
+	#end
+	<div class="clear"></div>
+</div>

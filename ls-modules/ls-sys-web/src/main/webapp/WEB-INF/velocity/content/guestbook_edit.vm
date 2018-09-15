@@ -1,0 +1,468 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">基本信息</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">回复信息</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+            <form role="form" id="modify_form" ms-controller="modify_form">
+                <table class="table table-bordered petition-table">
+                    <tbody>
+                        #if($recType==0)
+                        <tr class="unit">
+                            <th>收信单位：</th>
+                            <td colspan="2">
+                                <select class="form-control" id="receiveId" name="receiveId" ms-duplex="receiveId"
+                                        placeholder="请选择收信单位">
+                                    <option value="">请选择收信单位</option>
+                                    #foreach($s in $recList)
+                                        <option value="$!{s.recUnitId}">$!{s.recUnitName}</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                        #end
+                        #if($recType==1)
+                        <tr class="user">
+                            <th>收信领导：</th>
+                            <td colspan="2">
+                                <select class="form-control" id="receiveUserCode" name="receiveUserCode"
+                                        ms-duplex="receiveUserCode" placeholder="请选择收信领导">
+                                    <option value="">请选择收信领导</option>
+                                    #foreach($s in $recList)
+                                        <option value="$!{s.recUserId}">$!{s.recUserName}</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                        #end
+                        #if($codeList)
+                        <tr id="codeId">
+                            <th>留言类别：</th>
+                            <td colspan="2">
+                                <select class="form-control" id="classCode" name="classCode" ms-duplex="classCode"
+                                        class="form-control" placeholder="请选择留言类别">
+                                    <option value="">请选择留言类别</option>
+                                    #foreach($s in $codeList)
+                                        <option value="$!{s.classCode}">$!{s.className}</option>
+                                    #end
+                                </select>
+                            </td>
+                        </tr>
+                        #end
+                    <tr>
+                        <th>您的姓名：</th>
+                        <td colspan="2">
+                            <input type="text" name="personName" ms-duplex="personName" class="form-control"
+                                   placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>您的IP：</th>
+                        <td colspan="2">
+                            <input type="text" name="personIp" ms-duplex="personIp" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>留言标题：</th>
+                        <td colspan="2">
+                            <input type="text" name="title" ms-duplex="title" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">主题内容：</th>
+                        <td colspan="2">
+                            <textarea id="guestBookContent" name="guestBookContent" ms-duplex="guestBookContent"
+                                      class="form-control" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+
+                    <tr>
+                        <th>公开留言内容：</th>
+                        <td colspan="2">
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="1"> 是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublic" ms-duplex-number="isPublic" value="0"> 否
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>公开个人信息：</th>
+                        <td colspan="2">
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublicInfo" ms-duplex-number="isPublicInfo" value="1"> 是
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="isPublicInfo" ms-duplex-number="isPublicInfo" value="0"> 否
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>留言日期：</th>
+                        <td>
+                            <input type="datetime" name="addDate" ms-duplex="addDate" class="form-control"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                    </tr>
+
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            #if(${toolbar} == 'hide')
+                            #else
+                                <button class="btn btn-default btn-save" type="button" onclick="doSubmit()"> 保 存
+                                </button>
+                                <button class="btn btn-default btn-back" type="button" onclick="closeWin()"> 关 闭
+                                </button>
+                            #end
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </form>
+        </div>
+        <div class="tab-pane" id="tab_1_2">
+            <form role="form" id="reply_form" ms-controller="reply_form">
+                <table class="table table-bordered petition-table">
+                    <tbody>
+                    <tr id="status" style="display: none">
+                        <th>当前状态：</th>
+                        <td colspan="2" ms-text="statusName">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>办理状态：</th>
+                        <td>
+                            #foreach($s in $statusList)
+                                <label class="radio-inline">
+                                    <input type="radio" name="dealStatus" ms-duplex-string="dealStatus"
+                                           value="$!{s.statusCode}"/> $!{s.statusName}
+                                </label>
+                            #end
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="vertical-align: top;">回复内容：</th>
+                        <td colspan="2">
+                <textarea id="responseContent" name="responseContent" ms-duplex="responseContent" class="form-control"
+                          style="width: 100%; visibility:visible ;height:200px"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>回复日期：</th>
+                        <td>
+                            <input type="datetime" name="replyDate" ms-duplex="replyDate" class="form-control"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+                    </tr>
+                    <tr style="display: none">
+                        <th>回复人ID：</th>
+                        <td>
+                            <input type="text" id="replyUserId" name="replyUserId" class="form-control"
+                                   ms-duplex="replyUserId" placeholder=""/>
+                        </td>
+                    </tr>
+                        #if($recType==1)
+                        <tr>
+                            <th>回复人：</th>
+                            <td>
+                                <div class="input-group" id="resMark">
+                                    <input type="text" id="replyUserName" name="replyUserName" class="form-control"
+                                           ms-duplex="replyUserName" placeholder=""/>
+                                    <div class="input-group-btn">
+                                        <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                                onclick="showRes()">
+                                            <i class="fa fa-caret-down" id="select_icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        #end
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            <button class="btn btn-default btn-save" type="button" onclick="doSubmitReply()"> 保 存
+                            </button>
+                            <button class="btn btn-default btn-back" type="button" onclick="closeWin()"> 关 闭</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</body>
+
+#parse("_page_layout/_footer.vm")
+
+<script>
+    var curr = {
+        vm: ""
+    }
+
+    var curr1 = {
+        vm: ""
+    }
+    var siteId = '${siteId}';
+    var columnId = '${columnId}';
+    var contentId = '${baseContentId}';
+    var recType = '$!{recType}';
+    var codeType = '$!{codeType}';
+
+    $(document).ready(function () {
+        eweb = Ls.editor("guestBookContent", {style: "Lmini", height: "200"});
+        /*editor = KindEditor.create('textarea[name="guestBookContent"]', {
+            resizeType: 1,
+            allowPreviewEmoticons: false,
+            allowImageUpload: false,
+            items: [
+                'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            filterMode: true
+        });*/
+
+        eweb1 = Ls.editor("responseContent", {style: "Lmini", height: "200"});
+        /*editor1 = KindEditor.create('textarea[name="responseContent"]', {
+            resizeType: 1,
+            allowPreviewEmoticons: false,
+            allowImageUpload: false,
+            items: [
+                'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+            afterCreate: function () {
+                this.sync();
+            },
+            afterBlur: function () {
+                this.sync();
+            },
+            filterMode: true
+        });*/
+        getVO();
+    });
+
+    function doSubmit() {
+        eweb.update();
+        $("#modify_form").submit();
+    }
+
+    function doSubmitReply() {
+        eweb1.update();
+        $("#reply_form").trigger("validate");
+        return false;
+    }
+
+    function closeWin() {
+        self.close();
+    }
+
+    function getVO() {
+        Ls.ajaxGet({
+            url: "/guestBook/getVO",
+            data: {id: contentId}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tips(text.desc, {icons: "info"});
+                return;
+            }
+            data = text.data;
+            data.classCode = Ls.isEmpty(data.classCode) ? "" : data.classCode;
+            if (recType == '0') {
+                data.receiveId = Ls.isEmpty(data.receiveId) ? "" : data.receiveId;
+            }
+            if (recType == '1') {
+                data.receiveUserCode = Ls.isEmpty(data.receiveUserCode) ? "" : data.receiveUserCode;
+            }
+            curr.$id = "modify_form";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            // avalon.scan(document.body, curr.vm);
+            avalon.scan($("#modify_form").get(0), curr.vm);
+            if (data.guestBookContent != null) {
+                //editor.html(data.guestBookContent);
+                eweb.setHtml(data.guestBookContent);
+            }
+
+            //回复信息
+            curr1.$id = "reply_form";
+            //初始化表单字段
+            curr1.init = Ls.initFORM(curr1.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr1.vm = avalon.vmodels[curr1.$id];
+            if (!curr1.vm) {
+                curr1.vm = avalon.define(curr1.init);
+            } else {
+                Ls.assignVM(curr1.vm, data);
+            }
+            // avalon.scan(document.body, curr.vm);
+            avalon.scan($("#reply_form").get(0), curr1.vm);
+            if (data.responseContent != null) {
+                //editor1.html(data.responseContent);
+                eweb1.setHtml(data.responseContent);
+            } else {
+                curr1.vm.responseContent =
+                        "<p><span>尊敬的来信人：您好！<span></span></span></p>" +
+                        "<p><span>感谢您对我们工作的理解和支持。<span></span></span></p>";
+                //editor1.html(curr1.vm.responseContent);
+                eweb1.html(curr1.vm.responseContent);
+            }
+            if (!Ls.isEmpty(data.statusName)) {
+                $("#status").show();
+            }
+        });
+    }
+
+    $('#modify_form').validator({
+        fields: {
+            'addDate': '留言时间:required;',
+            'guestBookContent': '留言内容:required;',
+            'personName': '留言人姓名:required;length[1~32];',
+            'title': '留言标题:required;length[1~250];',
+            'personIp': '留言人IP:required;length[1~32];',
+        },
+        valid: function () {
+            save();
+        }
+    })
+
+
+    function save() {
+        if (recType != null && recType != '') {
+            if (recType == '0' && Ls.isEmpty(curr.vm.receiveId)) {
+                Ls.tips("收信单位不能为空", {icons: "info"});
+                return;
+            }
+            if (recType == '1' && Ls.isEmpty(curr.vm.receiveUserCode)) {
+                Ls.tips("收信领导不能为空", {icons: "info"});
+                return;
+            }
+        }
+        if (codeType == '1' && Ls.isEmpty(curr.vm.classCode)) {
+            Ls.tips("留言类型不能为空", {icons: "info"});
+            return;
+        }
+        var content = $("#guestBookContent").val();
+        //curr.vm.guestBookContent = editor.html();
+        curr.vm.guestBookContent = eweb.getHtml();
+        curr.vm.recType = recType;
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+        Ls.ajax({
+            type: "POST",
+            url: "/guestBook/modifySave",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("修改成功");
+                // window.parent.guestbook_manage.getData(pageIndex, columnId, key, condition, status);
+
+            }
+        })
+
+    }
+
+    $('#reply_form').validator({
+        fields: {
+            'responseContent': '回复内容:required;',
+            'dealStatus': '办理状态:checked'
+        },
+        valid: function () {
+            saveReply();
+        }
+    })
+
+
+    function saveReply() {
+        if (status == '0') {
+            Ls.tipsErr("请先配置办理状态");
+            return;
+        }
+        var content = $("#responseContent").val();
+        //curr1.vm.responseContent = editor.html();
+        curr1.vm.responseContent = eweb.getHtml();
+        curr1.vm.recType = "$!{recType}";
+        var value = curr1.vm.$model;
+        value = Ls.toJSON(value);
+
+        Ls.ajax({
+            url: "/guestBook/reply",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("修改成功");
+                //parent.searchClear();
+            }
+        });
+    }
+
+
+    function showRes() {
+        Ls.dropDowns2('resMark', {
+            async: {
+                url: "/onlinePetition/getRecUnitOrPerson",
+                otherParam: {columnId: columnId},
+            },
+            data: {
+                key: {
+                    title: "recUserName",
+                    name: "recUserName"
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "recUserId",
+                        pIdKey: "parentId"
+                    }
+                }
+            },
+            callback: {
+                onClick: function (e, treeId, node) {
+                    //  $("#receiveUserName").val(node.recUserName);
+                    curr1.vm.replyUserId = node.recUserId;
+                    curr1.vm.replyUserName = node.recUserName;
+                }
+            }
+        });
+
+    }
+
+
+    function getGuestBookFormData() {
+        var content = $("#guestBookContent").val();
+        //curr.vm.guestBookContent = editor.html();
+        curr.vm.guestBookContent = eweb.getHtml();
+        curr.vm.recType = recType;
+
+        //curr.vm.responseContent = editor1.html();
+        curr.vm.responseContent = eweb1.getHtml();
+        curr.vm.replyDate = curr1.vm.replyDate;
+        curr.vm.dealStatus = curr1.vm.dealStatus;
+        curr.vm.replyUserId = curr1.vm.replyUserId;
+        curr.vm.replyUserName = curr1.vm.replyUserName;
+        var value = curr.vm.$model;
+
+        value = Ls.toJSON(value);
+        return value;
+    }
+</script>	

@@ -1,0 +1,68 @@
+#set($Integer=0)
+#set($titleLength=$!{paramObj.titleLength})
+#set($picTitleLength=$!{paramObj.picTitleLength})
+#set($contentLength=$!{paramObj.contentLength})
+
+
+#set($picEO=$resultObj.get("picEO"))
+#set($newsList=$resultObj.get("newsList"))
+#if($picEO)
+<ul class="web_top">
+    #if($picEO.imageLink.indexOf("/mongo")>=0)
+        #set($filePath="")
+    #elseif($picEO.imageLink.indexOf(".")>=0)
+        #set($filePath="$!{fileServerNamePath}")
+    #else
+        #set($filePath="$!{fileServerPath}")
+    #end
+    <li class="pic">
+        <a href="$!{picEO.link}" target="_blank" title="$!{picEO.title}">
+            <img src="$!{filePath}$!{picEO.imageLink}" width="117" border="0" height="88">
+        </a>
+    </li>
+    <li class="pictitle">
+        <a class="pictitle01" href="#if("$!{picEO.redirectLink}" != "")$!{picEO.redirectLink}#else$!{picEO.link}#end" target="_blank" title="$!{picEO.title}">
+            <b>#cutstr("#filterHtml($!{picEO.title})",$picTitleLength)</b>
+        </a>
+        <div>
+            #cutstr("#filterHtml($!{picEO.article})",$contentLength)
+            <a class="" href="#if("$!{picEO.redirectLink}" != "")$!{picEO.redirectLink}#else$!{picEO.link}#end" target="_blank" title="$!{picEO.title}">[详细]</a>
+        </div>
+    </li>
+    <div class="clear"></div>
+</ul>
+#end
+
+#if($newsList.size()>0)
+<ul class="web_con1">
+    #foreach($news in $newsList)
+        <li><a href="#if("$!{news.redirectLink}" != "")$!{news.redirectLink}#else$!{news.link}#end" target="_blank" title="$!{news.title}" class="left">
+            #set($style="")
+            #if("$!{news.isBold}" == "1")
+                #set($style="font-weight:bold;")
+            #end
+            #if("$!{news.isTilt}" == "1")
+                #set($style=$style+"font-style:italic;")
+            #end
+            #if("$!{news.isUnderline}" == "1")
+                #set($style=$style+"text-decoration:underline;")
+            #end
+            #if("$!{news.titleColor}" != "#000000")
+                #set($style=$style+"color:$!{news.titleColor};")
+            #end
+            #set($new_length=0)
+            #if("$!{news.isNew}" == "1")
+                #set($new_length=$!{length} - 2)
+            #else
+                #set($new_length=$!{length})
+            #end
+            <span style='$style'>#cutstr("#filterHtml($!{news.title})",$titleLength)</span></a>
+            #if("$!{news.isNew}" == "1")
+                <img src="/images/news.gif">
+            #end
+            <span class="right date">#date_format("$!{news.publishDate}","$!{paramObj.dateFormat}")</span>
+
+        </li>
+    #end
+</ul>
+#end

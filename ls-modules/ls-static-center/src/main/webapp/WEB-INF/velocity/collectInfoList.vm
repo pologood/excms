@@ -1,0 +1,40 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isState="$!{paramObj.isState}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($dateType="$!{paramObj.dateType}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+<li class="$!{css}">
+    #set($title=$!{eo.title})
+
+    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="${title}" class="left">
+        #cutstr($title,$length)
+    </a>
+
+    #if($isDate == "true")
+        #if("${dateType}"=="1")
+            <span class="right date">#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")</span>
+        #else
+            <span class="right date">$!{eo.timeStr}</span>
+        #end
+    #end
+
+    #if("$!{isState}" == "true")
+        #if("$!{eo.isTimeOut}" == "1")
+            <span class="nostart">未开始</span>
+        #elseif("$!{eo.isTimeOut}" == "2")
+            <span class="starting">进行中</span>
+        #elseif("$!{eo.isTimeOut}" == "3")
+            <span class="over">已结束</span>
+        #else
+        #end
+    #end
+
+</li>
+#end

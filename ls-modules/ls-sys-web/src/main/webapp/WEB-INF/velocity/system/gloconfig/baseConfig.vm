@@ -1,0 +1,93 @@
+#parse("_page_layout/_header.vm")
+<div style="width:480px;">
+    <form role="form" id="form1">
+        <div class="form-body">
+            <div style="margin: 0 auto;">
+                <fieldset style="width:550px;border:solid 1.5px #aaa;margin-top:8px;position:relative;">
+                    <legend><b>上传配置</b></legend>
+                    <table class="tform w98p">
+                        #foreach($uc in ${UploadConfig})
+                            <tr>
+                                <td class="tdlabel b"><label for="$uc.key$text">$!uc.itemName：</label></td>
+                                <td>
+                                    <input name="$!uc.key" id="$!uc.itemId" class="mini-textbox" required="true" width="260px" requiredErrorText="内容不能为空" value="$!uc.value"/>
+                                    #if($!uc.dataType=='string')<span>多个请用字母逗号隔开</span>
+                                    #elseif($!uc.dataType=='number')<span>KB</span>
+                                    #end
+                                </td>
+                            </tr>
+                        #end
+                    </table>
+                </fieldset>
+                <fieldset style="width:550px;border:solid 1.5px #aaa;margin-top:8px;position:relative;">
+                    <legend><b>短信中心</b></legend>
+                    <table class="tform w98p">
+
+                        #foreach($sms in ${SMSCenter})
+                            <tr>
+                                <td class="tdlabel b"><label for="$!sms.key$text">$sms.itemName：</label></td>
+                                <td>
+
+                                    <input name="$!sms.key" id="$!sms.itemId"
+                                           #if($sms.dataType=="string")class="mini-textbox" #elseif($sms.dataType=="pass")class="mini-password" #end
+                                           required="true" width="220px" requiredErrorText="内容不能为空" value="$!sms.value"/>
+                                </td>
+                            </tr>
+                        #end
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+        </br>
+        <div class="form-actions" style="text-align:center">
+            <button type="button" class="btn22_blue h30 f14 mr15" onclick="saveConfig()">保存</button>
+            <button type="button" class="btn22_gray h30 f14" onclick="cancel()">重置</button>
+        </div>
+    </form>
+</div>
+#parse("_page_layout/_footer.vm")
+
+<script>
+    mini.parse();
+    var grid = mini.get("form1");
+    var form = new mini.Form("#form1");
+    function cancel() {
+        form.reset();
+    }
+
+
+    function saveConfig() {
+        var el = form.el;
+        var config = [];
+        var i = 0;
+        for (a in el) {
+            if (el[a] && el[a].type == "text" || el[a] && el[a].type == "password") {
+                var obj = "";
+                obj = el[a].name + "|" + el[a].value;
+                config.push(obj);
+            }
+        }
+        Ls.ajax({
+            url: "/globConfig/saveBaseConfig",
+            data: {config: config}
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("保存失败：" + d.desc);
+            } else {
+                Ls.tipsOk("成功");
+                //	window.CloseOwnerWindow();
+            }
+        })
+    }
+
+    function ReplaceDot(str) {
+        var Obj = document.getElementById(str);
+        var oldValue = Obj.value;
+        while (oldValue.indexOf("，") != -1)//寻找每一个中文逗号，并替换
+        {
+            Obj.value = oldValue.replace("，", ",");
+            oldValue = Obj.value;
+        }
+    }
+
+</script>

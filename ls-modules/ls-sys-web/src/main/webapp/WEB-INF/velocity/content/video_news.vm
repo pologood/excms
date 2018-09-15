@@ -1,0 +1,275 @@
+<div id="doc_main" style="width: 100%; height: 100%;">
+
+    <div class="portlet light">
+        <!--<div class="portlet-title">
+          <div class="caption font-grey-silver">
+            <span class="caption-subject bold uppercase">用户列表</span>
+          </div>
+          <div class="tools"></div>
+        </div>-->
+        <div class="portlet-body">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="editVideoNews(0)"> 添 加</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onclick="publishs(1)">批量发布</a></li>
+                                <li><a href="#" onclick="publishs(0)">批量取消发布</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" onclick="deletes()">批量删除</a></li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" onclick="searchByType('isPublish',1)">已发布</a></li>
+                                <li><a href="#" onclick="searchByType('isPublish',0)">未发布</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#" onclick="searchByType('isNew',1)">已标新</a></li>
+                                <li><a href="#" onclick="searchByType('isTop',1)">已置顶</a></li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-all-check" id="checkAll" onclick="checkAll()"> 全 选</button>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <label>搜索：</label>
+                                <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="名称">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="searchContent()"> 搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="video_list" class="video-news pb15">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="$!{rc.contextPath}/assets/js/pages/videoNews_mgr.js"></script>
+<script>
+    cur.fileServerPath = "${fileServerPath}";
+    $(document).ready(function () {
+        cur.pageIndex = "${pageIndex}";
+        video_mgr.init();
+    });
+    var i = 0;
+    function checkAll() {
+        if (i == 1) {
+            $("input[name='check']").prop("checked", false);
+            i = 0;
+            return;
+        } else {
+            $("input[name='check']").prop("checked", true);
+            i = 1;
+            return;
+        }
+    }
+
+    //批量发布状态
+    function publishs(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        });
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        } else {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    siteId: GLOBAL_SITEID,
+                    columnId: cur.columnId,
+                    type: type
+                },
+                url: "/articleNews/publishs"
+            }).done(function (text) {
+                if (text.data) {
+                    Ls.tipsOk("发布成功");
+                    video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    Ls.tipsErr("发布失败");
+                }
+            });
+        }
+    }
+
+
+    //批量删除
+    function deletes() {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/videoNews/delVideoEOs"
+            }).done(function (text) {
+                if (text.data == 0) {
+                    Ls.tipsOk("删除成功");
+                    video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    Ls.tipsErr("删除失败");
+                    return;
+                }
+            });
+        }
+    }
+
+    //单删除
+    function deleteById(id) {
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/videoNews/delVideoEO"
+            }).done(function (text) {
+                if (text.data == 0) {
+                    Ls.tipsOk("删除成功");
+                    video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    Ls.tipsErr("删除失败");
+                    return;
+                }
+            });
+        }
+    }
+
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish:isPublish
+            },
+            url: "/articleNews/changePublish"
+        }).done(function (text) {
+            var isPublish = text.data;
+            if (isPublish == 1) {
+                $("#p_" + id).removeClass("green-meadow");
+                Ls.tipsOk("取消发布成功");
+                video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+            } else {
+                $("#p_" + id).addClass("green-meadow");
+                Ls.tipsOk("发布成功");
+                video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+            }
+        });
+    }
+    //改变置顶状态
+    function changeTop(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeTop"
+        }).done(function (text) {
+            var isPublish = text.data;
+            if (isPublish == 1) {
+                $("#top_" + id).removeClass("blue");
+                Ls.tipsOk("取消置顶成功");
+                video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+            } else {
+                $("#top_" + id).addClass("blue");
+                Ls.tipsOk("置顶成功");
+                video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+            }
+        });
+    }
+
+    //改变标题新闻状态
+    function changeTitle(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeTitle"
+        }).done(function (text) {
+            var isTitle = text.data;
+            if (isTitle == 1) {
+                $("#title_" + id).removeClass("blue");
+                Ls.tipsOk("取消标题新闻成功");
+            } else {
+                $("#title_" + id).addClass("blue");
+                Ls.tipsOk("设置标题新闻成功");
+            }
+        });
+    }
+
+    //改变加新状态
+    function changeNew(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeNew",
+        }).done(function (text) {
+            var isNew = text.data;
+            if (isNew == 1) {
+                $("#new_" + id).removeClass("blue");
+                Ls.tipsOk("取消加新成功");
+            } else {
+                $("#new_" + id).addClass("blue");
+                Ls.tipsOk("加新成功");
+            }
+        });
+    }
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status)
+    }
+
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        cur.condition = "";
+        cur.status = "";
+        video_mgr.getData(0, cur.columnId, cur.key, '', '');
+    }
+    function searchByType(type, status) {
+        cur.condition = type;
+        cur.status = status;
+        video_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+    }
+    //TODO 更换弹窗
+    function copyNews(id) {
+        layer.open({
+            type: 2,
+            title: '新闻复制',
+            maxmin: false,
+            area: ['430px', '460px'],
+            content: "/content/copyNews?id=" + id,
+            end: function () {
+            }
+        });
+    }
+
+</script>

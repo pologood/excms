@@ -1,0 +1,26 @@
+<html>
+<head>
+    <style>
+        * {
+            margin: 0;
+            pandding: 0
+        }
+    </style>
+</head>
+<body>
+<img id="img" src=""/>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script>
+    api = art.dialog.open.api;
+    $(document).ready(function () {
+        var path = '$!{picEO.path}'//art.dialog.data('path');
+        if(path.indexOf(".") != -1){
+            $("#img").attr("src", "$!{fileServerNamePath}" + path)
+        }else{
+            $("#img").attr("src", "$!{fileServerPath}" + path)
+        }
+    })
+</script>
+</body>
+</html>

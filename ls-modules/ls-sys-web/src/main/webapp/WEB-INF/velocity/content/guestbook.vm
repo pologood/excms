@@ -1,0 +1,551 @@
+<div class="portlet light">
+    <!--<div class="portlet-title">
+      <div class="caption font-grey-silver">
+        <span class="caption-subject bold uppercase">用户列表</span>
+      </div>
+      <div class="tools"></div>
+    </div>-->
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-12">
+                    <button disabled class="editBtn btn btn-default btn-add" onclick="doAdd()">添 加</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn disabled" id="publishs"><a href="javascript:;">批量发布</a></li>
+                            <li class="publishBtn disabled" id="unpublishs"><a href="javascript:;">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="editBtn disabled" id="deletes"><a href="javascript:;">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu" id="statusList">
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" id="checkAll" onclick="checkAll()" class="btn btn-default btn-all-check"> 全 选</button>
+                    </div>
+                </div>
+
+                <div class="col-md-12 mt10">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <select class="form-control" type="text" id="classCode" name="classCode">
+                            </select>
+                            <select class="form-control" type="text" id="recUnitId" name="recUnitId">
+                            </select>
+                            <select class="form-control" type="text" id="recUserId" name="recUserId">
+                            </select>
+                            <input type="text" id="searchKey" name="searchKey" class="form-control w140" placeholder="标题" maxlength="50">
+                            <button type="button" class="btn btn-default btn-search" onClick="searchContent()">搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="guestbook_list_body" class="doc-manage">
+        </div>
+
+
+    </div>
+</div>
+
+<script id="guestbook_list_template" type="text/html">
+    <table class="table guestbook-list2">
+        <tbody>
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i],resourceType = ""?>
+        <?
+           if(el.resourceType==1){
+                resourceType = "[来自微信]"
+           }else if(el.resourceType==2){
+                resourceType = "[来自微博]"
+           }else if(el.resourceType==0){
+                resourceType = "[来自网页]"
+           }
+             var disabledStr = Ls.publishStatus(el.isPublish);
+        ?>
+        <tr>
+            <th scope="row" class="w40">
+                <?if(el.workFlowStatus!=1){?>
+                <input type="checkbox" name="check" value="<?=el.baseContentId?>">
+            ##                <?}else{?>
+            ##                    <input type="checkbox" name="check" disabled="disabled" value="<?=el.baseContentId?>">
+                <?}?>
+            </th>
+            <td>
+
+                <div class="message-title">
+                    <?if(el.className!=null){?><a style="color:green;" title="留言类型">[<?=el.className?>]</a> <?}?>
+                    <?=el.title?><?if(disabledStr!=''){?><span class="publish-status">[生成中...]</span><?}?>
+                    <?if(el.isTimeOut==2){?><a href="javascript:void(0)" style="color:#ED670E;" title="黄牌警告:" +<?=el.yellowCardDay?>+"天未回复为超时">(黄)</a> <?}?>
+                    <?if(el.isTimeOut==3){?><a href="javascript:void(0)" style="color:red;" title="红牌警告:" +<?=el.redCardDay?>+"天未回复为超时">(红)</a> <?}?>
+                    <?if(el.isTimeOut==1){?><a href="javascript:void(0)" style="color:gray;" title="超时警告:" +<?=el.limitDay?>+"天未回复为超时">(超)</a> <?}?>
+                </div>
+
+                <div class="message-attr" title="<?=resourceType?>">
+                    网友：<?=el.personName?>&nbsp;&nbsp;&nbsp;
+                    添加日期：<?=el.addDate?>&nbsp;&nbsp;&nbsp;
+                    手机号码：<?=el.personPhone?>&nbsp;&nbsp;&nbsp;
+                    IP地址：<?=el.personIp?>&nbsp;&nbsp;&nbsp;
+                    查询编号 ：<?=el.docNum?>&nbsp;&nbsp;&nbsp;
+                    查询密码：<?=el.randomCode?>
+                    <?if(el.isPublic==0){?>
+                    【不公开】
+                    <?}else{?>
+                    【公开】
+                    <?}?>
+                    <br/>
+                    <p style="color: #0BB20C">接收单位：
+                        <?if(el.receiveName){?>
+                        <?=el.receiveName?>
+                        <?}else{?>
+                        无
+                        <?}?>
+                    </p>
+                </div>
+
+                <div class="message-body">
+                    <?==el.guestBookContent?>
+                </div>
+
+                <?if(el.commentName){?>
+                <div class="message-evaluation">
+                    评价：<?=el.commentName?>
+                </div>
+                <?}?>
+
+                <?if(el.responseContent){?>
+                <div class="message-reply">
+                    <div class="replyUser">
+                        <?if(el.recType==1){?>
+                        <?if(el.replyUnitName){?>
+                        <?=el.replyUnitName?>
+                        <?}else{?>
+                        <?if(el.receiveName){?>
+                        <?=el.receiveName?>
+                        <?}else{?>
+                        <?=el.replyUserName?>
+                        <?}?>
+                        <?}?>
+                        <?}else if(el.recType==0){?>
+                        <?if(el.replyUnitName){?>
+                        <?=el.replyUnitName?>
+                        <?}else{?>
+                        <?=el.receiveName?>
+                        <?}?>
+                        <?}?>
+                        &nbsp;&nbsp;&nbsp;<?=el.replyDate?></div>
+                    <div class="replyContent">
+                        <?==el.responseContent?>
+                    </div>
+                </div>
+                <?}?>
+                <div class="message-bottom">
+                    <span class="pull-right">
+                        <ol class="tools-bar">
+                            <?if(el.workFlowStatus!=1){?>
+                            <li>
+                                <button type="button" disabled class="editBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                        onclick="modify(<?=el.baseContentId?>)">修改
+                                </button>
+                              </li>
+                            <?if(el.isPublic==1){?>
+                            <li>
+                                <button type="button" disabled
+                                        class="publishBtn btn btn-default btn-xs <? if(el.isPublish==1){?> green-meadow<?}?>  <?=disabledStr?>_1"
+                                        id="p_<?=el.baseContentId?>"
+                                        onclick="changePublish(<?=el.baseContentId?>)">发布
+                                </button>
+                              </li>
+                            <?}?>
+                        #*<li>
+                          <button type="button" disabled class="dealBtn btn btn-default btn-xs"
+                                  onclick="report(<?=el.baseContentId?>)">报审
+                          </button>
+                        </li>*#
+                            <?if(el.isPublish==1){?>
+                            <li>
+                                <button type="button" disabled
+                                        class="publishBtn btn btn-default btn-xs <?=disabledStr?>_1"
+                                        id="p_<?=el.baseContentId?>"
+                                        onclick="rePublish(<?=el.baseContentId?>)">重发
+                                </button>
+                            </li>
+                            <?}?>
+                            <li>
+                                <button type="button" disabled class="dealBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                        onclick="reply(<?=el.baseContentId?>)">办理
+                                </button>
+                              </li>
+                            <?if(el.recType==0||el.recType==1){?>
+                            <li>
+                                <button type="button" disabled class="editBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                <? if(el.isPublish==1){?>disabled="true"<?}?> onclick="forwardById(<?=el.id?>)">转办</button>
+                              </li>
+                            <?}?>
+                            <li>
+                                <button type="button" disabled class="editBtn btn btn-default btn-xs  <?=disabledStr?>_1"
+                                        id="p_<?=el.baseContentId?>"
+                                        onclick="deleteById(<?=el.baseContentId?>)">删除
+                                </button>
+                              </li>
+                            <?}?>
+                            <li>
+                            <button type="button" class="btn btn-default btn-xs" onclick="record(<?=el.id?>)">转办记录
+                            </button>
+                          </li>
+                          <li>
+                               <button type="button" class="btn btn-default btn-xs" onclick="doPrint(<?=el.baseContentId?>)">打印受理单</button>
+                          #*<a class="btn btn-default btn-xs" style="border:0;" href="/guestBook/doPrint?id=<?=el.baseContentId?>">打印受理单</a>*#
+                          </li>
+                        </ol>
+                    </span>
+                    <div class="clearfix"></div>
+                </div>
+
+            </td>
+        </tr>
+        <? } ?>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination pull-right"></div>
+    <div class="clearfix"></div>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/guestbook_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script>
+    var recType = -1;
+    getRecUnitOrUser();
+    $(document).ready(function () {
+        guestbook_manage.init();
+        getStatusList();
+    });
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+    }
+
+    function getRecUnitOrUser() {
+        Ls.ajax({
+            type: "POST",
+            url: "/guestBook/getRec",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            var data = text;
+            var length = data.length;
+            if (length > 0) {
+                var str1 = '<option value=""> 留言类别 </option> ';
+                var strCode = "";
+                if (!Ls.isEmpty(data[0].recType) && data[0].recType != 2) {
+                    recType = data[0].recType;
+                    if (recType == 0) {
+                        $("#recUserId").hide();
+                        var str = '<option value=""> 受理单位 </option> ';
+                        for (i = 0; i < length; i++) {
+                            if (data[i].recUnitId != null && data[i].recUnitId != '') {
+                                str += ' <option value=' + data[i].recUnitId + '>' + data[i].recUnitName + '</option> ';
+                            } else {
+                                strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                            }
+                        }
+                        $("#recUnitId").append(str);
+                    } else if (recType == 1) {
+                        $("#recUnitId").hide();
+                        var str = '<option value=""> 收信领导 </option> ';
+                        for (i = 0; i < length; i++) {
+                            if (data[i].recUserId != null && data[i].recUserId != '') {
+                                str += ' <option value=' + data[i].recUserId + '>' + data[i].recUserName + '</option> ';
+                            } else {
+                                strCode += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                            }
+                        }
+                        $("#recUserId").append(str);
+                    }
+                    if (Ls.isEmpty(strCode)) {
+                        $("#classCode").hide();
+                    } else {
+                        $("#classCode").append(str1 + strCode);
+                    }
+                } else {
+                    for (i = 0; i < length; i++) {
+                        str1 += ' <option value=' + data[i].classCode + '>' + data[i].className + '</option> ';
+                    }
+                    $("#classCode").append(str1);
+                    $("#recUnitId").hide();
+                    $("#recUserId").hide();
+
+                }
+            }
+
+        });
+    }
+
+    function getStatusList() {
+        Ls.ajax({
+            type: "POST",
+            url: "/guestBook/getStatusList",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            var str = '<li><a href="javascript:;" onclick="searchByPublish(1)">已发布</a></li>' +
+                '<li><a href="javascript:;" onclick="searchByPublish(0)">未发布</a></li>';
+            var data = text.data;
+            if (data.length > 0) {
+                str += '<li class="divider"></li>';
+                for (var i = 0; i < data.length; i++) {
+                    str += '<li><a href="javascript:;" onclick="searchByStatus(\'' + data[i].statusCode + '\')">' + data[i].statusName + '</a></li>'
+                }
+            }
+            $('#statusList').append(str);
+        });
+    }
+
+    //全选，取消全选
+    function checkAll() {
+        if (cur.c == 0) {
+            $("input[name='check']").prop("checked", true);
+            cur.c = 1;
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            cur.c = 0;
+            return;
+        }
+    }
+
+    //搜索
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        cur.classCode = $("#classCode").val();
+        if (recType == 0) {
+            cur.recUserId = '';
+            cur.receiveId = $("#recUnitId").val();
+        }
+        if (recType == 1) {
+            cur.receiveId = '';
+            cur.recUserId = $("#recUserId").val();
+        }
+        guestbook_manage.getData(0, cur.columnId, cur.key, '', '', cur.classCode, cur.receiveId, cur.recUserId);
+    }
+
+    //显示全部
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey").val("");
+        $("#classCode").val("");
+        $("#recUnitId").val("");
+        $("#recUserId").val("");
+        cur.isPublish = "";
+        cur.dealStatus = "";
+        cur.classCode = '';
+        guestbook_manage.getData(0, cur.columnId, cur.key, '', '', '', '', '');
+    }
+
+    //修改
+    function modify(id) {
+        var columnId = cur.columnId;
+
+        Ls.openWin('/guestBook/modify?id=' + id + '&&columnId=' + columnId, '600px', '480px', {
+            id: 'modify',
+            title: '修改操作',
+            padding: 0,
+        });
+    }
+
+    //改变发布状态
+    function changePublish(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changePublish",
+            success: function (text) {
+                if (!text.status) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+                var isSuccess = text.data;
+                if (isSuccess == 1) {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+                } else {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("正在生成处理中");
+                    guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+
+                }
+
+            }
+        });
+    }
+
+    //批量发布
+    function batchPublish(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        });
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                type: type
+            },
+            url: "/guestBook/batchPublish",
+            success: function (text) {
+                var isSuccess = text.data;
+                if (isSuccess) {
+                    if (type == 1) {
+                        Ls.tipsOk("批量发布完成，正在生成处理中");
+                    } else {
+                        Ls.tipsOk("批量取消发布完成，正在生成处理中");
+                    }
+                } else {
+                    if (type == 1) {
+                        Ls.tipsErr("批量发布失败");
+                    } else {
+                        Ls.tipsErr("批量取消发布失败");
+                    }
+                    return;
+                }
+
+                guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+            }
+        });
+    }
+
+    //属性筛选
+    function searchByPublish(type) {
+        cur.isPublish = type;
+        guestbook_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+    }
+    function searchByStatus(code) {
+        cur.dealStatus = code;
+        guestbook_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+    }
+
+
+    //后台打开回复弹窗
+    function reply(id) {
+        Ls.openWin('/guestBook/guestBookReply?id=' + id + '&&columnId=' + cur.columnId
+            , '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0,
+                close: function () {
+                    guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.classCode, cur.receiveId, cur.recUserId);
+
+                }
+            });
+
+    }
+
+    //打开转办功能窗口
+    function forwardById(id) {
+        Ls.openWin('/guestBook/guestBookForward?id=' + id + '&columnId=' + cur.columnId, '460px', '320px', {
+            id: 'guestBook_button_forward',
+            title: "留言转办",
+            ok: function () {
+                var iframe = this.iframe.contentWindow;
+                if (!iframe.document.body) {
+                    return false;
+                }
+                iframe.$("#" + iframe.cur.id).submit();
+                return false;
+            }
+        });
+    }
+
+    //单个删除
+    function deleteById(id) {
+        var check = [];
+        check.push(id);
+        if (confirm("确定删除留言？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/articleNews/delete",
+                success: function (text) {
+                    Ls.tipsOk("删除完成，正在生成处理中");
+                    guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveId, cur.recUserId);
+
+                }
+            });
+        }
+    }
+
+    //批量删除
+    function deletes() {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/articleNews/delete",
+                success: function (text) {
+                    Ls.tipsOk("批量删除完成，正在生成处理中");
+                    guestbook_manage.getData(cur.pageIndex, cur.columnId, cur.key, cur.isPublish, cur.dealStatus, cur.receiveId, cur.recUserId);
+                }
+            });
+        }
+    }
+
+    //打开转办记录窗口
+    function record(id) {
+        //alert(id)
+        Ls.openWin('/guestBook/queryForwardRecord?id=' + id, '700px', '400px', {
+            id: 'record',
+            title: '转办记录',
+            padding: 0
+
+        });
+    }
+
+    function doPrint(id) {
+//        Ls.openWin('/guestBook/doPrint?id=' + id, '700px', '400px', {
+//          id: 'do_print',
+//          title: '打印留言受理单',
+//          padding: 0
+//        });
+        content_mgr.getContentApp("/guestBook/doPrint?id=" + id + "&&pageIndex=" + cur.pageIndex);
+    }
+
+    //修改
+    var doAdd = function (id) {
+        content_mgr.getContentApp("/guestBook/add?columnId=" + content_mgr.node.indicatorId + "&&pageIndex=" + cur.pageIndex);
+
+    };
+
+    function report(dataId) {
+        startProcess("EX", cur.columnId, "GuestBook", dataId);
+    }
+</script>

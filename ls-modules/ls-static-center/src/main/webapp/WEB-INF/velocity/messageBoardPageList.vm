@@ -1,0 +1,49 @@
+#set($Integer=0)
+#set($isDate="$!{paramObj.isDate}")
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+
+<div class="liuyan_cxcon1">
+    <p class="tj messageBoardCountAjax" data-siteId="$!{context.siteId}" data-columnIds="$!{context.columnId}" data-type="amount,replyNum,todayAmount,todayReplyNum">
+        （来信总数：<span class="sz" id="amount_0">0</span> 件<span class="jg"></span>
+        回复总数：<span class="sz" id="replyNum_0">0</span> 件<span class="jg"></span>
+        今日来信：<span class="sz" id="todayAmount_0">0</span> 件<span class="jg"></span>
+        今日回复：<span class="sz" id="todayReplyNum_0">0</span> 件）
+    </p>
+</div>
+
+<div class="guestbook-table">
+
+#if("$!{typeStr}"==0)
+    <ul class="guestbook_title">
+        <li class="t1">主题</li>
+        <li class="t2">留言人</li>
+        <li class="t3">发布时间</li>
+        <li class="t4">处理状态</li>
+        <li class="t5">类型</li>
+        <li class="t6">受理单位</li>
+    </ul>
+    #foreach($eo in $resultObj.list)
+        #set($title=$!{eo.title})
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <ul class="$!{css}">
+            <li class="t1">
+                <a href="$!{eo.link}" target="$!{paramObj.target}" title="${title}" target="_blank">
+                    <font>#cutstr($title,$length)</font>
+                </a></li>
+            <li class="t2">$!{eo.messageBoardContent}</li>
+            <li class="t3">[#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}")]</li>
+            <li class="t4">$!{eo.className}</li>
+            <li class="t5">$!{eo.receiveUnitName}</li>
+        </ul>
+    #end
+#end
+
+</div>
+
+#if("$!{typeStr}"!="0")
+    #parse("messageBoardForm.vm")
+#end

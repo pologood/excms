@@ -1,0 +1,36 @@
+<div class="collection-theme">
+    <div id="ideaPageDiv" class="collection-theme-list">
+        <h3 class="collectit">网友评论</h3>     
+    
+    
+    <ul id="idea_page">
+     #foreach($eo in $resultObj.data)    
+        <li>
+            <div class="collection-body">
+            <div class="collection-tit">
+                <span class="collection-username">$!{eo.createUserName}</span>
+                <span class="collection-datetime">(#date_format("$!{eo.createDate}","$!{paramObj.dateFormat}"))$!{resultObj.pageCount}</span>
+	    </div>
+            <div class="collection-info">$!{eo.content}</div>
+            </div>
+        </li>	
+     #end
+     </ul>
+     </div>
+     #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.contentId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.contentId}", function (pageIndex) {
+            location.href = '/content/article/$!{context.contentId}?pageIndex=' + pageIndex;
+        }, {
+            isTotal: true,
+            total: $!{resultObj.total},
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+     <div id="collectionpage" class="pagination"></div>
+</div>
+

@@ -1,0 +1,39 @@
+<div class="panel {{moduleId}}_panel clearfix">
+    {{if conf.isTitle}}
+    <div class="panel-heading clearfix">
+        <div class="title">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.title}}</a>
+        </div>
+        {{if conf.isMore}}
+        <div class="more">
+            <a href="{{conf.titleHref}}" target="_blank">{{conf.more}}</a>
+        </div>
+        {{/if}}
+    </div>
+    {{/if}}
+    <div class="panel-body">
+        <div class="panel-body-inner">
+            {{if conf.panelBodyTop.enable}}
+            <div class="panel-body-top ls-panelBodyTopLabel">{{#panelBodyTopLabelHtml}}</div>
+            {{/if}}
+            <div class="panel-body-center ">
+                {{#mainLabelHtml}}
+            </div>
+            {{if conf.panelBodyBottom.enable}}
+            <div class="panel-body-bottom ls-panelBodyBottomLabel">{{#panelBodyBottomLabelHtml}}</div>
+            {{/if}}
+            {{if conf.panelBodyLeft.enable}}
+            <div class="panel-body-left ls-panelBodyLeftLabel">{{#panelBodyLeftLabelHtml}}</div>
+            {{/if}}
+            {{if conf.panelBodyRight.enable}}
+            <div class="panel-body-right ls-panelBodyRightLabel">{{#panelBodyRightLabelHtml}}</div>
+            {{/if}}
+
+        </div>
+    </div>
+    {{if conf.footer.enable}}
+    <div class="panel-footer">
+        {{#footerLabelHtml}}
+    </div>
+    {{/if}}
+</div>

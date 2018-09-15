@@ -1,0 +1,157 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .title_msg {
+        color: #555;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .fu_title_msg td {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 24px;
+        background: #fafafa;
+    }
+</style>
+<style type="text/css">
+    table.gridtable {
+        font-family: verdana, arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
+
+    table.gridtable th {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #a4d3dd;
+    }
+
+    table.gridtable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" style="background-color: #fdfdfd">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <table style="width: 100%">
+                    <tr>
+                        <td align="center" class="title_msg">
+                            $!{eo.title}
+                        </td>
+                    </tr>
+                    <tr class="fu_title_msg">
+                        <td height="30px" align="center">
+                            供稿人:$!{eo.author} &nbsp;&nbsp;来源:$!{eo.fromName} &nbsp;&nbsp;
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="left" valign="top" style="line-height:23px;">
+                            <textarea id="content" name="content" style="width: 100%;height: 320px;">
+                                $!{eo.content}
+                            </textarea>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        initKindEditor();
+        cur.api.button(
+            {id:'back',className:'btn-back',name:'关闭',callback:function(){cancel();return false;}}
+        );
+    })
+
+    function employ() {
+        Ls.ajax({
+            url: "/msg/employ/batchEmploy",
+            data: {
+                msgIds: getMsgId(),
+                /*content: cur.editor.html(),*/
+                content: eweb.getHtml(),
+                type: 0  //采用到当前对应栏目
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.call_back(resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getTitle() {
+        return '$!{eo.name}';
+    }
+
+    function getMsgId() {
+        return '$!{eo.id}';
+    }
+
+    function employ_other() {
+        /*art.dialog.data('content', cur.editor.html());*/
+        art.dialog.data('content', eweb.getHtml());
+        art.dialog.data('msgId', getMsgId());
+
+        Ls.openWin("/msg/employ/employOther", '380px', '400px', {
+            id: 'employOther',
+            title: "采编到其他栏目"
+        });
+    }
+
+    function employ_other_callback(msg) {
+        Ls.tips(msg, {times: 2})
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {style: "Lmini"},height: "200");
+        #*
+        cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '$!{rc.contextPath}/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            readonlyMode:true,
+            items:[]
+        });
+        * *#
+
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>
+</body>
+</html>

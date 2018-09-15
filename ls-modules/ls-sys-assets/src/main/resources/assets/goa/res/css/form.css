@@ -1,0 +1,92 @@
+﻿table.tbForm {
+	background-color:#FFF;
+	border:1px solid #a5b3c5;
+	border-collapse:collapse
+}
+table.tbForm td, th {
+	border:1px solid #a5b3c5;
+	border-width:0 1px 1px 0;
+	vertical-align:middle;
+}
+table.tbForm th {
+	background-color:#a5b3c5
+}
+.tbForm thead th{
+	background:url(images/bg_nav01.jpg?max_age=19830211&d=20120328093341) repeat-x #DFF0F9;
+	color:#254262;
+	font-family:\5FAE\8F6F\96C5\9ED1, arial, \5B8B\4F53;
+	font-size:14px;
+	font-weight:700;
+	line-height:30px;
+	padding-left:5px;
+	text-align:center;
+	vertical-align:middle
+}
+
+.tbForm .tbH {
+	background:url(images/bg_nav01.jpg?max_age=19830211&d=20120328093341) repeat-x #DFF0F9;
+	color:#254262;
+	font-family:\5FAE\8F6F\96C5\9ED1, arial, \5B8B\4F53;
+	font-size:14px;
+	font-weight:700;
+	line-height:30px;
+	padding-left:5px;
+	text-align:center;
+	vertical-align:middle
+}
+.tbForm .tbH a:link,.tbForm  .tbH a:visited {
+	color:#254262
+}
+.tbForm .tbL,.tbForm  .tbL1,.tbForm  .tbL2 {
+	padding:5px;
+	text-align:right
+}
+.tbForm .tbL {
+	background-color:#f1f5fb;
+	color:#666
+}
+.tbForm .tbL1 {
+	background-color:#FEF8E0;
+	color:#666
+}
+.tbForm .tbL2 {
+	background-color:#F6F6B5;
+	color:#666
+}
+.tbForm .tbC {
+	background-color:#fff;
+	padding:5px 5px 0;
+	text-align:left
+}
+.tbForm .tbC2 {
+	background-color:#FCFCEA;
+	padding:5px 5px 0;
+	text-align:left
+}
+.tbForm .tbLine {
+	border-bottom-width:1px!important;
+	border-bottom-color:#a5b3c5;
+	border-bottom-style:solid
+}
+.tbForm tfoot tr,
+.tbForm .tbBT {
+	background:url(images/wizarddownbg.gif?max_age=19830211&d=20120328093341) repeat-x top center #FCFCFC;
+	border-top:0;
+	
+}
+.tbForm .tbBC {
+	background:url(images/wizarddownbg.gif?max_age=19830211&d=20120328093341) repeat-x center center #FCFCFC;
+	border-top:0;
+}
+.tbForm .tbBD {
+	background:url(images/wizarddownbg.gif?max_age=19830211&d=20120328093341) repeat-x bottom center #FCFCFC;
+	border-top:0;
+}
+.tbForm tfoot tr td{
+	padding-right:10px;text-align:right; height:36px;
+}
+.tbForm tfoot tr td * { vertical-align:middle}
+
+/*.tbForm .tbH *, .tbForm .tbL *,.tbForm .tbC *, .tbForm .tbC2 *, .tbForm .tbL1 *, .tbForm .tbBT *, .tbForm .tbBC *, .tbForm .tbBD *, .tbForm .tbL2 * {
+	vertical-align:middle
+}*/

@@ -1,0 +1,263 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">文章信息</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">图片轮播</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_1_1">
+            <form role="form" id="picture_form" ms-controller="picture_form">
+                <table class="table table-bordered picture-table">
+                    <tbody>
+                    <tr>
+                        <th>标题：</th>
+                        <td>
+                            <table class="w100p">
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control" placeholder="" maxlength="500"></td>
+                                    <td class="w150 text-center">
+                                        <button type="button" id="colorpicker" class="btn btn-default btn-font" title="字体颜色">
+                                            <i class="fa fa-font"></i>
+                                        </button>
+                                        <input type="hidden" id="mycolor" class="colorPicker evo-cp0"/>
+                                        <button type="button" id="bold" class="btn btn-default btn-bold" title="加粗"><i class="fa fa-bold"></i>
+                                        </button>
+                                        <button type="button" id="tilt" class="btn btn-default btn-italic" title="倾斜"><i class="fa fa-italic"></i>
+                                        </button>
+                                        <button type="button" id="underline" class="btn btn-default btn-underline" title="下划线"><i
+                                            class="fa fa-underline"></i></button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="w300" rowspan="8">
+                            <div class="thumb_main">
+                                <div id="prcture_thumb" class="thumb">
+                                    <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" id="imageLink"/>
+                                </div>
+                                #if(${toolbar} == 'hide')
+                                #else
+                                    <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                    <div class="thum-upload" id="uploadImg"><i class="fa fa-upload"></i></div>
+                                #end
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>副标题：</th>
+                        <td><input type="text" id="subTitle" maxlength="300" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+                    </tr>
+                    <tr>
+                        <th>来源：</th>
+                        <td>
+                            <div class="input-group" id="resMark">
+                                <input type="text" id="resources" ms-duplex="resources" class="form-control" placeholder="" onclick="pic_news.getResource()"/>
+                                <div class="input-group-btn">
+                                    <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="pic_news.getResource()">
+                                        <i class="fa fa-caret-down" id="select_icon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>作者：</th>
+                        <td>
+                            <input type="text" id="author" ms-duplex="author" class="form-control" placeholder="" maxlength="30">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>发布日期：</th>
+                        <td>
+                            <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control readonly"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>属性：</th>
+                        <td>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" class="publishBtn" disabled id="isNew" value="1"> 加新
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" class="publishBtn" disabled id="isTitle" value="option2"> 标题新闻
+                            </label>
+                            <label id="isComment" class="checkbox-inline hide">
+                                <input type="checkbox" id="isAllowComments" class="publishBtn" disabled value="1"> 允许评论
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" class="publishBtn" disabled id="isTop" value="1"> 置顶
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="isJob" class="publishBtn" disabled value="1"> 定时发布
+                            </label>
+                            <label class="checkbox-inline">
+                                <button id="btn_extend_picture" type="button" class="btn btn-default btn-xs btn-picture-extend">
+                                    扩展信息
+                                    <i class="fa fa-angle-double-down"></i>
+                                </button>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr class="picture_attr_ext hide">
+                        <th>摘要：</th>
+                        <td>
+                            <textarea class="form-control" id="remarks" rows="2" placeholder=""></textarea>
+                        </td>
+                    </tr>
+                    <tr id="JobDate" class="hide">
+                        <th>定时发布：</th>
+                        <td>
+                            <input type="datetime" id="jobIssueDate" placeholder="定时发布时间，空值代表无需定时发布" ms-duplex="jobIssueDate" class="form-control readonly publishBtn"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm',minDate:'${nowDate}',readOnly:true})" readonly/>
+                        </td>
+                    </tr>
+                    <tr id="TopDate" class="hide">
+                        <th>置顶有效期：</th>
+                        <td>
+                            <input type="datetime" id="topValidDate" placeholder="空值代表永久有效" ms-duplex="topValidDate" class="form-control readonly publishBtn"
+                                   onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'${nowDate}',readOnly:true})" readonly/>
+                        </td>
+                    </tr>
+                    <tr class="picture_attr_ext hide">
+                        <th>跳转URL：</th>
+                        <td>
+                            <input type="text" id="redirectLink" ms-duplex="redirectLink" class="form-control" placeholder="">
+                        </td>
+                    </tr>
+                        #if(${toolbar} == 'hide')
+                        #else
+                        <tr id="checkWords" class="picture_attr_ext hide">
+                            <th>内容过滤：</th>
+                            <td>
+                                <button class="btn btn-default btn-reset" id="errorWords" type="button" onclick="contentCheck('EASYERR')">易错词检测</button>
+                                <button class="btn btn-default btn-reset" id="senWords" type="button" onclick="contentCheck('SENSITIVE')">敏感词检测</button>
+                                <button class="btn btn-default btn-reset" id="hotWords" type="button" onclick="contentCheck('HOT')">热词检测</button>
+                            </td>
+                        </tr>
+                        #end
+                    <tr>
+                        <th style="vertical-align: top;">内容：</th>
+                        <td colspan="2">
+                            <textarea id="article_content" name="content" style="width: 100%; visibility: visible;"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td colspan="2">
+                            #if(${toolbar} == 'hide')
+                            #else
+                                <button disabled class="publishBtn btn btn-default btn-save-release" type="button" id="saveAndPublish"> 保存并发布</button>
+                                <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+                                <button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>
+                            #end
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+
+        </div>
+
+        <div class="tab-pane" id="tab_1_2">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="pdr10">
+                            #if(${uploadBar} == 'hide')
+                            #else
+                                <button type="button" class="btn btn-default btn-upload" onclick="uploadPic()">
+                                    <i class="fa fa-upload"></i> 上传图片
+                                </button>
+                            #end
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover picture-upload">
+                <thead>
+                <tr>
+                    <th class="w55">排 序</th>
+                    <th class="w180"></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="picList">
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<script src="$!{rc.contextPath}/assets/js/pages/content/picNews/pic_news_edit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/picNews/editHandle.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/contentCheck.js"></script>
+<script>
+    var config = {
+        expand: 0,
+        pageIndex: '$!{pageIndex}'
+    }
+
+    var pic = {
+        id: '$!{picNewsId}',
+        columnId: '',
+        siteId: GLOBAL_SITEID,
+        title: '',
+        subTitle: '',
+        author: GLOBAL_PERSON.name,
+        resources: GLOBAL_PERSON.unitName,
+        redirectLink: '',
+        imageLink: '',
+        isNew: 0,
+        isTop: 0,
+        topValidDate: '',
+        isBold: 0,
+        isUnderline: 0,
+        isTilt: 0,
+        titleColor: "",
+        remarks: '',
+        content: '',
+        isPublish: 0,
+        publishDate: '',
+        typeCode: 'pictureNews',
+        isAllowComments: 0,
+        picList: '',
+        videoStatus: 100, //默认无视频
+        recordStatus: '$!{recordStatus}' == '' ? 'Normal' : '$!{recordStatus}'
+    }
+
+    $(document).ready(function () {
+        mini.parse();
+        pic_news.init();
+        pic.columnId = content_mgr.indicatorId;
+        $("#publishDate").val('${nowDate}');
+        $("#author").val(pic.author);
+        $("#resources").val(pic.resources);
+
+        getModelConfig();
+
+        //权限控制
+        for (var i = 0; i < cur.opt.length; i++) {
+            if (cur.opt[i] == "publish" || cur.opt[i] == "super") {
+                $(".publishBtn").attr("disabled", false);
+                $(".publishBtn").removeClass("disabled");
+            }
+        }
+
+        //初始化数据
+        initData();
+
+    })
+</script>

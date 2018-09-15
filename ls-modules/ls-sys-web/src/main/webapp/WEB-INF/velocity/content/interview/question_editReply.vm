@@ -1,0 +1,209 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+<body class="page-body-white">
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="formInterReply" role="form" ms-controller="formInterReply">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>是否回复</label>
+
+                    <div class="radio-group">
+                        <label class="radio-inline"><input type="radio" name="isReply" value="1" ms-duplex-string="isReply">是</label>
+                        <label class="radio-inline"><input type="radio" name="isReply" value="0" ms-duplex-string="isReply">否</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>回复嘉宾</label>
+                    <select id="replyName" class="form-control" name="replyName"
+                            ms-duplex="replyName" placeholder="请选择回复嘉宾">
+                    </select>
+                    <!--<input name="replyName" type="text" class="form-control" placeholder="姓名不能为空" ms-duplex="replyName">-->
+                </div>
+                <div class="form-group">
+                    <label>回复内容</label>
+                    <textarea name="replyContent" style="width: 100%;height:250px; visibility: visible;" placeholder=""
+                              ms-duplex="replyContent"></textarea>
+                </div>
+
+                <div class="col-xs-8 col-md-8" style="padding-left: 0">
+                    <div class="form-group">
+                        <label>回复图片</label>
+                        <input type="text" name="replyPic" id="replyPic" readonly class="form-control readonly"
+                               placeholder="点击选择回复图片" ms-duplex="replyPic" onclick="imgUpload()"/>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-md-4">
+                    <img id="replyPicImg" src="$!{rc.contextPath}/assets/images/no.photo.jpg" alt="" style="width: 100px;border:2px solid white">
+                    <div class="thum-delete" style="top:30px" id="delImg" onclick="deleteWbPic()" title="删除"><i class="fa fa-trash"></i></div>
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        questionId: Ls.url.get("questionId"),
+        interviewId: Ls.url.get("interviewId")
+    };
+    var eweb;
+
+    $(document).ready(function () {
+
+        setTimeout(function () {
+            eweb = Ls.editor("replyContent", {style: "Lmini",height: "200"});
+            /*cur.editor = KindEditor.create('textarea[name="replyContent"]', {
+                items: ["source", "|", "undo", "redo", "|", "template", "code", "cut", "copy", "paste", "plainpaste", "wordpaste", "|", "justifyleft", "justifycenter", "justifyright", "justifyfull", "clearhtml", "quickformat", "selectall", "|", "formatblock", "fontname", "fontsize", "|", "forecolor", "hilitecolor", "bold", "italic", "underline", "strikethrough", "lineheight", "removeformat", "|", "table", "hr", "emoticons", "link", "unlink"],
+                allowImageUpload: false,
+                allowFileManager: false,
+                allowFlashUpload: false,
+                allowMediaUpload: false,
+                filterMode: false,
+                afterCreate: function () {
+                    this.sync();
+                },
+                afterBlur: function () {
+                    this.sync();
+                },
+                resizeType: 1
+            });*/
+
+            //拉取数据
+            var getData = function () {
+                Ls.ajaxGet({
+                    url: "/interviewQuestion/getQuestion",
+                    data: {
+                        questionId: cur.questionId
+                    }
+                }).done(function (d) {
+
+                    data = d.data;
+                    cur.$id = "formInterReply"
+                    data.$id = cur.$id;
+                    if (data.names != null && data.names != '') {
+                        var selectNames = data.names.split("|");
+                        var options = '';
+                        for (var i = 0; i < selectNames.length; i++) {
+                            options += '<option value="' + selectNames[i] + '">' + selectNames[i] + '</option> '
+                        }
+                        $("#replyName").append(options)
+                    }
+                    $("#replyPicImg").attr("src",Ls.isEmpty(data.replyPic) ? GLOBAL_CONTEXTPATH + "/assets/images/no.photo.jpg":data.replyPic);
+                    cur.vm = avalon.define(data)
+                    avalon.scan($("#ID").get(0), cur.vm);
+                    /*cur.editor.html(data.replyContent);*/
+                    eweb.setHtml(data.replyContent);
+
+                }).fail(function () {
+                    alert('失败!')
+                })
+            };
+
+            getData();
+
+        }, 500)
+
+    })
+
+    $('#formInterReply').validator({
+        fields: {
+            'replyName': '回复嘉宾:required;length[2~40]'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = Ls.toJSON(cur.vm.$model);
+        /*data.replyContent = cur.editor.html()*/
+        data.replyContent = eweb.getHtml();
+        Ls.ajax({
+            url: '/interviewQuestion/saveReply',
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                        Ls.winClose();
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function imgUpload() {
+        var desc = "";
+
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+//                mongoId = data[0].mongoId;
+//                cur.vm.questionPic = mongoId;
+//                $("#replyPic").val(GLOBAL_FILESERVERPATH + mongoId);
+//                $("#replyPicImg").attr("src", GLOBAL_FILESERVERPATH + mongoId);
+                cur.vm.questionPic = data[0].fileName;
+                $("#replyPic").val(GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                $("#replyPicImg").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": cur.vm.siteId,
+                "desc": desc,
+                "type": "NotDefined",
+                "code": "interviewReply"
+            }
+        })
+    }
+
+    /**
+     * 删除栏目缩略图
+     */
+    function deleteWbPic() {
+        var replyPic = $('#replyPic').val();
+        if (replyPic == null || "" == replyPic) {
+            Ls.tipsErr("图片不存在！");
+            return;
+        }
+        if (confirm("确定删除?")) {
+            Ls.ajaxGet({
+                url: "/fileCenter/deleteByMongoId",
+                data: {
+                    mongoId: cur.vm.replyPic
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("删除成功！", {
+                        icons: "success", callback: function () {
+                            $('#replyPic').val('');
+                            $("#replyPicImg").attr("src",GLOBAL_CONTEXTPATH + "/assets/images/no.photo.jpg");
+                            cur.vm.replyPic = "";
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc);
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>

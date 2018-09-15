@@ -1,0 +1,129 @@
+<form id="catalog_form" role="form" ms-controller="catalog_form">
+    <div class="form-body">
+        <div class="form-group">
+            <label><span style="color: #da1202">*</span>目录名称</label>
+            <input type="text" name="name" class="form-control" placeholder="目录名称" ms-duplex="name">
+        </div>
+
+        <div class="form-group">
+            <label><span style="color: #da1202">*</span>目录编码</label>
+            <input type="text" name="code" class="form-control" placeholder="目录编码" ms-duplex="code">
+        </div>
+
+        <div class="form-group">
+            <label><span style="color: #da1202">*</span>目录类别</label>
+            <div id="selectWrap">
+                <input id="columnTypeId" name="columnTypeId" class="form-control" placeholder="目录类别">
+            </div>
+##                #foreach($columnType in $columnTypeList)
+##                    <option value="$!{columnType.id}">$!{columnType.typeName}</option>
+##                #end
+        </div>
+
+        <div class="form-group">
+            <label><span style="color: #da1202">*</span>目录类型</label>
+            <select name="attribute" class="form-control" ms-duplex="attribute" placeholder="目录类型"
+                    data-rule="目录类型:required;">
+                #foreach($attribute in $attributeList)
+                    <option #if($attribute.default) selected #end value="$!{attribute.code}">$!{attribute.key}</option>
+                #end
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label><span style="color: #da1202">*</span>排序号</label>
+            <input type="text" name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+        </div>
+
+        <div class="form-group">
+            <label>转向链接</label>
+            <input type="text" name="link" class="form-control" placeholder="转向链接" ms-duplex="link"
+                   data-rule="length(~300)"
+                   data-msg-length="转向链接最多填写300个字符"/>
+        </div>
+
+        <div class="form-group">
+            <label>分管领导</label>
+            <input type="text" name="leader" class="form-control" placeholder="分管领导" ms-duplex="leader"
+                   data-rule="length(~20)"
+                   data-msg-length="分管领导最多填写20个字符"/>
+        </div>
+
+        <div class="form-group">
+            <label>责任人</label>
+            <input type="text" name="personLiable" class="form-control" placeholder="责任人" ms-duplex="personLiable"
+                   data-rule="length(~20)"
+                   data-msg-length="责任人最多填写20个字符"/>
+        </div>
+
+        <div class="form-group">
+            <label>联系电话</label>
+            <input type="text" name="phone" class="form-control" placeholder="联系电话" data-rule="mobile|tel|shortTel;"
+                   ms-duplex="phone">
+        </div>
+
+        <div class="form-group">
+            <label>更新周期</label>
+            <input type="text" name="updateCycle" class="form-control" placeholder="更新周期" ms-duplex="updateCycle"
+                   data-rule="integer">
+        </div>
+
+        <div class="form-group">
+            <label>黄牌警示天数</label>
+            <input type="text" name="yellowCardWarning" class="form-control" placeholder="黄牌警示天数"
+                   ms-duplex="yellowCardWarning" data-rule="integer">
+        </div>
+
+        <div class="form-group">
+            <label>红牌警示天数</label>
+            <input type="text" name="redCardWarning" class="form-control" placeholder="红牌警示天数"
+                   ms-duplex="redCardWarning" data-rule="integer">
+        </div>
+
+        #if("$!{type}" == "1")
+            <div class="form-group">
+                <label>关联目录</label>
+                <textarea class="form-control" name="relCatNames" placeholder="关联其他信息公开目录" rows="2"
+                          ms-duplex="relCatNames" readonly ms-click="relCatIds_select()"></textarea>
+            </div>
+        #end
+
+        <div class="form-group">
+            <label>引用信息到栏目</label>
+            <textarea class="form-control" name="referColumnNames" id="referColumnNames"
+                      ms-duplex-string="referColumnNames" rows="2" readonly 　ms-click="getReferColumn()"
+                      placeholder="点击选择栏目"></textarea>
+            <input type="hidden" name="referColumnIds" id="referColumnIds"
+                   ms-duplex-string="referColumnIds">
+        </div>
+        <div class="form-group">
+            <label>引用信息到信息公开目录</label>
+            <textarea class="form-control" name="referOrganCatNames" id="referOrganCatNames"
+                      ms-duplex-string="referOrganCatNames" rows="2" readonly 　ms-click="getReferOrganCat()"
+                      placeholder="点击选择信息公开目录"></textarea>
+            <input type="hidden" name="referOrganCatIds" id="referOrganCatIds"
+                   ms-duplex-string="referOrganCatIds">
+        </div>
+
+        <div class="form-group">
+            <label>关键字</label>
+            <textarea class="form-control" name="keyWords" ms-duplex="keyWords" rows="3"
+                      placeholder="目录关键字" data-rule="length(~500)"
+                      data-msg-length="目录关键字最多填写500个字符"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>描述</label>
+            <textarea class="form-control" name="description" ms-duplex="description" rows="3"
+                      placeholder="目录描述" data-rule="length(~500)"
+                      data-msg-length="目录描述最多填写500个字符"></textarea>
+        </div>
+
+        #if("$!{type}" != "1")
+            <div class="form-actions noborder">
+                <button type="submit" class="btn blue">保 存</button>
+                <button type="reset" class="btn default">重 置</button>
+            </div>
+        #end
+    </div>
+</form>

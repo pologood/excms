@@ -1,0 +1,6 @@
+#foreach($eo in $resultObj.columns)
+<li class="num$!{velocityCount}">
+    <span class="num">$eo[1]</span>
+    <a href="/$!{eo[3]}/index.html" title="$eo[2]" target="_blank">$eo[2]</a>
+</li>
+#end

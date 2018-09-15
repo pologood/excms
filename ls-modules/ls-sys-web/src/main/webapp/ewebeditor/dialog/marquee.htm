@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+        var sAction = "INSERT";
+        var sTitle = lang["DlgComInsert"];
+        var oControl;
+
+        var sText = "";
+        var sBehavior = "";
+
+        if (EWEBSelection.GetType() == "Control") {
+            oControl = EWEBSelection.GetSelectedElement();
+            if (oControl.tagName == "MARQUEE") {
+                sAction = "MODI";
+                sTitle = lang["DlgComModify"];
+                sBehavior = oControl.behavior;
+                sText = oControl.innerHTML;
+            }
+        }
+
+        var sCaption = lang["DlgMarquee"] + "(" + sTitle + ")";
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            $("d_text").value = sText;
+            switch (sBehavior) {
+                case "scroll":
+                    $("d_behavior_scroll").checked = true;
+                    break;
+                case "slide":
+                    $("d_behavior_slide").checked = true;
+                    break;
+                default:
+                    sBehavior = "alternate";
+                    $("d_behavior_alternate").checked = true;
+                    break;
+            }
+
+            parent.InnerDialogLoaded(sCaption);
+        }
+
+        function ok() {
+            sText = $("d_text").value;
+            sBehavior = GetRadioGroupValue("d_behavior");
+            if (sAction == "MODI") {
+                oControl.behavior = sBehavior;
+                oControl.innerHTML = sText;
+            } else {
+                EWIN.insertHTML("<marquee behavior='" + sBehavior + "'>" + sText + "</marquee>");
+            }
+
+            parent.Ok();
+        }
+
+        function GetRadioGroupValue(s_Name) {
+            var els = document.getElementsByName(s_Name);
+            for (var i = 0; i < els.length; i++) {
+                if (els[i].checked) {
+                    return els[i].value;
+                }
+            }
+        }
+    </script>
+</head>
+
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr>
+                    <td>
+                        <FIELDSET>
+                            <LEGEND></LEGEND>
+                            <table border=0 cellspacing=0 cellpadding=5 width="100%">
+                                <tr>
+                                    <td>
+
+                                        <table border=0 cellspacing=2 cellpadding=0 width="100%">
+                                            <tr>
+                                                <td noWrap width="20%"><span lang=DlgMarqueeText></span>:</td>
+                                                <td noWrap width="80%"><input type=text id="d_text" size=40 value=""></td>
+                                            </tr>
+                                            <tr>
+                                                <td noWrap width="20%"><span lang=DlgMarqueeBehavior></span>:</td>
+                                                <td noWrap width="80%"><input type="radio" name="d_behavior" id="d_behavior_scroll" value="scroll"><label
+                                                    for="d_behavior_scroll"><span lang=DlgMarqueeScroll></span></label> <input type="radio" name="d_behavior" id="d_behavior_slide"
+                                                                                                                               value="slide"><label for="d_behavior_slide"><span
+                                                    lang=DlgMarqueeSlide></span></label> <input type="radio" name="d_behavior" id="d_behavior_alternate" value="alternate"><label
+                                                    for="d_behavior_alternate"><span lang=DlgMarqueeAlternate></span></label></td>
+                                            </tr>
+
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </FIELDSET>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td height=10></td>
+                </tr>
+                <tr>
+                    <td noWrap align=right><input type=submit class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                               class="dlgBtnCommon dlgBtn"
+                                                                                                                                                               value=''
+                                                                                                                                                               onclick="parent.Cancel()"
+                                                                                                                                                               lang=DlgBtnCancel>
+                    </td>
+                </tr>
+            </table>
+
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,328 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" id="reply_form" ms-controller="reply_form">
+            <table class="table table-bordered petition-table">
+                <tbody>
+                <tr id="status" style="display: none">
+                    <th>当前状态：</th>
+                    <td colspan="2" ms-text="statusName">
+                    </td>
+                </tr>
+                <tr>
+                    <th>办理状态：</th>
+                    <td>
+                        #foreach($s in $statusList)
+                            #if(!${dealStatus} && $!{s.statusCode}=="replyed")
+                                <label class="radio-inline">
+                                    <input type="radio" name="dealStatus" value="$!{s.statusCode}" checked="checked"/> $!{s.statusName}
+                                </label>
+
+
+                            #elseif($!{dealStatus}==$!{s.statusCode})
+                                <label class="radio-inline">
+                                    <input type="radio" name="dealStatus" value="$!{s.statusCode}" checked="checked"/> $!{s.statusName}
+                                </label>
+                            #else
+                                <label class="radio-inline">
+                                    <input type="radio" name="dealStatus" value="$!{s.statusCode}"/> $!{s.statusName}
+                                </label>
+                            #end
+                        #end
+                    </td>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">回复内容：</th>
+                    <td colspan="2">
+                <textarea id="replyContent" name="replyContent" ms-duplex="replyContent" class="form-control"
+                          style="width: 100%; visibility:visible ;height:200px"></textarea>
+                    </td>
+                </tr>
+                <tr class="hide">
+                    <th>附件：</th>
+                    <td colspan="2">
+                        <textarea id="video_content" name="attachId" ms-duplex="attachId"
+                                  class="form-control"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th>附件：</th>
+                    <td colspan="2">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" id="attachName" name="attachName" ms-duplex="attachName"
+                                       class="form-control">
+
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default btn-default-upload" type="button"
+                                            onclick="uploadAttachment()">上传
+                                        <i class="fa fa-cloud-upload"></i>
+                                    </button>
+                                </div>
+                                <!-- /btn-group -->
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                #* <tr style="display: none">
+                     <th>回复人ID：</th>
+                     <td>
+                         <input type="text" id="createUserId" name="createUserId" class="form-control"
+                                ms-duplex="createUserId" placeholder=""/>
+                     </td>
+                 </tr>
+                     #if($recType==1)
+                     <tr>
+                         <th>回复人：</th>
+                         <td>
+                             <div class="input-group" id="resMark">
+                                 <input type="text" id="userName" name="userName" class="form-control"
+                                        ms-duplex="userName" placeholder=""/>
+                                 <div class="input-group-btn">
+                                     <button id="icon_btn" class="btn btn-default btn-default-upload" type="button"
+                                             onclick="showRes()">
+                                         <i class="fa fa-caret-down" id="select_icon"></i>
+                                     </button>
+                                 </div>
+                             </div>
+                         </td>
+                     </tr>
+                     #end*#
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+</body>
+
+<!--[if lt IE 9]>
+<script src="$!{sysStaticPath}/assets/js/patch.min.js"></script>
+<![endif]-->
+<!-- BEGIN CORE PLUGINS -->
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/kindeditor/kindeditor.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+
+<script>
+    var cur = {
+        pWin: Ls.getWin.win
+    }
+    var baseContentId = "${baseContentId}";
+    var messageBoardId = "${messageBoardId}";
+    var createUserId = "${createUserId}";
+    var status = '$!{status}';
+    var isSuper = '$!{isSuper}';
+    var eweb;
+    var curr = {
+        vm: {}
+    }
+
+    $(document).ready(function () {
+        eweb = Ls.editor("replyContent", {cusdir: "/" + GLOBAL_SITEID + "/" + cur.columnId});
+        /*KindEditor.ready(function (K) {
+            editor = K.create('textarea[name="replyContent"]', {
+                uploadJson: GLOBAL_CONTEXTPATH + '/articleNews/upload?siteId=' + GLOBAL_SITEID + "&columnId=" + cur.columnId,//上传文件
+                fileManagerJson: '/fileCenter/getPage',//文件空间
+                allowImageUpload: true,
+                allowFileManager: false,
+                allowFlashUpload: false,
+                allowMediaUpload: false,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                fileServerPath: GLOBAL_FILESERVERNAMEPATH,
+                filterMode: false,
+                afterCreate: function () {
+                    this.sync();
+                },
+                afterBlur: function () {
+                    this.sync();
+                },
+                resizeType: 1
+            });
+        })*/
+
+
+        /*  editor = KindEditor.create('textarea[name="replyContent"]', {
+              resizeType: 1,
+              allowPreviewEmoticons: false,
+              allowImageUpload: false,
+              items: [
+                  'forecolor', 'hilitecolor', 'bold', 'italic', 'underline'],
+              afterCreate: function () {
+                  this.sync();
+              },
+              afterBlur: function () {
+                  this.sync();
+              },
+              filterMode: true
+          });*/
+        var api = Ls.getWin.api;
+        if (!api) return;
+        // 操作对话框
+        api.button({
+                id: 'abcd',
+                focus: true,
+                name: '保 存',
+                callback: function () {
+                    $("#reply_form").trigger("validate");
+                    return false;
+                }
+            }, {
+                id: 'ab',
+                name: '返回',
+                callback: function () {
+                    goBack();
+                    return false;
+                }
+            }
+        );
+        getVO();
+    });
+
+    var columnId = null;
+
+    function getVO() {
+        Ls.ajaxGet({
+            url: "/messageBoard/getReplyVO",
+            data: {id: messageBoardId, isSuper: isSuper}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            data = text.data;
+            columnId = data.columnId;
+            curr.$id = "reply_form";
+            //初始化表单字段
+            curr.init = Ls.initFORM(curr.$id, data);
+            //如果模型已经绑定，不再绑定
+            curr.vm = avalon.vmodels[curr.$id];
+            if (!curr.vm) {
+                curr.vm = avalon.define(curr.init);
+            } else {
+                Ls.assignVM(curr.vm, data);
+            }
+            // avalon.scan(document.body, curr.vm);
+            avalon.scan($("#reply_form").get(0), curr.vm);
+            if (data.replyContent != null) {
+                //editor.html(data.replyContent);
+                eweb.setHtml(data.replyContent);
+            } else {
+                curr.vm.replyContent = "<p class='MsoNormal'>" +
+                    "<span style='font-size:9.0pt;font-family:宋体;'>尊敬的来信人：您好！<span></span></span></p>" +
+                    "<p class='MsoNormal'><span style='font-size:9.0pt;font-family:宋体;'>感谢您对我们工作的理解和支持。<span></span></span></p>";
+                //editor.html(curr.vm.replyContent);
+                eweb.setHtml(curr.vm.replyContent);
+            }
+            if (!Ls.isEmpty(data.statusName)) {
+                $("#status").show();
+            }
+
+        });
+    }
+
+    $('#reply_form').validator({
+        fields: {
+            'messageBoardContent': '回复内容:required;',
+            'dealStatus': '办理状态:checked',
+        },
+        valid: function () {
+            saveReply();
+        }
+    })
+
+
+    function saveReply() {
+        if (status == '0') {
+            Ls.tipsErr("请先配置办理状态");
+            return;
+        }
+        var content = $("#replyContent").val();
+        var dealStatus = $("input[name='dealStatus']:checked").val();
+        //curr.vm.replyContent = editor.html();
+        curr.vm.replyContent = eweb.getHtml();
+        curr.vm.recType = "$!{recType}";
+        curr.vm.messageBoardId = messageBoardId;
+        curr.vm.baseContentId = baseContentId;
+        curr.vm.isSuper = isSuper;
+        curr.vm.dealStatus = dealStatus;
+        var value = curr.vm.$model;
+        value = Ls.toJSON(value);
+
+        Ls.ajax({
+            url: "/messageBoard/reply",
+            data: value
+        }).done(function (d) {
+            if (d.status == 0) {
+                Ls.tipsErr("操作失败：" + d.desc);
+            } else {
+                Ls.tipsOk("回复成功", function () {
+                    goBack();
+                    cur.pWin.cur.grid.reload();
+                });
+                //parent.searchClear();
+            }
+        });
+    }
+
+    function goBack() {
+        Ls.winClose();
+    }
+
+    var json = "";
+
+    function showRes() {
+        Ls.dropDowns2('resMark', {
+            async: {
+                url: "/onlinePetition/getRecUnitOrPerson",
+                otherParam: {columnId: columnId},
+            },
+            data: {
+                key: {
+                    title: "recUserName",
+                    name: "recUserName"
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "recUserId",
+                        pIdKey: "parentId"
+                    }
+                }
+            },
+            callback: {
+                onClick: function (e, treeId, node) {
+                    //  $("#receiveUserName").val(node.recUserName);
+                    curr.vm.replyUserId = node.recUserId;
+                    curr.vm.replyUserName = node.recUserName;
+                }
+            }
+        });
+
+    }
+
+    function uploadAttachment() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                curr.vm.attachId = filePath[0].fileName;
+                curr.vm.attachName = filePath[0].fileName;
+                $('#attachName').val(filePath[0].fileName);
+                $('#attachId').val(filePath[0].fileName);
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传附件',
+            file_size_limit: "20 MB",
+            file_types: "*.zip;*.rar;*.doc;*.docx;*.xls;*.xlsx;*.ppt;*.pptx;*.txt;*.jpg;*.gif;*.bmp;*.pdf",
+            file_upload_limit: 1,  //配置上传个数
+            post_params: {
+                "type": "NotDefined"
+            }
+        });
+    }
+
+</script>	

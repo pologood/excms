@@ -1,0 +1,373 @@
+<div id="doc_main" style="width: 100%; height: 100%; position: relative;">
+    <div class="portlet light">
+        <div class="portlet-body">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-sm-12 col-md-12 col-lg-5">
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作
+                                <i class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li class="publishBtn disabled" id="batchUse_news"><a href="javascript:;">批量采用</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选
+                                <i
+                                        class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="searchByType('isUse',3)">已采用</a></li>
+                                <li><a href="javascript:;" onclick="searchByType('isPut',1)">未采用</a></li>
+                                <li class="divider"></li>
+                                <li><a href="javascript:;" onclick="searchByType('isBack',2)">已退回</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-all-check" id="checkAll"
+                                    onclick="checkAll(this)"> 全 选
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-7">
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <input type="datetime" id="startTime" class="form-control w105" placeholder="开始时间"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endTime\')}',readOnly:true})"
+                                       readonly>
+                                <input type="datetime" id="endTime" class="form-control w105" placeholder="结束时间"
+                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startTime\')}',readOnly:true})"
+                                       readonly>
+                                <input type="text" id="searchKey" name="searchKey" class="form-control w140"
+                                       placeholder="关键字" maxlength="50">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="searchContent()"> 搜 索
+                            </button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="doc-manage">
+
+                <table class="table table-hover doc-list">
+                    <thead>
+                    <tr>
+                        <th class="w30">
+                        #*<input type="checkbox" id="checkAll" onclick="checkAll()">*#
+                        </th>
+                        <th>标 题</th>
+                        <th class="w150">状 态</th>
+                        <th class="w80">操 作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="doc_list_body">
+                    </tbody>
+                </table>
+                <div id="pagination" class="pagination pull-right mr22"></div>
+            ##        <div id="page_more" class="page_more">加载更多...</div>
+                <div class="clearfix"></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<iframe name="download" id="download" style="display: none;"></iframe>
+<script id="member_list_template" type="text/html">
+    <? for(var i=0,l=data.length; i<l; i++){
+        var el = data[i],titleStyle = "";
+        var imga=""; var imgPath="";
+        if(el.imageLink!=null&&el.imageLink!="") {
+            imgPath = (GLOBAL_CONTEXTPATH||"") +  + "/assets/images/img.png";
+            imga='<img src="/assets/images/img.png"/>';
+    }
+
+    titleStyle = "color:" + el.titleColor + ";";
+    if(el.isBold==1) {
+    titleStyle += "font-weight:bold;"
+    }
+    if(el.isTilt==1) {
+    titleStyle += "font-style:italic;"
+    }
+    if(el.isUnderline==1) {
+    titleStyle += "text-decoration:underline;"
+    }
+    var redirectLink = "";
+    if(el.redirectLink && el.redirectLink != "") {
+    if(el.redirectLink.indexOf("http")!= -1){
+    redirectLink = el.redirectLink
+    }else{
+    redirectLink = GLOBAL_HTMLFILEPATH + el.redirectLink
+    }
+
+    } else {
+    redirectLink = GLOBAL_HTMLFILEPATH + "/content/article/" + el.id
+    }
+    title_new=el.title;
+    if(title_new.indexOf("<br>")!= -1){
+    title_new=title_new.replace("<br>","\n");
+    }
+    ?>
+    <tr data-id="<?= el.id ?>" data-no="<?= el.num ?>">
+        <td>
+            <div class="title">
+                <?if(el.memberConStu == 1 ){?>
+                <input type="checkbox" name="check" value="<?=el.id?>">
+                <?}else{?>
+                <input type="checkbox" name="check" disabled="disabled" value="<?=el.id?>">
+                <?}?>
+            </div>
+        </td>
+        <td colspan="3">
+            <div class="title rows">
+                <a href="javascript:;" onclick="show_detail(<?=el.id?>)" target="_blank" style="<?=titleStyle?>">
+                    <?=title_new?>
+                </a>&nbsp;&nbsp;&nbsp;<?==imga?>
+            </div>
+            <div class="attr l">
+                <span class="w230">投稿日期：<?=el.memPutDate?></span>
+                <span class="w180">会员：<?=el.member?></span>
+                <span class="w180">作者：<?=el.author?></span>
+            </div>
+            <div class="tools r w250">
+                <div class="l mr70">
+                    <?switch(el.memberConStu)
+                    {
+                    case 0:?>
+                    <span class="w150" style="color:#a2a3a2">未提交</span>
+                    <?break;
+                    case 1:?>
+                    <span class="w150" style="color:#a2a3a2">未采用</span>
+                    <?break;
+                    case 2:?>
+                    <span class="w150" style="color:#a2a3a2">已退回</span>
+                    <?break;
+                    default:?>
+                    <span class="w150" style="color:#a2a3a2">已采用(<?=el.columnName?>)</span>
+                    <?}?>
+                </div>
+                <?if(el.workFlowStatus == 0){?>
+                <span class="w250" style="color:#a2a3a2">审核中</span>
+                <?}else{?>
+                <div class="input-group">
+                    <?if(el.memberConStu==1){?>
+                    <div class="btn-group">
+                        <button type="button" onclick="useById(<?=el.id?>)"
+                                class="editBtn btn btn-default btn-xs">采 用
+                        </button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" onclick="back_msg(<?=el.id?>)"
+                                class="editBtn btn btn-default btn-xs">退 回
+                        </button>
+                    </div>
+                    <?}else{?>
+                    <div class="btn-group">
+                        <button type="button" onclick="useById(<?=el.id?>)"
+                                class="editBtn btn btn-default btn-xs" style="visibility:hidden">采 用
+                        </button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button type="button" onclick="back_msg(<?=el.id?>)"
+                                class="editBtn btn btn-default btn-xs" style="visibility:hidden">退 回
+                        </button>
+                    </div>
+                    <?}?>
+                </div>
+                <?}?>
+            </div>
+        </td>
+    </tr>
+    <? } ?>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/memberNews/member_news_list.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script>
+    var cur = {
+        key: "",
+        condition: "",
+        status: "",
+        columnId: '',
+        pageSize: 10,
+        pageIndex: 0,
+        startTime: '',
+        endTime: '',
+        resources: ''
+    };
+
+    $(document).ready(function () {
+        cur.pageIndex = $!{pageIndex};
+        member_manage.init();
+
+    });
+    function show_detail(id) {
+        Ls.openWin("/memberNews/detail?id=" + id, '800px', '600px', {
+            title: "预览"
+        });
+    }
+    function back_msg(id) {
+        Ls.openWin("/memberNews/back?id=" + id, '500px', '250px', {
+            title: "退回消息"
+        });
+    }
+    //加载列表
+    function getList() {
+        member_manage.getData(cur.pageIndex, cur.key, cur.condition, cur.status);
+    }
+
+    //修改
+    function editArticle(id) {
+        Ls.ajaxGet({
+            data: {
+                ids: id
+            },
+            url: "/articleNews/getStatus",
+            success: function (text) {
+                var type = text.data;
+                if (type == null) {
+                    content_mgr.getContentApp("/articleNews/articleNewsEdit?id=" + id + "&pageIndex=" + cur.pageIndex + "&type=" + type + "&typeCode=" + '$!{typeCode}')
+                } else {
+                    content_mgr.getContentApp("/articleNews/articleNewsEdit?id=" + id + "&pageIndex=" + cur.pageIndex + "&type=" + type + "&typeCode=" + '$!{typeCode}')
+                }
+            }
+        });
+    }
+
+    function searchContent() {
+        cur.key = $("#searchKey").val();
+        cur.startTime = $("#startTime").val();
+        cur.endTime = $("#endTime").val();
+        member_manage.getData(0, cur.key, cur.condition, cur.status)
+    }
+
+    function searchClear() {
+        cur.key = "";
+        $("#searchKey,#startTime,#endTime").val("");
+        cur.condition = "";
+        cur.status = "";
+        cur.startTime = '';
+        cur.endTime = '';
+        member_manage.getData(0, cur.key, '', '')
+    }
+
+    function searchByType(type, status) {
+        cur.condition = type;
+        cur.status = status;
+        member_manage.getData(0, cur.key, cur.condition, cur.status);
+    }
+
+    function checkAll(el) {
+        var el = $(el);
+        if (el.data("checked")) {
+            $("input[name='check']").not("input:disabled").prop("checked", false);
+            el.data("checked", false);
+        } else {
+            $("input[name='check']").not("input:disabled").prop("checked", true);//check  会被选中
+            el.data("checked", true);
+        }
+    }
+
+    function batchUse_news() {// 批量采用
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        useById(check);
+    }
+
+
+    function useById(id) {
+        //$(obj).css("visibility",'hidden');
+        var i = "采用";
+        var r = "/content/toMove?contentId=" + id + "&source=1&type=1";
+        Ls.openWin(r, "400px", "400px", {
+            id: "copy_refer_page",
+            title: i + "到",
+            ok: function () {
+                iframe = this.iframe.contentWindow;
+                data = iframe.ok();
+                data.contentId = id.toString();
+                data.type = 1;
+                Ls.ajax({
+                    url: "/memberNews/use",
+                    data: data
+                }).done(function (e) {
+                    if (e.status == 1) {
+                        Ls.tipsOk(i + "成功!")
+                        member_manage.getData(cur.pageIndex, cur.key, cur.condition, cur.status);
+                    } else {
+                        Ls.tipsErr(e.desc);
+                    }
+                })
+            }
+        })
+
+    }
+
+    //单删除
+    function deleteById(id) {
+        var check = [];
+        check.push(id);
+        if (confirm("确认要删除吗？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/articleNews/delete",
+                success: function (text) {
+                    if (text.status == 1) {
+                        Ls.tipsOk("删除成功!")
+                        doc_manage.getData(cur.pageIndex, cur.key, cur.condition, cur.status);
+                    } else {
+                        Ls.tipsErr(text.desc);
+                    }
+                }
+            });
+        }
+    }
+
+    function contentSort(id, num, opr) {
+        var data = {
+            opr: opr,
+            oprId: id,
+            oprSort: num,
+            columnId: cur.columnId,
+            title: cur.key,
+            condition: cur.condition,
+            status: cur.status
+        };
+
+        Ls.ajaxGet({
+            data: data,
+            url: "/content/contentSort",
+            success: function (text) {
+                if (text.status == 1) {
+                    member_manage.getData(cur.pageIndex, cur.key, cur.condition, cur.status);
+                    Ls.tipsOk("排序成功");
+                } else {
+                    Ls.tipsErr(text.desc);
+                }
+            }
+        });
+    }
+
+    function report(dataId, processId, processName) {
+        startProcess("EX", cur.columnId, "ArticleNews", dataId, processId, processName);
+    }
+
+    function reloadData() {
+        member_manage.getData(0, cur.key, cur.condition, cur.status);
+    }
+</script>

@@ -1,0 +1,219 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="addTask()">添加任务</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-delete" onclick="batchDel()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/db/collect/getPageTaskEOs" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="" width="50%" align="center" headerAlign="center" renderer="taskNameDiy">名称</div>
+                        <div field="columnName" width="50%" align="left" headerAlign="center" >所属栏目</div>
+                        <div field="dbType" width="80" align="center" headerAlign="center">数据库类型</div>
+                        <div field="ip" width="150" align="center" headerAlign="center">IP地址</div>
+                        <div field="port" width="60" align="center" headerAlign="center">端口</div>
+                        <div field="dataBase" width="100" align="center" headerAlign="center">数据库</div>
+                        <div field="collectCount" width="60" align="center" headerAlign="center">采集数量</div>
+                        <div field="collectDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">上次采集时间</div>
+                        <div field="" width="80" align="center" headerAlign="center" renderer="contentRule">采集配置</div>
+                        <div width="80" align="center" headerAlign="center" allowSort="true" renderer="execCollect">采集操作</div>
+                        <div width="80" name="loginfo" align="center" headerAlign="center" allowSort="true" renderer="collectLog" visible="false">采集日志</div>
+                        <div width="125" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key:$('#ser_key'),
+        dialog:Ls.getWin.dialog
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load({siteId: GLOBAL_SITEID});
+    })
+
+    //任务采集完成回调函数
+    function msg_db_collect() {
+        $("#collect_task_" + cur.excu_task_id).show();
+        $("#collect_ing_" + cur.excu_task_id).hide();
+    }
+
+    /*
+    * 添加采集任务
+    * */
+    function addTask() {
+        cur.dialog.data("type","add");
+        Ls.openWin("/db/collect/addOrEditTask", '600px', '410px', {
+            title: "添加DB采集任务"
+        });
+    }
+
+    function editTask(id) {
+        var record = cur.grid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+        cur.dialog.data("type","edit");
+        cur.dialog.data("record",record);
+        Ls.openWin("/db/collect/addOrEditTask", '600px', '410px', {
+            title: "编辑DB采集任务"
+        });
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if(id != null && id != "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for(var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/db/collect/deleteTasks",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:"error",times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function taskNameDiy(obj) {
+        var record = obj.record;
+        var diy = '<a id=' + record.id + ' href="javascript:;"  onclick="dataDetail('+record.id+','+record.columnId+','+record.cSiteId+')"><u>' + record.taskName + '</u></a>';;
+        return diy;
+    }
+
+    function dataDetail(id,columnId,cSiteId) {
+        cur.dialog.data("taskId",id);
+        cur.dialog.data("columnId",columnId);
+        cur.dialog.data("cSiteId",cSiteId);
+        Ls.openWin("/db/collect/dataDetail?taskId=" + id, '880px', '490px', {
+            id:"content_data",
+            title: "采集数据"
+        });
+    }
+
+    function contentRule(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editContentRule('+record.id+',\''+record.dbType+'\')">配置规则</button> ';
+        return edit;
+    }
+
+    function editContentRule(id,dbType) {
+        cur.dialog.data("taskId",id);
+        cur.dialog.data("dbType",dbType);
+        Ls.openWin("/db/collect/contentRule", '800px', '500px', {
+            id:"content_rule",
+            title: "编辑内容采集规则"
+        });
+    }
+
+    function execTask(id,name) {
+        cur.excu_task_id = id;
+        $("#collect_task_" + id).hide();
+        $("#collect_ing_" + id).show();
+        Ls.ajaxGet({
+            url: "/db/collect/execTask",
+            data: {
+                taskId:id
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    Ls.tips(resp.desc);
+                } else {
+                    Ls.tips(resp.desc,{icons:'error',times:5});
+                }
+            }
+        });
+    }
+
+    function execCollect(obj) {
+        var record = obj.record;
+        var collect = '<button id="collect_task_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="execTask('+record.id+',\''+record.taskName+'\')">执行任务</button> ';
+        var collecting = "<div id='collect_ing_" + record.id + "' style='display: none'><font color='green'>采集中</font></div>";
+        return collect + collecting;
+    }
+
+    function collectLog(obj) {
+        var record = obj.record;
+        var log = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="showLog(\''+record.taskName+'\')">实时日志</button> ';
+        return log;
+    }
+
+    function showLog(name) {
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editTask('+record.id+')">配置源</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel('+record.id+')">删 除</button>';
+        return edit + del;
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({siteId: GLOBAL_SITEID, keys: 'taskName', keyValue: keyValue});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+
+    function callback(msg) {
+        Ls.tips(msg, {times: 2});
+        search();
+    }
+</script>

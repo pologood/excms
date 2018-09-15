@@ -1,0 +1,25 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($isHit="$!{paramObj.isHit}")
+#set($length=$Integer.parseInt($length))
+#if($resultObj.data.size()>0)
+<ul class="public-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        <li><a href="$!{eo.link}">${eo.title}</a></li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+#end

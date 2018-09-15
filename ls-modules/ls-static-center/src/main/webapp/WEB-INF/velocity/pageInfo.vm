@@ -1,0 +1,62 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($showImg="$!{paramObj.showImg}")
+#set($showType="$!{paramObj.showType}")
+#set($length=$Integer.parseInt($length))
+#set($remarks="$!{resultObj.remarks}")
+#set($article="$!{resultObj.article}")
+#set($imageLink="$!{resultObj.imageLink}")
+#set($title="$!{resultObj.title}")
+#if($!{imageLink}!="")
+    #if($imageLink.indexOf("/")>=0)
+        #set($filePath="")
+    #elseif($imageLink.indexOf(".")>=0)
+        #set($filePath="$!{fileServerNamePath}")
+    #else
+        #set($filePath="$!{fileServerPath}")
+    #end
+    #if("$showImg"=="true")
+    <ul class="img">
+        <a href="$!{resultObj.link}" target="$!{paramObj.target}">
+            <img src="$!{filePath}$!{imageLink}" title="$!{title}"/>
+        </a>
+    </ul>
+    #end
+#end
+#if("$!{showType}"=="" || "$!{showType}"=="1")
+    #if($remarks)
+    <p class="content-info">
+        #cutstr($!{remarks},$!{length})
+
+        #if("$paramObj.detailed"!="")
+            <a href="$!{resultObj.link}" target="$!{paramObj.target}" class="detailed">$!{paramObj.detailed}</a>
+        #end
+    </p>
+    #end
+#elseif("$!{showType}"=="3")
+<div class="content-title">
+    $title
+</div>
+<p class="content-info">
+    #if($!{length} > 0)
+        #cutstr("$!{article}",$!{length})
+    #else
+        $!{article}
+    #end
+
+    #if("$paramObj.detailed"!="")
+        <a href="$!{resultObj.link}" target="$!{paramObj.target}" class="detailed">$!{paramObj.detailed}</a>
+    #end
+</p>
+#else
+<p class="content-info">
+    #if($!{length} > 0)
+        #cutstr("$!{article}",$!{length})
+    #else
+        $!{article}
+    #end
+    #if("$paramObj.detailed"!="")
+        <a href="$!{resultObj.link}" target="$!{paramObj.target}" class="detailed">$!{paramObj.detailed}</a>
+    #end
+</p>
+#end

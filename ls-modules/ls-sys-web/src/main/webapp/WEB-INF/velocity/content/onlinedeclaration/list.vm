@@ -1,0 +1,355 @@
+<div id="file_download" style="width: 100%; height: 100%;">
+    <div class="portlet light">
+        <div class="portlet-body">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-5">
+                        <button class="btn btn-default btn-add" onclick="edit('')">添 加</button>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li class="publishBtn"><a href="javascript:publishOpt(1);">批量发布</a></li>
+                                <li class="publishBtn"><a href="javascript:publishOpt(0);">批量取消发布</a></li>
+                                <li class="divider"></li>
+                                <li class="editBtn" id="deletes"><a href="javascript:deleteAll();">批量删除</a></li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu" id="statusList">
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" id="checkAll" onclick="checkAll()" class="btn btn-default btn-all-check"> 全 选</button>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <form class="form-inline tr" role="form">
+                            <div class="form-group">
+                                <input type="text" id="searchText" name="searchText" class="form-control" placeholder="标题">
+                                <button type="button" class="btn btn-default btn-search" onClick="search()">搜 索</button>
+                                <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div id="declaration_list_body" class="declaration-manage">
+            </div>
+
+        </div>
+    </div>
+</div>
+<script id="onlinedecla_list_template" type="text/html">
+    <table class="table guestbook-list2">
+        <tbody>
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <tr>
+            <th scope="row" class="w40">
+                <?if(el.workFlowStatus!=1){?>
+                    <input type="checkbox" name="check" value="<?=el.baseContentId?>">
+##                <?}else{?>
+##                    <input type="checkbox" name="check" disabled="disabled" value="<?=el.baseContentId?>">
+                <?}?>
+
+            </th>
+            <td>
+                <div class="message-title">
+                    <a onclick="showVO('<?=el.baseContentId||""?>')"><?=el.title?></a>
+                </div>
+                <div class="message-attr">
+                    申请人：<?=el.personName?>&nbsp;&nbsp;&nbsp;
+                    添加日期：<?=el.createDate?>&nbsp;&nbsp;&nbsp;
+                    查询编号 ：<?=el.docNum?>&nbsp;&nbsp;&nbsp;
+                    查询密码：<?=el.randomCode?>
+                </div>
+                <div class="message-body">
+                    <?==el.factReason?>
+                </div>
+                <?if(el.attachId!=null){?>
+                <div class="message-attach">
+                    <img src="<?=GLOBAL_CONTEXTPATH?>/assets/images/attachment.gif"/>
+                    <a onclick="downAttach('<?=el.attachId||""?>')">附件下载：<?=el.attachName?></a>
+                </div>
+                <?}?>
+                <?if(el.replyContent!=null){?>
+                <div class="message-reply">
+                    <div class="reply_user"><?=el.replyUnitName?>&nbsp;&nbsp;&nbsp;<?=el.replyDate?></div>
+                    <div class="reply_content">
+                        <?==el.replyContent?>
+                    </div>
+                </div>
+                <?}?>
+
+                <div class="message-bottom">
+              <span class="pull-right">
+                <ol class="tools-bar">
+                    <?if(el.workFlowStatus!=1){?>
+                      <li><button type="button" class="btn btn-default btn-xs <? if(el.isPublish==1){?> green-meadow<?}?>" id="p_<?=el.id?>"
+                                  onclick="changePublish(<?=el.baseContentId?>,<?=el.isPublish?>)">发布</button></li>
+                      #*<li>
+                        <button type="button" class="dealBtn btn btn-default btn-xs"
+                                onclick="report(<?=el.baseContentId?>)">报审
+                        </button>
+                      </li>*#
+                      <li><button type="button" class="btn btn-default btn-xs" onclick="doReply(<?=el.id?>)">办理</button></li>
+                      <?if(el.recType==0){?>
+                      <li><button type="button" class="btn btn-default btn-xs"
+                          <? if(el.isPublish==1){?>disabled="true"<?}?> onclick="transfer(<?=el.id?>)">转办</button></li>
+                      <?}?>
+                      <li><button type="button" class="btn btn-default btn-xs" id="p_<?=el.baseContentId?>" onclick="deleteVO(<?=el.baseContentId?>)">删除</button></li>
+                    <?}?>
+                    <li><button type="button" class="btn btn-default btn-xs" onclick="record(<?=el.id?>)">转办记录</button></li>
+                </ol>
+              </span>
+                    <div class="clearfix"></div>
+                </div>
+            </td>
+        </tr>
+        <? } ?>
+        </tbody>
+    </table>
+    <div id="pagination" class="pagination pull-right"></div>
+    <div class="clearfix"></div>
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/onlineDecla_mgr.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/process/process.js"></script>
+<script>
+
+    $(document).ready(function () {
+        decla_manage.init();
+        getStatusList();
+    });
+
+    //全选，取消全选
+    function checkAll() {
+        if (cur.c == 0) {
+            $("input[name='check']").prop("checked", true);
+            cur.c = 1;
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            cur.c = 0;
+            return;
+        }
+    }
+
+    //批量发布状态
+    function publishs(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        });
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        } else {
+            Ls.ajaxGet({
+                data: {
+                    ids: check,
+                    siteId: GLOBAL_SITEID,
+                    columnId: cur.columnId,
+                    type: type
+                },
+                url: "/articleNews/publishs"
+            }).done(function (text) {
+                if (text.data) {
+                    Ls.tipsOk("发布成功");
+                    cur.key = $("#searchText").val();
+                    decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+
+                } else {
+                    Ls.tipsErr("发布失败");
+                }
+            });
+        }
+    }
+
+    //改变发布状态
+    function changePublish(id,isPublish) {
+        Ls.ajaxGet({
+            data: {
+                id: id,
+                isPublish:isPublish
+            },
+            url: "/articleNews/changePublish"
+        }).done(function (text) {
+            var isPublish = text.data;
+            cur.key = $("#searchText").val();
+            if (isPublish == 1) {
+                $("#p_" + id).removeClass("green-meadow");
+                Ls.tipsOk("取消发布成功");
+                decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+            } else {
+                $("#p_" + id).addClass("green-meadow");
+                Ls.tipsOk("发布成功");
+                decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+            }
+        });
+    }
+
+    var deleteAll = function () {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        var ids = check.join(",");
+        if (confirm("您确定删除吗？")) {
+            Ls.ajaxGet({
+                url: "/onlinePetition/deleteVOs",
+                data: {
+                    ids: ids
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+                }
+            });
+        }
+    }
+
+    // 删除
+    var deleteVO = function (id) {
+        var ids = id + "";
+        if (confirm("您确定要删除吗?")) {
+            Ls.ajaxGet({
+                url: "/onlinePetition/deleteVOs",
+                data: {
+                    ids: id
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！");
+                    decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+                }
+            });
+        }
+    }
+
+    //修改
+    var edit = function (id) {
+        content_mgr.getContentApp("/onlineDeclaration/edit?columnId=" + content_mgr.node.indicatorId
+            + "&&pageIndex=" + cur.pageIndex);
+    };
+
+    //条件
+    var search = function () {
+        cur.key = $("#searchText").val();
+        decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+    };
+
+    var searchClear = function () {
+        $("#searchText").val("");
+        decla_manage.getData(0, cur.columnId, null, null, null);
+    };
+
+    function publishOpt(status) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+
+        var str = (status == 1 ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/articleNews/publishs",
+                data: {
+                    ids: check,
+                    siteId: GLOBAL_SITEID,
+                    columnId: content_mgr.node.indicatorId,
+                    type: status
+                },
+                success: function (text) {
+                    Ls.tipsOk(str + "成功！");
+                    decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+                }
+            });
+        }
+    }
+
+    function getStatusList() {
+        Ls.ajax({
+            type: "POST",
+            url: "/guestBook/getStatusList",
+            data: {columnId: content_mgr.node.indicatorId}
+        }).done(function (text) {
+            if (!text.status) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+            var str = '<li><a href="javascript:;" onclick="searchByPublish(1)">已发布</a></li>' +
+                '<li><a href="javascript:;" onclick="searchByPublish(0)">未发布</a></li>';
+            var data = text.data;
+            if (data.length > 0) {
+                str += '<li class="divider"></li>';
+                for (var i = 0; i < data.length; i++) {
+                    str += '<li><a href="javascript:;" onclick="searchByStatus(\'' + data[i].statusCode + '\')">' + data[i].statusName + '</a></li>'
+                }
+            }
+            $('#statusList').append(str);
+        });
+    }
+
+    function searchByPublish(type) {
+        cur.isPublish = type;
+        decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+    }
+
+    function searchByStatus(code) {
+        cur.dealStatus = code;
+        decla_manage.getData(0, cur.columnId, cur.key, cur.isPublish, cur.dealStatus);
+    }
+
+    function doReply(id) {
+        Ls.openWin('/onlineDeclaration/doReply?declarationId=' + id + "&&columnId=" + content_mgr.node.indicatorId + "&&pageIndex=" + cur.pageIndex, '600px', '400px', {
+            id: 'do_reply',
+            title: '编辑回复',
+            padding: 0,
+        });
+    }
+
+    function transfer(id) {
+        Ls.openWin('/onlineDeclaration/doTransfer?declarationId=' + id + "&&columnId=" + content_mgr.node.indicatorId, '600px', '300px', {
+            id: 'transfer_1',
+            title: '转办',
+            padding: 0,
+        });
+    }
+
+    function record(id) {
+        Ls.openWin('/declarationRecord/openRecord?declarationId=' + id, '800px', '500px', {
+            id: 'record',
+            title: '转办记录',
+            padding: 0,
+        });
+    }
+
+    function downAttach(attachId) {
+        $("#download_frame").attr("src", '/onlineDeclaration/downloadFile?attachId=' + attachId + '&&s=' + Math.random());
+    }
+
+    var showVO = function (baseContentId) {
+        Ls.openWin('/onlineDeclaration/doShow?baseContentId=' + baseContentId + '&columnId=' + content_mgr.node.indicatorId + '&pageIndex=' + cur.pageIndex, '600px', '400px', {
+            id: 'showVO',
+            title: '查看详细',
+            padding: 0,
+        });
+    }
+
+    function report(dataId){
+        startProcess("EX",cur.columnId,"OnlineDeclaration",dataId);
+    }
+</script>

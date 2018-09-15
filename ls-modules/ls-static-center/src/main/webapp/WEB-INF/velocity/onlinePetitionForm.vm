@@ -1,0 +1,235 @@
+<form name="petition_form" id="petition_form">
+    <table border="0" cellspacing="0" cellpadding="0" class="petition_form">
+        <tbody>
+            #if("$!{recType}"=="0")
+            <tr>
+                <th align="right">收信单位：</th>
+                <td class="poll_input">
+                    <select name="recUnitId">
+                        <option value="" selected="selected">请选择收信单位</option>
+                        #foreach($vo in $recList)
+                            <option value="$vo.recUnitId">$vo.recUnitName</option>
+                        #end
+                    </select>
+                </td>
+            </tr>
+            #end
+        <tr>
+            <th align="right">信件目的：</th>
+            <td class="poll_input">
+                <select name="purposeCode" id="purposeCode">
+                    <option value="" selected="selected">请选择信件目的</option>
+                    #foreach($vo in $pList)
+                        <option value="$vo.code">$vo.key</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th align="right">信件类型：</th>
+            <td class="poll_input">
+                <select name="categoryCode" id="categoryCode">
+                    <option value="" selected="selected">请选择信件类型</option>
+                    #foreach($vo in $cList)
+                        <option value="$vo.code">$vo.key</option>
+                    #end
+                </select>
+            </td>
+        </tr>
+        <tr style="display: none">
+            <th align="right">站点Id：</th>
+            <td class="poll_input"><input name="siteId" type="hidden" size="30" value="$eo.siteId" maxlength="50"></td>
+        </tr>
+        <tr style="display: none">
+            <th align="right">栏目Id：</th>
+            <td class="poll_input"><input name="columnId" type="hidden" size="30" value="$eo.columnId" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">标题：</th>
+            <td class="poll_input"><input name="title" type="text" size="30" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">您的姓名：</th>
+            <td class="poll_input"><input name="author" type="text" size="30" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">联系方式：</th>
+            <td class="poll_input"><input name="phoneNum" type="text" size="30" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">您的职业：</th>
+            <td class="poll_input"><input name="occupation" type="text" size="30" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">联系地址：</th>
+            <td class="poll_input"><input name="address" type="text" size="30" maxlength="50" placeholder="提示：固话不支持短线'-'"></td>
+        </tr>
+        <tr>
+            <th align="right">内容：</th>
+            <td class="poll_input"><textarea name="content" cols="70" rows="5"></textarea></td>
+        </tr>
+        <tr style="display: none">
+            <th align="right">附件：</th>
+            <td class="poll_input"><input name="attachId" type="text" size="30" maxlength="50"></td>
+        </tr>
+        <tr>
+            <th align="right">附件：</th>
+            <td class="poll_input">
+                <input name="attachName" type="text" size="30" maxlength="50">
+                <input type="button" value="上传" onlick="upload()">
+            </td>
+        </tr>
+        <tr>
+            <th align="right">发布日期：</th>
+            <td>
+                <input type="datetime" name="publishDate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" readonly/>
+        </tr>
+        <tr>
+            <th align="right">是否公开：</th>
+            <td colspan="2">
+                <label> <input type="radio" name="isPublic" value="1">是 </label>
+                <label><input type="radio" name="isPublic" value="0" checked="checked">否 </label>
+            </td>
+        </tr>
+        <tr>
+            <td align="left">&nbsp;</td>
+            <td align="left" class="btn_group">
+                <input id="btn_submit" class="btn submit" type="button" accesskey="S" value="确定(S)">
+                <input id="btn_search" class="btn search" type="button" accesskey="S" value="信件查询(C)">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script id="petition_tips_tpl" type="text/html">
+    <div class="guestbook-tips">
+        <ul>
+            <li>查询密码：<span><?=randomCode?></span></li>
+        </ul>
+    </div>
+</script>
+<script id="petition_search_tpl" type="text/html">
+    <form name="petition_search_bar" id="petition_search_bar" method="post" action="">
+        <div class="guestbook-search">
+            <ul>
+                <li>查询密码：<span><input name="randomCode" type="text" maxlength="50"></li>
+            </ul>
+        </div>
+    </form>
+</script>
+<script>
+    $(document).ready(function () {
+
+        using("validator", function () {
+
+            $("#petition_form").validator({
+                rules: {
+                    //mobile: [/^1[34758]\d{9}$/, '请检查手机号格式']
+                },
+                fields: {
+                    recUnitId: "收信单位:required;",
+                    purposeCode: "信件目的:required;",
+                    categoryCode: "信件类型:required;",
+                    title: "标题:required;length[1~200];",
+                    author: "您的姓名:required;length[1~15];",
+                    phoneNum: "联系方式:required;mobile|tel_1|shortTel;",
+                    content: "内容:required;",
+                    checkCode: "验证码:required"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+                var data = (petition_form = $("#petition_form")).getFromJSON();
+                return Ls.ajax({
+                    url: "/frontGuestBook/saveVO",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 0) {
+                        Ls.tipsErr(d.desc);
+                    } else {
+                        var isPublic = $(".isPublic:checked").val();
+                        if (isPublic == 0) {
+
+                            using("dialog", function () {
+                                Ls.openWin({
+                                    title: '温馨提示',
+                                    content: Ls.template("petition_tips_tpl", d.data)
+                                }).show();
+                            });
+
+                            petition_form[0].reset();
+
+                        }
+                    }
+                });
+            };
+
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#petition_form").trigger("validate");
+        });
+
+        $("#btn_search").on('click', function () {
+            using("dialog", function () {
+                Ls.openWin({
+                    title: '信访查询',
+                    content: Ls.template("petition_search_tpl"),
+                    okValue: '查询',
+                    ok: function () {
+                        var petition_search_bar = $("#petition_search_bar");
+                        petition_search_bar.validator({
+                            fields: {
+                                randomCode: "查询密码:required"
+                            },
+                            valid: function () {
+                                var dd = '$!{resultObj.linkPrefix}',
+                                    url = (location.href).setUrlParam("action", "search");
+                                petition_search_bar.attr("action", url).submit();
+                            },
+                            msgClass: 'n-right',
+                            timely: 1
+                        });
+
+                        petition_search_bar.submit();
+                        return false;
+                    }
+                }).show();
+            });
+
+        });
+
+    });
+
+    function upload() {
+        Ls.uploadFile(function (filePath) {
+            if (filePath != '') {
+                var serverData = filePath[0];
+                $("#attachId").val(filePath[0].fileName);
+                $("#attachName").val(filePath[0].fileName);
+            }
+            return true;
+        }, {
+            lock: true,
+            title: '上传附件',
+            file_size_limit: "20 MB",
+            file_types: "*.zip;*.rar;*.doc;*.docx;*.xls;*.xlsx;*.ppt;*.pptx;*.txt;*.jpg;*.gif;*.bmp;*.pdf",
+            file_upload_limit: 1  //配置上传个数
+        });
+    }
+
+</script>

@@ -1,0 +1,78 @@
+<div class="list-wp">
+        	<div class="nav-current">会员中心 > 密码修改</div>
+            <div class="user-info">
+                <table>
+                    <tr>
+                        <td class="label">密码：</td>
+                        <td class="inpt td-password"><input type="password" id="password" name="password"  maxlength="30"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">密码验证问题：</td>
+                        <td class="inpt td-password"><input type="text" id="question" name="question" value="$!{resultObj.member.question}" maxlength="50"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">密码验证答案：</td>
+                        <td class="inpt td-password"><input type="text" id="answer" name="answer" maxlength="50"/></td>
+                    </tr>
+					<tr>
+            			<td class="label">验<span class="s01"></span>证<span class="s02"></span>码：</td>
+            			<td class="inpt td-code">
+            				<input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            		  <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                      </td>
+            		</tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input class="sub" type="button" onclick="updatePassword()" value="保存">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+ </div>
+<script>
+var validateSite = "$!{paramObj.validateSite}";
+var siteId = "$!{resultObj.siteId}";
+$(document).ready(function(e) {
+	$("#imgCode").on('click',function(){
+		var _this = $(this);
+		_this.attr("src","/member/getCode?s="+Math.random());
+	});
+});
+function updatePassword() {
+	    var password = $("#password").val();
+	    var question = $("#question").val();
+		var answer = $("#answer").val();
+		var checkCode = $("#checkimg").val();
+		if(password == ''){
+		   alert("密码确认不能为空！");
+           return;
+		}
+		if(question == ''){
+		   alert("密码验证问题不能为空！");
+           return;
+		}
+		if(answer == ''){
+		   alert("密码验证答案不能为空！");
+           return;
+		}
+		if(checkCode == ''){
+		   alert("验证码不能为空！");
+           return;
+		}
+        Ls.ajax({
+            url: "/member/saveSafe",
+            data: {password:password,question:question,answer:answer,checkCode:checkCode}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("修改成功");
+                location.href = "/member/center/"+siteId+"?type=safe";
+            } else {
+                alert(d.desc);
+				$("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+</script>

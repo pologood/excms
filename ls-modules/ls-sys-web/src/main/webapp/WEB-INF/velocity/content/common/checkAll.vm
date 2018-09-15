@@ -1,0 +1,174 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;page-body-white" class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <button id="adduser_btn" class="btn btn-default btn-replace" onclick="replacesAll()">批量替换</button>
+                            <button id="adduser_btn" class="btn btn-default btn-neglect" onclick="neglectAll()">忽略并保存</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-info pd10">
+                    点击替换词单元格可修改替换内容；
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:560px;" onDrawGroup="onDrawGroup"
+                     allowResize="true" pageSize="200" onlyCheckSelection="true" showPager="false"
+                     allowCellEdit="true" allowCellSelect="true" multiSelect="true" oncellbeginedit="OnCellBeginEdit"
+                     editNextOnEnterKey="true" editNextRowCell="true">
+                    <div property="columns">
+                        <div type="checkcolumn" width="35"></div>
+                        <div field="words" width="200" headerAlign="center" allowSort="false">检测词</div>
+                        <div field="targetWords" width="100%" headerAlign="center" allowSort="false">
+                            替换词
+                            <input property="editor" class="mini-textbox" style="width:100%;"/>
+                        </div>
+                        <div width="115" headerAlign="center" allowSort="false" renderer="renderOp" align="center">操作</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script type="text/javascript">
+    mini.parse();
+    var grid, win = Ls.getWin.win, api = Ls.getWin.api;
+    var content = Ls.getWin.win.eweb.getHtml();
+    var title = Ls.getWin.win.$("#title").val() || "";
+    var subTitle = Ls.getWin.win.$("#subTitle").val() || "";
+    var remarks = Ls.getWin.win.$("#remarks").val() || "";
+    var author = Ls.getWin.win.$("#author").val() || "";
+    var resources = Ls.getWin.win.$("#resources").val() || "";
+
+    $(document).ready(function () {
+        grid = mini.get("datagrid1");
+        grid.groupBy("type", "asc");
+
+        var types = win.getTypes();
+
+        grid.load({
+            dataFlag: 1,
+            content: content + title + author + resources + subTitle + remarks,
+            types: types
+        });
+
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(grid, 120);
+
+        grid.setUrl("/content/checkAll");
+    })
+
+    //操作加载
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        tgBtn = '<button class="btn btn-sm btn-default btn-edit"  onclick="replaceOpr(' + rec._uid + ')">替 换</button> '
+        qsBtn = '<button class="btn btn-sm btn-default btn-delete" onclick="deleteOpr(' + rec._uid + ')">忽 略</button>'
+        str += tgBtn + qsBtn;
+        return str;
+    }
+
+    function targetWords(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<input id="' + rec.id + '_tag" value="' + rec.targetWords + '" class="btn btn-sm btn-default btn-edit form-control" style="height:20px"></input>';
+        return str;
+    }
+
+    function hotDesc(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.type == 3) {
+            str = '<input id="' + rec.id + '_desc" value="' + rec.desc + '" class="btn btn-sm btn-default btn-edit form-control" style="height:18px"></input>';
+        }
+        return str;
+    }
+
+    function deleteOpr(uid) {
+        var row = grid.getRowByUID(uid);
+        grid.removeRow(row);
+    }
+
+    function replaceOpr(uid) {
+        var row = grid.getRowByUID(uid), words = row.targetWords;
+
+        content = content.replaceAll(row.words, words);
+        title = title.replaceAll(row.words, words);
+        subTitle = subTitle.replaceAll(row.words, words);
+        remarks = remarks.replaceAll(row.words, words);
+        author = author.replaceAll(row.words, words);
+        resources = resources.replaceAll(row.words, words);
+
+        win.eweb.setHtml(content);
+        Ls.getWin.win.$("#title").val(title);
+        Ls.getWin.win.$("#subTitle").val(subTitle);
+        Ls.getWin.win.$("#remarks").val(remarks);
+        Ls.getWin.win.$("#author").val(author);
+        Ls.getWin.win.$("#resources").val(resources);
+
+        grid.removeRow(row);
+    }
+
+    function replacesAll() {
+        var row, rpw, rows = grid.getSelecteds();
+        if (rows.length == 0) {
+            Ls.tipsInfo("请选择要替换的项！");
+            return false;
+        }
+        for (var i = 0; i < rows.length; i++) {
+            row = rows[i], words = row.targetWords;
+
+            content = content.replaceAll(row.words, words);
+            title = title.replaceAll(row.words, words);
+            subTitle = subTitle.replaceAll(row.words, words);
+            remarks = remarks.replaceAll(row.words, words);
+            author = author.replaceAll(row.words, words);
+            resources = resources.replaceAll(row.words, words);
+
+            Ls.getWin.win.eweb.setHtml(content);
+            Ls.getWin.win.$("#title").val(title);
+            Ls.getWin.win.$("#subTitle").val(subTitle);
+            Ls.getWin.win.$("#remarks").val(remarks);
+            Ls.getWin.win.$("#author").val(author);
+            Ls.getWin.win.$("#resources").val(resources);
+
+            grid.removeRow(row);
+        }
+        api.close();
+    }
+
+    function neglectAll() {
+        Ls.getWin.win.save();
+        Ls.winClose();
+    }
+
+    function onDrawGroup(e) {
+        var val = "", type = e.value;
+        var rows = e.rows;
+        if (type == 1) {
+            val = "易错词：";
+        } else if (type == 2) {
+            val = "敏感词：";
+        } else if (type == 3) {
+            val = "热词：";
+        }
+        e.cellHtml = val + "( 已检测到 " + e.rows.length + " 个 )";
+    }
+
+    function OnCellBeginEdit(e) {
+        var record = e.record, field = e.field;
+        if (field == "targetWords" && record.type == "3") {
+            e.cancel = true;    //如果已婚，则不允许编辑性别
+        }
+    }
+
+</script> 

@@ -1,0 +1,295 @@
+<div class="portlet light">
+    <div class="portlet-body" id="article_list" ms-controller="article_list">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default btn-add" ms-click="funAdd" ms-class="disabled:isEdit"> 添 加</button>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li ms-click="funPublish($event,'',1)" ms-class="disabled:isPublish"><a href="javascript:;">批量发布</a></li>
+                            <li ms-click="funPublish($event,'',0)" ms-class="disabled:isPublish"><a href="javascript:;">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li ms-click="funDelete($event)" ms-class="disabled:isEdit"><a href="javascript:;">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> {{dropdown_text}} <i class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" ms-click="funAttr($event,'isPublish',1)">已发布</a></li>
+                            <li><a href="javascript:;" ms-click="funAttr($event,'isPublish',0)">未发布</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" ms-click="funAttr($event,'isNew',1)">已标新</a></li>
+                            <li><a href="javascript:;" ms-click="funAttr($event,'isTop',1)">已置顶</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-7">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <!--  <label>搜索：</label>-->
+                            <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题" ms-duplex="key">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" ms-click="funSearch"> 搜 索</button>
+                        <button type="button" class="btn btn-default btn-show-all" ms-click="funSearchClear">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="doc-manage">
+
+            <table class="table table-hover doc-list">
+                <thead>
+                <tr>
+                    <th class="w50">排 序</th>
+                    <th class="w30">
+                        <input type="checkbox" id="checkAll" ms-click="funCheckAll($event)">
+                    </th>
+                    <th>标 题</th>
+                    <th class="w150">属 性</th>
+                    <th class="w90">操 作</th>
+                </tr>
+                </thead>
+                <tbody id="doc_list_body">
+
+
+                <tr ms-repeat="list">
+                    <th>
+                        <div class="rows text-center">
+                            <a href="javascript:;" ms-click="funSort($event,el.id,'up')">
+                                <i class="fa fa-long-arrow-up" style="margin-top:-3px"></i>
+                            </a>
+                            <a href="javascript:;" ms-click="funSort($event,el.id,'down')">
+                                <i class="fa fa-long-arrow-down"></i>
+                            </a>
+                        </div>
+                    </th>
+                    <td>
+                        <div class="title">
+                            <input type="checkbox" name="checkIds" ms-duplex-string="checkIds" value="" ms-attr-value="{{el.id}}">
+                        </div>
+                    </td>
+                    <td colspan="3">
+                        <div class="title rows">
+                            <a href="javascript:void(0)" target="_blank" ms-attr-href="{{el.redirectLink!=null? el.redirectLink: url+'/content/article/'+el.id}}">{{el.title}}</a>
+                        </div>
+                        <div class="attr l">
+                            <span class="w230">{{ el.isPublish == 1? '发布时间：'+el.publishDate: '添加时间：'+el.createDate}}</span>
+                            <span class="w140">作者：{{el.author}}</span>
+                            <span>点击量：{{el.hit}}</span>
+                        </div>
+                        <div class="r w230">
+                            <div class="l mr42">
+                                <button type="button" class="btn btn-default btn-xs" ms-class="green-meadow:el.isPublish" ms-attr-disabled="isEdit"
+                                        ms-click="funPublish($event,el.id,el.isPublish)">发
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" ms-class="blue:el.isTop" ms-attr-disabled="isEdit" ms-click="funTop($event,el.id)">顶
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" ms-class="blue:el.isTitle" ms-attr-disabled="isEdit" ms-click="funTitle($event,el.id)">标
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" ms-class="blue:el.isNew" ms-attr-disabled="isEdit" ms-click="funNew($event,el.id)">新
+                                </button>
+                            </div>
+                            <div class="input-group">
+                                <div class="btn-group">
+
+                                    <button type="button" class="btn btn-default btn-xs" ms-attr-disabled="isEdit" ms-class="disabled:isEdit" ms-click="funEdit($event,el.id)">修 改
+                                    </button>
+                                    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                            ms-attr-disabled="isEdit"
+                                            ms-class="disabled:isEdit">
+                                        <span class="caret"></span>
+                                        <span class="sr-only"> 修 改 </span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li ms-class="disabled:isEdit"><a href="javascript:;" ms-click="funCopy($event,el.id)"> 复 制 </a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li ms-class="disabled:isEdit"><a href="javascript:;" ms-click="funDelete($event,el.id)"> 删 除 </a></li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+
+
+                </tbody>
+            </table>
+            <div id="pagination" class="pagination pull-right mr22"></div>
+        ##<div id="page_more" class="page_more">加载更多...</div>
+            <div class="clearfix"></div>
+
+        </div>
+    </div>
+</div>
+
+<script src="$!{rc.contextPath}/assets/js/pages/content/articleNews/article_mgr_list.js"></script>
+<script>
+
+    var pageIndex = $!{pageIndex};
+    $(document).ready(function () {
+        doc_mgr.init();
+    })
+
+    //批量发布状态
+    function publishs(type) {
+        var check = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            check.push(val.value);
+        })
+        if (check.length <= 0) {
+            Ls.tipsInfo("至少选择一项");
+            return;
+        }
+        Ls.ajaxGet({
+            data: {
+                ids: check,
+                siteId: GLOBAL_SITEID,
+                columnId: cur.columnId,
+                type: type
+            },
+            url: "/articleNews/publishs",
+            success: function (text) {
+                doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+            }
+        });
+    }
+
+
+    //单删除
+    function deleteById(id) {
+        var check = [];
+        check.push(id);
+        if (confirm("确定删除选中记录？")) {
+            Ls.ajaxGet({
+                data: {
+                    ids: check
+                },
+                url: "/articleNews/delete",
+                success: function (text) {
+                    doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            });
+        }
+    }
+
+
+    //改变发布状态
+    function changePublish(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changePublish",
+            success: function (text) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#p_" + id).removeClass("green-meadow");
+                    Ls.tipsOk("取消发布成功");
+                    doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#p_" + id).addClass("green-meadow");
+                    Ls.tipsOk("发布成功");
+                    doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+
+            }
+        });
+    }
+
+    //改变置顶状态
+    function changeTop(id) {
+        Ls.ajaxGet({
+            data: {
+                id: id
+            },
+            url: "/articleNews/changeTop",
+            success: function (text) {
+                var isPublish = text.data;
+                if (isPublish == 1) {
+                    $("#top_" + id).removeClass("blue");
+                    Ls.tipsOk("取消置顶成功");
+                    doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                } else {
+                    $("#top_" + id).addClass("blue");
+                    Ls.tipsOk("置顶成功");
+                    doc_mgr.getData(0, cur.columnId, cur.key, cur.condition, cur.status);
+                }
+            }
+        });
+    }
+
+    //改变标题新闻状态
+    function changeTitle(id) {
+        Ls.ajaxGet({
+            data: {id: id},
+            url: "/articleNews/changeTitle",
+            success: function (text) {
+                var isTitle = text.data;
+                if (isTitle == 1) {
+                    $("#title_" + id).removeClass("blue");
+                    Ls.tipsOk("取消标题新闻成功");
+                } else {
+                    $("#title_" + id).addClass("blue");
+                    Ls.tipsOk("设置标题新闻成功");
+                }
+            }
+        });
+    }
+
+    //改变加新状态
+    function changeNew(id) {
+        Ls.ajaxGet({
+            data: {id: id},
+            url: "/articleNews/changeNew",
+            success: function (text) {
+                var isNew = text.data;
+                if (isNew == 1) {
+                    $("#new_" + id).removeClass("blue");
+                    Ls.tipsOk("取消加新成功");
+                } else {
+                    $("#new_" + id).addClass("blue");
+                    Ls.tipsOk("加新成功");
+                }
+            }
+        });
+    }
+
+    function contentSort(id, num, opr) {
+        var data = {
+            opr: opr,
+            oprId: id,
+            oprSort: num,
+            columnId: cur.columnId,
+            title: cur.key,
+            condition: cur.condition,
+            status: cur.status
+        };
+        Ls.ajaxGet({
+            data: data,
+            url: "/content/contentSort",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    doc_mgr.getData(cur.pageIndex, cur.columnId, cur.key, cur.condition, cur.status);
+                    Ls.tipsOk("排序成功");
+                }
+            }
+        });
+    }
+
+    function copyNews(id) {
+        Ls.winOpen("/content/copyNews?id=" + id, '430px', '460px', {
+            lock: true,
+            title: '新闻复制'
+        })
+    }
+</script>

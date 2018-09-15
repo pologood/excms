@@ -1,0 +1,58 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="mini-fit">
+  <div class="mini-fit">
+    <ul class="ztree" id="petition_unit_tree"></ul>
+  </div>
+</div>
+<div class="portlet light">
+  <div class="portlet-body form">
+     <form role="form" ms-controller="add_remarks">
+       <div class="form-body">
+         <div class="form-group">
+           <label>流转备注：</label>
+           <textarea class="form-control" id="remarks" name="remarks" rows="2" placeholder=""
+                     ms-duplex="remarks"></textarea>
+         </div>
+       </div>
+       </form>
+    </div>
+  </div>
+
+
+
+<div class="mini-toolbar hide" style="text-align:center;padding-top:8px;padding-bottom:8px;"
+     borderStyle="border-left:0;border-bottom:0;border-right:0;">
+  <a class="mini-button" id="transmit1" style="width:60px;" >确定</a>
+  <span style="display:inline-block;width:25px;"></span>
+  <a class="mini-button" style="width:60px;" >取消</a>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/petition_choose_unit.js"></script>
+<script type="text/javascript">
+  mini.parse();
+  var columnId1="${columnId}";
+  var recType1="${recType}";
+  var petitionId1="${petitionId}";
+  $(document).ready(function(){
+    var dialog = art.dialog,
+      api = art.dialog.open.api;
+    if (!api) return;
+    // 操作对话框
+    api.button(
+      {
+        name: '保存',
+        id: 'saveBtn',
+        focus: true,
+        callback: function () {
+          $('#transmit1').click();
+          return false;
+        }
+      }
+    );
+    unitManage.getUnit();
+  });
+
+</script>
+</body>

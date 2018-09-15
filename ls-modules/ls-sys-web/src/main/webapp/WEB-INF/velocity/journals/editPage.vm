@@ -1,0 +1,250 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<form role="form" id="materiaForm" ms-controller="materiaForm">
+        <table class="table table-bordered video-table">
+            <tbody>
+            <tr>
+                <th>标题：</th>
+                <td>
+                    <table class="w100p">
+                        <tbody>
+                        <tr>
+                            <td colspan="3"><input type="text" name="materiaName" id="materiaName" ms-duplex="materiaName" maxlength="100" class="form-control"></td>
+                            <td rowspan="5" class="w300">
+                                <div class="thumb_layout">
+                                    <div class="thumb">
+                                        <img src="$!{sysStaticPath}/assets/images/video_bg.jpg" alt="" id="imageLink"/>
+                                    </div>
+                                        <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                                        <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="normalUpload()"></i></div>
+
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+
+            </tr>
+            <tr>
+                <th>期刊号：</th>
+                <td>
+                    <div class="form-group">
+                        <div class="input-group mb0" style="width:563px">
+                            <input type="text" id="periodical" name="periodical" ms-duplex="periodical"
+                                   class="form-control" >
+                            <div class="input-group-btn">
+                            <button type="button" class="btn btn-default btn-default-upload"
+                                    onclick="uploadMateria()"><i class=" fa fa-upload">上传</i>
+                            </button>
+                             </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <th>作者：</th>
+                <td >
+                    <input type="text" id="author" ms-duplex="author" class="form-control" placeholder="" style="width:563px">
+                <td>
+            </tr>
+##            <tr>
+##                <th>属性：</th>
+##                <td> <label class="checkbox-inline"  >
+##                    <input type="checkbox"  class="publishBtn" id="isPublish" name="isPublish"> 发布
+##                </label>
+##
+##                </td>
+##            </tr>
+##            <tr>
+##                <th>状态：</th>
+##             <td>
+##                 <div class="radio-group">
+##                     <label class="radio-inline"><input type="radio" name="type" value="0" ms-duplex-string="review">正常</label>
+##
+##                     <label class="radio-inline"><input type="radio" name="type" value="1" ms-duplex-string="review">往期回顾</label>
+##                 </div>
+##
+##
+##             </td>
+##
+##            </tr>
+
+
+            </tbody>
+        </table>
+    </form>
+</body>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var curr = {
+        vm: "",
+        id:"$!{id}",
+        columnId:"$!{columnId}",
+        opt: []
+    };
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    $(document).ready(function (){
+        Ls.ajax({
+            type: "GET",
+            url: "/journal/getJournals",
+            data: {'id': curr.id},
+            success:function (d) {
+                var data= d.data;
+                if (data.imageLink != null && data.imageLink != "") {
+                    if (data.imageLink.indexOf("/") != -1) {
+                        $("#imageLink").attr('src', data.imageLink);
+                    } else if (data.imageLink.indexOf(".") != -1) {
+                        $("#imageLink").attr('src', GLOBAL_FILESERVERNAMEPATH + data.imageLink);
+                    } else {
+                        $("#imageLink").attr('src', GLOBAL_FILESERVERPATH + data.imageLink);
+                    }
+                }
+
+                if(data.materiaId!=null){
+                    $("#periodical").attr("disabled","disabled");
+                }
+                if(data.isPublish==1){
+                    $("#isPublish").attr("checked","checked");
+                }
+                //初始化表单字段
+                curr.init = Ls.initFORM("materiaForm",data);
+                //如果模型已经绑定，不再绑定
+                curr.vm = avalon.vmodels["materiaForm"];
+                curr.vm = avalon.define(curr.init);
+                //avalon.scan(document.body, curr.vm);
+                avalon.scan($("#materiaForm").get(0), curr.vm);
+
+            }
+        });
+        api.button(
+                {
+                    name: '保存',
+                    callback: function () {
+                       $("#materiaForm").submit();
+                        return false;
+                    },
+                    focus: true
+                }
+        )
+
+    });
+
+    //上传
+    function uploadMateria() {
+        Ls.uploadFile(function (json) {
+                var data=json[0].data;
+                curr.vm.filePath = data.fileName;
+                var name = data.fileName;
+                var index = name.lastIndexOf(".");
+                if (index < 0) {
+                    Ls.tipsInfo("视频未上传成功");
+                    return;
+                }
+//                curr.vm.materiaName = name.substring(0, index);
+                var type = name.substring(index);
+
+                curr.vm.fileType = type;
+
+            return true;
+        }, {
+            lock: true,
+            title: '上传文件',
+            upload_url: "/journal/uploadFile",
+            post_params: {
+                "siteId": GLOBAL_SITEID
+
+            },
+            file_size_limit: "50 MB",
+            file_types: "*.pdf",
+            file_types_description: "PDF Files",
+            file_upload_limit: 1,  //配置上传个数
+        })
+    }
+
+
+
+
+
+
+    $('#materiaForm').validator({
+        fields: {
+            'materiaName': '标题:required;length[1~250];',
+            'periodical': '期号:required;Integer;'
+        },
+        valid: function () {
+            doSave();
+        },
+        msgClass: "n-right"
+    });
+
+    function doSave() {
+             if(curr.vm.isPublish==1&&(curr.vm.filePath==null||curr.vm.filePath=='')){
+                Ls.info("发布信息需上传素材!");
+                return;
+             }
+        if ($("#isPublish").is(':checked')) {
+            curr.vm.isPublish=1;
+        }
+        else{
+
+            curr.vm.isPublish=0;
+        }
+
+
+        if(null==curr.vm.imageLink||''==curr.vm.imageLink){
+            curr.vm.imageLink='58590edbe4b03b458cca398e';
+
+        }
+            var value = curr.vm;
+            value = Ls.toJSON(value);
+             value.columnId=curr.columnId;
+            Ls.ajax({
+                type: "POST",
+                url: "/journal/saveJournals",
+                data: value
+            }).done(function (text) {
+                if (text.status!=1) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+
+                Ls.tipsOk("保存成功");
+                Ls.getWin.win.grid.reload();
+                Ls.winClose();
+            });
+
+    }
+
+    //缩略图路径
+    function changeImg(path) {
+
+        $("#imageLink").attr("src", (path.indexOf(".") != -1 ? '$!{fileServerNamePath}' : '$!{fileServerPath}') + path);
+        curr.vm.imageLink = path;
+    }
+
+    function normalUpload() {
+        Ls.uploadFile(function (filePath) {
+            changeImg(filePath[0].data.fileName);
+            return true;
+        }, {
+            upload_url: '/journal/uploadImge',
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "contentId": curr.vm.id || '',
+                "imgPath": curr.vm.imageLink || '',
+                "desc": "上传缩略图"
+            },
+            file_types: "*.jpg;*.gif;*.bmp;*.jpeg;*.png",
+        });
+    }
+
+    //移除缩略图
+    $("#delImg").click(function () {
+        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/video_bg.jpg');
+        curr.vm.imageLink = '';
+    })
+
+</script>

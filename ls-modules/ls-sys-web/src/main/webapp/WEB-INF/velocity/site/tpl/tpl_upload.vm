@@ -1,0 +1,74 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white" ms-controller="tpl_form">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="tpl_form" role="form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <input type="file" name="file" id="file" accept=".*"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/ajaxfileupload.min.js"></script>
+<script>
+    var cur = {
+        id:${id},
+        win:Ls.getWin.win,
+        api:Ls.getWin.api
+    };
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){ok();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+    })
+
+    function uploadTpl() {
+        var tips = Ls.tips("上传中",{icons:'loading',autoClose:false});
+        jQuery.ajaxFileUpload({
+            url: '$!{rc.contextPath}/tpl/tplUpload?id=' + cur.id,//服务器端程序
+            secureuri: false,
+            fileElementId: 'file',//input框的ID
+            dataType: 'json',//返回数据类型
+            beforeSend: function () {//上传前需要处理的工作，如显示Loading...
+            },
+            success: function (data, status) {
+                tips.hide();
+                if(data.status == 1) {
+                    cur.win.callback_upload(data.desc);
+                    Ls.winClose();
+                } else {
+                    cur.win.callback_upload(data.desc);
+                    Ls.winClose();
+                }
+            },
+            error: function (data, status, e) {
+                cur.win.callback_upload("系统错误!");
+                Ls.winClose();
+            }
+        });
+    }
+
+    function ok() {
+        var id = cur.id;
+        if (Ls.isEmpty(id)) {
+            Ls.alert('请选择模板！');
+            return;
+        }
+        uploadTpl();
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>

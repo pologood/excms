@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="/assets/js/ztree/ztreeBig-min.css" rel="stylesheet" type="text/css"/>
+    <script src="/assets/js/jquery-min.js"></script>
+    <script src="/assets/js/core-min.js"></script>
+    <script src="/assets/js/ztree/ztree-min.js"></script>
+</head>
+<body>
+    <table>
+        <tbody>
+		<tr>
+			<td valign="top" colspan="6">通道id:53f3eda79a05c23c1e1ac497-->通知公告（2656800）通道id:53f463789a05c2544be426a4-->经验交流（2657096）通道id:540917055d21fbbb3617aa64-->工作动态（2657100）</br>
+			通道id:53f30ece9a05c27410da5295-->舆情回应（2658583）通道id:53f2ef669a05c2f902d8596a-->督查通报（2658466）通道id:53f2e5859a05c2b07f752c85-->国家级制度规定（2810774）</br>
+			通道id:53f2e5919a05c20774c1585a-->省级制度规定（2810780）通道id:53f2e59d9a05c2b07f005266-->市级制度规定（2810787）</br></td>
+        </tr>
+		<tr>
+            <td valign="top" colspan="6">
+				通道id：<input type="text" name="channelId" id="channelId" />
+				栏目id：<input type="text" name="columnId" id="columnId" />
+				<button type="button" onclick="importColumn();">导入</button>（选择对应通道导入对应栏目数据）
+            </td>
+        </tr>
+		<tr>
+            <td valign="top" colspan="6">
+                <button type="button" style="height: 40px; margin:5px;" onclick="importPublicGuide();">导入公开指南</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importPublicAnnualReport();">导入公开年报</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublic();">导入依申请公开</button>
+				<button type="button" style="height: 40px; margin:5px;" onclick="importApplyPublicCatalog();">导入依申请公开目录</button>
+				<span>左边所有按钮都是针对所有单位的操作。</span>
+				<span id="doSub_msg" style="color: red;display: none">数据正在导入,请耐心等待(请勿关闭浏览器)。</span>
+				<span id="clear_msg" style="color: red;display: none">数据正在清空,请耐心等待(请勿关闭浏览器)。</span>
+			</td>
+        </tr>
+        <tr style="margin-top:20px">
+            <td valign="top" style="width:500px;">滁州市信息公开目录：
+                <div style="border: 1px solid black;height:400px;overflow:auto;">
+                    <ul id="chuzhou_public_tree" class="ztree"></ul>
+                </div>
+			</td>
+            <td valign="top" style="padding-left:30px;width:500px;">-> EX8信息公开目录：
+                <div style="border: 1px solid black;height:400px;overflow:auto;">
+					<ul id="ex8_public_tree" class="ztree" style="width:350px;"></ul>
+                </div>
+			</td>
+            <td valign="top" style="width:100%">--> 操作：
+				<button type="button" style="height:40px; " onclick="importDrivingPublic();">导入</button>
+				<button type="button" style="height:40px; " onclick="clearPublicInfo();" >清空</button><br />
+				<span style="margin-left:30px;">可选择对应单位或者目录进行数据相关操作。</span>
+			</td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+<script type="text/javascript">
+var cur = {
+	chuzhou_tree : null,
+	ex8_tree : null,
+	chuzhou_selectNode : null,
+	ex8_selectNode : null
+}
+
+var ztree_settings_chuzhou = {
+    view: {
+        nameIsHTML: true,
+        showTitle: true,
+        selectedMulti: false,
+        dblClickExpand: false,
+        expandSpeed: "fast"
+    },
+	async: {
+        enable: true,
+		autoParam : [ "organId=id", "id=mongoId" ],
+        url: "/chuzhou/xxgk/getChuzhouPublicTree"
+    },
+    data: {
+        keep: {},
+        key: {
+            title: "id",
+            name: "name"
+        },
+        simpleData: {
+            idKey: 'id',
+            pIdKey: 'parentId'
+        }
+    },
+    callback: {
+        onClick: function (event, treeId, node) {
+			cur.chuzhou_selectNode = node;
+            return false;
+        }
+    }
+};
+
+var ztree_settings_ex8 = {
+    view: {
+        nameIsHTML: true,
+        showTitle: true,
+        selectedMulti: false,
+        dblClickExpand: false,
+        expandSpeed: "fast"
+    },
+	async: {
+        enable: true,
+        url: "/chuzhou/xxgk/getEx8PublicTree",
+		autoParam: ["organId=id"]
+    },
+    data: {
+        keep: {},
+        key: {
+            title: "id",
+            name: "name"
+        },
+        simpleData: {
+            idKey: 'id',
+            pIdKey: 'parentId'
+        }
+    },
+    callback: {
+        onClick: function (event, treeId, node) {
+            cur.ex8_selectNode = node;
+            return false;
+        }
+    }
+};
+
+$(document).ready(function () {
+    cur.chuzhou_tree = $.fn.zTree.init($("#chuzhou_public_tree"), ztree_settings_chuzhou);
+    cur.ex8_tree = $.fn.zTree.init($("#ex8_public_tree"), ztree_settings_ex8);
+});
+
+function importPublicInfo(url){
+	$("#doSub_msg").show();
+	Ls.ajaxGet({
+        url: url,
+        success: function (text) {
+            if (text.status == 0) {
+				 alert(text.desc);
+            } else {
+                alert("导入成功");
+            }
+			$("#doSub_msg").hide();
+        }
+    });
+}
+
+function importPublicGuide(){
+	importPublicInfo("/chuzhou/xxgk/importPublicGuide");
+}
+
+function importPublicAnnualReport(){
+	importPublicInfo("/chuzhou/xxgk/importPublicAnnualReport");
+}
+
+function importApplyPublic(){
+	importPublicInfo("/chuzhou/xxgk/importApplyPublic");
+}
+
+function importApplyPublicCatalog(){
+	importPublicInfo("/chuzhou/xxgk/importApplyPublicCatalog");
+}
+
+function importDrivingPublic(){
+	if(cur.chuzhou_selectNode==null || cur.ex8_selectNode == null){
+		alert("请选择对应单位或目录");
+        return false;
+	}
+	if(cur.chuzhou_selectNode.isOrgan != cur.ex8_selectNode.isOrgan){
+		alert("只能单位对单位或者目录对目录导入");
+        return false;
+	}
+	var data = {isOrgan : cur.chuzhou_selectNode.isOrgan};
+	if(data.isOrgan){
+		data.chuzhouOrganId = cur.chuzhou_selectNode.id;
+		data.ex8OrganId = cur.ex8_selectNode.id;
+	}else{
+		data.chuzhouOrganId = cur.chuzhou_selectNode.organId;
+		data.chuzhouCatId = cur.chuzhou_selectNode.id;
+		data.ex8OrganId = cur.ex8_selectNode.organId;
+		data.ex8CatId = cur.ex8_selectNode.id;
+	}
+	$("#doSub_msg").show();
+    Ls.ajaxGet({
+        data: data,
+        url: "/chuzhou/xxgk/importDrivingPublic",
+        success: function (text) {
+            if (text.status == 0) {
+                alert(text.desc);
+            } else {
+                alert("导入成功");
+            }
+			$("#doSub_msg").hide();
+        }
+    });
+}
+
+function clearPublicInfo(){
+	if(cur.ex8_selectNode == null){
+		alert("请选择EX8信息公开单位或目录");
+        return false;
+	}
+	var data = {isOrgan : cur.ex8_selectNode.isOrgan};
+	if(data.isOrgan){
+		data.organId = cur.ex8_selectNode.id;
+	}else{
+		data.organId = cur.ex8_selectNode.organId;
+		data.catId = cur.ex8_selectNode.id;
+	}
+	$("#clear_msg").show();
+	Ls.ajaxGet({
+        url: "/chuzhou/xxgk/clear",
+		data : data,
+        success: function (text) {
+            if (text.status == 0) {
+			 	alert(text.desc);
+            } else {
+                alert("清空成功");
+            }
+			$("#clear_msg").hide();
+        }
+    });
+}
+
+function importColumn(){
+	var channelId = $("#channelId").val();
+    var columnId = $("#columnId").val();
+
+    if(channelId==null||channelId==""){
+        alert("请填写通道id");
+        return false;
+    }
+
+    if(columnId==null||columnId==""){
+        alert("请填写栏目id");
+        return false;
+    }
+
+    var data = {
+        channelId : channelId,
+        columnId : columnId
+    };
+
+	$("#doSub_msg").show();
+    Ls.ajaxGet({
+        data: data,
+        url: "/chuzhou/xxgk/importColumn",
+        success: function (text) {
+            if (text.status == 0) {
+				 alert(text.desc);
+            } else {
+                alert("导入成功");
+            }
+			$("#doSub_msg").hide();
+        }
+    });
+}
+</script>
+</body>
+</html>

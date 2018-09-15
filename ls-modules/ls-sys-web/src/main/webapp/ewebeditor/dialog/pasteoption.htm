@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var bSYFlag = (((config.SYWZFlag == "2" || config.SYTPFlag == "2") && config.SYVLocal == "1") ? true : false);
+
+
+        var sCaption = lang["DlgPaste"];
+        document.write("<title>" + sCaption + "</title>");
+
+        var aFlag = URLParams["flag"].split(",");
+        var sAutoDone = URLParams["autodone"];
+
+        function ok() {
+            if ((aFlag[4] == "1" && aFlag[5] != "5") && ($("d_opthtml").checked)) {
+                EWEBActiveX.AsynCallBack("getclipboard", ["html"],
+                    function (o_Data) {
+                        var s_Html = o_Data["Ret"];
+                        GoReturn(s_Html, "html");
+                        return;
+                    }
+                );
+            } else {
+                _ok2();
+            }
+        }
+
+        function _ok2() {
+            if ((aFlag[1] == "1") && ($("d_opttext").checked)) {
+                EWEBActiveX.AsynCallBack("getclipboard", ["text"],
+                    function (o_Data) {
+                        var s_Html = o_Data["Ret"];
+                        GoReturn(s_Html, "text");
+                        return;
+                    }
+                );
+            } else {
+                _ok3();
+            }
+        }
+
+        function _ok3() {
+            DLGDoingMsg.Show();
+
+            var s_OriSendUrl = EWEB.SendUrl;
+            if (aFlag[3] == "1") {
+                if ($("d_optfile").checked) {
+                    if (bSYFlag) {
+                        if ($("d_syflag3").checked) {
+                            EWEB.SendUrl = EWEB.SendUrl + "&syflag=1";
+                            if (!EWEBBrowser.IsUseLS) {
+                                EWEBActiveX.ActiveX.SendUrl = EWEB.SendUrl;
+                            }
+                        }
+                    }
+
+                    var s_Opt = "";
+                    EWEBActiveX.AsynCallBack("pastefilelist", [s_Opt],
+                        function (o_Data) {
+                            _CheckActiveXStatus(o_Data, s_OriSendUrl, "file");
+                        }
+                    );
+                }
+            }
+
+            if (aFlag[0] == "1" || aFlag[5] == "5") {
+                if ($("d_optimg").checked) {
+                    if (bSYFlag) {
+                        if ($("d_syflag0").checked) {
+                            EWEB.SendUrl = EWEB.SendUrl + "&syflag=1";
+                            if (!EWEBBrowser.IsUseLS) {
+                                EWEBActiveX.ActiveX.SendUrl = EWEB.SendUrl;
+                            }
+                        }
+                    }
+
+                    var s_ImgType = "";
+                    if ($("d_imgjpg").checked) {
+                        s_ImgType = "jpg";
+                    } else if ($("d_imggif").checked) {
+                        s_ImgType = "gif";
+                    } else if ($("d_imgpng").checked) {
+                        s_ImgType = "png";
+                    }
+
+                    var s_Opt = "imgtype:" + s_ImgType + ";";
+                    EWEBActiveX.AsynCallBack("pasteimage", [s_Opt],
+                        function (o_Data) {
+                            _CheckActiveXStatus(o_Data, s_OriSendUrl, "image");
+                        }
+                    );
+                }
+            }
+        }
+
+        function _CheckActiveXStatus(o_Data, s_OriSendUrl, s_EventType) {
+            if (s_OriSendUrl != EWEB.SendUrl) {
+                EWEB.SendUrl = s_OriSendUrl;
+            }
+
+            if (EWEBActiveX.IsError(o_Data["Error"])) {
+                DLGDoingMsg.Hide();
+                EWEBActiveX.SetIsRun(false);
+                return;
+            }
+
+            EWIN.addUploadFiles(o_Data["OriginalFiles"], o_Data["SavedFiles"]);
+            DLGDoingMsg.Hide();
+
+            var s_Body = o_Data["Body"];
+            GoReturn(s_Body, s_EventType);
+        }
+
+        function GoReturn(s_Html, s_EventType) {
+            if ($("d_pos").checked) {
+                EWIN.setHTML(s_Html, true);
+            } else {
+                EWIN.insertHTML(s_Html);
+            }
+
+            parent.Ok({flag: "Paste", type: s_EventType});
+        }
+
+        function doClickOpt(b) {
+            try {
+                $("d_imggif").disabled = b
+            } catch (e) {
+            }
+            ;
+            try {
+                $("d_imgjpg").disabled = b
+            } catch (e) {
+            }
+            ;
+            try {
+                $("d_imgpng").disabled = b
+            } catch (e) {
+            }
+            ;
+        }
+
+        function OnSubDialogClose() {
+            if (sAutoDone) {
+                window.setTimeout("ok()", 100);
+            }
+        }
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+            parent.InnerDialogLoaded(sCaption);
+
+            if (sAutoDone) {
+                ok();
+            }
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+
+
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <table border=0 cellpadding=0 cellspacing=0 align=center>
+                <tr>
+                    <td>
+                        <fieldset>
+                            <legend><span lang=DlgPasteOpt></span>:</legend>
+                            <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                <tr>
+                                    <td valign=top>
+                                        <table border=0 cellpadding=0 cellspacing=3>
+                                            <script type="text/javascript">
+                                                var b_Default = false;
+                                                var s_Checked = "";
+                                                if (aFlag[3] == "1") {
+                                                    s_Checked = b_Default ? "" : " checked";
+                                                    b_Default = true;
+                                                    document.write("<tr><td noWrap>");
+                                                    document.write("<input type=radio id='d_optfile' name='d_opt' " + s_Checked + " onclick='doClickOpt(true)'><label for=d_optfile><span lang=DlgPasteOptFile></span></label><br>&nbsp;&nbsp;<span lang=DlgPasteFileExt></span>:" + config.AllowLocalExt + "<br>&nbsp;&nbsp;<span lang=DlgPasteFileSize></span>:" + FormatKB(config.AllowLocalSize));
+                                                    if (bSYFlag) {
+                                                        document.write("<br>&nbsp;&nbsp;<span lang=DlgImgSYFlag></span>: <input type=checkbox id=d_syflag3 value='1'>");
+                                                    }
+                                                    document.write("</td></tr>");
+                                                }
+                                                if (aFlag[0] == "1" || aFlag[5] == "5") {
+                                                    s_Checked = b_Default ? "" : " checked";
+                                                    b_Default = true;
+                                                    document.write("<tr><td noWrap>");
+                                                    document.write("<input type=radio id='d_optimg' name='d_opt' " + s_Checked + " onclick='doClickOpt(false)'><label for=d_optimg><span lang=DlgPasteOptImg></span>:</label> <input type=radio id=d_imggif name=d_imgtype><label for=d_imggif>GIF</label> <input type=radio id=d_imgjpg name=d_imgtype><label for=d_imgjpg>JPG</label> <input type=radio id=d_imgpng name=d_imgtype checked><label for=d_imgpng>PNG</label>");
+                                                    if (bSYFlag) {
+                                                        document.write("<br>&nbsp;&nbsp; <span lang=DlgImgSYFlag></span>: <input type=checkbox id=d_syflag0 value='1'>");
+                                                    }
+                                                    document.write("</td></tr>");
+                                                }
+                                                if (aFlag[4] == "1" && aFlag[5] != "5") {
+                                                    s_Checked = b_Default ? "" : " checked";
+                                                    b_Default = true;
+                                                    document.write("<tr>");
+                                                    document.write("	<td noWrap><input type=radio id='d_opthtml' name='d_opt' " + s_Checked + " onclick='doClickOpt(true)'><label for=d_opthtml><span lang=DlgPasteOptHtml></span></label></td>");
+                                                    document.write("</tr>");
+                                                }
+                                                if (aFlag[1] == "1") {
+                                                    s_Checked = b_Default ? "" : " checked";
+                                                    b_Default = true;
+                                                    document.write("<tr>");
+                                                    document.write("	<td noWrap><input type=radio id='d_opttext' name='d_opt' " + s_Checked + " onclick='doClickOpt(true)'><label for=d_opttext><span lang=DlgPasteOptText></span></label></td>");
+                                                    document.write("</tr>");
+                                                }
+                                            </script>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td height=5></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <table border=0 cellpadding=0 cellspacing=0 width="100%">
+                            <tr>
+                                <td noWrap><input type=checkbox id=d_pos><label for=d_pos><span lang=DlgComInsertReplace></span></label></td>
+                                <td noWrap align=right>&nbsp; <input type=submit class="dlgBtnCommon dlgBtn" value='' id="btn_ok" onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input
+                                    type=button class="dlgBtnCommon dlgBtn" value='' onclick="parent.Cancel()" lang=DlgBtnCancel>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgPasteFileUploading"]);
+</script>
+
+</body>
+</html>

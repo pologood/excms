@@ -1,0 +1,182 @@
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10" style="padding-top: 10px;">
+    <div class="sui-row-fluid">
+        <div class="span6">
+            <fieldset>
+                <legend>组件</legend>
+                <sui-control-group>
+                    <sui-checkbox v-model="conf.isTitle">显示标题</sui-checkbox>
+                    <sui-checkbox v-model="conf.footer.enable">显示底部</sui-checkbox>
+                </sui-control-group>
+
+                <sui-control-group title="触发">
+                    <sui-radio-group v-model="conf.toggle">
+                        <sui-radio label="tab">点击</sui-radio>
+                        <sui-radio label="mouse">移入</sui-radio>
+                    </sui-radio-group>
+                </sui-control-group>
+
+                <sui-control-group title="组件大小">
+                    宽
+                    <sui-input size="mini" v-model="conf.width" rules="required|digits|gt=49|lt=2001"
+                               errmsg="大于等于50且小于2000的整数"></sui-input>
+                    - 高
+                    <sui-input size="mini" v-model="conf.height" rules="required|digits|gt=49|lt=2001"
+                               errmsg="大于等于50且小于2000的整数"></sui-input>
+                    <span class="sui-msg msg-info">(单位:像素)</span>
+                </sui-control-group>
+
+                <sui-control-group title="内间距">
+                    <sui-input v-model="conf.panelPadding" rules="required|digits|gt=-1|lt=500" errmsg="大于等于0且小于500的整数"
+                               size="mini"></sui-input>
+                    <span class="sui-msg msg-info">(单位:像素)</span>
+                </sui-control-group>
+
+                <!--<sui-control-group title="标题高度" v-if="conf.isTitle">-->
+    <!--<sui-input v-model="conf.panelHeadingHeight" rules="required|digits|gt=-1|lt=500"  errmsg="大于等于0且小于500的整数" size="mini" > </sui-input>-->
+    <!--<span class="sui-msg msg-info">(单位:像素)</span>-->
+<!--</sui-control-group>-->
+
+<sui-control-group title="">
+    <sui-checkbox v-model="conf.isCustomPBH">自定义内容高度</sui-checkbox>
+</sui-control-group>
+<sui-control-group title="内容高度" v-if="conf.isCustomPBH">
+    <sui-input v-model="conf.panelBodyHeight" rules="required|digits|gt=-1|lt=5000"  errmsg="大于等于0且小于5000的整数" size="mini" > </sui-input>
+    <span class="sui-msg msg-info">(单位:像素)</span>
+</sui-control-group>
+
+<sui-control-group title="组件样式" v-if="isStyleList">
+    <sui-dropdown v-model="conf.className" @on-target-change="onStyleListChange"
+                  :items="styleList">
+    </sui-dropdown>
+</sui-control-group>
+
+            </fieldset>
+
+        </div>
+
+        <div class="span6">
+
+            <div class="control-group">
+                <div class="controls">
+                    <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="add">添加</a>
+                    <a href="javascript:void(0);" class="sui-btn btn-primary"
+                       v-on:click="associateNode">添加关联栏目</a>
+                </div>
+            </div>
+
+            <div class="ls-listtable">
+                <table class="sui-table table-bordered" style="margin-bottom: 0;">
+                    <thead>
+                    <tr>
+                        <th style="width:50px;">排序</th>
+
+                        <th>名称</th>
+                        <th>关联栏目</th>
+                        <th style="width:60px;">操作</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="attrFormTBody">
+                    <tr v-for="(el, index) in conf.tabs" v-bind:id="'tr_'+ index">
+                        <td class="tc">
+                            <a href="javascript:;" v-if="index>0" v-on:click="moveUp(index)" title="向下移动">
+                                <i class="sui-icon icon-arrow-fat-up"></i></a>
+                            <a href="javascript:;" v-if="index < (conf.tabs.length -1)" v-on:click="moveDown(index)"
+                               title="向下移动">
+                                <i class="sui-icon icon-arrow-fat-down"></i></a>
+                        </td>
+
+                        <td>
+                            <input type="text" class="input-medium" data-rules="required" v-model="el.name">
+                        </td>
+                        <td style="text-align: center">
+                            <a href="javascript:void(0);" class="sui-btn  btn-small"
+                               v-bind:class="[label[el.dataId].id > 0 ? 'btn-success' : 'btn-bordered' ]"
+                               v-on:click="associateNode(index)">关联</a>
+                        </td>
+
+                        <td style="text-align: center; ">
+                            <a href="javascript:void(0);" class="sui-btn btn-bordered btn-small btn-danger"
+                               v-on:click="remove(index)" v-if="index > 0">删除</a>
+
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <!--ls-listtable-->
+        </div>
+    </div>
+
+    <fieldset v-if="conf.isTitle">
+        <legend>标题</legend>
+        <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+        <sui-control-group>
+            <sui-checkbox v-model="conf.isMore">显示更多</sui-checkbox>
+        </sui-control-group>
+        <sui-control-group title="标题">
+            <sui-input size="large" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.title" rules="required"
+                       placeholder="请输入标题"></sui-input>
+        </sui-control-group>
+        <sui-control-group title="更多文本" v-if="conf.isMore">
+            <sui-input  v-model="conf.more" ></sui-input>
+        </sui-control-group>
+        <sui-control-group title="标题链接">
+            <sui-input size="xxlarge" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.titleHref" rules="required"
+                       placeholder="请输入标题链接"></sui-input>
+        </sui-control-group>
+
+    </fieldset>
+
+    <fieldset>
+        <legend>内容</legend>
+        <!--<sui-control-group title="区块">-->
+            <!--<sui-checkbox v-model="conf.panelBodyTop.enable">上部</sui-checkbox>-->
+            <!--<sui-checkbox v-model="conf.panelBodyRight.enable">右部</sui-checkbox>-->
+            <!--<sui-checkbox v-model="conf.panelBodyBottom.enable">下部</sui-checkbox>-->
+            <!--<sui-checkbox v-model="conf.panelBodyLeft.enable">左部</sui-checkbox>-->
+        <!--</sui-control-group>-->
+
+        <fieldset>
+            <legend>主内容</legend>
+            <div id="mainLabelHtml"></div>
+
+        </fieldset>
+
+        <fieldset v-if="conf.panelBodyTop.enable">
+            <legend>上部</legend>
+            <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+            <div id="panelBodyTopLabelFormHtml"></div>
+        </fieldset>
+        <fieldset v-if="conf.panelBodyRight.enable">
+            <legend>右部</legend>
+            <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+            <div id="panelBodyRightLabelFormHtml"></div>
+        </fieldset>
+        <fieldset v-if="conf.panelBodyBottom.enable">
+            <legend>下部</legend>
+            <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+            <div id="panelBodyBottomLabelFormHtml"></div>
+        </fieldset>
+        <fieldset v-if="conf.panelBodyLeft.enable">
+            <legend>左部</legend>
+            <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+            <div id="panelBodyLeftLabelFormHtml"></div>
+        </fieldset>
+
+    </fieldset>
+
+    <fieldset v-if="conf.footer.enable">
+        <legend>底部</legend>
+        <!--<a href="javascript:void(0);" class="sui-btn">插入标签</a>-->
+        <div id="footerLabelFormHtml"></div>
+    </fieldset>
+
+</form>
+
+
+
+
+

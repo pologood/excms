@@ -1,0 +1,108 @@
+<serviceGroup>
+    <service name="loginService">
+        <description>单点登录服务接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">loginService</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+    <service name="wordsCheckService">
+        <description>词汇检测接口（敏感词、易错词、热词）</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">wordsCheckService</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+    <service name="axis2WebService">
+        <description>WebService</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">axis2WebService</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+    <service name="siteColumnService">
+        <description>站点栏目接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">SiteColumnServiceImpl_webservice</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+
+    <service name="baseContentService">
+        <description>新闻内容写入接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">BaseContentServiceImpl_webservice</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+
+    <service name="publicCatalogService">
+        <description>信息公开目录接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">PublicCatalogServiceImpl_webservice</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+    <service name="publicClassService">
+        <description>信息公开目录接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">PublicClassServiceImpl_webservice</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+    <service name="publicContentService">
+        <description>信息公开内容写入接口</description>
+        <parameter name="ServiceObjectSupplier">
+            org.apache.axis2.extensions.spring.receivers.SpringServletContextObjectSupplier
+        </parameter>
+        <parameter name="SpringBeanName">PublicContentServiceImpl_webservice</parameter>
+        <messageReceivers>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-only"
+                             class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
+            <messageReceiver mep="http://www.w3.org/2004/08/wsdl/in-out"
+                             class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
+        </messageReceivers>
+    </service>
+</serviceGroup>

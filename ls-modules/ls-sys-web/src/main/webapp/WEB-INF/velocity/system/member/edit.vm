@@ -1,0 +1,427 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .select-control {
+        /*background-color: #fff;*/
+        /*background-image: none;*/
+        border: 1px solid #c2cad8;
+        /*border-radius: 4px;*/
+        /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+        color: #4d6b8a;
+        /*display: block;*/
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;*/
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="user_form" ms-controller="user_form">
+                    <div class="form-body">
+                        <input name="siteId" class="form-control" type="hidden" ms-duplex="siteId">
+                        <table class="table table-bordered article-table th80">
+                            <tbody>
+                            <tr>
+                                <th>会员类型：</th>
+                                <td colspan="2">
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="memberType" class="memberType" value="0"
+                                                   ms-duplex-string="memberType" ms-click="memberTypeChange(0)">网站会员
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="memberType" class="memberType" value="1"
+                                                   ms-duplex-string="memberType"
+                                                   ms-click="memberTypeChange(1)">部门会员</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id="unitIds" style="display: none">
+                                <th>所属单位：</th>
+                                <td colspan="2">
+                                    <select id="unitId" class="form-control w180" name="unitId"
+                                            ms-duplex="unitId" placeholder="请选择单位">
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>登录名：</th>
+                                <td>
+                                    <input name="uid" class="form-control" placeholder="会员登录名不能为空" ms-duplex="uid">
+                                </td>
+                                <td class="w300" rowspan="7">
+                                    <div class="thumb_layout">
+                                        <div class="thumb">
+                                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt=""
+                                                 id="imageLink"/>
+                                        </div>
+##                                        <div class="thum-delete" id="delImg" onclick="deletePic()" title="删除"><i
+##                                                class="fa fa-trash"></i></div>
+                                    ##                                        <div class="thum-upload" id="uploadImg" onclick="uploadPic()" title="上传"><i
+                                    ##                                                class="fa fa-upload"></i></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>姓 名：</th>
+                                <td>
+                                    <input name="name" type="text" class="form-control" placeholder="姓名不能为空"
+                                           ms-duplex="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>密 码：</th>
+                                <td>
+                                    <input name="plainpw" id="plainpw" type="password" class="form-control"
+                                           placeholder="密码不能为空">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>重复密码：</th>
+                                <td>
+                                    <input name="rePass" id="rePass" type="password" class="form-control"
+                                           placeholder="重复密码不能为空">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>电子邮箱：</th>
+                                <td colspan="2">
+                                    <input name="email" type="text" class="form-control" placeholder=""
+                                           ms-duplex="email">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>手机号码：</th>
+                                <td colspan="2">
+                                    <input name="phone" type="text" class="form-control" placeholder=""
+                                           ms-duplex="phone">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>证件号码：</th>
+                                <td colspan="2">
+                                    <input name="idCard" type="text" class="form-control" placeholder="证件号码不能为空"
+                                           ms-duplex="idCard">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>地 址：</th>
+                                <td colspan="2">
+                                    <input name="address" type="text" class="form-control" placeholder=""
+                                           ms-duplex="address">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>会员积分：</th>
+                                <td colspan="2">
+                                    <input name="memberPoints" id="memberPoints" type="text" class="form-control"
+                                           placeholder=""
+                                           ms-duplex="memberPoints" onblur="memberRoleClick()">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>会员角色：</th>
+                                <td colspan="2">
+                                    <select disabled class="form-control" id="memberRoleId" name="memberRoleId"
+                                            ms-duplex="memberRoleId">
+                                        <option value="">请选择会员角色</option>
+                                        #foreach($s in $roleList)
+                                            <option value="$!{s.id}">$!{s.name}</option>
+                                        #end
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>性 别：</th>
+                                <td colspan="2">
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="sex" value="1" ms-duplex-string="sex">男 </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="sex" value="0" ms-duplex-string="sex">女</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>会员状态：</th>
+                                <td colspan="2">
+                                    <div class="radio-group">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="status" value="1" ms-duplex-string="status">启用
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="status" value="0"
+                                                   ms-duplex-string="status">停用</label>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>验证问题：</th>
+                                <td colspan="2">
+                                    <input name="question" type="text" class="form-control" placeholder="密码提示问题不能为空"
+                                           ms-duplex="question">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>验证答案：</th>
+                                <td colspan="2">
+                                    <input name="answer" type="text" class="form-control" placeholder="密码提示答案不能为空"
+                                           ms-duplex="answer">
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        memberId: '$!{memberId}',
+        siteId: Ls.url.get("siteId"),
+        unitId: $("#unitId")
+    };
+    $(document).ready(function () {
+        api.button(
+                {
+                    id: 'save',
+                    className: 'btn-save',
+                    focus: true,
+                    name: '确定',
+                    callback: function () {
+                        $("#user_form").submit();
+                        return false;
+                    }
+                },
+                {
+                    id: 'back',
+                    className: 'btn-back',
+                    name: '取消',
+                    callback: function () {
+                        Ls.winClose();
+                        return false;
+                    }
+                }
+        );
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/member/getMember",
+                data: {
+                    id: cur.memberId
+                }
+            }).done(function (d) {
+                data = d.data;
+                console.info(data);
+                cur.$id = "user_form"
+                data.$id = cur.$id;
+                data.siteId = cur.siteId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#user_form").get(0), cur.vm);
+                if (data.img != null) {
+                ##                    $("#imageLink").attr("src", '$!{fileServerPath}' + data.img)
+                    $("#imageLink").attr("src", '$!{rc.contextPath}'+data.img)
+//                    $("#uploadImg").hide();
+                }
+                //加载单位
+                getOrgans(data.unitId);
+                memberTypeChange(data.memberType);
+                memberRoleClick();
+            })
+
+        };
+
+        getData();
+
+        $('#user_form').validator({
+            rules: {
+                myRule: function (el, param, field) {
+                    var isTrue = (cur.memberId == "" ? true : false);
+                    if (!isTrue) {
+                        isTrue = ($("#plainpw").val() == "" ? false : true);
+                    }
+                    return isTrue;
+                },
+                myRule2: function (el, param, field) {
+                    var memberType=$('input[name="memberType"]:checked').val();
+                    var isTrue = (memberType == 1 ? true : false);
+                    return isTrue;
+                }
+            },
+            fields: {
+                'unitId': '所属单位:required(myRule2);',
+                'uid': '登录名:required;length[2~20]',
+                'name': '姓名:required;length[2~20]',
+                'plainpw': '密码:required(myRule);password;length[2~30]',
+                'rePass': "确认密码:required(myRule);match(plainpw);length[2~30]",
+                'email': '邮箱:email;length[~40];',
+                'phone': '手机号:mobile;length[~13];',
+                'idCard': '身份证号码:IDcard;',
+                'address': '地址:length[~50];',
+                'memberPoints': '会员积分:integer;range[0~9999999]',
+                'question': '密码提示问题:length[2~50]',
+                'answer': '密码提示答:length[2~50]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            data.plainpw = $("#plainpw").val();
+            if(data.unitId!=null){data.unitName = $("#unitId option:selected").text();}
+            data.memberRoleId = $("#memberRoleId option:selected").val();
+            Ls.ajax({
+                url: "/member/save",
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        icons: "success", callback: function () {
+                            Ls.winClose();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+
+    function getOrgans(unitId) {
+        Ls.ajaxGet({
+            url: "/organ/getSiteOrgans",
+            data: {}
+        }).done(function (d) {
+            var data = d.data;
+            var htmls = "<option value=''>请选择单位</option>"
+            if (data != null) {
+                var ok = false;
+                if (!Ls.isEmpty(unitId)) {
+                    ok = true;
+                }
+                $.each(data, function (i, o) {
+                    var str = "";
+                    if (ok) {
+                        str = (unitId == o.organId ? "selected" : "");
+                        if (str == 'selected') {
+                            ok = false;
+                        }
+                    }
+                    htmls += "<option " + str + " value='" + o.organId + "'>" + o.name + "</option>"
+                })
+            }
+            cur.unitId.html(htmls);
+        });
+    }
+
+
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                cur.vm.img = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + data[0].fileName);
+                updateImg(cur.memberId, cur.vm.img);
+            }
+            return true
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "type": "NotDefined",
+            },
+        })
+    }
+
+    function deletePic() {
+        if (cur.vm.img == null) {
+            Ls.tipsErr("请上传图片！")
+            return;
+        }
+        if (confirm("您确定要删除吗?")) {
+            updateImg(cur.memberId, "");
+        }
+##        Ls.ajaxGet({
+##            url: "/fileCenter/deleteByMongoId",
+##            data: {
+##                mongoId: cur.vm.img
+##            }
+##        }).done(function (d) {
+##            if (d.status == 1) {
+##                Ls.tips("删除成功！", {
+##                    icons: "success", callback: function () {
+##                        cur.vm.img = '';
+##                        $("#uploadImg").show();
+##                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+##                        updateImg(cur.memberId, "");
+##                    }
+##                })
+##            } else {
+##                Ls.tipsErr(d.desc)
+##            }
+##        })
+
+    }
+
+    function updateImg(memberId, img) {
+        if (cur.memberId != '') {
+            Ls.ajaxGet({
+                url: "/member/updateImg",
+                data: {
+                    memberId: cur.memberId,
+                    img: img,
+                }
+            }).done(function (d) {
+                if (d.status == 1) {
+                    $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+                }
+            })
+        }
+    }
+
+    function memberTypeChange(type) {
+        if (type == 1) {
+            $("#unitIds").show();
+        } else {
+            $("#unitIds").hide();
+        }
+    }
+
+    function memberRoleClick() {
+        var memberPoints = $("#memberPoints").val();
+        if(memberPoints==''){
+            memberPoints=0;
+        }
+        Ls.ajaxGet({
+            url: "/memberRole/getBbsMemberPoints",
+            data: {
+                memberPoints: memberPoints
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                if (d.data != null) {
+                    $("#memberRoleId").val(d.data.id);
+                }
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+</script>
+</body>
+</html>

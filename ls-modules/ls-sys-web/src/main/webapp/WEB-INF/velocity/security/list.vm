@@ -1,0 +1,300 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="addMateria('')">添加</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">批量操作<i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu">
+                                    <li class="publishBtn"><a href="javascript:batchDel();">批量删除</a></li>
+                                    <li class="publishBtn"><a href="javascript:batchPublish();">批量发布</a></li>
+                                    <li class="publishBtn"><a href="javascript:batchCancelPublish();">批量取消发布</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                                    <input type="datetime" id="createDate" ms-duplex="" class="form-control w160" placeholder="发送时间"
+                                           onClick="WdatePicker({dateFmt:'yyyy',readOnly:true})" readonly/>
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/materia/getmMateriaList" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn" width="20"></div>
+                        <div field="materiaName" width="150" align="left" headerAlign="center" renderer="goLink">安全生产杂志标题</div>
+                        <div field="year" width="50" align="center" align="center" headerAlign="center">年份</div>
+                        <div field="periodical" width="30" align="center" headerAlign="center" allowSort="true">期刊号</div>
+                        <div field="" width="50" align="center" headerAlign="center" renderer="guide_publish">发布</div>
+                        <div field="" width="50" align="center" headerAlign="center" renderer="renderOp">操作</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    mini.parse();
+
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID
+
+    }
+    var grid = mini.get("datagrid1");
+    grid.load(cmm);
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+
+    $(document).ready(function () {
+        $("#butonDel").hide();
+
+    })
+
+    function renProcess(e) {
+        var rec = e.record;
+        return '<button  class=" btn btn-default btn-sm btn-edit" onclick="detail(' + rec.id + ')"> 详情 </button> ';
+    }
+
+    //操作加载
+    function renderOp(e) {
+        var rec = e.record;
+        var edit = '<button  class=" btn btn-default btn-sm btn-edit" onclick="addMateria(' + rec.id + ')">编辑</button> ';
+        return edit;
+    }
+
+
+    function addMateria(id) {
+        Ls.openWin("/materia/editPage?id=" + id, {
+            width: '800px',
+            height: '400px',
+            lock: true,
+            title: '编辑',
+        });
+
+
+    }
+
+
+    function search() {
+        var name = $("#searchKey").val();
+        var createDate = $("#createDate").val();
+        grid.load({keyWord: name, dataFlag: 1, create: createDate});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        $("#createDate").val("")
+        grid.load({dataFlag: 1, 'siteId': cmm.siteId});
+    }
+
+    function onKeyEnter(e) {
+        search();
+    }
+
+    function userGroup() {
+        Ls.openWin("/weChat/userMgr/userGroup", {
+            width: '650px',
+            height: '450px',
+            lock: true,
+            title: '用户组管理',
+        });
+    }
+
+    function batchDel() {
+        var ids = getIDS();
+        if (ids == '' || ids.length <= 0) {
+            Ls.tipsInfo("请选择待删除项");
+            return;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': ids},
+            url: "/weChatDeal/delMag",
+            success: function (text) {
+                Ls.tips
+
+                Ls.tipsOk("删除成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                        Ls.winClose();
+                    }
+                });
+            }
+        })
+
+
+    }
+
+    function batchPublish() {
+        var ids = getIDS();
+        var contentIds = getPublishIDS();
+        if (ids == '' || ids.length <= 0) {
+            Ls.tipsInfo("请选择待发布项");
+            return;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': ids, 'contentIds': contentIds},
+            url: "/materia/batchPublish",
+            success: function (text) {
+                Ls.tipsOk("发布成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                    }
+                });
+            }
+        })
+
+
+    }
+
+
+    function getIDS() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].id);
+        }
+        ids = ids.join(",");
+        return ids;
+    }
+
+    function getPublishIDS() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].baseContentId);
+        }
+        ids = ids.join(",");
+        return ids;
+    }
+
+    function batchCancelPublish() {
+        var ids = getPublishIDS();
+        if (ids == '' || ids.length <= 0) {
+            Ls.tipsInfo("请选择待取消发布项");
+            return;
+        }
+
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': ids},
+            url: "/materia/batchCancelPublish",
+            success: function (text) {
+                Ls.tipsOk("取消发布成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                    }
+                });
+            }
+        })
+
+
+    }
+
+
+    function guide_publish(obj) {
+        var record = obj.record;
+        var diyDom = '<a id=' + record.id + ' onclick="publish(' + record.id + ',' + record.baseContentId + ')"><img src="$!{sysStaticPath}/assets/images/noclick.gif" border="0" title="发布" ></a>';
+        if (record.isPublish == 1) {
+            diyDom = '<a id=' + record.id + ' onclick="cancel_publish(' + record.baseContentId + ')"><img src="$!{sysStaticPath}/assets/images/click.gif" border="0" title="取消发布" ></a>';
+        }
+
+        return diyDom;
+    }
+
+    function publish(id, contentId) {
+
+
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': id, 'contentIds': contentId},
+            url: "/materia/batchPublish",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                    return;
+                }
+
+                Ls.tipsOk("发布成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                    }
+                });
+            }
+        })
+
+
+    }
+
+    function cancel_publish(id) {
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': id},
+            url: "/materia/batchCancelPublish",
+            success: function (text) {
+                Ls.tipsOk("取消发布成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                    }
+                });
+            }
+        })
+
+
+    }
+
+    function batchDel() {
+        var ids = getIDS();
+        var contentIds = getPublishIDS();
+        Ls.ajax({
+            type: "POST",
+            data: {'ids': ids, 'contentIds': contentIds},
+            url: "/materia/batchDel",
+            success: function (text) {
+                Ls.tipsOk("删除成功", {
+                    callback: function () {
+                        Ls.getWin.win.grid.reload();
+                    }
+                });
+            }
+        })
+
+    }
+
+
+</script>

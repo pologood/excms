@@ -1,0 +1,214 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">网站可用性</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="row">
+            <div class="col-md-8">
+                <form id="configForm" role="form">
+                    <input type="hidden" value="after" name="monitoredType">
+                    <input type="hidden" value="$!{typeCode}" name="typeCode">
+                    <input id="columnTypeCode" type="hidden" value="columnTypeCode" name="columnTypeCode">
+                    <input type="hidden" name="standardCode" id="standardCode" value="notOpenSite">
+                    <div class="tab-content">
+                        <!-- 站点无法访问 -->
+                        <div class="tab-pane active" id="tab_1_2">
+                            <div class="form-body">
+
+                                <div class="note note-info">
+                                    <h4 class="block">普查考核指标</h4>
+                                    <p>
+                                        <a href="http://www.gov.cn/zhengce/content/2015-03/24/content_9552.htm" target="_blank">国务院办公厅关于开展第一次全国政府网站普查的通知 国办发〔2015〕15号</a>
+                                    </p>
+                                    <p>&nbsp;</p>
+                                    <p><strong>扣分细则：</strong></p>
+                                    <p>1、监测1周，每天间隔性访问20次以上，累计超过（含）15秒网站仍打不开的次数比例每1%扣5分（累计超过（含）5%的，直接列入单项否决）。</p>
+                                    <p>2、首页上的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣1分；如首页仅为网站栏目导航入口，则检查所有二级页面上的链接。</p>
+                                    <p>3、其他页面的链接（包括图片、附件、外部链接等），每发现一个打不开或错误的，扣0.1分。</p>
+                                </div>
+                                <table class="table table2">
+                                    <caption></caption>
+                                    <tbody>
+                                    <tr>
+                                        <th>监测方式：</th>
+                                        <td> 监测点开始之前</td>
+                                        <td class="w50">
+                                            <input type="text" name="monitoredNum" id="monitoredNum" maxlength="4" class="form-control w50"/>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" id="monitoredTimeType" name="monitoredTimeType">
+                                                <option value="">单位</option>
+                                                <option value="day">天</option>
+                                                <option value="week">周</option>
+                                                <option value="month">月</option>
+                                                <option value="year">年</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td> 每天</td>
+                                        <td>
+                                            <input type="text" name="dayMonitoredCount" id="dayMonitoredCount" maxlength="4" class="form-control w50"/>
+                                        </td>
+                                        <td class="tl"> 次</td>
+                                    </tr>
+                                    <tr>
+                                        <th>扣分方式：</th>
+                                        <td>网站打不开占比 *</td>
+                                        <td class="w50">
+                                            <input type="text" name="notOpenNum" id="notOpenNum" placeholder="" maxlength="4" class="form-control w50"/>
+                                        </td>
+                                        <td class="tl"> 分</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table table2">
+                                    <caption>首页链接</caption>
+                                    <tbody>
+                                    <tr>
+                                        <th>扣分方式：</th>
+                                        <td>错误链接个数 *</td>
+                                        <td class="w50">
+                                            <input type="text" name="indexErrorNum" id="indexErrorNum" placeholder="" maxlength="4" class="form-control w50"/>
+                                        </td>
+                                        <td class="tl"> 分</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table table2">
+                                    <caption>其他链接</caption>
+                                    <tbody>
+                                    <tr>
+                                        <th>扣分方式：</th>
+                                        <td>错误链接个数 *</td>
+                                        <td class="w50">
+                                            <input type="text" name="otherErrorNum" id="otherErrorNum" placeholder="" maxlength="4" class="form-control w50"/>
+                                        </td>
+                                        <td class="tl"> 分</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div class="form-actions noborder">
+                                    <button type="submit" class="btn btn-default btn-save">保 存</button>
+                                    <button type="button" class="btn btn-default btn-reset" onclick="syn()">同 步</button>
+                                    <button type="reset" class="btn btn-default btn-reset">重 置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    var cur = {
+        typeCode: "$!{typeCode}"
+    };
+    $(document).ready(function () {
+
+        Ls.ajax({
+            url: "/monitor/vetoConfig/getDataByCode",
+            data: {
+                typeCode: cur.typeCode
+            },
+            type: "get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    $("#columnTypeCode").val(data.columnTypeCode);
+                    $("#monitoredNum").val(data.monitoredNum)
+                    $("#dayMonitoredCount").val(data.dayMonitoredCount)
+                    $("#notOpenNum").val(data.notOpenNum)
+                    $("#monitoredTimeType option[value=" + data.monitoredTimeType + "]").attr("selected", true);
+                    $("#indexErrorNum").val(data.indexErrorNum)
+                    $("#otherErrorNum").val(data.otherErrorNum)
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+
+        $('#configForm').validator({
+            fields: {
+                'monitoredNum': '监测时长:required;integer(+);',
+                'dayMonitoredCount': '每日访问次数:required;integer(+);',
+                'notOpenNum': '未访问成功概率:required;integer(+);',
+                'otherErrorNum': '其他链接错误分数:required;match(/^[0-9]+([.]{1}[0-9]+){0,1}$/);',
+                'indexErrorNum': '首页链接错误分数:required;integer(+);',
+                'monitoredTimeType': '监测时长单位:required;'
+            },
+            valid: function () {
+                doSave();
+            },
+            timely: 1,
+            msgClass: "n-top"
+        });
+
+    })
+
+    function doSave() {
+        var data = $('#configForm').serializeObject();
+        if(data.columnTypeCode == undefined || data.columnTypeCode == null || data.columnTypeCode == "" || data.columnTypeCode == "null"){
+            //默认互动访谈类栏目
+            data.columnTypeCode = "columnType_index";
+        }
+        Ls.ajax({
+            url: "/monitor/vetoConfig/saveData",
+            data: {content:JSON.stringify(data),typeCode:data.typeCode},
+            type: "POST",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tipsOk("保存成功!");
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+
+    }
+
+    function syn(){
+        Ls.ajax({
+            url: "/monitor/vetoConfig/synByCode",
+            data: {
+                typeCode: cur.typeCode,
+                baseCode:'scop'
+            },
+            type: "get",
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    $("#monitoredNum").val(data.monitoredNum)
+                    $("#dayMonitoredCount").val(data.dayMonitoredCount)
+                    $("#notOpenNum").val(data.notOpenNum)
+                    $("#monitoredTimeType").val(data.monitoredTimeType);
+                    $("#indexErrorNum").val(data.indexErrorNum)
+                    $("#otherErrorNum").val(data.otherErrorNum)
+
+                } else {
+                    Ls.tips(resp.desc, {icons: 'error', times: 2});
+                }
+            }
+
+        })
+    }
+
+
+    function doReset() {
+        $("#monitoredNum").val('')
+        $("#dayMonitoredCount").val('')
+        $("#notOpenNum").val('')
+        $("#monitoredTimeType").val('');
+        $("#indexErrorNum").val('')
+        $("#otherErrorNum").val('')
+
+    }
+
+</script>

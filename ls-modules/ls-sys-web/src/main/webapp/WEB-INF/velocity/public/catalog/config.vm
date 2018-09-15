@@ -1,0 +1,145 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+	<div region="center" style="border:none; overflow: auto;">
+		<div class="portlet light">
+			<div class="portlet-body form">
+				<form id="organ_config_form" role="form" ms-controller="organ_config_form">
+					<div class="form-body">
+						<div class="form-group">
+							<label>单位名称</label>
+							<input type="text" readonly class="form-control readonly" ms-duplex="organName">
+            			</div>
+
+						<div class="form-group">
+							<label>单位目录</label>
+							<select id="catId" class="form-control" name="catId" ms-duplex="catId" placeholder="请选择单位目录"></select>
+            			</div>
+
+						<div class="form-group">
+							 <label>内容模型</label>
+                             <select id="contentModelCode" class="form-control" name="contentModelCode" ms-duplex="contentModelCode" placeholder="请选择内容模型"></select>
+            			</div>
+
+						<div class="form-group">
+							<label>排序</label>
+							<input type="text" name="sortNum" class="form-control" ms-duplex="sortNum" />
+            			</div>
+
+                        <div class="form-group">
+                            <label>是否启用</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isEnable" value="true" ms-duplex-boolean="isEnable">是</label>
+                                <label class="radio-inline"><input type="radio" name="isEnable" value="false" ms-duplex-boolean="isEnable">否</label>
+                            </div>
+                        </div>
+
+						<div class="form-group">
+                            <label>公开制度按级别分类</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isInstitutionLevel" value="true" ms-duplex-boolean="isInstitutionLevel">是</label>
+                                <label class="radio-inline"><input type="radio" name="isInstitutionLevel" value="false" ms-duplex-boolean="isInstitutionLevel">否</label>
+                            </div>
+                        </div>
+
+						<div class="form-group">
+                            <label>公开指南按级别分类</label>
+                            <div class="controls">
+                                <label class="radio-inline"><input type="radio" name="isGuideLevel" value="true" ms-duplex-boolean="isGuideLevel">是</label>
+                                <label class="radio-inline"><input type="radio" name="isGuideLevel" value="false" ms-duplex-boolean="isGuideLevel">否</label>
+                            </div>
+                        </div>
+
+						<div class="form-group">
+							<label>生成关联页面</label>
+							<input id="linkPageIds" type="hidden" name="linkPageIds" class="form-control" ms-duplex="linkPageIds">
+                            <textarea class="form-control" rows="3" name="linkPageNames" id="linkPageNames"
+                                      ms-duplex-string="linkPageNames" ms-click="getGenePage()"
+                                      placeholder="点击选择栏目"></textarea>
+            			</div>
+					</div>
+        		</form>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+var cur = {
+	id : "organ_config_form",//表单
+	vm : null,//模型
+	save_url : "/public/catalog/saveConfig",//保存url
+	W : Ls.getWin.win,
+	data : null//数据
+};
+$(document).ready(function(){
+	var node = cur.W.cur.node;
+	//加载数据
+	var data = cur.W.cur.data;
+	data.$id = cur.id;
+
+	data.organId = cur.W.cur.organId;
+	data.organName = node.name;
+	// 如果模型已经绑定，不再绑定
+	cur.vm = avalon.vmodels[data.$id];
+	if (!cur.vm) {
+		// 绑定模型
+		cur.vm = avalon.define(data);
+	} else {
+		Ls.assignVM(cur.vm, data);
+	}
+	// 绑定
+	$("#catId").empty().append(cur.W.cur.catalogStr).val(data.catId);
+	$("#contentModelCode").empty().append(cur.W.cur.contentModeStr).val(data.contentModelCode);
+	avalon.scan(document.body, cur.vm);
+
+	//验证
+	$('#' + cur.id).validator({
+		fields : {
+			'catId' : '单位目录:required;',
+			'contentModelCode' : '内容模型:required;',
+			'sortNum' : '排序:range[1~9999];'
+		},
+		valid : function() {
+			cur.W.catalogManage.loadData(cur.save_url,Ls.toJSON(cur.vm.$model),function(d){
+				if(d.status == 1){
+					// 关闭弹框
+					cur.data = d.data;
+					Ls.getWin.api.close();
+				} else{
+					Ls.tips(d.desc, {icons : "error"});
+				}
+			});
+		}
+	});
+
+	Ls.getWin.api.button({
+        name: '确定',
+        className:"aui_state_highlight",
+        callback: function() {
+			$('#' + cur.id).submit();
+          	return false;
+        }
+    });
+});
+</script>
+<script>
+function getGenePage() {
+    var linkPageIds = $("#linkPageIds").val();
+    var url= '/siteMain/toSelectColumnTree?siteId=' + cur.W.GLOBAL_SITEID + '&synColumnIds=' + linkPageIds + '&flag=0&contentModelCode=' + cur.W.cur.data.contentModelCode;
+    Ls.openWin(url, '400px', '500px', {
+    	id:'gene_page',
+    	title: '生成关联页面',
+    	padding: 0,
+		ok:function(){
+            iframe = this.iframe.contentWindow;
+            data = iframe.doOk();
+            if (data != null) {
+                cur.vm.linkPageIds = data.ids;
+                cur.vm.linkPageNames = data.names;
+            }
+        }
+   });
+}
+</script>

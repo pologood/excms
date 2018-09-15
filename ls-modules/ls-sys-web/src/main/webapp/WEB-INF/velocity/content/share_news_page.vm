@@ -1,0 +1,94 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white page-content-white">
+
+<div class="pd10" style="overflow: hidden;">
+    <table class="table table-bordered article-table">
+        <tr>
+            <td>
+                <div style="font-size:18px;font-family:微软雅黑;" class="bold">推送到其他平台</div>
+            </td>
+        </tr>
+        <tr>
+            <td><textarea class="form-control" id="content" style="width:520px;height:180px;">${Content}</textarea></td>
+        </tr>
+        <tr>
+            <td>
+                <div class="bold">推送到：
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="sinaCheck" value="1"><img src="$!{sysStaticPath}/assets/images/sinawb.jpg"/> 新浪微博
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="tencentCheck" value="1"><img src="$!{sysStaticPath}/assets/images/tencentwb.jpg"/> 腾讯微博
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="android" name="dreviceType" value="1"><img src="$!{sysStaticPath}/assets/images/android.png"/> 安卓客户端
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="ios" name="dreviceType" value="1"><img src="$!{sysStaticPath}/assets/images/apple.png"/> 苹果客户端
+                    </label>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+
+    $(document).ready(function () {
+
+        api.button({
+            id: "do_submit",
+            name: "确定",
+            focus: true,
+            callback: function () {
+                saveShare();
+                return false;
+            }
+        });
+
+    })
+
+    var saveShare = function () {
+        var data = {};
+        data.id = Ls.url.get("id");
+        data.content = $("#content").val();
+        var sinaCheck = $("#sinaCheck:checked").val() || 0;
+        var tencentCheck = $("#tencentCheck:checked").val() || 0;
+        var android = $("#android:checked").val() || 0;
+        var ios = $("#ios:checked").val() || 0;
+
+        if (sinaCheck == 0 && tencentCheck == 0 && android == 0 && ios == 0) {
+            Ls.tipsInfo("请选择您要推送的对象");
+            return false;
+        }
+        data.sinaCheck = sinaCheck;
+        data.tencentCheck = tencentCheck;
+        data.android = android;
+        data.ios = ios;
+        Ls.ajax({
+            data: data,
+            url: "/content/shareNews",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    Ls.tips("消息推送成功", {
+                        icons: "success",
+                        callback: function () {
+                            Ls.winClose();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    var cancel = function () {
+        Ls.winClose();
+    }
+
+</script>

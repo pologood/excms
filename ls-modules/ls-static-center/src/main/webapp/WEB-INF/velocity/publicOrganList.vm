@@ -1,0 +1,5 @@
+<ul>
+	#foreach($organ in $resultObj)
+	<li><a href="/public/column/$!{organ.organId}?type=4" title="$!{organ.name}">$!{organ.name}</a></li>
+	#end
+</ul>

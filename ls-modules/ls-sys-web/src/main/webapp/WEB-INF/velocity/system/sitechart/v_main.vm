@@ -1,0 +1,328 @@
+<style>
+    .ac {
+        align: center
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto; overflow-x: hidden;">
+        <div id="doc_list_body" style="margin:15px 30px">
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="alert alert-warning">
+                            <h4 class="alert-heading">温馨提示：</h4>
+                            <p><strong>浏览次数(PV)：</strong> 即通常说的PV（PageView）值，用户每打开1个网站页面，记录1个PV。用户多次打开同一页面PV累计多次。</p>
+                            <p><strong>独立访客(UV)：</strong>
+                                1天（00:00-24:00）之内，访问网站的不重复用户数（以浏览器cookie为依据），一天内同一访客多次访问网站只被计算1次。</p>
+                            <p><strong>访问地址(IP)：</strong> 1天（00:00-24:00）之内，访问网站的不重复IP数。一天内相同IP地址多次访问网站只被计算1次。</p>
+                            <p><strong>新独立访客(NUV)：</strong> 当日的独立访客中，历史上首次访问网站的访客为新独立访客。</p>
+                            <p><strong>访问次数(SV)：</strong>
+                                访客从进入网站到离开网站（退出浏览器）的一系列活动记为一次访问，也称会话(session),一次访问(会话)可能包含多个PV。</p>
+                        </div>
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">网站流量概况</span> &nbsp;
+                                <span style="font-size:14px;color:red">(统计数据整点更新)</span>
+                                <span class="caption-helper"></span>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div>
+                                <table class="table table-hover doc-list">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>浏览次数(PV)</th>
+                                        <th>独立访客(UV)</th>
+                                        <th>访问地址(IP)</th>
+                                        <th>新独立访客(NUV)</th>
+                                        <th>访问次数(SV)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="mainList">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12">
+                    <div class="portlet light bordered mb25">
+                        <div class="portlet-title">
+                            <div class="caption">
+                                <i class="icon-bar-chart font-blue"></i>
+                                <span class="caption-subject font-blue bold">访问趋势</span>
+                                &nbsp;<span style="font-size:14px;color:red">(统计数据整点更新)</span>
+                                <span class="caption-helper"></span>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-group form-inline ">
+                                    <input type="text" name="st" id="st" class="form-control w160"
+                                           placeholder="开始时间"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <input type="text" name="ed" id="ed" class="form-control w160"
+                                           placeholder="结束时间"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'${TODAY}',readOnly:true})"/>
+                                    <button type="button" class="btn btn-default btn-search" onclick="search()">查询
+                                    </button>
+                                    <button type="button" class="btn btn-default" onclick="searchClear()">清除条件</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portlet-body">
+                            <div class="tabbable-line">
+                                <ul class="nav nav-tabs">
+                                    <li class="active">
+                                        <a href="#tab_1_2" data-toggle="tab">访问趋势总计</a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab_1_1" data-toggle="tab">访问趋势明细</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-content">
+                                        <div class="tab-pane active" id="tab_1_2">
+                                            <div id="option_a" style="height: 480px;"></div>
+                                        </div>
+                                        <div class="tab-pane" id="tab_1_1">
+                                            <div id="option_b" style="height: 480px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/plugins/echarts/echarts.min.js"></script>
+<script>
+    var cur = {
+        totalEchart: null,
+        detailEchart: null,
+        showDiv: '#tab_1_2'
+    }
+    $(document).ready(function () {
+        mini.parse();
+
+        /*
+         * 解决tab切换时组建加载不全问题
+         */
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            cur.showDiv = id;
+            if (id == '#tab_1_1' && !cur.detailLoad) {
+                cur.detailEchart = require('echarts').init(document.getElementById('option_b'));
+                cur.detailEchart.setOption(cur.detailOption);
+                cur.detailLoad = true;
+            } else if (id == '#tab_1_2' && !cur.totalLoad) {
+                cur.totalEchart = require('echarts').init(document.getElementById('option_a'));
+                cur.totalEchart.setOption(cur.totalOption);
+                cur.totalLoad = true;
+            }
+        });
+
+        Ls.ajaxGet({
+            url: "/siteChartMain/getSurvey",
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    var str = "";
+                    for (var i = 0; i < d.length; i++) {
+                        str += "<tr><td style='padding-left:50px;' class='bold'>" + d[i].mold + "</td><td>" + d[i].pv + "</td><td>" + d[i].uv + "</td><td>" + d[i].ip + "</td><td>" + d[i].nuv + "</td><td>" + d[i].sv + "</td></tr>";
+                    }
+                    $("#mainList").html(str);
+                }
+            }
+        });
+    })
+
+    // 路径配置
+    require.config({
+        paths: {
+            echarts: '$!{rc.contextPath}/assets/js/plugins/echarts'
+        }
+    });
+
+    // 使用
+    require(
+            [
+                'echarts',
+                'echarts/chart/line',
+                'echarts/chart/bar',
+                'echarts/chart/pie'
+            ],
+            function (ec) {
+                searchClear();
+            })
+
+
+    function search() {
+        var cmm = {};
+        cmm.st = $("#st").val();
+        cmm.ed = $("#ed").val();
+        Ls.ajaxGet({
+            url: "/siteChartMain/visitChart",
+            data: cmm,
+            success: function (data) {
+                if (data.status == 0) {
+                    Ls.tipsErr("获取统计数据失败");
+                } else {
+                    var d = data.data;
+                    var series = d.series;
+                    var newAxis = [], newSeries = [];
+                    if (series && series.length > 0) {
+                        var length = series.length;
+                        for (var i = 0; i < length; i++) {
+                            var total = 0;
+                            var dd = series[i].data;
+                            var len = dd.length;
+                            for (var j = 0; j < len; j++) {
+                                if (!isNaN(dd[j])) {
+                                    total += parseInt(dd[j]);
+                                }
+                            }
+                            newAxis.push(series[i].name);
+                            newSeries.push(total);
+                        }
+                    }
+                    cur.totalLoad = false;
+                    cur.detailLoad = false;
+                    cur.detailOption = getOption(d.xAxis, d.series);
+                    cur.totalOption = getOptionNew(newAxis, newSeries);
+                    if (cur.showDiv == '#tab_1_1') {//明细
+                        cur.detailEchart = require('echarts').init(document.getElementById('option_b'));
+                        cur.detailEchart.setOption(cur.detailOption);
+                        cur.detailLoad = true;
+                    } else if (cur.showDiv == '#tab_1_2') {
+                        cur.totalEchart = require('echarts').init(document.getElementById('option_a'));
+                        cur.totalEchart.setOption(cur.totalOption);
+                        cur.totalLoad = true;
+                    }
+                }
+            }
+        });
+    }
+
+    function searchClear() {
+        $("#st").val("");
+        $("#ed").val("");
+        search();
+    }
+
+    function getOption(xAxis, series) {
+        var option = {
+            title: {
+                text: ''
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['PV', 'UV', 'NUV', 'IP', 'SV']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            dataZoom: {
+                show: true,
+                realtime: true,
+                start: 0,
+                end: 100
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xAxis
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ],
+            series: series
+        };
+        return option;
+    }
+
+    function getOptionNew(xAxis, series) {
+        return {
+            title: {
+                show: false,
+                text: '',
+                subtext: ''
+            },
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                show: false,
+                data: ['访问趋势总计']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            calculable: true,
+            xAxis: [
+                {
+                    type: 'category',
+                    data: xAxis
+                }
+            ],
+            grid: {
+                y2: 80
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                }
+            ],
+            series: [
+                {
+                    name: '访问趋势总计',
+                    type: 'bar',
+                    data: series,
+                    itemStyle: {
+                        normal: {
+                            label: {
+                                show: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                }
+            ],
+            color: [
+                '#1790cf', '#1bb2d8', '#99d2dd', '#88b0bb',
+                '#1c7099', '#038cc4', '#75abd0', '#afd6dd'
+            ]
+        }
+    }
+</script>

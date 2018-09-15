@@ -1,0 +1,8 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+<li> <a href="$!{eo.link}"  title="$eo.recUnitName" target="$!{paramObj.target}">
+   #cutstr( $eo.recUnitName ,$length)
+</a></li>
+#end

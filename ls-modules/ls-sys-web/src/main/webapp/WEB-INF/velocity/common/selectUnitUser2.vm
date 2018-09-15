@@ -1,0 +1,1548 @@
+#parse("/_page_layout/_header.vm")
+<link rel="stylesheet" href="$!{rc.contextPath}/assets/js/plugins/autocomplete/1.1/jquery.autocomplete.css">
+<style type="text/css">
+    body, html {
+        overflow: hidden;
+        font-size: 12px;
+    }
+
+    .ztree {
+        overflow: hidden;
+    }
+
+    .wh100p {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    td {
+        font-size: 12px;
+    }
+
+    .select_wrap {
+        padding: 0 10px 0 10px;
+        margin: 0;
+        width: 600px
+    }
+
+    .select_wrap > fieldset > legend {
+        font-size: 14px;
+        font-weight: bold
+    }
+
+    .select_con {
+        padding: 0 10px 0 10px;
+    }
+
+    .s1 {
+        margin: 10px 0;
+    }
+
+    .selectedBox {
+    }
+
+    .selectedBox, .selectedBox li {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .selectedBox li {
+        background-color: #EDF2F5 !important;
+        font-weight: bold;
+        padding: 2px 5px 2px 15px;
+        height: 27px;
+        line-height: 200%;
+        border-bottom: #FFF solid 1px;
+    }
+
+    .selectedBox li a {
+        float: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        text-decoration: none;
+    }
+
+    .selectedBox li.chk {
+        background-color: #FFEBC0 !important;
+    }
+
+    .icon_del14 {
+        background: url($!{rc.contextPath}/assets/images/del.png) no-repeat center center !important;
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+    }
+
+    .wx_tips {
+        border: #EFEFEF;
+        background: #FFFCBB;
+        color: #702A00;
+        line-height: 24px;
+        padding: 3px 8px;
+    }
+
+    #tool_bar {
+        text-align: center;
+        margin-top: 90px;
+        vertical-align: middle
+    }
+
+    .h23 {
+        height: 23px;
+    }
+
+    .mini-layout-region {
+        border: 0 none !important;
+    }
+
+    .mini-layout-region-south {
+        border-top: 1px solid #a8a8a8 !important;
+        background: #F5F5F5;
+    }
+
+    .mini-layout-region-north .mini-layout-region-body {
+        overflow: hidden;
+    }
+
+    .mini-tabs-bodys {
+        padding: 0;
+    }
+
+    #seach_input {
+        line-height: 23px;
+        height: 26px;
+        border: solid 1px #999999;
+        text-indent: 1em;
+    }
+
+    #tabs2 .mini-tabs-body {
+        overflow: hidden;
+    }
+
+    .w650 {
+        width: 658px;
+    }
+    .wx_tips01{
+        background: #FFFCBB;
+        color: #702A00;
+        line-height: 24px;
+        padding: 3px 8px;
+    }
+</style>
+<base target="_self">
+</head>
+
+<body onkeydown="if (event.keyCode==116){reload.click()}" class="page-body-white">
+<a id="reload" style="display:none">reload...</a>
+<div id="layout1" class="mini-layout mini-fit wh100p" splitSize="0">
+
+    <div region="north" allowResize="false" height="85" showSplitIcon="false" showHeader="false" style="padding: 0 16px;">
+        <div class="s1 fixV">
+            <span class="gray" style="height:26px; line-height:26px; display:inline-block">快速查询：</span>
+            <input type="text" id="seach_input" autocomplete="off" class="text h23 w650" placeholder="支持简拼、全拼、中文搜索..." value="">&nbsp;
+        ##            <button class="btn22_gray w90 mr10 h25" onClick="cur.fn.clear()">显示全部</button>
+        </div>
+        <div class="s1 fixV wx_tips01">
+            &nbsp;
+            提示：1、按住Ctrl多选；#*2、按住Shift连选。*#
+        </div>
+    </div>
+
+    <div title="center" region="center" showCloseButton="false" splitSize="0"
+         showSplit="false" bodyStyle="background:#fff; overflow:hidden;">
+
+        <div id="layout2" class="mini-layout" style="width:750px;height:380px; margin: 0px 16px;">
+
+            <div region="west" allowResize="false" showSplitIcon="false" width="350" showHeader="false" showCollapseButton="false">
+
+                <div id="tabs1" class="mini-tabs" activeIndex="0" style="width:100%;height:365px;" plain="false">
+                    <div title="单位用户/个人用户">
+                        <ul id="treeview01" class="ztree"></ul>
+                    </div>
+                #*<div title="单位通讯簿">
+                    <ul id="treeview02" class="ztree"></ul>
+                </div>
+                <div title="个人通讯簿">
+                    <ul id="treeview03" class="ztree"></ul>
+                </div>
+                <div title="本单位">
+                    <ul id="treeview04" class="ztree"></ul>
+                </div>*#
+                </div>
+
+            </div>
+
+            <div region="east" allowResize="false" showSplitIcon="false" width="340" showHeader="false" showCollapseButton="false">
+                <div id="tabs2" class="mini-tabs" activeIndex="0" plain="false" style="width:100%;height:365px;" buttons="#tabsButtons">
+                    <div title='<span id="tabs2-title">已选</span>(<span class="b red" id="totalSelectCount"></span>)'>
+                        <div style="height: 338px; overflow: auto; overflow-x:hidden;" id="selectArea" ms-controller="selectArea">
+                            <ul id="SelectedBox" class="selectedBox">
+                                <li ms-repeat-el="userListA" #*:key="user.id"*#>
+                                    <a href="javascript:void(0)">{{el.name}}</a>
+                                    <span title="删除" class="icon_del14 r" ms-click="del($index)"></span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tabsButtons">
+                    <a class="mini-button" onclick="cur.fn.clearSelectedAll()">清除所选</a>
+                </div>
+
+            </div>
+
+            <div allowResize="false" region="center">
+                <div id="tool_bar">
+                    <input type="image" src="$!{rc.contextPath}/assets/images/add.png" id="doADD" title="添加">
+                #*<br>
+                <br>
+                <input type="image" src="$!{rc.contextPath}/assets/images/up.png" id="doUP" title="向上">
+                <br>
+                <br>
+                <input type="image" src="$!{rc.contextPath}/assets/images/down.png" id="doDOWN" title="向下">*#
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div region="south" height="44" splitSize="0" showSplit="false" showHeader="false" bodyCls="footBar" bodyStyle="overflow:hidden">
+        <div style="text-align: right; margin-top: 5px;">
+            <button class="btn btn-default btn-confirm mr10" onClick="cur.fn.ok()">确 定</button>
+            <button class="btn btn-default btn-close mr10" onClick="cur.fn.closeDg()">取 消</button>
+        </div>
+    </div>
+    <!-- south -->
+</div>
+
+<div id="pageLoading" class="ls-loading">
+    <div class="ls-loading-img"></div>
+</div>
+<script>
+    var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+</script>
+    #parse("/_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/goa/res/form/autocomplete/1.1/jquery.autocomplete.js"></script>
+<script>
+    /*
+    参数介绍：
+    1.scope：
+    后端：用于描述需要获取的节点范围，scope支持0-3，0-获取所有的子节点，1-获取子单位、部门/处室和虚拟处室，2-获取子单位和部门/处室，3-获取子单位；
+    前端：0-只能选择人，1-只能选择 OrganUnit Virtual，2-只能选择 OrganUnit，3-只能选择 Organ
+    2.organIds:用于描述获取哪些单位、部门或虚拟部门的子节点，如果organIds为null，那么获取第一级节点；
+
+    3.scopeType: 单选或多选 'single' 或 'multi' ； 默认多选
+    4.isSimple : 采用IDS,NAMES的方式传递数据{ids:"1,2,3",names:"1,2,3"}
+    5.isSelectParent: 是否支持选中父节点，默认可选中 0 不可选  1 可选
+
+    scope:0 数组下标说明:p.personId,p.name,p.organId,p.organName,p.unitId,p.unitName,p.simplePy,p.fullPy,p.dn,,p.mobile,p.positions,p.userId,p.isExternalPerson,p.platformCode
+    scope:1 数组下标说明：o.organId,o.name,o.type,o.parentId,o.dn,o.simplePy,o.fullPy,o.isFictitious,p.isExternalPerson,p.platformCode,p.path
+    */
+
+    //获取窗口对象
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+
+    var cur = {
+                viewModel: {},
+                fn: {},
+                action: {
+                    getTree01: '/ldap/getNodes'/*,
+                getNodesByPersonName: '/ldap/getNodesByPersonName',
+                getNodesByOrganName: '/ldap/getNodesByOrganName'*/
+                },
+                el: {},
+                params: {
+                    scope: Ls.url.get('scope'),
+                    systemCode: Ls.url.get('systemCode'),
+                    organIds: Ls.url.get('organIds'),
+                    scopeType: Ls.url.get('scopeType') || 'multi',
+                    isSimple: Ls.url.get('isSimple') || 0,
+                    isSelectParent: Ls.url.get('isSelectParent') == 0 ? 0 : 1,
+                    isContainsExternal: Ls.url.get('isContainsExternal'),
+                    isOneSelf: Ls.url.get('isOneSelf')
+                },
+                treeId01: "treeview01",
+                treeId02: "treeview02",
+                treeId03: "treeview03",
+                treeId04: "treeview04",
+                tree01: "",
+                tree02: "",
+                tree03: "",
+                tree04: "",
+                mapping: {
+                    'listA': {
+                        key: function (el) {
+                            var keyid;
+                            if (cur.params.scope == 0) {
+                                if (Ls.isFunction(el.userId)) {
+                                    keyid = el.userId() + "" + el.organId();
+                                } else {
+                                    keyid = el.userId + "" + el.organId;
+                                }
+                                return ko.utils.unwrapObservable(keyid);
+                            } else if (cur.params.scope == 1) {
+                                if (Ls.isFunction(el.organId)) {
+                                    keyid = el.organId();
+                                } else {
+                                    keyid = el.organId;
+                                }
+                                return ko.utils.unwrapObservable(keyid);
+                            } else if (cur.params.scope == 2) {
+                                if (Ls.isFunction(el.unitId)) {
+                                    keyid = (el.unitId() || 0) + "" + (el.organId() || 0);
+                                } else {
+                                    keyid = (el.unitId || 0) + "" + (el.organId || 0);
+                                }
+                                return ko.utils.unwrapObservable(keyid);
+                            } else if (cur.params.scope == 5) {
+                                if (Ls.isFunction(el.id)) {
+                                    keyid = el.id();
+                                } else {
+                                    keyid = el.id;
+                                }
+                                return ko.utils.unwrapObservable(keyid);
+                            } else {
+                                if (Ls.isFunction(el.unitId)) {
+                                    keyid = el.unitId();
+                                } else {
+                                    keyid = el.unitId;
+                                }
+                                return ko.utils.unwrapObservable(keyid);
+                            }
+                        }
+                    }
+                },
+                userList: {listA: [], listB: [], userListA: []},
+                selectedBox: "",
+                tabIndex: 0,
+                ptitle: "",
+                nodes: null,
+                pId: null,
+                dataType: ""
+            },
+            ALLUSERS_ARRAY = [],
+            ALLORGANS_ARRAY = [],
+            DNS = "$!{dns}";
+
+    $(document).ready(function () {
+
+        mini.parse();
+        cur.tabs = mini.get("tabs1");
+        cur.tabs2 = mini.get("tabs2");
+        cur.layout = mini.get("layout1");
+        cur.getActiveTab = cur.tabs.getActiveTab();
+        // 当organIds不为空时,说明是指定单位,则不启动单位通讯簿和个人通讯簿
+        if (!Ls.isEmpty(cur.params.organIds)) {
+            cur.tabs.removeAll(0);
+        }
+
+        if (cur.params.scope == 0) {
+            cur.ptitle = "选择用户"
+            cur.dataType = 0;
+        } else if (cur.params.scope == 1) {
+            cur.ptitle = "选择部门";
+            cur.dataType = 1;
+        } else if (cur.params.scope == 2) {
+            cur.ptitle = "选择部门或单位";
+            //cur.tabs.removeAll([0,3]);
+            cur.dataType = 2;
+        } else if (cur.params.scope == 3) {
+            cur.ptitle = "选择单位";
+            cur.dataType = 3;
+            //cur.tabs.removeAll([0,1,2,3]);
+        } else if (cur.params.scope == 5) {
+            cur.ptitle = "选择单位或部门";
+            cur.dataType = 1;
+        }
+
+        api.title(cur.ptitle);
+        var activeTab = cur.tabs2.getActiveTab();
+        $("#tabs2-title").text((cur.ptitle).replace("选择", "已选"));
+        //cur.tabs2.updateTab(activeTab,{title:(cur.ptitle).replace("选择","已选")});
+
+        $("#reload").attr('href', location.href);
+        cur.el.loading = $("#pageLoading");
+        cur.initTree01().done(function () {
+            cur.initSelectedBox();
+            // 隐藏页面加载提示
+            cur.el.loading.hide();
+        }).done(function () {
+            cur.tabs.on("beforeactivechanged", function (e) {
+                cur.getActiveTab = e.tab;
+                if (cur.getActiveTab.title == "单位通讯簿") {
+                    !cur.tree02 ? cur.initTree02() : cur.ztreeObj = cur.tree02;
+                } else if (cur.getActiveTab.title == "个人通讯簿") {
+                    !cur.tree03 ? cur.initTree03() : cur.ztreeObj = cur.tree03;
+                } else if (cur.getActiveTab.title == "本单位") {
+                    !cur.tree04 ? cur.initTree04() : cur.ztreeObj = cur.tree04;
+                } else {
+                    !cur.tree01 ? cur.initTree01() : cur.ztreeObj = cur.tree01;
+                }
+            });
+        }).done(function () {
+
+            var selectedBox = "";
+            cur.selectedBox = selectedBox = $("#SelectedBox");
+            /*.on('click','li',function(){
+                var this_ = $(this);
+                    this_.addClass("chk").siblings().removeClass("chk");
+            })
+
+            /!*排序*!/
+            selectedBox.sortable({
+                stop:function(event, ui){
+                }
+            });*/
+
+            //根据DSN过滤
+            var nodes_filter = function (dn, item) {
+                if (!dn) {
+                    return false;
+                }
+                var reg = new RegExp(dn + "$");
+                return reg.test(item);
+            }
+
+            //添加已选用户
+            $("#doADD").on('click', function () {
+
+                var nodes = cur.ztreeObj.getSelectedNodes(), userData = ALLUSERS_ARRAY;
+
+                for (var i = 0, l = nodes.length; i < l; i++) {
+                    var flag = false, treeNode = nodes[i];
+
+                    if (cur.params.isSelectParent != 1 && treeNode.isParent) {
+                        continue;
+                    }
+
+                    if (cur.params.scopeType == "multi") {
+
+                        if (treeNode.type == "Group_User" && cur.params.scope == 0) {
+
+                            if (treeNode.children) {
+                                var userData = treeNode.children, tnode;
+                                for (var ii = 0, ll = userData.length; ii < ll; ii++) {
+                                    tnode = userData[ii];
+                                    cur.fn.addArr(tnode);
+                                }
+                            }
+                            continue;
+
+                        } else if (treeNode.type == "Group_Unit" && (cur.params.scope == 3 || cur.params.scope == 5)) {
+                            if (treeNode.children) {
+                                var userData = treeNode.children, tnode;
+                                for (var ii = 0, ll = userData.length; ii < ll; ii++) {
+                                    tnode = userData[ii];
+                                    cur.fn.addArr(tnode);
+                                }
+                            }
+                            continue;
+
+                        } else if (treeNode.type == "OrganUnit" && (cur.params.scope == 0)) {
+                            var dn = (treeNode.dn || "").replace(/,/g, "-") || "";
+                            for (var ii = 0, ll = userData.length; ii < ll; ii++) {
+                                if (userData[ii][8].indexOf(dn) != -1) {
+                                    cur.fn.addArr(cur.fn.createTree(userData[ii]));
+                                }
+                            }
+                            continue;
+
+                        } else if (treeNode.type == "Organ" && (cur.params.scope == 0)) {
+                            var dn = (treeNode.dn || "").replace(/,/g, "-") || "", unitId = treeNode.unitId;
+                            for (var ii = 0, ll = userData.length; ii < ll; ii++) {
+                                if (userData[ii][4] == unitId) {
+                                    cur.fn.addArr(cur.fn.createTree(userData[ii]));
+                                }
+                            }
+                            continue;
+
+                        } else if ((treeNode.type == "Organ" || treeNode.type == "OrganUnit") && cur.params.scope == 5) {
+                            /*var dn = (treeNode.dn||"").replace(/,/g,"-") || "";
+
+                            for(var ii= 0,ll=userData.length;ii<ll;ii++){
+                                if(userData[ii][4].indexOf(dn)!=-1 && userData[ii][2]=="Organ"){
+                                    cur.fn.addArr(cur.fn.createTree(userData[ii]));
+                                }
+                            }
+                            continue;*/
+                        }
+
+                    }
+
+                    var treeNode = reGroup(treeNode);
+                    treeNode && cur.fn.addArr(treeNode);
+                }
+
+            })
+
+            //删除已选用户
+            $("#doDEL").on('click', function () {
+                selectedBox.find(".chk").map(function () {
+                    var this_ = $(this), id = this_.attr("data-id");
+                    cur.viewModel.listA.remove(function (item) {
+                        return id == item.id
+                    });
+                }).get()
+            })
+
+            //上移
+            $("#doUP").on('click', function () {
+                var li = selectedBox.find(".chk"),
+                        index = li.index();
+                if (li.lenght == 0) {
+                    Ls.tipsErr('未选择排序项！');
+                    return false;
+                }
+                index > 0 && li.insertBefore(li.prev('li'));
+            })
+
+            //下移
+            $("#doDOWN").on('click', function () {
+                var li = selectedBox.find(".chk"),
+                        lilength = selectedBox.find("li").length,
+                        index = li.index();
+                if (li.lenght == 0) {
+                    Ls.tipsErr('未选择排序项！');
+                    return false;
+                }
+                index < lilength - 1 && li.insertAfter(li.next('li'));
+            })
+        })
+
+        // 初始化快速选择
+        cur.fn.initAutoComplete();
+
+        //屏蔽F5刷新
+        /*shortcut.add("F5", function (e) {
+            e.keyCode = 0;
+            return false;
+        });*/
+    });
+
+    //静态数据为空时，不可全选
+    cur.fn.NullDataTips = function () {
+        ALLUSERS_ARRAY = []
+        if (ALLUSERS_ARRAY.length == 0) {
+            Ls.tipsErr('正在加载异步数据，请稍等。');
+        }
+        return false;
+    }
+
+    // 初始化快速选择
+    cur.fn.initAutoComplete  = function () {
+        var remote_timecut = "$!{timecut}", systemMgrHost = "${systemMgrHost}";
+        // 1. 服务器端获取用于快速检索的全部人员或单位数据时间截,与本地的cookie中记录的时间截比对
+        // scope 0 全部人员 1,2,3 单位或部门  0,1 单位,部门,人员
+        // 服务端要根据不同的scope返回不同的时间截
+
+        // 通过scope来限定要加载的静态文件,并且加上服务器上返回的时间截
+        //var static_js_name = cur.params.scope==0 ? "allusers_array.js".setUrlParam('etc',remote_timecut):"allunits_array.js".setUrlParam('etc',remote_timecut);
+        var static_js_name = "";
+        if (cur.params.scope == 0) {
+            static_js_name = "http://lonsunsys.5397078.cn/app/common/js/persons.js?etc=" + remote_timecut;
+        } else {
+            static_js_name = "http://lonsunsys.5397078.cn/app/common/js/organs.js?etc=" + remote_timecut
+        }
+
+        $.ajax({
+            dataType: 'script',
+            url: static_js_name,
+            cache: true
+        }).done(function () {
+            if (cur.params.scope != 0) {
+                ALLUSERS_ARRAY = ALLORGANS_ARRAY;
+            }
+            Ls.log('尝试从JS静态文件中加载数据,如果返回的内容有JS错误,直接跳转到error回调');
+            if (ALLUSERS_ARRAY && Ls.isArray(ALLUSERS_ARRAY) && ALLUSERS_ARRAY.length > 0) {
+                Ls.log('静态文件中获取数据正常,直接使用');
+                cur.layout.showRegion('north');
+                cur.fn.autoComplete(ALLUSERS_ARRAY);
+
+            } else {
+                Ls.log('如果返回的数据为空数组,尝试从服务器异步获取数据');
+                //cur.layout.hideRegion('north');
+                cur.fn.getAutoCompleteData4Remote();
+            }
+        }).fail(function () {
+            Ls.log('静态文件中获取数据错误,尝试从服务器异步获取数据');
+            cur.fn.getAutoCompleteData4Remote();
+        });
+    };
+
+    // 从服务端拉取数据实现快速查询功能
+    cur.fn.getAutoCompleteData4Remote = function () {
+        Ls.log('从服务端拉取数据实现快速查询功能 >>> ');
+        var url = GLOBAL_CONTEXTPATH + "/ldap/getNodes?dataFlag=1&scope=" + cur.params.scope;
+        Ls.ajax({
+            contentType: "application/javascript;charset=utf-8",
+            dataType: 'script',
+            url: url
+        }).done(function () {
+            // 如果有数据,则直接使用
+            if (cur.params.scope != 0) {
+                ALLUSERS_ARRAY = ALLORGANS_ARRAY;
+            }
+            if (ALLUSERS_ARRAY && Ls.isArray(ALLUSERS_ARRAY) && ALLUSERS_ARRAY.length > 0) {
+                Ls.log('从服务器异步获取数据正确 >>>');
+                cur.layout.showRegion('north');
+                cur.fn.autoComplete(ALLUSERS_ARRAY);
+            } else {
+                Ls.log('返回的数据为空数组,隐藏快速选择');
+                cur.layout.hideRegion('north');
+            }
+        }).fail(function () {
+            Ls.log('从服务器异步获取数据错误,禁用快速选择');
+            cur.layout.hideRegion('north');
+        });
+    };
+
+
+    //根据DSN过滤
+    cur.fn.autoComplete_filter = function (item) {
+        if (Ls.isEmpty(DNS)) {
+            return false;
+        }
+        var DNS_ = DNS.split(",");
+        for (var i = 0, l = DNS_.length; i < l; i++) {
+            var reg = new RegExp(DNS_[i] + "$");
+            return reg.test(item);
+        }
+    }
+
+    //根据类型过滤
+    cur.fn.autoComplete_typeFilter = function (item) {
+        if ((cur.params.scope == 1 || cur.params.scope == 2) && (item == "OrganUnit" || item == "Virtual")) {
+            return true;
+        } else if ((cur.params.scope == 5) && (item == "OrganUnit" || item == "Organ")) {
+            return true;
+        } else if (cur.params.scope == 3 && item == "Organ") {
+            return true;
+        }
+        return false;
+    }
+
+    // 数据过滤
+    cur.fn.data_filter = function (data) {
+
+        var tmpArr = [];
+        if (!Ls.isEmpty(DNS)) {
+            var flag = false;
+            for (var i = 0, l = data.length; i < l; i++) {
+                if (cur.params.scope == 0) {
+                    if (cur.fn.autoComplete_filter(data[i][8])) {
+                        tmpArr.push(data[i]);
+                    }
+                } else {
+                    if (cur.fn.autoComplete_filter(data[i][4]) && cur.fn.autoComplete_typeFilter(data[i][2])) {
+                        tmpArr.push(data[i]);
+                    }
+                }
+            }
+        } else {
+            if (cur.params.scope != 0) {
+                for (var i = 0, l = data.length; i < l; i++) {
+                    if (cur.fn.autoComplete_typeFilter(data[i][2])) {
+                        tmpArr.push(data[i]);
+                    }
+                }
+            } else {
+                tmpArr = ALLUSERS_ARRAY;
+            }
+        }
+        return tmpArr;
+    }
+
+    cur.fn.autoComplete = function (data) {
+
+        // 配置
+        var conf = {
+            width: 660,
+            matchContains: true,
+            formatItem: function (row, i, max) {
+                // 定义要显示的数据格式，可使用html
+                if (cur.params.scope == 0) {
+                    return "<span title=" + row[1] + ">" + row[1] + " - " + row[5] + ">" + row[3] + "</span> ";
+                } else {
+                    var path = row[10];
+                    return "<span title=" + (row[10].replace(/>/g, "&gt;") || '') + ">" + path + "</span> ";
+                }
+            },
+            formatMatch: function (row, i, max) {
+                // 定义用于自动匹配的数据
+                // 当前定义的为三个，分别是姓名 + 简拼 + 全拼
+                if (cur.params.scope == 0) {
+                    return row[1] + '|' + row[6] + '|' + row[7];
+                } else {
+                    return row[1] + '|' + row[5] + '|' + row[6];
+                }
+            },
+            formatResult: function (row) {
+                // 当选择后的返回内容
+                return row[1];
+            }
+        };
+
+        $("#seach_input").autocomplete(cur.fn.data_filter(data), conf).result(function (evt, row, formated) {
+            //重新构建 nodes
+            if (row) {
+                var treeNode = cur.fn.createTree(row);
+                treeNode && cur.fn.addArr(treeNode);
+                $("#seach_input").val("");
+                locationNode(treeNode.dn)
+            }
+        });
+
+    };
+
+    function locationNode(dn) {
+        if (dn != '') {
+            var dns = dn.split(',');
+            var dnshow = '';
+            var dnArray = [];
+            var min = 0;
+            var nodeUnitdn = '';
+            if (cur.params.scope != '0') {
+                min = 1;
+            }
+            if (cur.params.organIds != '') {
+                var id = "OrganEO" + cur.params.organIds;
+                var nodeUnit = cur.ztreeObj.getNodeByParam('id', id);
+                nodeUnitdn = nodeUnit.dn;
+            }
+            for (var i = dns.length - 1; i >= min; i--) {
+                var d = dns[i]
+                if (d.indexOf("dc=") >= 0) {
+                    dnshow = d + (dnshow == '' ? '' : ("," + dnshow));
+                } else if (d.indexOf("o=") >= 0 || d.indexOf("ou=") >= 0) {
+                    dnshow = dns[i] + "," + dnshow;
+                    if (cur.params.organIds != '') {
+                        if (dnshow.indexOf(nodeUnitdn) >= 0) {
+                            dnArray.push(dnshow);
+                        }
+                    } else {
+                        dnArray.push(dnshow);
+                    }
+
+                }
+            }
+            cur.ztreeObj.expandAll(false)
+            showNode(dnArray, 0)
+        }
+    }
+
+    function showNode(dnArray, i) {
+        if (i < dnArray.length) {
+            var dn = dnArray[i];
+            var node = cur.ztreeObj.getNodeByParam('dn', dn);
+            if (node != null) {
+                cur.fn.getDataShow(node, dnArray, i);
+            }
+        }
+    }
+
+    cur.fn.getDataShow = function (treeNode, dnArray, i) {
+        if (!treeNode.children) {
+            return Ls.ajax({
+                url: cur.treeAsyncUrl01,
+                data: {
+                    parentId: treeNode.unitId || treeNode.organId
+                }
+            }).done(function (json) {
+                var data = json.data;
+                cur.ztreeObj.addNodes(treeNode, data);
+                showNode(dnArray, i + 1)
+            });
+        } else {
+            cur.ztreeObj.expandNode(treeNode, true, false, true, true);
+            showNode(dnArray, i + 1)
+        }
+    };
+
+    cur.fn.createTree = function (row) {
+        var treeNode;
+        if (cur.params.scope == 0) {//Person
+            treeNode = {
+                "id": "PersonEO" + row[0],
+                "name": row[1],
+                "type": "Person",
+                "userId": row[11],
+                "personId": row[0],
+                "personName": row[1],
+                "mobile": row[9],
+                "unitId": row[4],
+                "unitName": row[5],
+                "organId": row[2],
+                "organName": row[3],
+                "isExternalPerson": row[12],
+                "platformCode": row[13],
+                "dn": row[8].replace(/-/g, ",")
+            }
+        } else if (cur.params.scope == 1) {//OrganUnit Virtual
+            treeNode = {
+                "id": "OrganEO" + row[0],
+                "name": row[1],
+                "type": row[2],
+                "organId": row[0],
+                "organName": row[1],
+                "isExternalOrgan": row[8],
+                "platformCode": row[9],
+                "dn": row[4].replace(/-/g, ",")
+            }
+        } else if (cur.params.scope == 2) {//OrganUnit
+            treeNode = {
+                "id": "OrganEO" + row[0],
+                "name": row[1],
+                "type": row[2],
+                "organId": row[0],
+                "organName": row[1],
+                "isExternalOrgan": row[8],
+                "platformCode": row[9],
+                "dn": row[4].replace(/-/g, ",")
+            }
+        } else if (cur.params.scope == 3) {//Organ
+            treeNode = {
+                "id": "OrganEO" + row[0],
+                "name": row[1],
+                "type": row[2],
+                "unitId": row[0],
+                "unitName": row[1],
+                "isExternalOrgan": row[8],
+                "platformCode": row[9],
+                "dn": row[4].replace(/-/g, ",")
+            }
+        } else if (cur.params.scope == 5) {//Organ  OrganUnit
+            treeNode = {
+                "id": "OrganEO" + row[0],
+                "name": row[1],
+                "type": row[2],
+                "unitId": row[2] == "Organ" ? row[0] : "",
+                "unitName": row[2] == "Organ" ? row[1] : "",
+                "organId": row[2] == "OrganUnit" ? row[0] : "",
+                "organName": row[2] == "OrganUnit" ? row[1] : "",
+                "isExternalOrgan": row[8],
+                "platformCode": row[9],
+                "dn": row[4].replace(/-/g, ",")
+            }
+        }
+        return treeNode
+    }
+
+    //初始化树
+    cur.fn.initTreeByNameAuto = function (name) {
+        var url = cur.action.getNodesByPersonName;
+
+        if (cur.params.scope != 0) {
+            url = cur.action.getNodesByOrganName;
+        }
+
+        if (name == null || $.trim(name).length <= 0 || "支持简拼、全拼、中文搜索..." == name) {
+            cur.fn.clear();
+            return;
+        }
+
+        var data = {
+            organIds: cur.params.organIds,
+            name: name, scope: cur.params.scope
+        };
+
+        return Ls.ajax(url, data).done(function (json) {
+            Ls.tree.create("#" + cur.treeId01, {
+                callback: {
+                    onDblClick: dblClick01,
+                    beforeExpand: beforeExpand01
+                },
+                view: {
+                    // 定义初始加载树或新增节点时自定处理树节点的名称内容
+                    addDiyDom: addDiyDom
+                }
+            }, json.data, function (obj) {
+                cur.tree01 = $.fn.zTree.getZTreeObj(cur.treeId01);
+                cur.tree01.expandAll(true);
+                cur.tabs.activeTab(0);
+            });
+        });
+    };
+
+    // 初始化公共树
+    cur.initTree01 = function () {
+        var setting = {
+            simpleData: {
+                enable: true
+            },
+            callback: {
+                beforeClick: BeforeClick,
+                onClick: OnClick1,
+                onDblClick: dblClick01,
+                beforeExpand: beforeExpand01
+            },
+            view: {
+                // 定义初始加载树或新增节点时自定处理树节点的名称内容
+                addDiyDom: addDiyDom,
+                dblClickExpand: true
+            }
+        }
+        cur.treeAsyncUrl01 = cur.action.getTree01 + '?scope=' + cur.dataType + '&isContainsExternal=' + cur.params.isContainsExternal;
+        return Ls.ajax({
+            url: cur.treeAsyncUrl01.setUrlParam("organIds", cur.params.organIds)
+        }).done(function (json) {
+
+            if (cur.params.isContainsExternal == "true") {
+                json.data = {
+                    id: 0,
+                    name: "信息平台",
+                    pid: null,
+                    isParent: true,
+                    type: "VirtualOrgan",
+                    icon: "/app/common/imgs/icons/16x16/virtual_organ.gif",
+                    open: true,
+                    children: json.data
+                }
+            }
+
+            var data = Ls.treeDataFilter(json.data, Ls.treeDataType.UNIT);
+
+            cur.ztreeObj = jQuery.fn.zTree.init($("#" + cur.treeId01), setting, data);
+
+        });
+    };
+
+    // 初始化个人通讯录
+    //abType 1 单位，0 个人
+    cur.initTree02 = function () {
+        cur.treeAsyncUrl02 = cur.action.getTree02 + '?abType=1&scope=' + cur.dataType + '&systemCode=' + cur.params.systemCode;
+        return Ls.ajax(cur.treeAsyncUrl02.setUrlParam("organIds", cur.params.organIds)).doen(function (json) {
+            Ls.tree.create("#" + cur.treeId02, {
+                simpleData: {
+                    enable: true
+                },
+                callback: {
+                    //onDblClick:dblClick02
+                },
+                view: {
+                    dblClickExpand: true,
+                    nameIsHTML: true,
+                    showTitle: false
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pid",
+                        rootPId: null
+                    }
+                }
+            }, json.data, function (obj) {
+                cur.ztreeObj = cur.tree02 = $.fn.zTree.getZTreeObj(cur.treeId02);
+            });
+        });
+    };
+
+    // 初始化个人通讯录
+    cur.initTree03 = function () {
+        cur.treeAsyncUrl03 = cur.action.getTree02 + '?abType=0&scope=' + cur.dataType + '&systemCode=' + cur.params.systemCode;
+        return Ls.ajax(cur.treeAsyncUrl03.setUrlParam("organIds", cur.params.organIds)).done(function (json) {
+            Ls.tree.create("#" + cur.treeId03, {
+                callback: {
+                    //onDblClick:dblClick02
+                },
+                view: {
+                    dblClickExpand: true
+                },
+                data: {
+                    simpleData: {
+                        enable: true,
+                        idKey: "id",
+                        pIdKey: "pid",
+                        rootPId: null
+                    }
+                }
+            }, json.data, function (obj) {
+                cur.ztreeObj = cur.tree03 = $.fn.zTree.getZTreeObj(cur.treeId03);
+            });
+        });
+    };
+
+    // 初始化本单位
+    cur.initTree04 = function () {
+        cur.treeAsyncUrl01 = cur.action.getTree01 + '?scope=' + cur.dataType + '&isContainsExternal=' + cur.params.isContainsExternal;
+        return Ls.ajax(cur.treeAsyncUrl01.setUrlParam("organIds", '')).done(function (json) {
+            Ls.tree.create("#" + cur.treeId04, {
+                callback: {
+                    //onDblClick:dblClick01,
+                    beforeExpand: beforeExpand01
+                },
+                view: {
+                    // 定义初始加载树或新增节点时自定处理树节点的名称内容
+                    addDiyDom: addDiyDom,
+                    dblClickExpand: true
+                }
+            }, json.data, function (obj) {
+                cur.ztreeObj = cur.tree04 = $.fn.zTree.getZTreeObj(cur.treeId04);
+            });
+        });
+    };
+
+    cur.fn.search = function () {
+        //模拟执行事件
+        var e = $.Event("keydown");
+        e.keyCode = 13;
+        $("#autocomplete1 input").focus().trigger(e);
+    }
+
+    //显示所有
+    cur.fn.clear = function () {
+        cur.tabs.activeTab(0);
+        cur.initTree01();
+        $("#seach_input").val('').blur();
+    }
+
+    //关闭窗口
+    cur.fn.closeDg = function () {
+        api.close();
+    };
+
+    //获取对象
+    cur.fn.getArr = function (id) {
+        var sel = ko.mapping.toJS(cur.viewModel.listA);
+        for (var i = 0; i < sel.length; i++) {
+            var keyid = "";
+            if (cur.params.scope == 0) {
+                keyid = (sel[i].userId || sel[i].id) + "" + (sel[i].organId || 0);
+            } else if (cur.params.scope == 1) {
+                keyid = sel[i].organId;
+            } else if (cur.params.scope == 2) {
+                keyid = sel[i].organId;
+            } else if (cur.params.scope == 3) {
+                keyid = sel[i].unitId;
+            }
+            if (keyid == id) {
+                return sel[i];
+                break;
+            }
+        }
+    };
+
+    //排序对象
+    cur.fn.sortArr = function (l) {
+        var tmp = [],
+                dtd = $.Deferred(),
+                li = cur.selectedBox.find("li");
+        for (var i = 0; i < li.length; i++) {
+            var el = $(li[i]),
+                    arr = cur.fn.getArr(el.attr("data-id"));
+            tmp.push(arr);
+        }
+        cur.viewModel.listA.removeAll();
+        ko.mapping.fromJS(tmp, cur.mapping, cur.viewModel.listA);
+        dtd.resolve();
+        return dtd.promise();
+    }
+
+    cur.fn.checkOrgan = function (item) {
+        var sel = ko.mapping.toJS(cur.viewModel.listA);
+        for (var i = 0; i < sel.length; i++) {
+            var el = sel[i];
+            if (el.type == "OrganUnit") {
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
+
+    cur.fn.ok = function () {
+        if (cur.vm.userListA.length == 0) {
+            Ls.tipsErr("请" + cur.ptitle);
+            return false;
+        }
+
+        var sel = cur.vm.userListA;
+
+        var args = {},
+                idArr = [],
+                nameArr = [],
+                shortNameArr = [],
+                parentLinkIdsArr = [],
+                organIdArr = [],
+                organNameArr = [],
+                categoryArr = [],
+                categoryNameArr = [],
+                typeArr = [],
+                typeNameArr = [],
+                govRegionArr = [],
+                phoneArr = [],
+                sexArr = [],
+                photoUriArr = [];
+
+        cur.userList.listB = [];
+
+//                        if (sel.length == 0) {
+//                            Ls.tips.err("请" + cur.ptitle);
+//                            return false;
+//                        }
+        // listType==1 采用简单数据类型
+        Ls.log("cur.listType = " + cur.listType);
+        if (cur.listType != 1) {
+            Ls.log("采用列表对象类型返回 >>>");
+            for (var i = 0; i < sel.length; i++) {
+
+                var el = sel[i],
+                        id = el.id,
+                        name = el.name,
+                        shortName = el.shortName,
+                        parentLinkIds = el.parentLinkIds,
+                        organId = el.organId,
+                        organName = el.organName,
+                        category = el.category,
+                        categoryName = el.categoryName,
+                        type = el.type,
+                        typeName = el.typeName,
+                        govRegion = el.govRegion,
+                        phone = el.phone,
+                        sex = el.sex,
+                        photoUri = el.photoUri,
+                        address = el.address,
+                        createDate = el.createDate,
+                        yearIncome = el.yearIncome;
+
+                if (cur.params.scope == 0) {
+                    args = {
+                        id: id,
+                        name: name,
+                        shortName: shortName,
+                        parentLinkIds: parentLinkIds,
+                        category: category,
+                        categoryName: categoryName,
+                        type: type,
+                        typeName: typeName,
+                        govRegion: govRegion
+                    };
+
+                    shortNameArr.push(shortName);
+                    parentLinkIdsArr.push(parentLinkIds);
+                    categoryArr.push(category);
+                    categoryNameArr.push(categoryName);
+                    typeArr.push(type);
+                    typeNameArr.push(typeName);
+                    govRegionArr.push(govRegion);
+
+                } else if (cur.params.scope == 1) {
+                    args = {
+                        id: id,
+                        name: name,
+                        organId: organId,
+                        organName: organName,
+                        phone: phone,
+                        sex: sex,
+                        photoUri: photoUri
+                    }
+                    organIdArr.push(organId);
+                    organNameArr.push(organName);
+                    phoneArr.push(phone);
+                    sexArr.push(sex);
+                    photoUriArr.push(photoUri);
+
+                } else if (cur.params.scope == 2) {
+                    args = {
+                        id: id,
+                        name: name,
+                        createDate: createDate,
+                        address: address,
+                        yearIncome: yearIncome
+                    }
+                } else if (cur.params.scope == 3) {
+                    args = {
+                        id: id,
+                        name: name,
+                        createDate: createDate,
+                        address: address,
+                        yearIncome: yearIncome
+                    }
+                }
+                idArr.push(id);
+                nameArr.push(name);
+
+                cur.userList.listB.push(args);
+            }
+        }
+
+        args = {
+            list: cur.userList.listB,
+            ids: idArr.join(','),
+            names: nameArr.join(','),
+            shortNames: shortNameArr.join(','),
+            parentLinkIds: parentLinkIdsArr.join(','),
+            organIds: organIdArr.join(','),
+            organNames: organNameArr.join(','),
+            categorys: categoryArr.join(','),
+            categoryNames: categoryNameArr.join(','),
+            types: typeArr.join(','),
+            typeNames: typeNameArr.join(','),
+            govRegions: govRegionArr.join(','),
+            phones: phoneArr.join(','),
+            sexs: sexArr.join(','),
+            photoUris: photoUriArr.join(',')
+        }
+
+        Ls.log('args:');
+        Ls.log(JSON.stringify(args));
+
+        if (!Ls.isEmpty(cur.dg)) {
+            cur.dg.close(args).remove();
+        } else {
+            window.returnValue = args;
+            Ls.winClose();
+        }
+        return false
+    };
+
+    // 添加自定义的DOM,仅对新增节点或是初始加载树起作用
+    function addDiyDom(treeId, treeNode) {
+        var aObj = $("#" + treeNode.tId + "_a");
+        var aNameTxt = $("#" + treeNode.tId + "_span");
+        if (treeNode.isPluralistic == true) {
+            aNameTxt.append("(兼)")
+        }
+    }
+
+    function beforeDblClick(treeId, treeNode) {
+        return false;
+    }
+
+    //单击前
+    function BeforeClick() {
+        cur.nodes = cur.ztreeObj.getSelectedNodes();
+    }
+
+    //单点事件
+    function OnClick1(event, treeId, treeNode) {
+        var nodes = cur.nodes;
+        if (nodes != null && nodes.length > 0) {
+            var isShift = event.shiftKey;
+            if (isShift) {
+                cur.pId = nodes[0].pId;
+                //treeNode.pId！=null 防止多选根据目录人员过多，影响速度的问题。
+                if (cur.pId != treeNode.pId || treeNode.pId == null) {
+                    return false;
+                }
+                var nodeNew;
+                for (var i = 0, l = nodes.length; i < l; i++) {
+                    nodeNew = nodes[i];
+                    cur.ztreeObj.selectNode(nodeNew, true);
+                    selectNodes(treeNode, nodeNew);
+                }
+            }
+        }
+    }
+
+    //正向反向选择节点
+    function selectNodes(node, nodeNew) {
+        var firstNode = nodeNew.tId.split('_')[1],
+                lastNode = node.tId.split('_')[1],
+                count = lastNode - firstNode;
+        if (count > 0) {
+            for (var i = 1; i < count; i++) {
+                nodeNew = nodeNew.getNextNode();
+                cur.ztreeObj.selectNode(nodeNew, true);
+            }
+        } else {
+            for (var i = 1; i < (-count); i++) {
+                nodeNew = nodeNew.getPreNode();
+                cur.ztreeObj.selectNode(nodeNew, true);
+            }
+        }
+    }
+
+    // 树节点的双击click事件
+    function dblClick01(event, treeId, treeNode) {
+        Ls.log("dblClick01>>>");
+        Ls.log(treeNode);
+        if (treeNode) {
+
+            var treeNode = reGroup(treeNode);
+
+            treeNode && cur.fn.addArr(treeNode);
+        }
+        return false;
+    }
+
+    function dblClick02(event, treeId, treeNode) {
+        Ls.log("dblClick02>>>");
+        Ls.log(treeNode);
+        if (treeNode) {
+
+            /*if((treeNode.type=="Group_User" || treeNode.type=="Group_Unit") && cur.params.scopeType == "multi"){
+
+                if(treeNode.children){
+                    var data = treeNode.children;
+                    for(var i= 0,l=data.length;i<l;i++){
+                        var tnode = data[i];
+                        cur.fn.addArr(tnode);
+                    }
+                }
+
+                return false;
+            }*/
+
+            var treeNode = reGroup(treeNode);
+
+            treeNode && cur.fn.addArr(treeNode);
+        }
+        return false;
+    }
+
+    //重组
+    function reGroup(treeNode) {
+
+        if (cur.params.isSelectParent != 1 && treeNode.isParent) {
+            return false;
+        }
+
+        var flag = false;
+        if (cur.params.scope == 0) {
+            if (treeNode.type == "Person") {
+                flag = true;
+            }
+        } else if (cur.params.scope == 1) {
+            if (treeNode.type == "OrganUnit" || treeNode.type == "Virtual") {
+                flag = true;
+            }
+        } else if (cur.params.scope == 2) {
+            if (treeNode.type == "OrganUnit") {
+                flag = true;
+            }
+        } else if (cur.params.scope == 3) {
+            if (treeNode.type == "Organ") {
+                flag = true;
+            }
+        } else if (cur.params.scope == 5) {
+            if (treeNode.type == "Organ" || treeNode.type == "OrganUnit") {
+                flag = true;
+            }
+        }
+        if (flag) {
+            return treeNode;
+        } else {
+            return false;
+        }
+    }
+
+    function beforeExpand01(treeId, treeNode) {
+        Ls.log("beforeExpand01>>>")
+        Ls.log(treeNode)
+        //alert(treeNode.)
+        !treeNode.children && cur.fn.getData(treeNode);
+    }
+
+    cur.fn.addArr = function (node) {
+        if (cur.params.scopeType == 'single' || cur.params.scopeType == 0) {
+            cur.viewModel.listA([node]);
+        } else {
+            // 检查已经添加的内容中是否含有当前选择对象,如果包含了说明已经选择,直接返回
+            try {
+//                cur.viewModel.listA.mappedCreate(list);
+                var isNew = true;
+                var vmList = cur.vm.userListA;
+
+
+                for (var i = 0; i < vmList.length; i++) {
+                    var el = vmList[i];
+                    if (node.id + "" === el.id + "") {
+                        isNew = false;
+                    }
+                }
+                if (isNew) {
+                    vmList.push(node);
+                    //Ls.assignVM(cur.vm.$data, vmList);
+                }
+                Ls.log('vmList:', vmList)
+            } catch (e) {
+            }
+        }
+    }
+
+    cur.fn.getData = function (treeNode) {
+        return Ls.ajax({
+            url: cur.treeAsyncUrl01,
+            data: {
+                parentId: treeNode.unitId || treeNode.organId
+            }
+        }).done(function (json) {
+            var data = Ls.treeDataFilter(json.data, Ls.treeDataType.UNIT);
+            cur.ztreeObj.addNodes(treeNode, data);
+        });
+    };
+
+    cur.fn.clearSelectedAll = function () {
+        cur.vm.userListA = [];
+    };
+
+    Ls.openWinGetArgs = function () {
+        if (api && api.config && api.config.data) {
+            return api.config.data;
+        }
+    };
+
+    // 初始化已选人员框
+    cur.initSelectedBox = function () {
+
+        var arg = art.dialog.data('dialog_data') || '';
+        Ls.log('arg:', arg)
+        // 是否采用简单数据类型返回
+        cur.listType = cur.params.isSimple;//$.isArray(arg.list);
+
+        if (!Ls.isEmpty(arg) && $.type(arg) == "object") {
+
+            //如果是ko对象，转换成JOSN数组
+            //Ls.isFunction(arg.list.ids) && (arg.list = ko.mapping.toJS(arg.list));
+
+            var sArr = arg.list,
+                    tArr = [];
+
+            Ls.log("初始化数据>>>")
+            Ls.log(sArr)
+            if (cur.listType != 1) {
+                if (sArr != null && sArr.length > 0) {
+                    for (var i = 0, l = sArr.length; i < l; i++) {
+                        if (cur.params.scope == 0) {
+                            var el = {
+                                id: sArr[i].id || 0,
+                                name: sArr[i].personName || sArr[i].name,
+                                userId: sArr[i].userId || '',
+                                personId: sArr[i].personId || '',
+                                personName: (sArr[i].personName || sArr[i].name) || '',
+                                organId: sArr[i].organId || '',
+                                organName: sArr[i].organName || '',
+                                unitId: sArr[i].unitId || '',
+                                unitName: sArr[i].unitName || '',
+                                mobile: sArr[i].mobile || '',
+                                dn: sArr[i].dn || '',
+                                platformCode: sArr[i].platformCode || '',
+                                isExternalPerson: sArr[i].isExternalPerson || false
+                            }
+                        } else if (cur.params.scope == 1) {
+                            var el = {
+                                id: sArr[i].organId,
+                                name: sArr[i].organName,
+                                organId: sArr[i].organId || '',
+                                organName: sArr[i].organName || '',
+                                unitId: sArr[i].unitId || '',
+                                unitName: sArr[i].unitName || '',
+                                dn: sArr[i].dn || '',
+                                platformCode: sArr[i].platformCode || '',
+                                isExternalOrgan: sArr[i].isExternalOrgan || false
+                            }
+                        } else if (cur.params.scope == 2) {
+                            var el = {
+                                id: sArr[i].organId,
+                                name: sArr[i].organName,
+                                organId: sArr[i].organId || '',
+                                organName: sArr[i].organName || '',
+                                unitId: sArr[i].unitId || '',
+                                unitName: sArr[i].unitName || '',
+                                dn: sArr[i].dn || '',
+                                platformCode: sArr[i].platformCode || '',
+                                isExternalOrgan: sArr[i].isExternalOrgan || false
+                            }
+                        } else if (cur.params.scope == 3) {
+                            var el = {
+                                id: sArr[i].unitId,
+                                name: sArr[i].unitName,
+                                unitId: sArr[i].unitId || '',
+                                unitName: sArr[i].unitName || '',
+                                dn: sArr[i].dn || '',
+                                platformCode: sArr[i].platformCode || '',
+                                isExternalOrgan: sArr[i].isExternalOrgan || false
+                            }
+                        } else if (cur.params.scope == 5) {
+                            var el = {
+                                id: Ls.isEmpty(sArr[i].organId) ? sArr[i].unitId : sArr[i].organId,
+                                name: Ls.isEmpty(sArr[i].organId) ? sArr[i].unitName : sArr[i].organName,
+                                unitId: sArr[i].unitId || '',
+                                unitName: sArr[i].unitName || '',
+                                organId: sArr[i].organId || '',
+                                organName: sArr[i].organName || '',
+                                dn: sArr[i].dn || '',
+                                platformCode: sArr[i].platformCode || '',
+                                isExternalOrgan: sArr[i].isExternalOrgan || false
+                            }
+                        }
+                        console.info(el)
+                        cur.userList.listA.push(el);
+                    }
+                }
+            } else {
+                if (!Ls.isEmpty(arg.list.ids)) {
+                    var isIds = false;
+                    Ls.isEmpty(sArr.ids) ? (ids = "") : ids = sArr.ids;
+                    Ls.isEmpty(sArr.userIds) ? (userIds = "") : userIds = sArr.userIds;
+                    Ls.isEmpty(sArr.personIds) ? (personIds = "") : (personIds = sArr.personIds, isIds = true);
+                    Ls.isEmpty(sArr.names) ? (names = "") : names = sArr.names;
+                    Ls.isEmpty(sArr.organIds) ? (organIds = "") : organIds = sArr.organIds;
+                    Ls.isEmpty(sArr.organNames) ? (organNames = "") : organNames = sArr.organNames;
+                    Ls.isEmpty(sArr.unitIds) ? (unitIds = "") : unitIds = sArr.unitIds;
+                    Ls.isEmpty(sArr.unitNames) ? (unitNames = "") : unitNames = sArr.unitNames;
+
+                    var ids_ = ids.split(','),
+                            userIds_ = userIds.split(','),
+                            personIds_ = personIds.split(','),
+                            names_ = names.split(','),
+                            organIds_ = organIds.split(','),
+                            organNames_ = organNames.split(','),
+                            unitIds_ = unitIds.split(','),
+                            unitNames_ = unitNames.split(',');
+
+                    Ls.log("isIds>>>")
+                    Ls.log(isIds)
+                    if (isIds == true) {
+                        ids_ = personIds_;
+                    }
+
+                    for (var i = 0, l = ids_.length; i < l; i++) {
+                        var id = ids_[i],
+                                el = {
+                                    id: id,
+                                    name: names_[i],
+                                    userId: id,
+                                    personId: isIds ? personIds_[i] : 0,
+                                    organId: organIds_[i] || 0,
+                                    organName: organNames_[i] || "",
+                                    unitId: unitIds_[i] || 0,
+                                    unitName: unitNames_[i] || ""
+                                }
+                        cur.userList.listA.push(el);
+                    }
+                }
+            }
+        }
+
+        //vm
+
+        cur.vm = avalon.define({
+        $id: 'selectArea',
+                userListA: cur.userList.userListA,
+                del: function (index) { //删除
+            if (index < cur.vm.userListA.length) {
+                cur.vm.userListA.splice(index, 1);
+            }
+        }
+    });
+        avalon.scan($("#selectArea").get(0), cur.vm);
+
+
+        $("#totalSelectCount").text(cur.userList.userListA.length)
+
+        cur.vm.$watch("userListA.length", function observe(newVal, oldVal) {
+            $("#totalSelectCount").text(newVal)
+        })
+
+    };
+
+</script>
+</body>
+</html>
+<!-- 2015-07-23 14:11 -->

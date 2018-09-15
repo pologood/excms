@@ -1,0 +1,23 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $eos)
+    #if($leaf)
+    <li class="num${velocityCount}">
+        #if("$!{eo.linkUrl}" != "")
+            <a href="$!{eo.linkUrl}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #else
+            <a href="/content/article/$!{eo.contentId}?guideId=$!{eo.id}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #end
+    </li>
+    #else
+    <li  class="num${velocityCount}">
+        #if($!{eo.isStartUrl} == 0)
+            <a href="/content/column/$!{eo.indicatorId}" target="$target">#cutstr($!{eo.name},$length)</a>
+        #else
+            <a href="$!{eo.transUrl}" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #end
+    </li>
+    #end
+#end

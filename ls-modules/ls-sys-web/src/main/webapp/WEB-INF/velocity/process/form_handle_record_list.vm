@@ -1,0 +1,119 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+
+                                <div class="form-group">
+                                    <input type="datetime" name="startDate" id="startDate" class="form-control" placeholder="开始日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="endDate" id="endDate" class="form-control" placeholder="结束日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="createPersonName" name="createPersonName" class="form-control"
+                                           placeholder="发起人">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="title" name="title" class="form-control"
+                                           placeholder="标题">
+                                </div>
+
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/formHandleRecord/getFormHandleRecordPagination?dataFlag=1&moduleCode=$!{moduleCode}" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <div type="indexcolumn" width="20" headerAlign="center" align="center">序号</div>
+                        <div field="docTitle" width="300" headerAlign="center"  renderer="renderTitle">标题</div>
+                        <div field="columnName" width="120" headerAlign="center" align="center" >栏目</div>
+                        <div field="createPersonName" width="80" headerAlign="center" align="center" >发起人</div>
+                        <div field="createDate" width="120" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" >办理时间</div>
+                        <div width="80" headerAlign="center" align="center" renderer="renderCurStep">当前步骤</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        startDate: $('#startDate'),
+        endDate: $('#endDate'),
+        title: $('#title'),//标题
+        createPersonName: $('#createPersonName'),//发起人
+        dialog: Ls.getWin.dialog
+    };
+
+    jQuery(document).ready(function(){
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    });
+
+    function search() {
+        cur.grid.load({title: cur.title.val(),createPersonName: cur.createPersonName.val(), startDate: cur.startDate.val(), endDate: cur.endDate.val()});
+    }
+
+    function showAll() {
+        cur.startDate.val('');
+        cur.endDate.val('');
+        cur.createPersonName.val('');
+        cur.title.val('');
+        search();
+    }
+
+    function renderCurStep(e){
+        var rec = e.record;
+        var str = '';
+        if(rec.curActivityName == '已办结' || rec.curActivityName == '已终止' || rec.curActivityName == '已归档'){
+            str = rec.curActivityName;
+        }else{
+            str='<a onclick="showActivityTaskList('+rec.procInstId+','+rec.curActinstId+');return false;" ><u>'+rec.curActivityName+'</u></a>';
+        }
+        return str;
+    }
+
+    //查看办理情况
+    function showActivityTaskList (procInstId,curActinstId) {
+        var url = '/process/activityTaskList'+"?procInstId="+procInstId+"&actinstId="+curActinstId;
+        Ls.openWin(url, {
+            winType: 1,
+            title: '办理情况',
+            width: '350px',
+            height: '200px'
+        });
+    }
+
+    // 重写title(流程发文)
+    function renderTitle(e){
+        var rec = e.record;
+        var str='<a onclick="read('+rec.processFormId+');"><u>'+rec.title+'</u></a>';
+        return str;
+    }
+
+    function read(processFormId) {
+        var url = "/process/processForm?processFormId="+processFormId+"&viewForm=1";
+        window.open(url,processFormId,'height='+window.screen.availHeight+',width='+window.screen.availWidth);
+    }
+
+</script>

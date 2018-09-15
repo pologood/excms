@@ -1,0 +1,202 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<form role="form" id="materiaForm" ms-controller="materiaForm">
+    <table class="table table-bordered video-table">
+        <tbody>
+        <tr>
+            <th>类别：</th>
+            <td>
+                <table class="w100p">
+                    <tbody>
+                    <tr>
+                        <td colspan="3"><input style="width:300px" type="text" name="typeName" id="typeName" ms-duplex="typeName" maxlength="100" class="form-control"></td>
+                        <td rowspan="5" class="w300">
+##                            <div class="thumb_layout">
+##                                <div class="thumb">
+##                                    <img src="$!{sysStaticPath}/assets/images/video_bg.jpg" alt="" id="imageLink"/>
+##                                </div>
+##                                <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+##                                <div class="thum-upload" id="uploadImg"><i class="fa fa-upload" onclick="normalUpload()"></i></div>
+##
+##                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+
+        </tr>
+        <tr>
+            <th>概率：</th>
+            <td>
+                <div class="form-group">
+                    <div class="input-group mb0" style="width:300px">
+                        <input type="text" id="chance" name="chance" ms-duplex="chance"
+                               class="form-control" >
+
+                    </div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var curr = {
+        vm: "",
+        id:"$!{typeId}",
+        opt: []
+    };
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    $(document).ready(function (){
+        Ls.ajax({
+            type: "GET",
+            url: "/lotteryType/getLotteryType",
+            data: {'id': curr.id},
+            success:function (d) {
+                var data= d.data;
+//                if (data.imageLink != null && data.imageLink != "") {
+//                    if (data.imageLink.indexOf("/") != -1) {
+//                        $("#imageLink").attr('src', data.imageLink);
+//                    } else {
+//                        $("#imageLink").attr('src', GLOBAL_FILESERVERPATH + data.imageLink);
+//                    }
+//                }
+
+
+//                if(data.materiaId!=null){
+//                    $("#periodical").attr("disabled","disabled");
+//                }
+//                if(data.isPublish==1){
+//                    $("#isPublish").attr("checked","checked");
+//                }
+                //初始化表单字段
+                curr.init = Ls.initFORM("materiaForm",data);
+                //如果模型已经绑定，不再绑定
+                curr.vm = avalon.vmodels["materiaForm"];
+                curr.vm = avalon.define(curr.init);
+                //avalon.scan(document.body, curr.vm);
+                avalon.scan($("#materiaForm").get(0), curr.vm);
+
+            }
+        });
+        api.button(
+                {
+                    name: '保存',
+                    callback: function () {
+                        $("#materiaForm").submit();
+                        return false;
+                    },
+                    focus: true
+                }
+        )
+
+    });
+
+//    //上传
+//    function uploadMateria() {
+//        Ls.uploadFile(function (json) {
+//            var data=json[0].data;
+//            curr.vm.filePath = data.mongoId;
+//            var name = data.fileName;
+//            var index = name.lastIndexOf(".");
+//            if (index < 0) {
+//                Ls.tipsInfo("视频未上传成功");
+//                return;
+//            }
+////                curr.vm.materiaName = name.substring(0, index);
+//            var type = name.substring(index);
+//
+//            curr.vm.fileType = type;
+//
+//            return true;
+//        }, {
+//            lock: true,
+//            title: '上传文件',
+//            upload_url: "/materia/uploadFile",
+//            post_params: {
+//                "siteId": GLOBAL_SITEID
+//
+//            },
+//            file_size_limit: "50 MB",
+//            file_types: "*.pdf",
+//            file_types_description: "PDF Files",
+//            file_upload_limit: 1,  //配置上传个数
+//        })
+//    }
+
+
+
+
+
+
+    $('#materiaForm').validator({
+        fields: {
+            'typeName': '奖品类别:required;',
+            'chance': '概率:required;integer[+];range[1~99];'
+        },
+        valid: function () {
+            doSave();
+        },
+        timely:1,
+        msgClass: "n-right"
+    });
+
+    function doSave() {
+
+        var value = curr.vm;
+        value = Ls.toJSON(value);
+
+
+        Ls.ajax({
+            type: "POST",
+            url: "/lotteryType/saveLotteryType",
+            data: value
+        }).done(function (text) {
+            if (text.status!=1) {
+                Ls.tipsErr(text.desc);
+                return;
+            }
+
+            Ls.tipsOk("保存成功",function(){
+                Ls.getWin.win.grid.reload();
+                Ls.winClose();
+
+            });
+
+        });
+
+    }
+
+##    //缩略图路径
+##    function changeImg(path) {
+##        $("#imageLink").attr("src", '$!{fileServerPath}' + path);
+##        curr.vm.imageLink = path;
+##    }
+##
+##    function normalUpload() {
+##        Ls.uploadFile(function (filePath) {
+##            changeImg(filePath[0].data.mongoId);
+##            return true;
+##        }, {
+##            upload_url: '/materia/uploadImge',
+##            file_upload_limit: 1,
+##            post_params: {
+##                "siteId": GLOBAL_SITEID,
+##                "contentId": curr.vm.id || '',
+##                "imgPath": curr.vm.imageLink || '',
+##                "desc": "上传缩略图"
+##            },
+##            file_types: "*.jpg;*.gif;*.bmp;*.jpeg;*.png",
+##        });
+##    }
+##
+##    //移除缩略图
+##    $("#delImg").click(function () {
+##        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/video_bg.jpg');
+##        curr.vm.imageLink = '';
+##    })
+
+</script>

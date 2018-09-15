@@ -1,0 +1,158 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="datasource_form" role="form" ms-controller="datasource_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>数据厂商</label>
+                            <select class="form-control" name="manufacturerid" id="manufacturerid" ms-duplex="manufacturerid" placeholder="">
+                                <option value="">请选择</option>
+                                #foreach($eo in $manufacturerEOs)
+                                    <option value="$!{eo.id}">$!{eo.name}</option>
+                                #end
+                            </select>                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label>数据源名称</label>
+                        <input type="text" name="name" class="form-control" placeholder=""
+                               ms-duplex="name">
+                    </div>
+                    <div class="form-group">
+                        <label>数据库类型</label>
+                        <select class="form-control" name="databaseType" id="databaseType" ms-duplex="databaseType" placeholder="">
+                            <option value="">请选择</option>
+                            #foreach($eo in $dbTypes)
+                                <option value="$!{eo}">$!{eo}</option>
+                            #end
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>数据库名称</label>
+                        <input type="text" name="databaseName" class="form-control" placeholder=""
+                               ms-duplex="databaseName">
+                    </div>
+                    <div class="form-group">
+                        <label>URL/IP端口</label>
+                        <input type="text" name="databaseUri" class="form-control" placeholder=""
+                               ms-duplex="databaseUri">
+                    </div>
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" name="username" class="form-control" placeholder=""
+                               ms-duplex="username">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="text" name="passwd" class="form-control" placeholder=""
+                               ms-duplex="passwd">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        id: "datasource_form",
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        dialog: Ls.getWin.dialog,
+        dataSourceId: '$!{dataSourceId}'
+    };
+    $(document).ready(function () {
+        $('#' + cur.id).validator({
+            fields: {
+                'manufacturerid': '厂商名称:required;',
+                'databaseType': '数据库类型:required;',
+                'databaseName': '数据库名称:required;',
+                'databaseUri': 'URL:required;',
+                'username': '账号:required;',
+                'passwd': '密码:required;'
+            },
+            valid: function () {
+                var me = this;
+                var data = Ls.toJSON(cur.vm.$model);
+                Ls.ajax({
+                    url: "/dataimportdatasource/saveDataSource",
+                    data: data
+                }).done(function (d) {
+                    if (d.status == 1) {
+                        Ls.tips('操作成功!', {
+                            icons: "success", callback: function () {
+                                Ls.getWin.api.close();
+                                Ls.getWin.win.grid.reload();
+                                // 提交表单成功后，释放hold，如果不释放hold，就变成了只能提交一次的表单
+                            }
+                        });
+                    } else {
+                        Ls.tips(d.desc, {
+                            icons: "error",
+                            callback: function () {
+
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
+        cur.api.button(
+                {
+                    id: 'save',
+                    className: 'btn-save',
+                    focus: true,
+                    name: '确定',
+                    callback: function () {
+                        $('#' + cur.id).submit();
+                        return false;
+                    }
+                },
+                {
+                    id: 'back',
+                    className: 'btn-back',
+                    name: '取消',
+                    callback: function () {
+                        cancel();
+                        return false;
+                    }
+                }
+        );
+
+
+        Ls.ajaxGet({
+            url: "/dataimportdatasource/getDataSource",
+            data: {
+                dataSourceId: cur.dataSourceId
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                var data = d.data;
+                cur.$id = cur.id;
+                data.$id = cur.$id;
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels[data.$id];
+                if (!cur.vm) {
+                    //绑定模型
+                    cur.vm = avalon.define(data);
+                }
+                avalon.scan($("#" + cur.id).get(0), cur.vm);
+            } else {
+                Ls.tipsErr("加载数据失败!");
+            }
+        });
+
+    });
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+</script>

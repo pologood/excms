@@ -1,0 +1,22 @@
+##=============================
+## 明光定制,相关效果可参考滁州网站
+##=============================
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+#set($isDate="$!{paramObj.isDate}")
+#if($resultObj.data.size()>0)
+    #foreach($eo in $resultObj.data)
+    <li>
+        #if("$!{eo.linkUrl}" != "")
+            <a href="$!{eo.linkUrl}" target="$target" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #else
+            <a href="$!{paramObj.url}/content/article/$!{eo.contentId}?guideId=$!{eo.id}&tableColumnId=$!{paramObj.tableColumnId}&relateColumnId=$!{paramObj.relateColumnId}" target="$!{paramObj.target}"
+               title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+        #end
+        #if($isDate == "true")
+            <span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>
+        #end
+    </li>
+    #end
+#end

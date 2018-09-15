@@ -1,0 +1,54 @@
+##获取当前标签参数
+(function () {
+    var linkLiArr = [],num = ll_$!{context.columnId};
+    if (!num || num <= 0) {
+        num = "$!{paramObj.num}";
+    }
+    #set($isLogo=$!{paramObj.isLogo})
+    #set($width=$!{paramObj.width})
+    #set($height=$!{paramObj.height})
+    #foreach($eo in $resultObj)
+        #if($eo.imageLink.indexOf("/mongo")>=0)
+            #set($filePath="")
+        #elseif($eo.imageLink.indexOf(".")>=0)
+            #set($filePath="$!{fileServerNamePath}")
+        #else
+            #set($filePath="$!{fileServerPath}")
+        #end
+
+        var linkLi = '<li class="num${velocityCount}">
+        #if("$!{eo.attachRealName}" != "" && $eo.attachRealName.toLowerCase().indexOf(".swf") > -1)
+        <object #if($width > 0) width="$width" #end #if($height > 0) height="$height" #end codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000">
+            <param name="movie" value="$!{filePath}$!{eo.imageLink}" />
+            <param name="quality" value="high" />
+            <param name="wmode" value="transparent" />
+            <param name="menu" value="false"/>
+            <embed type="application/x-shockwave-flash"
+                #if($width > 0) width="$width" #end
+                #if($height > 0) height="$height" #end
+               pluginspage="http://www.macromedia.com/go/getflashplayer" quality="high" src="$!{filePath}$!{eo.imageLink}" wmode="transparent"></embed>
+        </object>
+        #else
+            <a title="#filterHtml($!{eo.title})" #if("$!{eo.redirectLink}" == "#") href="javascript:void(0)" #else href="$!{eo.redirectLink}" target="_blank" #end tabindex="-1">
+            #if("$!{isLogo}" == "1") ##图片
+                <img id="$!{eo.imageLink}" src="$!{filePath}$!{eo.imageLink}" #if($width > 0) width="$width" #end #if($height > 0) height="$height" #end border="0" alt="#filterHtml($!{eo.title})">
+                <span class="img_title img-title">$!{eo.title}</span>
+            #else $!{eo.title} #end </a>
+        #end </li>';
+        linkLiArr.push(linkLi);
+    #end
+    ##输出内容
+    var printContent = function(){
+        var length = linkLiArr.length;
+        if (num > length) {
+            num = length;
+        }
+        if (linkLiArr.length > 0) {
+            for (var i=0;i < num;i++) {
+                document.write(linkLiArr[i]);
+            }
+        } else {
+            $("#j-scroll-$!{context.columnId}").hide();
+        }
+    }();
+})()

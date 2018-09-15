@@ -1,0 +1,6 @@
+<select name="catId" id="catId" onchange="reloadDatas()">
+    <option value="">&nbsp;--职权类别选择--</option>
+	#foreach($catalog in $resultObj)
+        <option value="$!{catalog.id}">[$!{catalog.name}]</option>
+	#end
+</select>

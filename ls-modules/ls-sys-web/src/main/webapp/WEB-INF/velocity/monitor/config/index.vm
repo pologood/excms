@@ -1,0 +1,93 @@
+<style>
+    .form-control {
+        display: inline;
+    }
+
+    caption {
+        font-size: 14px;
+        color: #000000;
+    }
+
+    .table > tfoot > tr > td {
+        vertical-align: middle;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="170"
+         style="border:none; background:#fbfcfe; border-right: solid 1px #e5e5e5">
+        <div id="todo_box" class="sidebar-box">
+            <ul class="sidebar-nav sidebar-nav2">
+                #foreach($base in $typeCodeList)
+                    #if($velocityCount != 1)
+                        <li class="divider"></li>
+                    #end
+                    <li class="title"><a href="javascript:void(0)">$!{base.text}</a></li>
+                    #foreach($type in $base.type)
+                        <li class="active" title="类型编码：$!{type.name}"><a href="/monitor/vetoConfig/vetoIndex?typeCode=$!{type.name}">$!{type.text}</a></li>
+                    #end
+                #end
+##                <li class="title"><a href="javascript:void(0)">单项否决项</a></li>
+##                <li class="active"><a href="/monitor/vetoConfig/vetoIndex?typeCode=siteDeny">站点无法访问</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=siteUpdate">网站不更新</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=columnUpdate">栏目不更新</a></li>
+####                <li><a href="javascript:void(0)">严重错误</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=reply">互动回应差</a></li>
+##                <li class="divider"></li>
+##                <li class="title"><a href="javascript:void(0)">综合评分项</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=siteUse">网站可用性</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=infoUpdate">信息更新情况</a></li>
+##                <li><a href="/monitor/vetoConfig/vetoIndex?typeCode=replyScope">互动回应情况</a></li>
+##                <li><a href="javascript:void(0)">服务实用情况</a></li>
+            </ul>
+        </div>
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="monitorContent">
+        </div>
+    </div>
+</div>
+
+<script type="template" id="todo_nav">
+    <ul class="sidebar-nav">
+        <? for(var i=0,l=data.length; i<l; i++){ ?>
+        <? var el = data[i] ?>
+        <li>
+            <a href="javascript:;" data-code="<?==el.typeCode?>"> <?==el.typeName?>
+                <span id="badge_<?==el.typeCode?>" class="badge badge-info"><?==el.count?></span>
+            </a>
+        </li>
+        <?}?>
+    </ul>
+
+</script>
+
+<script>
+    mini.parse();
+
+    var cur = {
+        grid: mini.get("datagrid1"),
+    }
+
+    $(document).ready(function () {
+
+        var todoMenu;
+        todoMenu = $('.sidebar-nav').on('click', 'li:not(.title)>a', function (e) {
+            e.preventDefault();
+            var _this = $(this),
+                href = _this.attr("href");
+            _this.parent('li').addClass('active').siblings().removeClass('active');
+//            cur.typeCode = code;
+            App.getContentAjax(href).done(function (res) {
+                $("#monitorContent").html(res)
+            })
+        })
+
+        if (cur.typeCode) {
+            todoMenu.find('a[href="' + cur.typeCode + '"]').trigger('click');
+        } else {
+            todoMenu.find('li:not(.title)>a:first').trigger('click');
+        }
+
+    });
+
+</script>

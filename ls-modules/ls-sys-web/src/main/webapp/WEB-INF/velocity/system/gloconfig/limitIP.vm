@@ -1,0 +1,151 @@
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+
+    <ul class="nav nav-tabs">
+    #*<li class="active">
+        <a href="#tab_1_1" data-toggle="tab">允许以下IP访问</a>
+    </li>*#
+        <li class="active">
+            <a href="#tab_1_2" data-toggle="tab">IP规则列表</a>
+        </li>
+    </ul>
+
+    <div class="tab-content pt15">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="pdr10">
+                        <button type="button" class="btn btn-default btn-add" onclick="addIP()"> 新增</button>
+                    </div>
+                </div>
+                <div class="col-md-5">
+
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <input type="text" name="searchKey" id="searchKey" class="form-control" placeholder="IP地址">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="searchIP()">搜索
+                        </button>
+                        <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">显示全部
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div id="datagrid1" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+             url="/limitIP/getPage?dataFlag=1" sizeList="[5,10,20,50]" pageSize="20"
+             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;">
+            <div property="columns">
+                <div type="indexcolumn"></div>
+                <div field="ip" width="180" align="center" headerAlign="center">IP地址</div>
+                <div field="description" width="100%" align="left" headerAlign="left">备注</div>
+                <div field="rules" width="140" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="true" renderer="rulesOpt">访问规则</div>
+                <div field="createDate" width="140" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                <div width="115" align="center" headerAlign="center" allowSort="true" renderer="renderOpt">操作</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    var datagrid1;
+
+    function ipTest(ip) {
+        var re = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+        if (!re.test(ip)) {
+            Ls.tipsErr("IP地址输入不正确");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function searchIP() {
+        var ip = $("#searchKey").val()
+        datagrid1.load({ip: ip});
+    }
+
+    function showAll() {
+        $("#searchKey").val('');
+        datagrid1.load({ip: ""});
+    }
+
+    function rulesOpt(e) {
+        var str = "";
+        var rec = e.record;
+        var textStr = rec.rules ? "<span class='pd2 bg-red-thunderbird bg-font-red-thunderbird'>禁止访问</span>" : "<span class='pd2 bg-green-jungle bg-font-green-jungle'>允许访问</span>";
+        return textStr;
+    }
+
+    function renderOpt(e) {
+        var str = "";
+        var rec = e.record;
+        var btnStr = '<button class="btn btn-default btn-sm btn-edit" onclick="editIP(' + rec.id + ')">修 改</button> ';
+        btnStr += '<button class="btn btn-default btn-sm btn-delete" onclick="delIP(' + rec.id + ')">删 除</button>';
+        return btnStr;
+    }
+
+    function addIP() {
+        Ls.openWin("/limitIP/limitIPAdd", '550px', '330px', {
+                id: 'IP',
+                title: "添加IP规则"
+            }
+        )
+    }
+
+    function editIP(id) {
+        Ls.openWin("/limitIP/limitIPEdit?id=" + id, '550px', '330px', {
+                id: 'IP',
+                title: "修改IP规则"
+            }
+        )
+    }
+
+    function delIP(id) {
+        if (!confirm("您确认删除此IP规则吗？")) {
+            return false;
+        }
+        if (id) {
+            Ls.ajaxGet({
+                url: "/limitIP/delIP",
+                data: {
+                    id: id
+                }
+            }).done(function (d) {
+                if (d.status == 0) {
+                    Ls.tipsErr("删除失败：" + d.desc);
+                } else {
+                    datagrid1.reload()
+                }
+            })
+        }
+    }
+
+    $(document).ready(function () {
+        mini.parse();
+
+        datagrid1 = mini.get("datagrid1")
+
+        datagrid1.load();
+
+        /*
+        * grid高度渲染
+        * */
+        Ls.mini_datagrid_height(datagrid1, 80);
+
+        /*
+        * 解决tab切换时组建加载不全问题
+        * */
+        /*$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            if (id == '#tab_1_1') {
+                datagrid1.load();
+            }
+        });*/
+    })
+
+</script>

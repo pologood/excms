@@ -1,0 +1,70 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($descLength="$!{paramObj.descLength}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($itype="$!{paramObj.itype}")
+#set($length=$Integer.parseInt($length))
+#set($descLength=$Integer.parseInt($descLength))
+#if($resultObj.data.size()>0)
+<ul class="interview-list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        #set($title="$!{eo.title}")
+        #if("$!{eo.picUrl}"!= "")
+            #if($eo.picUrl.indexOf(".")>=0)
+                #set($imageLink="$!{fileServerNamePath}$!{eo.picUrl}")
+            #else
+                #set($imageLink="$!{fileServerPath}$!{eo.picUrl}")
+            #end
+        #else
+            #set($imageLink="/images/no_photo.jpg")
+        #end
+
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+
+        <li class="$!{css}">
+            <div class="interview-img">
+                <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$!{eo.title}"><img src="$!{imageLink}" width="210" height="157"></a>
+            </div>
+            <div class="interview-info">
+                <p class="interview-title">
+                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$title">#cutstr($title,$length)</a>
+                </p>
+                <p><span>时&nbsp;间：</span>$!{eo.time}</p>
+                <p><span>嘉&nbsp;宾：</span>
+                    <span class="interview-names" id="userNames_$!{eo.interviewId}"></span>
+                </p>
+                <p class="interview-note">
+                    #if("$!{eo.content}" !="")#cutstr($!{eo.content},$descLength)#end
+                    <a href="$!{eo.linkUrl}" target="$!{paramObj.target}" title="$title">【详细】</a>
+                </p>
+            </div>
+            <script>
+                var userNames = "$!{eo.userNames}";
+                var namesArray = userNames.split("|");
+                if (namesArray != null && namesArray.length > 0) {
+                    var lis = "";
+                    for (var i = 0; i < namesArray.length; i++) {
+                        lis += "<a>" + namesArray[i] + "</a>";
+                    }
+                    $("#userNames_$!{eo.interviewId}").html(lis);
+                }
+            </script>
+        </li>
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="interviewPage$!{context.columnId}" class="pagination"></div>
+    <script>
+        Ls.pagination("#interviewPage$!{context.columnId}", function (pageIndex) {
+            location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex + "&itype=$!{itype}";
+        }, {
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount}
+        })
+    </script>
+    #end
+#end

@@ -1,0 +1,360 @@
+#*<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="startTask()">启动所有任务</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-delete" onclick="stopTask()">停止所有任务</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-add" onclick="historyTask()">历史检测记录</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getIndexList?dataFlag=1" showPager="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <div name="aIndexName" field="aIndexName" width="150" align="center" headerAlign="center">一级指标</div>
+                        <div field="bIndexName" width="100%" align="center" headerAlign="center" >二级指标</div>
+                        <div field="" width="100" align="center" headerAlign="center" renderer="status">状态</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*#
+
+<style>
+
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;position: relative;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab1" data-toggle="tab">国家普查标准监测项（9项）</a>
+                </li>
+                <li>
+                    <a href="#tab2" data-toggle="tab">自定义监测任务</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab1">
+                        <div class="task-btn tr mb20">
+                            <button type="button" class="btn btn-default btn-add" onclick="startTask()"> 启动所有任务</button>
+                            <button type="button" class="btn btn-default" onclick="stopTask()"> 停止所有任务</button>
+                            <button type="button" class="btn btn-default btn-add" onclick="historyTask()">历史检测记录</button>
+                        </div>
+                        <div id="datagrid" class="mini-datagrid no-auto-height" allowCellSelect="false" onlyCheckSelection="true"
+                             allowResize="true"
+                             url="/monitor/index/manage/getIndexList?dataFlag=1" sizeList="[5,10,20,50]" pageSize="5"
+                             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+                             showPager="false">
+                            <div property="columns">
+                                <div field="aIndexName" name="aIndexName" width="40%" align="center" headerAlign="center">
+                                    一级指标
+                                </div>
+                                <div field="bIndexName" width="30%" align="center" headerAlign="center">二级指标</div>
+                                <div field="startDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">本次监测开始时间</div>
+##                                <div field="finishDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">监测完成时间</div>
+                                <div field="" width="100" align="center" headerAlign="center" renderer="status">状态</div>
+                                <div field="" width="70" align="center" headerAlign="center" renderer="look">结果查看</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab2">
+                        <div class="task-btn tr mb20">
+                        </div>
+                        <div id="datagrid2" class="mini-datagrid no-auto-height" allowCellSelect="false" onlyCheckSelection="true"
+                             allowResize="true"
+                             url="/monitor/index/manage/getCustomIndexList?dataFlag=1" sizeList="[5,10,20,50]" pageSize="5"
+                             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                             showPager="false">
+                            <div property="columns">
+                                <div field="aIndexName" name="aIndexName" width="40%" align="center" headerAlign="center">
+                                    一级指标
+                                </div>
+                                <div field="bIndexName" width="30%" align="center" headerAlign="center">二级指标</div>
+                                <div field="startDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">本次监测开始时间</div>
+                                <div field="" width="100" align="center" headerAlign="center" renderer="status">状态</div>
+                                <div field="" width="60" align="center" headerAlign="center" renderer="customLook">结果查看</div>
+                                <div field="" width="60" align="center" headerAlign="center" renderer="customHistory">历史记录</div>
+                                <div width="55" align="center" headerAlign="center" allowSort="true" renderer="opt">
+                                    操作
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        grid2:mini.get('datagrid2'),
+        dialog: Ls.getWin.dialog,
+        params: {
+            taskId:'$!{taskId}',
+            customTaskId:'$!{customTaskId}'
+        }
+    }
+
+    $(document).ready(function () {
+
+        //合并行 合并的项要加name
+        cur.grid.on("load", function () {
+            cur.grid.mergeColumns(["aIndexName"]);
+        });
+        cur.grid.load();
+
+        Ls.mini_datagrid_height(cur.grid, 120);
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // 获取已激活的标签页的名称
+            var id = e.currentTarget.hash;
+            if (id == '#tab2') {
+                cur.grid2.load();
+                Ls.mini_datagrid_height(cur.grid2, 90);  
+            }
+        });
+
+    })
+
+    function startTask() {
+        if(confirm('确认开始任务?')) {
+            Ls.ajax({
+                type: "POST",
+                url: "/monitor/index/manage/startTask",
+                data: {
+                }
+            }).done(function (resp) {
+                cur.grid.load();
+                if (resp.status == 0) {
+                    Ls.tipsErr(resp.desc);
+                } else {
+                    Ls.tipsOk(resp.desc);
+                }
+            });
+        }
+    }
+
+    function stopTask() {
+        if(confirm('确认停止任务?')) {
+            Ls.ajax({
+                type: "POST",
+                url: "/monitor/index/manage/stopTask",
+                data: {}
+            }).done(function (resp) {
+                if (resp.status == 0) {
+                    Ls.tipsErr(resp.desc);
+                } else {
+                    cur.grid.load();
+                }
+            });
+        }
+    }
+    
+    function cycleSet() {
+        
+    }
+    
+    function historyTask(a,v) {
+        cur.dialog.data("typeCode",v);
+        Ls.openWin("/monitor/index/manage/taskList", '800px', '380px', {
+            title: "编辑"
+        });
+    }
+
+    function status(obj) {
+        var rec = obj.record;
+        var status = rec.taskStatus;
+        if(status == 0) {
+            return '<font style="color: gray">未启动</font>';
+        } else if(status == 1) {
+            return '<span style="color: green">正在检测</span>';
+        } else if(status == 2) {
+            return '<span style="color: blue">检测完成</span>';
+        } else {
+            return '<span style="color: red">启动异常</span>';
+        }
+    }
+
+    function opt(obj) {
+        var rec = obj.record;
+        var status = rec.taskStatus;
+        var start = '<button type="button" class="btn btn-default btn-sm btn-add" onclick="startCustomTask(\'' + rec.bIndex + '\')">启动</button> ';
+        var stop = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="stopCustomTask(' + rec.id + ')">停止</button> ';
+        if(status == 0 || status == 2) {
+            return start;
+        } else {
+            return stop;
+        }
+    }
+
+    function startCustomTask(typeCode) {
+        if(confirm('确认开始任务?')) {
+            Ls.ajax({
+                type: "POST",
+                url: "/monitor/index/manage/startCustomTask",
+                data: {
+                    typeCode: typeCode
+                }
+            }).done(function (resp) {
+                cur.grid2.load();
+                if (resp.status == 0) {
+                    Ls.tipsErr(resp.desc);
+                } else {
+                    Ls.tipsOk(resp.desc);
+                }
+            });
+        }
+    }
+
+    function stopCustomTask(id) {
+        if(confirm('确认停止任务?')) {
+            Ls.ajax({
+                type: "POST",
+                url: "/monitor/index/manage/stopCustomTask",
+                data: {
+                    id: id
+                }
+            }).done(function (resp) {
+                cur.grid2.load();
+                if (resp.status == 0) {
+                    Ls.tipsErr(resp.desc);
+                } else {
+                    Ls.tipsOk(resp.desc);
+                }
+            });
+        }
+    }
+
+    function customHistory(obj) {
+        var record = obj.record;
+        return '<a href="javascript:void(0);" onclick="cystomHistoryWin(\'' + record.bIndex + '\')">历史记录</a>'
+    }
+
+    function cystomHistoryWin(typeCode) {
+        cur.dialog.data("typeCode",typeCode);
+        Ls.openWin("/monitor/index/manage/customTaskList", '800px', '500px', {
+            title: "历史记录"
+        });
+    }
+
+    function look(obj) {
+        return transferLook(obj,cur.params.taskId);
+    }
+
+    function customLook(obj) {
+        var record = obj.record;
+        return transferLook(obj,record.taskId);
+    }
+
+    function transferLook(obj,taskId) {
+        var record = obj.record;
+        var str = '';
+        if(record.bIndex == 'siteDeny') {
+            str = '<a href="javascript:void(0);" onclick="siteVisitDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'siteUpdate') {
+            str = '<a href="javascript:void(0);" onclick="indexNotUpdateDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'columnUpdate') {
+            str = '<a href="javascript:void(0);" onclick="columnNotUpdateDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'error') {
+            str = '<a href="javascript:void(0);" onclick="seriousErrorDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'reply') {
+            str = '<a href="javascript:void(0);" onclick="badInteractDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'siteUse') {
+            str = '<a href="javascript:void(0);" onclick="hrefUseableDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'infoUpdate') {
+            str = '<a href="javascript:void(0);" onclick="columnBaseInfoDetail(' + taskId + ')">查看</a>'
+        } else if(record.bIndex == 'replyScope') {
+            str = '<a href="javascript:void(0);" onclick="interactInfoDetail(' + taskId + ')">查看</a>'
+        }
+        return str;
+    }
+
+    function siteVisitDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/siteVisitDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_siteVisit",
+            title: "站点访问详情"
+        });
+    }
+
+    function seriousErrorDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/seriousErrorDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_seriousError",
+            title: "严重错误详情"
+        });
+    }
+
+    function hrefUseableDetail(taskId) {
+        cur.dialog.data("taskId",taskId);
+        Ls.openWin("/monitor/index/manage/hrefUseableDetail?monitorId=" + taskId, '850px', '500px', {
+            id:cur.params.taskId + "_hrefUseable",
+            title: "错误链接详情"
+        });
+    }
+
+    function indexNotUpdateDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/indexNotUpdateDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_indexNotUpdate",
+            title: "网站不更新详情"
+        });
+    }
+
+    function columnNotUpdateDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/columnNotUpdateDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_columnNotUpdate",
+            title: "栏目不更新详情"
+        });
+    }
+
+    function badInteractDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/badInteractDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_badInteract",
+            title: "互动回应差详情"
+        });
+    }
+
+    function indexColumnDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/indexColumnDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_indexColumn",
+            title: "首页栏目更新情况详情"
+        });
+    }
+
+    function columnBaseInfoDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/columnBaseInfoDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_columnBaseInfo",
+            title: "基本信息栏目更新情况详情"
+        });
+    }
+
+    function interactInfoDetail(taskId) {
+        cur.dialog.data("monitorId",taskId);
+        Ls.openWin("/monitor/index/manage/interactInfoDetail?monitorId=" + taskId, '800px', '500px', {
+            id:cur.params.taskId + "_interactInfo",
+            title: "互动回应情况详情"
+        });
+    }
+</script>

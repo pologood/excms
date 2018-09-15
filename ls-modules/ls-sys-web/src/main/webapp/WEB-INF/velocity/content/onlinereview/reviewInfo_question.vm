@@ -1,0 +1,152 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <button class="btn btn-default btn-back" onclick="goback()">返 回</button>
+                </div>
+                <div class="col-md-5">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="form-group">
+                            <label></label>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid_question" class="mini-treegrid" style="width:100%;height:500px;"
+             url="/reviewInfo/getQuestionList?themeId=$!{themeId}&dataFlag=1" showTreeIcon="true"
+             treeColumn="title" idField="id" parentField="pid" resultAsTree="false"
+             allowResize="true" expandOnLoad="true">
+            <div property="columns">
+                <div type="indexcolumn" headerAlign="center" align="center" width="50">序号</div>
+                <div name="title" field="title" headerAlign="center" width="100%">评议对象</div>
+                <div field="votesCount" width="80" headerAlign="center" align="center" renderer="renderVotesCount">票数</div>
+                <div width="140" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    var cur = {
+        themeId: "$!{themeId}",
+        options: "$!{options}"
+    }
+
+    $(document).ready(function () {
+        mini.parse();
+        cur.grid = mini.get("datagrid_question");
+        //cur.grid.load({themeId:cur.themeId,dataFlag: 1});
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+
+    })
+
+    function renderopt(e) {
+        var rec = e.record, str = '', type = rec.type, options = rec.options;
+        if (type == 'Question') {
+            str += '<button class="btn btn-default btn-sm btn-edit" onclick="replyList(' + rec.id + ')">回复建议</button> ';
+            str += '<button class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.id + ')">编 辑</button> ';
+            // str += '<button class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.id + ')">删 除</button> ';
+        } else {
+            str += '<button class="btn btn-default btn-sm btn-edit" onclick="editOption(' + rec.id + ',' + rec.pid + ')">编 辑</button> ';
+            // str += '<button class="btn btn-default btn-sm btn-delete" onclick="delOption(' + rec.id + ')">删 除</button> ';
+        }
+        return str;
+    }
+
+
+    function renderVotesCount(e) {
+        var rec = e.record, type = rec.type, str = '';
+        if (type == 'Question') {
+            str = rec.votesCount;
+        } else {
+            str = rec.votesCount;
+        }
+        return str;
+    }
+
+    function replyList(questionId) {
+        Ls.openWin("/reviewInfo/replyList?questionId=" + questionId + "&themeId=" + cur.themeId, "800px", "450px", {
+            type: 2,
+            title: '回复建议',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+
+    }
+
+    //修改
+    var edit = function (id) {
+        Ls.openWin("/reviewInfo/editQuestion?questionId=" + id + "&themeId=" + cur.themeId, "500px", "400px", {
+            type: 2,
+            title: id == '' ? '添加评议对象' : '编辑评议对象',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    };
+
+
+    function editOption(optionId, questionId) {
+        Ls.openWin("/reviewInfo/editOptions?options=" + cur.options + "&questionId=" + questionId + "&themeId=" + cur.themeId + "&optionId=" + optionId, "500px", "450px", {
+            type: 2,
+            title: '编辑评议类型',
+            maxmin: false,
+            close: function () {
+                cur.grid.reload();
+            }
+        });
+    }
+
+
+    // 删除
+    var del = function (id) {
+        var ids = [];
+        ids.push(id)
+        ids = ids.join(",");
+        ;
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/survey/question/delete",
+                data: {
+                    ids: ids
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    // 删除
+    var delOption = function (id) {
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/survey/question/deleteOption",
+                data: {
+                    optionId: id
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                }
+            });
+        }
+    }
+
+    var goback = function () {
+        content_mgr.getContentApp("/reviewInfo/index?indicatorId=&pageIndex=");
+    }
+
+
+</script>

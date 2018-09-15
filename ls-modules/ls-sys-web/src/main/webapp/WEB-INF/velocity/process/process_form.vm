@@ -1,0 +1,160 @@
+#parse("_page_layout/_header.vm")
+<body style="background-color: inherit; overflow: scroll;">
+
+<div style="width:100%;*width:auto;height:100%;">
+    #if ($formForwardData.buttons && $formForwardData.buttons.size() >0)
+        <div height="70" splitSize="0">
+            <div id="btn_tools" style="height:35px;line-height: 35px;margin: 5px 20px;">
+                #foreach($item in $formForwardData.buttons)
+                    <button class="btn22_gray ml15 h25 tbtn btn btn-default" type="$!{item.type}" data-code="$!{item.code}">${item.name}</button>
+                    &nbsp;
+                #end
+            </div>
+        </div> <!-- north -->
+    #end
+    <div title="center" region="center">
+        <div id="formPageWrap" style="position:relative;padding-top:20px; padding-bottom:20px">
+
+        </div>
+    </div> <!-- center -->
+</div> <!-- mini-layout -->
+<form name="form1" id="form1" action="">
+    <input type="hidden" id="processFormId" name="processFormId" value="$!{formForwardData.processForm.processFormId}"/>
+    <input type="hidden" id="recordId" name="recordId" value="$!{formForwardData.processForm.processFormId}"/>
+    <input type="hidden" id="processBusinessType" name="processBusinessType" value="$!{formForwardData.processForm.processBusinessType}"/>
+    <input type="hidden" id="processId" name="processId" value="$!{formForwardData.processForm.processId}"/>
+    <input type="hidden" id="moduleCode" name="moduleCode" value="$!{formForwardData.processForm.moduleCode}"/>
+    <input type="hidden" id="activityName" name="activityName" value="$!{formForwardData.activityName}"/>
+    <input type="hidden" id="dataId" name="dataId" value="$!{formForwardData.processForm.dataId}"/>
+</form>
+    #parse("_page_layout/_footer.vm")
+<script src="/assets/js/pages/process/btn_fun_pool.js?v=20150731"></script>
+
+
+<script>
+
+    // 配置当前页面所有ajax默认的访问地址
+    Ls.ajax.url = '';
+
+    var CUR_PROCESS = {
+        viewModel: {},
+        fn: {},
+        action: {
+            taskSign: '/process/taskSign'
+        },
+        el: {},
+        params: {
+            startFlow: '$!{formForwardData.param.startFlow}',
+            taskId: '$!{formForwardData.param.taskId}',
+            processId: '$!{formForwardData.processForm.processId}',
+            procInstId: '$!{formForwardData.processForm.procInstId}',
+            recordId: '$!{formForwardData.processForm.processFormId}',
+            processFormId: '$!{formForwardData.processForm.processFormId}',
+            formRecordId: '$!{formForwardData.processForm.recordId}',
+            moduleCode: '$!{formForwardData.processForm.moduleCode}',
+            formId: '$!{formForwardData.processForm.formId}',
+            formVer: '$!{formForwardData.processForm.formVer}',
+            activityId: '$!{formForwardData.activityId}',
+            needSign: '$!{formForwardData.needSign}',
+            autoToOwner: '$!{formForwardData.autoToOwner}',
+            writableFields: '$!{formForwardData.activityFieldControl.writableFields}',
+            protectFields: '$!{formForwardData.activityFieldControl.protectFields}',
+            commentFields: '$!{formForwardData.activityFieldControl.commentFields}',
+            caseType: '$!{formForwardData.caseType}',
+            caseId: '$!{formForwardData.processForm.processFormId}',
+            formUrl: '$!{formForwardData.formUrl}',
+            dataId: '$!{formForwardData.processForm.dataId}',
+            columnId: '$!{formForwardData.param.columnId}'
+        },
+        page: {},
+        fileEditVOs: [],
+        attachmentVOs: {
+            fileList: []
+        },
+        fallbackOptions: [],
+
+    };
+
+    var NEW_CUR_PROCESS = {};
+    $(document).ready(function () {
+        // 获取页面加载提示对象
+        CUR_PROCESS.el.loading = $("#pageLoading");
+        CUR_PROCESS.form = $('#form1');
+        //任务签收
+        if (CUR_PROCESS.params.needSign == 1 && !Ls.isEmpty(CUR_PROCESS.params.taskId)) {
+            taskSign();
+        }
+        //因getFormHtml 方法定义了 CUR_PROCESS 变量，所以定义一个临时变量待内容加载后再还回相晨变量
+        NEW_CUR_PROCESS = Ls.clone(CUR_PROCESS);
+        CUR_PROCESS.fn.getFormHtml();
+    });
+
+    var content_mgr = {indicatorId: CUR_PROCESS.params.columnId, node: {functions: []}};
+    var config = {model: []};
+    CUR_PROCESS.columnId = content_mgr.indicatorId;
+
+    CUR_PROCESS.fn.getFormHtml = function () {
+        var url = CUR_PROCESS.params.formUrl;
+        try {
+            Ls.ajax({
+                type: "POST",
+                data: {id: CUR_PROCESS.params.dataId, toolbar: 'hide'},
+                url: url,
+                dataType: 'html',
+                success: function (text) {
+                    $("#formPageWrap").html(text);
+                    CUR_PROCESS = NEW_CUR_PROCESS;
+                }
+            });
+        } catch (e) {
+        }
+
+    }
+
+    var validate = function (callback) {
+        return true;
+    };
+
+    //任务签收
+    var taskSign = function () {
+        var url = '/process/taskSign';
+        Ls.ajax({
+            type: "POST",
+            data: {taskId: CUR_PROCESS.params.taskId},
+            url: url,
+            success: function (text) {
+                try {
+                    window.opener.cur.grid.load();
+                    ;
+                } catch (e) {
+                }
+            }
+        });
+    }
+
+    //获取表单数据
+    var getData = function () {
+        var processBusinessType = $("#processBusinessType").val();
+        var formData = {};
+        if (processBusinessType == "ArticleNews") {
+            var subFormData = getFromData();
+        } else if (processBusinessType == "VideoNews") {
+            var subFormData = getVideoFromData();
+        } else if (processBusinessType == "PictureNews") {
+            var subFormData = getPictureFormData();
+        } else if (processBusinessType == "GuestBook") {
+            var subFormData = getGuestBookFormData();
+        } else if (processBusinessType == "OnlineDeclaration") {
+            var subFormData = getOnlineDeclarationFormData();
+        }
+        var processForm = $("#form1").getFromJSON()
+        $.extend(true, formData, subFormData);
+        $.extend(true, formData, processForm);
+        Ls.log(formData);
+        return formData;
+    }
+
+</script>
+
+</body>
+</html>

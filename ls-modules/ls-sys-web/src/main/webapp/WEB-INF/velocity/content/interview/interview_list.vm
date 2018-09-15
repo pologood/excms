@@ -1,0 +1,521 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-5">
+                    <button class="btn btn-default btn-add" onclick="edit('')">添加访谈</button>
+
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn"><a href="javascript:issuedOpt('1');">批量发布</a></li>
+                            <li class="publishBtn"><a href="javascript:issuedOpt('0');">批量取消发布</a></li>
+                            <li class="divider"></li>
+                            <li class="openBtn"><a href="javascript:openOpt('1');">批量开启</a></li>
+                            <li class="openBtn"><a href="javascript:openOpt('0');">批量取消开启</a></li>
+                            <li class="divider"></li>
+                            <li class="openBtn"><a href="javascript:typeOpt('3');">批量设为访谈预告</a></li>
+                            <li class="openBtn"><a href="javascript:typeOpt('1');">批量设为正在访谈</a></li>
+                            <li class="openBtn"><a href="javascript:typeOpt('2');">批量设为历史回顾</a></li>
+                            <li class="divider"></li>
+                            <li class="editBtn" id="deletes"><a href="javascript:deleteAll();">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="searchPublish(1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="searchPublish(0)">未发布</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" onclick="searchOpen(1)">已开启</a></li>
+                            <li><a href="javascript:;" onclick="searchOpen(0)">未开启</a></li>
+                            <li class="divider"></li>
+                            <li><a href="javascript:;" onclick="searchType(3)">访谈预告</a></li>
+                            <li><a href="javascript:;" onclick="searchType(1)">正在访谈</a></li>
+                            <li><a href="javascript:;" onclick="searchType(2)">历史回顾</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-7">
+
+                    <form class="form-inline tr" role="form">
+                        <div class="form-group">
+                            <label></label>
+                            <input type="text" id="searchText" name="searchText" class="form-control w140" placeholder="访谈主题" maxlength="50">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onClick="search()">搜 索</button>
+                        <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid  ls-mini-grid-cell" style="width:100%;height:500px;" multiSelect="true" allowCellWrap="true"
+             idField="id" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" onlyCheckSelection="true"
+             allowCellWrap="true" allowHeaderWrap="true" url="/interviewInfo/getPage">
+            <div property="columns">
+                <div type="checkcolumn" width="40"></div>
+                <div width="50" headerAlign="center" align="center" allowSort="false" renderer="renderSort">排序</div>
+                <div id="fieldWidth" field="title" width="100%" headerAlign="center" align="left" cellCls="mw300" renderer="renderTitle">访谈主题</div>
+                <div field="time" width="140" headerAlign="center" align="center">访谈时间</div>
+                <div width="60" headerAlign="center" align="center" renderer="renderIssued">发布</div>
+                <div width="60" headerAlign="center" align="center" renderer="renderIsOpen">开启</div>
+                <div width="80" headerAlign="center" align="center" renderer="renderHistory">访谈状态</div>
+                <div width="115" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    function convertStatusFn(e) {
+        var contentPath = e.record.contentPath;
+        return (contentPath && contentPath != '' && e.record.quoteStatus != 1) ? "disabled" : '';
+    }
+
+    var cur = {
+        params: {
+            columnId: content_mgr.indicatorId,
+            siteId: GLOBAL_SITEID,
+            typeCode: 'interviewInfo',
+            dataFlag: 1
+        },
+        pageIndex:"$!{pageIndex}"
+    }
+
+    $(document).ready(function () {
+
+        var width = $(window).width();
+        if (width < 1400) {
+            $("#fieldWidth").attr("width", 300);
+        }
+
+        mini.parse();
+        cur.grid = mini.get("datagrid1");
+        if(!Ls.isEmpty(cur.pageIndex)) {
+            cur.params.pageIndex = parseInt(cur.pageIndex)
+        }
+        cur.grid.load(cur.params);
+        cur.grid.on("beforeselect", function (e) {
+            convertStatusFn(e) != '' && (e.cancel = true);
+        });
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+
+    })
+
+    indexMgr.publish = function(data){
+        /*if (convert){//进度
+            $("#video_convert_complete_" + resourceId).html("视频转换进度：" + data);
+        } else { // 完成
+            // cur.grid.reload();
+            cur.grid.findRows(function (row) {
+                if ($.inArray(row.contentId, data.contentIds) >= 0) return true;
+            }).filter(function (v, i) {
+                v.issued = data.isPublish;
+                cur.grid.updateRow(v);
+            });
+        }*/
+        search();
+    }
+
+    function renderSort(e) {
+        var rec = e.record;
+        var str = '<div class="rows text-center">',
+            up = '<a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',1)" href="javascript:;"><i class="fa fa-long-arrow-up" style="margin-top:-3px" title="' + rec.sortNum + '"></i></a>',
+            down = ' <a onclick="moveSort(' + rec.contentId + ',' + rec.sortNum + ',0)" href="javascript:;"><i class="fa fa-long-arrow-down" title="' + rec.sortNum + '"></i></a>';
+
+        var index = (e.rowIndex + 1) + (cur.grid.pageSize * cur.grid.pageIndex);
+        if (index == 1) {
+            str += down;
+        } else if (cur.grid.totalCount == index) {
+            str += up;
+        } else {
+            str += up + down;
+        }
+        str += '</div>';
+        return str;
+    }
+
+    function moveSort(id, sortNum, type) {
+        var operate = (type == '1' ? "up" : "down");
+        Ls.ajaxGet({
+            url: "/content/updateSort",
+            data: {
+                id: id,
+                sortNum: sortNum,
+                operate: operate,
+                columnId: cur.params.columnId,
+                siteId: cur.params.siteId,
+                typeCode: cur.params.typeCode
+            },
+            success: function (text) {
+                Ls.tipsOk("操作成功")
+                cur.grid.reload(cur.params);
+            }
+        });
+    }
+
+    //描述
+    function renderopt(e) {
+        var rec = e.record, editStr = '',convertStatus = convertStatusFn(e);
+        if (convertStatus != '') {
+            editStr +='<span id="video_convert_complete_'+rec.contentId+'">视频转换中...</span><span id="video_convert_button_'+rec.contentId+'"class="hidden"></span>';
+        }else{
+            var disabledStr = Ls.publishStatus(rec.issued);
+            var publishStr = '';
+            if (rec.issued == '1') {
+                publishStr = '       <li><a href="javascript:void(0)" onclick="rePublish(' + rec.contentId + ',1)">重新发布</a></li>';
+            }
+            editStr +=
+                    '<div class="btn-group" role="group">' +
+                    '   <button ' + disabledStr +convertStatus+ ' type="button" class="btn btn-default btn-sm" onclick="edit(' + rec.interviewId + ')">修 改</button> ' +
+                    '   <button ' + disabledStr + convertStatus+' type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">' +
+                    '       <i class="fa fa-angle-down"></i>' +
+                    '   </button>' +
+                    '   <ul class="dropdown-menu pull-right">' + publishStr +convertStatus+
+                    '       <li><a href="javascript:void(0)" onclick="del(' + rec.interviewId + ',' + rec.contentId + ')">删 除</a></li>' +
+                    '   </ul>' +
+                    '</div>';
+        }
+//        editStr += '<button '+convertStatus+' class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.interviewId + ')">修 改</button> ';
+//        editStr += '<button '+convertStatus+' class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.interviewId + ',' + rec.contentId + ')">删 除</button> '
+
+        return editStr;
+    }
+
+    function rePublish(id, status) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("您确定重新发布？")) {
+            Ls.ajax({
+                type: "POST",
+                data: {ids: ids, siteId: GLOBAL_SITEID, columnId: cur.params.columnId, type: status},
+                url: "/articleNews/publishs",
+                success: function (text) {
+                    Ls.tipsOk("正在生成处理中")
+                    cur.grid.reload(cur.params);
+                }
+            });
+        }
+    }
+
+    function renderTitle(e) {
+        var rec = e.record, title = rec.title, str = '',convertStatus = convertStatusFn(e);
+        // title = title + "<span id='video_convert_complete_"+rec.contentId+"'></span>";
+        str='<a href="javascript:void(0)" style="text-decoration:underline;color:blue;"'+(convertStatus==''?' onclick="view(' + rec.interviewId + ')"':'')+'>' + title + '</a>';
+        str += '<span id="publish_' + rec.contentId + '" class="publish-status">';
+        var status = Ls.publishStatus(rec.issued);
+        if (status != "") {
+            str += '[生成中...]';
+        }
+        str += '</span>';
+        if(rec.videoStatus == 0){
+            str += '<span class="publish-status">视频转换中...</span>';
+        }
+        var process = '<div class="title rows"><span style="color: red;" id="video_convert_complete_'+rec.contentId+'"></span></div>';
+        return str + process;
+    }
+
+    function renderHistory(e) {
+        var rec = e.record, type = rec.type, str = "";
+        if (type == '3') {
+            str = "访谈预告";
+        } else if (type == '1') {
+            str = "正在访谈";
+        } else if (type == '2') {
+            str = "历史回顾";
+        }
+        return str
+    }
+
+
+
+    function renderIssued(e) {
+        var rec = e.record, issued = rec.issued, str = "",convertStatus = convertStatusFn(e);
+        var disabledStr = Ls.publishStatus(issued);
+        if (issued == '1') {
+//            str = '<a href="javascript:void(0)" '+(convertStatus==''?' onclick="issuedClick(' + rec.contentId + ',0)"':'')+'><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/click.gif" border="0" title="取消发布" ></a>';
+            str = '<button ' + disabledStr + (convertStatus==''?' onclick="issuedClick(' + rec.contentId + ',0)"':'')+' type="button" class="btn btn-sm btn-default btn-ok" onclick="issuedClick(' + rec.contentId + ',0)" title="取消发布"><span class="glyphicon glyphicon-ok"></span></button>';
+        } else {
+//            str = '<a href="javascript:void(0)" '+(convertStatus==''?' onclick="issuedClick(' + rec.contentId + ',1)"':'')+'><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/noclick.gif" border="0" title="发布"></a>';
+            str = '<button ' + disabledStr + (convertStatus==''?' onclick="issuedClick(' + rec.contentId + ',1)"':'')+' type="button" class="btn btn-sm btn-default btn-remove" onclick="issuedClick(' + rec.contentId + ',1)" title="发布"><span class="glyphicon glyphicon-ok"></span></button>';
+
+        }
+        return str
+    }
+
+    function renderIsOpen(e) {
+        var rec = e.record, isOpen = rec.isOpen, issued = rec.issued,str = "";
+        var disabledStr = Ls.publishStatus(issued);
+        if (isOpen == '1') {
+            //str = '<a onclick="openClick(' + rec.interviewId + ',0)"><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/click.gif" border="0" title="取消开启" ></a>';
+            str = '<button ' + disabledStr + ' type="button" class="btn btn-sm btn-default btn-ok" onclick="openClick(' + rec.interviewId + ',0)" title="取消开启"><span class="glyphicon glyphicon-ok"></span></button>';
+        } else {
+            // str = '<a onclick="openClick(' + rec.interviewId + ',1)"><img src="' + GLOBAL_CONTEXTPATH + 'assets/images/noclick.gif" border="0" title="开启"></a>';
+            str = '<button ' + disabledStr + ' type="button" class="btn btn-sm btn-default btn-remove" onclick="openClick(' + rec.interviewId + ',1)" title="开启"><span class="glyphicon glyphicon-ok"></span></button>';
+        }
+        return str;
+    }
+
+    function issuedClick(contentId, status) {
+        var ids = [];
+        ids.push(contentId)
+        ids = ids.join(",");
+        ;
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    if(text.status==1){
+                        Ls.tipsOk("正在生成处理中")
+                        cur.grid.reload(cur.params);
+                    }else{
+                        Ls.tipsInfo(text.desc);
+                    }
+
+                }
+            });
+        }
+    }
+
+    function openClick(infoId, status) {
+        var ids = [];
+        ids.push(infoId)
+        ids = ids.join(",");
+        ;
+        var str = (status == '1' ? '开启' : '取消开启');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/interviewInfo/updateIsOpen",
+                data: {
+                    ids: ids,
+                    isOpen: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功")
+                    cur.grid.reload(cur.params);
+                }
+            });
+        }
+    }
+
+    var deleteAll = function () {
+        var ids = getIDS();
+        var contentIds = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定删除吗")) {
+            Ls.ajaxGet({
+                url: "/interviewInfo/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("批量删除完成，正在生成处理中")
+                    cur.grid.reload(cur.params);
+                }
+            });
+
+        }
+
+    }
+
+    // 删除
+    var del = function (id, contentId) {
+        var ids = [];
+        var contentIds = [];
+        ids.push(id)
+        contentIds.push(contentId);
+        ids = ids.join(",");
+        contentIds = contentIds.join(",");
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/interviewInfo/delete",
+                data: {
+                    ids: ids,
+                    contentIds: contentIds
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除完成，正在生成处理中")
+                    cur.grid.reload(cur.params);
+                    cur.grid.deselectAll(true);
+                }
+            });
+        }
+    }
+
+
+    //修改
+    var edit = function (id) {
+        content_mgr.getContentApp("/interviewInfo/edit?interviewId=" + id+"&pageIndex="+cur.grid.pageIndex)
+    };
+
+    var view = function (id) {
+        content_mgr.getContentApp("/interviewQuestion/list?interviewId=" + id +"&topPageIndex="+cur.grid.pageIndex)
+    }
+    //清除条件
+    var search = function () {
+        var searchText = $("#searchText").val();
+        cur.params.isPublish = '';
+        cur.params.isOpen = '';
+        cur.params.type = '';
+        cur.params.searchText = searchText;
+        cur.grid.load(cur.params);
+    }
+
+    var searchOpen = function (isOpen) {
+        cur.params.searchText = '';
+        cur.params.isPublish = '';
+        cur.params.type = '';
+        cur.params.isOpen = isOpen;
+        cur.grid.load(cur.params);
+    }
+
+    var searchType = function (type) {
+        cur.params.searchText = '';
+        cur.params.isPublish = '';
+        cur.params.isOpen = '';
+        cur.params.type = type;
+        cur.grid.load(cur.params);
+    }
+
+    var searchPublish = function (issued) {
+        cur.params.searchText = '';
+        cur.params.isOpen = '';
+        cur.params.type = '';
+        cur.params.isPublish = issued;
+        cur.grid.load(cur.params);
+    }
+
+    var searchClear = function () {
+        $("#searchText").val("");
+        cur.params.searchText = '';
+        cur.params.isPublish = '';
+        cur.params.type = '';
+        cur.params.isOpen = '';
+        cur.grid.load(cur.params);
+    }
+
+    function issuedOpt(status) {
+        var ids = getContentIdS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '发布' : '取消发布');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/content/updateStatus",
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                success: function (text) {
+                    if(text.status==1){
+                        str = "批量" + str + "完成，正在生成处理中"
+                        Ls.tipsOk(str);
+                        cur.grid.reload(cur.params);
+                    }else{
+                        Ls.tipsInfo(text.desc);
+
+                    }
+
+                }
+            });
+        }
+    }
+
+    function openOpt(status) {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        var str = (status == '1' ? '开启' : '取消开启');
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/interviewInfo/updateIsOpen",
+                data: {
+                    ids: ids,
+                    isOpen: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功")
+                    cur.grid.reload();
+                },
+                error: function () {
+                }
+            });
+        }
+    }
+
+    function typeOpt(status) {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择数据")
+            return;
+        }
+        ids = ids.join(",");
+        var str = "设为正在访谈";
+        if (status == '2') {
+            str = "设为历史回顾";
+        } else if (status == '3') {
+            str = "设为访谈预告 ";
+        }
+        if (confirm("您确定" + str + "？")) {
+            Ls.ajaxGet({
+                url: "/interviewInfo/updateType",
+                data: {
+                    ids: ids,
+                    type: status
+                },
+                success: function (text) {
+                    Ls.tipsOk("操作成功")
+                    cur.grid.reload();
+                },
+                error: function () {
+                }
+            });
+        }
+    }
+
+
+    //循环选中的行
+    function getIDS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].interviewId);
+        }
+        return ids;
+    }
+
+    function getContentIdS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].contentId);
+        }
+        return ids;
+    }
+
+
+</script>

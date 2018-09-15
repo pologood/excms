@@ -1,0 +1,39 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($length=$Integer.parseInt($length))
+
+<div class="contentbox minh500" >
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="bj_table">
+        <tr class="bj_thtitle">
+            <td width="340">受理事项</td>
+            <td width="198">受理部门</td>
+            <td width="240">申报人</td>
+            <td width="100">申报日期</td>
+            <td width="100">应办结日期</td>
+            <td>办件状态</td>
+        </tr>
+        #foreach($eo in $resultObj.data)
+            <tr class="bj_thlist">
+                <td width="340"> <div  class="bj1">#cutstr($!{eo.acceptanceItem},$length)</div></td>
+                <td width="198">$!{eo.acceptanceDepartment}</td>
+                <td width="240">$!{eo.declarePerson}</td>
+                <td width="100">#date_format("$!{eo.declareDate}","$!{paramObj.dateFormat}")</td>
+                <td width="100">#date_format("$!{eo.shouldFinishDate}","$!{paramObj.dateFormat}")</td>
+                <td>$!{eo.officeStatus}</td>
+            </tr>
+        #end
+    </table>
+
+</div>
+
+#if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+<div id="page_1" class="pagination"></div>
+<script>
+    Ls.pagination("#page_1", function (pageIndex) {
+        location.href = "$!{resultObj.linkPrefix}?pageIndex=" + pageIndex ;
+    }, {
+        pageCount:$!{resultObj.pageCount},
+        currPage:$!{resultObj.pageIndex} +1
+    })
+</script>
+#end

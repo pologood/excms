@@ -1,0 +1,417 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;display: none">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">论坛配置</a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_2" data-toggle="tab">积分配置</a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_3" data-toggle="tab">主题配置</a>
+                </li>
+                <li class="">
+                    <a href="#tab_1_4" data-toggle="tab">游客会员配置</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <form id="bbsSetting_form" role="form" ms-controller="bbsSetting_form" autocomplete="off">
+                    <div class="tab-content">
+                        <div class="tab-pane active col-md-8" id="tab_1_1"  style="padding-left: 0;">
+
+                            <table class="table table-bordered bbs-c-table">
+                                <tbody>
+                                <tr>
+                                    <th>论坛名称：</th>
+                                    <td>
+                                        <input type="text" name="name" ms-duplex="name" class="form-control" placeholder="论坛名称不能为空">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>论坛URL：</th>
+                                    <td>
+                                        <input type="text" name="softUrl" ms-duplex="softUrl" class="form-control" placeholder="例:http://www.hngov.cn/">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>注册默认角色：</th>
+                                    <td>
+                                        <select class="form-control" id="defaultGroupId" name="defaultGroupId" ms-duplex="defaultGroupId">
+                                            <option value="">请选择注册默认角色</option>
+                                            #foreach($s in $roleList)
+                                                <option value="$!{s.id}">$!{s.name}</option>
+                                            #end
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>楼层名称：</th>
+                                    <td>
+                                        <input type="text" name="threadFloor" ms-duplex="threadFloor" class="form-control" placeholder="例:楼主,沙发,板凳,地板,用','分割">
+                                    </td>
+                                </tr>
+##                                <tr>
+##                                    <th>信息类型：</th>
+##                                    <td>
+##                                        <input type="text" name="threadType" ms-duplex="threadType" class="form-control" placeholder="例:未选择,建议,咨询,举报,投诉,其他,用','分割">
+##                                    </td>
+##                                </tr>
+                                <tr>
+                                    <th>快速发主题帖：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="fastThreadOn" value="1" ms-duplex-string="fastThreadOn">开启 </label>
+                                            <label class="radio-inline"><input type="radio" name="fastThreadOn" value="0" ms-duplex-string="fastThreadOn">关闭</label>
+                                        </div>                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>快速发回复帖：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="fastPostOn" value="1" ms-duplex-string="fastPostOn">开启 </label>
+                                            <label class="radio-inline"><input type="radio" name="fastPostOn" value="0" ms-duplex-string="fastPostOn">关闭</label>
+                                        </div>                                    </td>
+                                </tr>
+##                                <tr>
+##                                    <th>会员注册：</th>
+##                                    <td>
+##                                        <div class="radio-group">
+##                                            <label class="radio-inline"><input type="radio" name="registerOn" value="1" ms-duplex-string="registerOn">开启 </label>
+##                                            <label class="radio-inline"><input type="radio" name="registerOn" value="0" ms-duplex-string="registerOn">关闭</label>
+##                                        </div>                                    </td>
+##                                </tr>
+                                <tr>
+                                    <th>注册验证：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="verifyMethod" value="1" ms-duplex-string="verifyMethod">通过手机短信方式 </label>
+                                            <label class="radio-inline"><input type="radio" name="verifyMethod" value="0" ms-duplex-string="verifyMethod">通过电子邮件方式</label>
+                                        </div>                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>激活方式：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="registerType" value="1" ms-duplex-string="registerType">注册成功后，自动开启论坛功能 </label>
+                                            <label class="radio-inline"><input type="radio" name="registerType" value="2" ms-duplex-string="registerType">注册成功后，手工开启论坛功能</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="vertical-align: top;">论坛声明：</th>
+                                    <td colspan="2">
+                                        <textarea name="statement" class="form-control" rows="3" placeholder="请输入论坛声明" ms-duplex="statement"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td colspan="2">
+                                        <div class="form-actions noborder">
+                                            <button class="btn btn-default btn-save" type="button" onclick="saveSetting(1)"> 保 存</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="clearfix"></div>
+                        </div>
+
+                        <div class="tab-pane" id="tab_1_2">
+
+                            <table class="table table-bordered bbs-c-table">
+                                <tbody>
+
+                                <tr>
+                                    <th>注册会员：</th>
+                                    <td>
+                                        <input type="text" name="registerNum" ms-duplex="registerNum" class="form-control w100"><span> 注册会员积分增加</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>会员每次登录：</th>
+                                    <td>
+                                        <input type="text" name="loginNum" ms-duplex="loginNum" class="form-control w100"><span> 会员登录积分增加</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>发表主题：</th>
+                                    <td>
+                                        <input type="text" name="postedNum" ms-duplex="postedNum" class="form-control w100" ><span> 用户发帖时积分增加</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>发表回复：</th>
+                                    <td>
+                                        <input type="text" name="replyNum" ms-duplex="replyNum" class="form-control w100" ><span> 用户回帖时积分增加</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>主题被删除：</th>
+                                    <td>
+                                        <input type="text" name="delNum" ms-duplex="delNum" class="form-control w100" ><span> 用户帖子被删除时积分减少</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>回复被删除：</th>
+                                    <td>
+                                        <input type="text" name="delReply" ms-duplex="delReply" class="form-control w100" ><span> 用户回复被删除时积分减少</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>主题被屏蔽：</th>
+                                    <td>
+                                        <input type="text" name="screenTitle" ms-duplex="screenTitle" class="form-control w100"><span> 用户帖子被屏蔽时积分减少</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>回复被屏蔽：</th>
+                                    <td>
+                                        <input type="text" name="screenReply" ms-duplex="screenReply" class="form-control w100"><span> 用户回复被屏蔽时积分减少</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td colspan="2">
+                                        <div class="form-actions noborder">
+                                            <button class="btn btn-default btn-save" type="button" onclick="saveSetting(2)"> 保 存</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane" id="tab_1_3">
+
+                            <table class="table table-bordered bbs-c-table">
+                                <tbody>
+                                <tr>
+                                    <th>逾期时间：</th>
+                                    <td>
+                                        <input type="text" name="replyDay" ms-duplex="replyDay" class="form-control w100"><span>  天后，状态将成为逾期状态</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>黄牌期限：</th>
+                                    <td>
+                                        <input type="text" name="yellowDay" ms-duplex="yellowDay" class="form-control w100"><span> 天后，将被设置成为黄牌状态。</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>红牌期限：</th>
+                                    <td>
+                                        <input type="text" name="redDay" ms-duplex="redDay" class="form-control w100"><span> 天后，将被设置成为红牌状态。</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>热门贴：</th>
+                                    <td>
+                                        <input type="text" name="hotTitle" ms-duplex="hotTitle" class="form-control w100" ><span> 回复数大于或等于此值，将被标记成热门贴。</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>新贴：</th>
+                                    <td>
+                                        <input type="text" name="newTitle" ms-duplex="newTitle" class="form-control w100" ><span> 小时。发布时间在此值内，将被标记成新贴。</span>
+                                    </td>
+                                </tr>
+##                                <tr>
+##                                    <th>自动办结天数：</th>
+##                                    <td>
+##                                        <input type="text" name="autoClose" ms-duplex="autoClose" class="form-control w100"><span> 天后，部门已经回复的问题，无再追问的情况下，将自动设置成办结状态。</span>
+##                                    </td>
+##                                </tr>
+##                                <tr>
+##                                    <th>回复后警告贴：</th>
+##                                    <td>
+##                                        <div class="radio-group">
+##                                            <label class="radio-inline"><input type="radio" name="hideCardReplied" value="1" ms-duplex-string="hideCardReplied">在前台取消警告信息 </label>
+##                                            <label class="radio-inline"><input type="radio" name="hideCardReplied" value="0" ms-duplex-string="hideCardReplied">在前台保留警告信息</label>
+##                                        </div>
+##                                    </td>
+##                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td colspan="2">
+                                        <div class="form-actions noborder">
+                                            <button class="btn btn-default btn-save" type="button" onclick="saveSetting(3)"> 保 存</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="tab-pane" id="tab_1_4">
+
+                            <table class="table table-bordered bbs-c-table">
+                                <tbody>
+
+                                <tr>
+                                    <th>发帖限制：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="visitorCanThread" value="1" ms-duplex-string="visitorCanThread">允许发表主题</label>
+                                            <label class="radio-inline"><input type="radio" name="visitorCanThread" value="0" ms-duplex-string="visitorCanThread">不允许发表主题</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>回复限制：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="visitorCanPost" value="1" ms-duplex-string="visitorCanPost">允许发表回复</label>
+                                            <label class="radio-inline"><input type="radio" name="visitorCanPost" value="0" ms-duplex-string="visitorCanPost">不允许发表回复</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>游客查看/下载：</th>
+                                    <td>
+                                        <div class="radio-group">
+                                            <label class="radio-inline"><input type="radio" name="visitorCanDownload" value="1" ms-duplex-string="visitorCanDownload">开启 </label>
+                                            <label class="radio-inline"><input type="radio" name="visitorCanDownload" value="0" ms-duplex-string="visitorCanDownload">关闭</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>游客命名前缀：</th>
+                                    <td>
+                                        <input type="text" name="visitorPrefix" ms-duplex="visitorPrefix" class="form-control w100" placeholder="游客:"><span> 时间  例如命名为“游客”，最后游客发帖的名字为“游客：90909”。</span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th></th>
+                                    <td colspan="2">
+                                        <div class="form-actions noborder">
+                                            <button class="btn btn-default btn-save" type="button" onclick="saveSetting(4)"> 保 存</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    var cur = {
+        siteId: GLOBAL_SITEID,
+        tabNum: '1'
+    }
+    $(document).ready(function () {
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/bbsSetting/getBbsSetting",
+                data: {
+                    siteId: cur.siteId
+                }
+            }).done(function (d) {
+                data = d.data;
+                cur.$id = "bbsSetting_form";
+                //初始化表单字段
+                cur.init = Ls.initFORM(cur.$id, data);
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels[cur.$id];
+                if (!cur.vm) {
+                    cur.vm = avalon.define(cur.init);
+                } else {
+                    Ls.assignVM(cur.vm, data);
+                }
+                avalon.scan($("#bbsSetting_form").get(0),cur.vm);
+            })
+        };
+        getData();
+    })
+
+    function saveSetting(t) {
+        cur.tabNum = t;
+        $('#bbsSetting_form').submit();
+    }
+
+    $('#bbsSetting_form').validator({
+        rules: {
+            myRule1: function (el, param, field) {
+                var isTrue = (cur.tabNum == 1 ? true : false);
+                return isTrue;
+            },
+            myRule2: function (el, param, field) {
+                var isTrue = (cur.tabNum == 2 ? true : false);
+                return isTrue;
+            },
+            myRule3: function (el, param, field) {
+                var isTrue = (cur.tabNum == 3 ? true : false);
+                return isTrue;
+            },
+            myRule4: function (el, param, field) {
+                var isTrue = (cur.tabNum == 4 ? true : false);
+                return isTrue;
+            },
+            myRule5: function (el, param, field) {
+                var isTrue = (cur.tabNum == 5 ? true : false);
+                return isTrue;
+            },
+
+        },
+        fields: {
+            'name': '论坛名称:required(myRule1);length[4~500]',
+            'softUrl': '论坛URL:required(myRule1);length[5~500]',
+            'defaultGroupId': '注册默认角色:required(myRule1);length[1~50]',
+            'threadFloor': '楼层名称:required(myRule1);',
+//            'threadType': '信息类型:required(myRule1);length[2~500]',
+            'statement': '论坛声明:length[10~500]',
+            'registerNum': '注册会员:integer(myRule2);range[0~99999]',
+            'loginNum': '会员每次登录:integer(myRule2);range[0~99999]',
+            'postedNum': '发表主题:integer(myRule2);range[0~99999]',
+            'replyNum': '发表回复:integer(myRule2);range[0~99999]',
+            'delNum': '主题被删除:integer(myRule2);range[-999~99999]',
+            'delReply': '回复被删除:integer(myRule2);range[-999~99999]',
+            'screenTitle': '主题被屏蔽:integer(myRule2);range[-999~99999]',
+            'screenReply': '回复被屏蔽:integer(myRule2);range[-999~99999]',
+            'replyDay': '按时回复期限:required(myRule3);integer(myRule3);range[0~99999]',
+            'yellowDay': '黄牌期限:required(myRule3);integer(myRule3);range[0~99999]',
+            'redDay': '红牌期限:required(myRule3);integer(myRule3);range[0~99999]',
+            'hotTopic': '热门贴:required(myRule3);integer(myRule3);range[0~99999]',
+            'newTopic': '新贴:required(myRule3);integer(myRule3);range[0~99999]',
+//            'autoClose': '自动办结天数:required(myRule3);integer(myRule3);range[0~99999]',
+            'visitorPrefix': '游客命名前缀:required(myRule4);'
+        },
+        valid: function () {
+            addPost()
+        }
+    })
+
+    var addPost = function () {
+        var data = cur.vm.$model;
+        data = Ls.toJSON(data);
+        if(parseInt(data.replyDay) > parseInt(data.yellowDay)){
+            Ls.tipsErr("按时回复期限不能大于等于黄牌期限!");
+            return;
+        }else if(parseInt(data.yellowDay)>=parseInt(data.redDay)){
+            Ls.tipsErr("黄牌期限不能大于等于红牌期限!");
+            return;
+        }
+        Ls.ajax({
+            url: "/bbsSetting/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("保存成功！", {
+                    icons: "success", callback: function () {
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+</script>

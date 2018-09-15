@@ -1,0 +1,308 @@
+###parse("_header.vm")
+<style>
+    #quick_search a{
+        margin-right:5px;
+        margin-left:5px;
+    }
+
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light ">
+            <div class="portlet-body">
+                <div class="">
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group col-md-8">
+                                <input type="text" id="searchKey" name="searchKey" onkeypress="if(event.keyCode==13){search()}" class="form-control" placeholder="请输入身份证或固定电话等关键信息">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" style="float: left;margin-right: 10px;margin-left:-15px;" onClick="search()">搜 索</button>
+                            <div style="float: left">
+                                其他条件：
+                                <div class="btn-group">
+                                    <a class="btn" href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown"><span id="dateDropDownText">时间不限</span> <i class="fa fa-angle-down"></i></a>
+                                    <ul id="dateDropDownSelector" class="dropdown-menu">
+                                        <li class="timebtngroup active" onclick="checkTime(this);" data-timetype="none"><a href="javascript:void(0);">时间不限</a></li>
+                                        <li class="timebtngroup" onclick="checkTime(this);" data-timetype="day"><a href="javascript:void(0);">一天内</a></li>
+                                        <li class="timebtngroup" onclick="checkTime(this);" data-timetype="week"><a href="javascript:void(0);">一周内</a></li>
+                                        <li class="timebtngroup" onclick="checkTime(this);" data-timetype="month"><a href="javascript:void(0);">一月内</a></li>
+                                        <li class="timebtngroup" onclick="checkTime(this);" data-timetype="year"><a href="javascript:void(0);">一年内</a></li>
+                                        <li class="timebtngroup" data-timetype="other"><a href="javascript:void(0);" style="background-color:#fafafa;">自定义<br/>
+                                            <input type="datetime" name="startDate" id="startDate"  placeholder="开始日期" style="width:90px;margin-top:5px;height:1.2em;"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true,position:{left:100,top:-30}})" readonly><br/>
+                                            <input type="datetime" name="endDate" id="endDate"  placeholder="结束日期" style="width:90px;height:1.2em;margin-top:5px;margin-bottom: 5px;"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true,position:{left:100,top:-30}})" readonly><br/>
+                                            <button onclick="checkTime($(this).parent().parent()[0], '自定义');" style="margin-bottom: 5px;">确定</button></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10" id="quick_search" style="padding-left:30px;margin-top:-10px;margin-bottom:10px;">
+                            <strong>快捷搜索：</strong>
+                            #*<a class="query_btn" href="javascript:void(0)" data-type='idCard'>身份证</a> |*#
+                            <a class="query_btn"  href="javascript:void(0)" data-type='mobile'>手机号</a>
+                            #*<a class="query_btn"  href="javascript:void(0)"  data-type='telephone'>固话</a>*#
+                        </div>
+                    </div>
+                    <div class="row">
+                    </div>
+                </div>
+
+                <div id="datagrid" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false"
+                     onlyCheckSelection="true"
+                     idField="postId" sizeList="[50, 100, 200]" pageSize="50" allowCellSelect="true" multiSelect="true"
+                     allowCellWrap="false" allowHeaderWrap="false" load="onloadSuccess">
+                    <div property="columns">
+                    ##                        <div type="checkcolumn" width="30px"></div>
+                        <div field="id" type="indexcolumn" headerAlign="center" width="30px">序号</div>
+                        <div field="columnName" width="10%" headerAlign="center" align="center" >栏目</div>
+                        <div field="title" width="10%" headerAlign="center" align="left" allowSort="false"  renderer="renderTitle"  >标题</div>
+                        <div field="content" width="30%" headerAlign="center" align="left" renderer="renderContent" >内容</div>
+                        <div width="160" headerAlign="center" align="center" renderer="renderOpt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script id="detailTmpl" type="text/html">
+    <div style="overflow-y: auto;max-height:85vh;padding-left:1em;">
+        <table class="table table-bordered survey-table" style="margin-top:20px;">
+            <tbody>
+            <tr>
+                <th style="width:100px;">标题：</th>
+                <td><a href="<?==GLOBAL_HTMLFILEPATH+link?>" target="_blank"><?==title?></a></td>
+            </tr>
+            <tr>
+                <th>栏目：</th>
+                <td><?==columnName?></td>
+            </tr>
+            <tr>
+                <th>创建时间：</th>
+                <td><?==createDate?></td>
+            </tr>
+            <tr>
+                <th>内容：</th>
+                <td ><?==content?></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+###parse("_footer.vm")
+<script>
+    var cur = {
+        params: {
+            recordStatus: 'Normal',
+            taskId:'$!{taskId}',
+            dataFlag: 1
+        },
+        nextpage: {
+            id: "",
+            t:'3'
+        },
+        searchText:{
+            idCard:'/.*(([1-9][0-9]{5}(18|19|([23][0-9]))[0-9]{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)[0-9]{3}([0-9]|[Xx]))|([1-9][0-9]{5}[0-9]{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)[0-9]{2})).*/',
+            mobile:'/.*1[3,4,5,7,8][0-9]{9}.*/',
+            telephone:'/.*[0-9]{3}-[0-9]{8}.*/',
+        }
+    }
+
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        //实例化datagrid
+        cur.grid = mini.get("datagrid");
+        cur.grid.setUrl("/globalSearch/getResultPage");
+//        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid,70);
+
+        $(".query_btn").on('click',function(){
+            search(this.dataset.type);
+        })
+
+    })
+
+    function unPublish(siteId, id, title, rowIndex){
+        if (id != null && id != '' && confirm("是否取消发布标题为【" + title + "】的记录？")) {
+            Ls.ajaxGet({
+                url: "/content/unPublish?id=" + id,
+                success: function (result) {
+                    if(result.status == 1){
+                        Ls.tipsOk("取消发布成功！")
+                        cur.grid.removeRow(cur.grid.getRow(parseInt(rowIndex)));
+                        if(cur.dialog.closed == false){
+                            cur.dialog.close();
+                        }
+//                        cur.grid.reload();
+                        return false;
+                    }
+                    Ls.tipsErr("取消发布失败，错误信息：" + result.desc);
+                }
+            });
+        }
+    }
+
+    function remove(siteId, id, title, rowIndex){
+        if (id != null && id != '' && confirm("是否删除标题为【" + title + "】的记录？")) {
+            Ls.ajaxGet({
+                url: "/content/unPublish?id=" + id,
+                success: function (result) {
+                    if(result.status == 1){
+                        Ls.tipsOk("删除成功！");
+                        cur.grid.removeRow(cur.grid.getRow(parseInt(rowIndex)));
+                        if(cur.dialog.closed == false){
+                            cur.dialog.close();
+                        }
+//                        cur.grid.reload();
+                        return false;
+                    }
+                    Ls.tipsErr("删除失败，错误信息：" + result.desc);
+                }
+            });
+        }
+    }
+
+    function checkTime(element, text){
+        $(element).siblings().removeClass('active');
+        $(element).addClass('active');
+        if(text != undefined && text != null && text != ""){
+            $('#dateDropDownText').text(text);
+        }else{
+            $('#dateDropDownText').text($(element).find('a').text());
+        }
+        search();
+    }
+    function showDetail(rowIndex){
+        var rowData = cur.grid.getRow(rowIndex);
+        var html = Ls.template("detailTmpl", rowData);
+        cur.dialog = Ls.openWin("", "900px", "400px", {
+            content: html,
+            type: 2,
+            title: "查看搜索详情",
+            maxmin: false,
+            button:[ { name: '删 除',
+                callback: function (a,b,c) {
+                    remove(rowData.siteId, rowData.id, rowData.title, rowIndex);
+                    return false;
+                }
+            },{ name: '取消发布',
+                callback: function () {
+                    unPublish(rowData.siteId, rowData.id, rowData.title, rowIndex);
+                    return false;
+                }
+            },{ name: '关闭',
+                callback: function () {
+                }
+            }]
+        });
+    }
+
+    function edit(siteId, id, typeCode, title){
+        var height = document.body.offsetHeight - 100;
+        if(height > 700){
+            height = 700;
+        }
+        cur.dialog = Ls.openWin("/globalSearch/edit?siteId="+ siteId +"&id="+ id +"&typeCode=" + typeCode, "1000px", height + "px", {
+            id: 'editContent',
+            title: "编辑内容【"+title+"】",
+            maxmin: false,
+            close: function (data) {
+                search();
+            }
+        });
+    }
+
+
+    //用户搜索
+    function search(value) {
+        if(value == undefined || value == null || value == ''){
+            //拼接上双引号，表示精准搜索
+            value = $("#searchKey").val();
+        }else{
+            value = cur.searchText[value];
+        }
+        if(value == undefined || value == null || value == ''){
+            Ls.tipsInfo("搜索内容不能为空");
+            return false;
+        }
+        if(cur.grid.is_loading == true){
+            Ls.tipsInfo("正在搜索，请耐心等待");
+            return;
+        }
+        $("#searchKey").val(value);
+        var flag = false;
+        for(var field in cur.searchText){
+            if(value == cur.searchText[field]){
+                flag  = true;
+                break;
+            }
+        }
+        if(flag != true){
+            value = value.replaceAll('\/\.','').replaceAll('\.\*\/','');
+            value = '"' + value +'"';
+        }
+        var timeType = $("#dateDropDownSelector").find(".active").data('timetype');
+        var startTime = '';
+        var endTime = '';
+        if(timeType == 'other'){
+            startTime = $("#startDate").val();
+            endTime = $("#endDate").val();
+            if(startTime == null || endTime == null  || startTime == '' || endTime == '' ){
+                Ls.tipsInfo("请选择搜索时间范围！");
+                return false;
+            }
+        }
+        var params = $.extend({}, cur.params, {
+            searchKey: value,
+            timeType: timeType,
+            startTime: startTime,
+            endTime:endTime
+        });
+        cur.grid.load(params);
+    }
+
+    function renderTitle(e){
+        var rec = e.record;
+        return "<a href='"+GLOBAL_HTMLFILEPATH+rec.link + "' target='_blank'>"+rec.title+"</span>"
+    }
+
+    function replaceSpan(value){
+        value = value.replaceAll("<font color='red'>",'');
+        value = value.replaceAll('</font>','');
+        return value;
+    }
+
+    function renderContent(e){
+        var rec = e.record;
+        return "<span >"+rec.content+"</span>"
+    }
+
+    // 操作列
+    function renderOpt(e) {
+        var rec = e.record;
+        var btn = new Array();
+//        btn.push('<div class="btn-group">');
+//        btn.push('<a class="btn" onclick="$(\'#optionContainer\').slideDown(200)" href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">操作 <i class="fa fa-angle-down"></i></a>');
+//        btn.push('<ul id="optionContainer" class="dropdown-menu">');
+//        btn.push('<li><a href="javascript:void(0);" onclick="showDetail(' + e.rowIndex + ')">查看</a></li>');
+//        btn.push('<li><a href="javascript:void(0);" onclick="unPublish(\''+rec.siteId+'\',\''+rec.id+'\',\''+replaceSpan(rec.title)+'\','+e.rowIndex+')">取消发布</a></li>');
+//        btn.push('<li><a href="javascript:void(0);" onclick="remove(\''+rec.siteId+'\',\''+rec.id+'\',\''+replaceSpan(rec.title)+'\','+e.rowIndex+'">删除</a></li>');
+//        btn.push('</ul></div>');
+
+        btn.push("<button class='btn btn-default btn-sm' onclick='showDetail(" + e.rowIndex + ")'>查看</button>&nbsp;&nbsp;");
+        btn.push("<button class='btn btn-default btn-sm btn-edit' onclick=\"edit('"+rec.siteId+"','"+rec.id+"','"+rec.typeCode+"','"+replaceSpan(rec.title)+"')\">编辑</button>&nbsp;&nbsp;");
+        btn.push("<button class='btn btn-default btn-sm btn-edit' onclick=\"unPublish('"+rec.siteId+"','"+rec.id+"','"+replaceSpan(rec.title)+"','"+e.rowIndex+"')\">取消发布</button>&nbsp;&nbsp;");
+        btn.push("<button class='btn btn-default btn-sm btn-delete' onclick=\"remove('"+rec.siteId+"','"+rec.id+"','"+replaceSpan(rec.title)+"','"+e.rowIndex+"')\">删除</button>&nbsp;&nbsp;");
+
+        return btn.join("");
+    }
+</script>

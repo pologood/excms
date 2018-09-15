@@ -1,0 +1,221 @@
+<style>
+    .note-info > h3, .note-info > .block {
+        display: inline-block;
+    }
+    .note-info > .block {
+        margin-left: 20px;
+    }
+</style>
+<div class="portlet light">
+    <div class="portlet-body form" id="searchCtrl" ms-controller="searchCtrl">
+        <div class="table-toolbar" style="width:100%;">
+            <div class="">
+                <div class="note note-info">
+                    <h3 class="alert-heading">全站搜索</h3>
+                    <p class="block">仅显示当前站点的检索信息。支持对检索信息的修改、删除、发布及取消发布。</p>
+                </div>
+            </div>
+            <div class="">
+                <div class="col-md-4" style="padding-left: 0;">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">批量操作 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li class="publishBtn" id="publishs" onclick="batchPublish('',1)"><a
+                                href="javascript:;">批量发布</a></li>
+                            <li class="publishBtn" id="unpublishs" onclick="batchPublish('',0)"><a
+                                href="javascript:;">批量取消发布</a></li>
+                            <li class="editBtn" id="deletes" onclick="global_search.del('')"><a
+                                href="javascript:;">批量删除</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">发布状态筛选 <i
+                            class="fa fa-angle-down"></i></button>
+                        <ul class="dropdown-menu">
+                            <li><a href="javascript:;" onclick="global_search.searchByStatus()">全部</a></li>
+                            <li><a href="javascript:;" onclick="global_search.searchByStatus(1)">已发布</a></li>
+                            <li><a href="javascript:;" onclick="global_search.searchByStatus(0)">未发布</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <form name="content_search_form" id="content_search_form" class="form-inline tr mt5" role="form">
+                        <div class="form-group">
+                            <input type="text" id="column_select" name="content_search_column"
+                                   class="form-control" placeholder="栏目选择" onclick="columnSelect()">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="content_search_words" name="content_search_words"
+                                   class="form-control" placeholder="关键词">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="global_search.search()">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default btn-show-all" onclick="global_search.showAll()">
+                            显示全部
+                        </button>
+                    </form>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div id="datagrid" class="mini-datagrid ls-mini-grid-cell" allowCellSelect="true" allowResize="true"
+             sizeList="[5,10,20,50]" pageSize="20" onlyCheckSelection="true" allowCellWrap="true"
+             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+            <div property="columns">
+                <div type="checkcolumn"></div>
+            ##                <div type="indexcolumn" width="40" align="center" headerAlign="center">序号</div>
+                <!-- modeName -->
+                <div renderer="typeCode" name="typeCode" width="120" align="center" headerAlign="center">文章类型</div>
+                <div field="title" width="100%" align="left" headerAlign="center" renderer="goLink">
+                    信息标题
+                </div>
+                <div field="columnName" width="300" align="left" headerAlign="left">所属栏目</div>
+                <div field="createDate" dateFormat="yyyy-MM-dd hh:mm:ss" width="150" align="center" headerAlign="center"
+                     allowSort="true">添加时间
+                </div>
+                <div width="75" align="center" headerAlign="center" renderer="publish">发布状态</div>
+                <div width="115" align="center" headerAlign="center" allowSort="true" renderer="global_search.operation">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/global_search.js"></script>
+<script>
+    $(document).ready(function () {
+        global_search.init();
+    })
+
+    function callBack(msg) {
+        Ls.tips(msg);
+    }
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        global_search.search();
+    }
+
+    function goLink(e) {
+        var rec = e.record
+        var str = "";
+        var key = global_search.cur.searchKey.val();
+        var title = key === '' ? rec.title : rec.title.replace(new RegExp(key, 'g'), '<span style="color:red;">' + key + '</span>');
+        if (rec.redirectLink != null && rec.redirectLink != "") {
+            str = '<a target="_blank" href="' + rec.redirectLink + '"><u>' + title + '</u></a>';
+        } else {
+            if (rec.typeCode == "messageBoard") {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.id + '"><u>' + title + '</u></a>';
+            } else if (rec.typeCode == "public_content") {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/public/content/' + rec.id + '"><u>' + title + '</u></a>';
+            } else {
+                str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '/content/article/' + rec.id + '"><u>' + title + '</u></a>';
+            }
+        }
+        str += '<span id="publish_' + rec.id + '" class="publish-status">';
+        var status = Ls.publishStatus(rec.isPublish);
+        Ls.log("rec.isPublish", rec.isPublish)
+        Ls.log("status", status)
+        if (status != "") {
+            str += '[生成中...]';
+        }
+        str += '</span>';
+        return str;
+    }
+
+    function columnSelect() {
+        art.dialog.data('siteId', GLOBAL_SITEID);
+        var url = "/globalSearch/columnSelect";
+        var title = "栏目选择";
+        Ls.openWin(url, '300px', '300px', {
+            id: "column_select",
+            title: title
+        });
+    }
+
+    function publish(e) {
+        var rec = e.record, str = '';
+        var publish = rec.isPublish;
+        if (publish == 1) {
+            str = "已发布"
+        } else if (publish == 2) {
+            str = '<span style="color: green;">发布中</span>';
+        } else {
+            str = '<span style="color: red;">未发布</span>';
+        }
+        return str;
+    }
+
+    //消息回调
+    indexMgr.publish = function (d) {
+        global_search.search();
+    }
+
+    //发布
+    function batchPublish(id, status) {
+        if (confirm("确定" + (status == 0 ? "取消发布" : "发布") + "选中记录？")) {
+            var ids = [], url = "";
+            if (id != null && id != "") {
+                ids.push(id);
+            } else {
+                var records = global_search.cur.grid.getSelecteds();
+                if ((null == records || records.length <= 0) && ids.length <= 0) {
+                    Ls.tips("请选择一条记录!", {times: 2});
+                    return;
+                }
+                for (var i = 0; i < records.length; i++) {
+                    ids.push(records[i].id);
+                }
+            }
+            Ls.ajaxGet({
+                data: {
+                    ids: ids,
+                    status: status
+                },
+                url: "/globalSearch/batchPublish",
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        Ls.tips((status == 0 ? "批量取消发布" : "批量发布") + "成功，正在生成处理中", {times: 2});
+                        global_search.searchByStatus();
+                    } else {
+                        Ls.tips(resp.desc, {icon: 'error', times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function column_callback(columnIds, names) {
+        global_search.cur.columnId = columnIds;
+        $('#column_select').val(names);
+    }
+
+    function typeCode(e) {
+        var rec = e.record;
+        var typeCode = rec.typeCode;
+        if (typeCode == 'articleNews') {
+            return "文章新闻";
+        } else if (typeCode == 'pictureNews') {
+            return "图片新闻";
+        } else if (typeCode == 'videoNews') {
+            return "视频新闻";
+        } else if (typeCode == 'survey') {
+            return "投票调查";
+        } else if (typeCode == 'reviewInfo') {
+
+            return "网上评议";
+        } else if (typeCode == 'interviewInfo') {
+            return "在线访谈";
+        } else if (typeCode == 'collectInfo') {
+            return "民意征集";
+        } else if (typeCode == 'workGuide') {
+            return "网上办事";
+        } else if (typeCode == 'public_content') {
+            return "信息公开";
+        } else if (typeCode == 'guestBook') {
+            return "留言";
+        } else if (typeCode == 'messageBoard') {
+            return "多回复留言";
+        }
+    }
+</script>

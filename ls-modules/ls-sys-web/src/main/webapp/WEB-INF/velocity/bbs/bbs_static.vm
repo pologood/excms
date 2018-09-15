@@ -1,0 +1,378 @@
+##----------------------操作框---------------------------
+<style type="text/css">
+    .g-menu {
+        display: none;
+        width: 115px;
+        z-index: 150;
+        position: absolute;
+        font-family: tahoma;
+        white-space: normal;
+        top: 0px;
+        left: 0px;
+        padding: 0px 2px 2px 0px;
+        border-radius: 3px;
+        background-color: #dbe8f2;
+    }
+
+    .g-menu ul {
+        border: 1px solid #9cb8cc;
+        background: #fff;
+        border-radius: 3px;
+    }
+
+    .g-menu-list {
+        zoom: 1;
+    }
+
+    .g-menu ul:before {
+        display: block;
+        height: 0px;
+        visibility: hidden;
+        clear: both;
+        font-size: 0px;
+        overflow: hidden;
+        content: ".";
+    }
+
+    .g-menu ul:after {
+        display: block;
+        height: 0px;
+        visibility: hidden;
+        clear: both;
+        font-size: 0px;
+        overflow: hidden;
+        content: ".";
+    }
+
+    .g-split {
+        border-bottom: 1px solid #9cb8cc;
+        line-height: 0;
+        height: 0px;
+        font-size: 0px;
+        overflow: hidden;
+    }
+
+    .g-menu ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .g-menu ul li {
+        list-style: none;
+        position: relative;
+        -float: left;
+    }
+
+    .g-menu ul li a {
+        position: relative;
+        text-decoration: none;
+        line-height: 22px;
+        zoom: 1;
+        display: block;
+        height: 22px;
+        color: #000;
+        width: auto;
+        overflow: hidden;
+        padding: 2px 10px 2px 5px;
+    }
+
+    .g-menu ul li a:hover {
+        color: #000000;
+        background-color: #428bca;
+    }
+
+    .g-menu b.ico {
+        line-height: 0;
+        width: 16px;
+        background-position: -976px -480px;
+        height: 16px;
+        font-size: 0px;
+        overflow: hidden;
+    }
+
+    .g-menu b.ico {
+        zoom: 1;
+        display: inline;
+        vertical-align: middle;
+    }
+
+    .g-menu b.ico {
+        line-height: 0;
+        width: 16px;
+        background-position: -976px -480px;
+        height: 16px;
+        font-size: 0px;
+        overflow: hidden;
+        margin-right: 2px;
+    }
+
+    .g-menu li a.hasIcon {
+        padding-left: 25px;
+    }
+
+    body, html {
+        overflow: hidden;
+    }
+
+    /*.mini-grid-border{ border-width:0!important; border-left:1px!important;}*/
+    .info_tips {
+        height: 30px;
+        line-height: 30px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        clear: both;
+        background: #FFFFCC;
+        border: dotted 1px #FF6600;
+    }
+
+    .info_tips ul {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    .info_tips ul li {
+        float: left;
+        margin-left: 15px;
+    }
+</style>
+
+##----------------------操作框 end---------------------------
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light ">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <button id="btn_add" class="btn btn-default btn-add" onclick="downLoad('')">下载</button>
+                            <div class="btn-group">
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+
+                                    <select id="order" class="form-control w130" ms-duplex="order"
+                                            placeholder="请选择排序">
+                                    </select>
+                                    <select id="acceptUnitId" class="form-control w150" name="acceptUnitId"
+                                            placeholder="请选择督办单位">
+                                    </select>
+
+                                    <input type="datetime" id="startTime" class="form-control w140" placeholder="发帖开始时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endTime\')}',readOnly:true})"
+                                           readonly> -
+                                    <input type="datetime" id="endTime" class="form-control w140" placeholder="发帖结束时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startTime\')}',readOnly:true})"
+                                           readonly>
+
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onClick="search()">搜索</button>
+                                <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">
+                                    显示全部
+                                </button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="datagrid" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false"
+                     onlyCheckSelection="true"
+                     idField="postId" sizeList="[15,30,45]" pageSize="15" allowCellSelect="true" multiSelect="true"
+                     allowCellWrap="true" allowHeaderWrap="true">
+                    <div property="columns">
+                        <div type="indexcolumn" width="40"></div>
+                        <div field="name" width="240" headerAlign="center" align="left" >部门名称</div>
+                        <div field="replyCount" width="80" headerAlign="center" align="center">已回复</div>
+                        <div field="unReplyCount" width="150" headerAlign="center" align="center" >未回复
+                        </div>
+                        <div field="outCount" width="100" headerAlign="center" align="center">逾期数</div>
+                        <div field="yellowCount" width="130" headerAlign="center"
+                             align="center">黄牌督办
+                        </div>
+                        <div field="readCount" width="130" headerAlign="center"
+                             align="center">红牌督办
+                        </div>
+                        <div field="count" width="130" headerAlign="center"
+                             align="center">案件总数
+                        </div>
+                        <div field="rate" width="130" headerAlign="center"
+                             align="center">回复率
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="application/javascript">
+    var cur = {
+        params: {
+            siteId: GLOBAL_SITEID,
+            recordStatus: 'Normal',
+            acceptUnitId:'',
+            parentIds:'',
+            startTime:'',
+            endTime:'',
+            order:'',
+            dataFlag: 1
+        },
+        nextpage: {
+            postId: ""
+        },
+        event: {
+            handelOrgan: $("#acceptUnitId"),
+            order: $("#order"),
+            isAccept: $("#isAccept")
+        },
+        times: parseInt(new Date().getTime() / 1000)
+    }
+
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        //实例化datagrid
+        cur.grid = mini.get("datagrid");
+        cur.grid.setUrl("/bbsStatic/getUnitList");
+        cur.grid.load(cur.params);
+        //重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.grid);
+        //拉取查询项
+        getOrder();
+        getOrgans();
+
+        $(document).on('click.post.list', function (e) {
+
+        })
+    })
+
+
+
+
+
+
+    function getOrder() {
+
+        var htmls = "<option value=''>排序</option>"
+
+        htmls += "<option value='" + 0 + "'> 已回复 </option>"
+        htmls += "<option value='" + 1 + "'>未回复</option>"
+        htmls += "<option value='" + 2 + "'>逾期办理</option>"
+        htmls += "<option value='" + 3 + "'>黄牌督办</option>"
+        htmls += "<option value='" + 4 + "'>红牌办理</option>"
+
+        cur.event.order.html(htmls)
+
+    }
+    function getOrgans() {
+        Ls.ajaxGet({
+            url: "/organ/getSiteOrgans",
+            data: {}
+        }).done(function (d) {
+            var data = d.data;
+            var htmls = "<option value=''>督办单位</option>"
+            if (data != null) {
+                $.each(data, function (i, o) {
+                    htmls += "<option  value='" + o.organId + "'>" + o.name + "</option>"
+                })
+            }
+            cur.event.handelOrgan.html(htmls);
+        });
+    }
+    function renderType(e) {
+        var rec = e.record, str = "", isHeadTop = rec.isHeadTop, isTop = rec.isTop, isEssence = rec.isEssence, isLock = rec.isLock;
+        str += (isHeadTop == 1 ? '<img style="width: 20px;height: 16px;"  src="/assets/images/go_top.png" border="0" title="总置顶" >' : '');
+        str += (isTop == 1 ? '<img src="/assets/images/din.gif" border="0" title="置顶" >' : '');
+        str += (isEssence == 1 ? '<img src="/assets/images/jian.gif" border="0" title="推荐" >' : '');
+        str += (isLock == 1 ? '<img style="width: 20px;height: 20px;" src="/assets/images/lock.png" border="0" title="锁定" >' : '');
+        return str;
+    }
+
+    function renderTitle(e) {
+        var rec = e.record, str = "", isColse = rec.isColse, isHeadTop = rec.isHeadTop, isTop = rec.isTop,
+                isEssence = rec.isEssence, isLock = rec.isLock;
+        if (isColse == 1) {
+            str += "<a onclick='view(" + rec.postId + ")' style='text-decoration:line-through;color:gray;' title='" + (rec.colseDesc == null ? "无封贴注释" : rec.colseDesc) + "'>" + rec.title + "</a>";
+        } else {
+            str += "<a onclick='view(" + rec.postId + ")' style='text-decoration: underline;color: blue'>" + rec.title + "</a>";
+        }
+        return str;
+    }
+
+    function renderRead(e) {
+        var rec = e.record;
+        return rec.viewCount + "/" + rec.replyCount;
+    }
+    function  view(id) {
+        App.getContentHtml("/bbsPost/view?postId=" + id, "");
+    };
+    function renderReadUnit(e) {
+        var rec = e.record, str = '';
+        if (!Ls.isEmpty(rec.acceptUnitName)) {
+            var yellowTimes = parseInt(rec.yellowTimes);
+            var redTimes = parseInt(rec.redTimes);
+            str += rec.acceptUnitName;
+            if (rec.isAccept == 1) {
+                str += '[<span style="color:blue">已回复</span>]'
+            } else if (rec.isAccept == 0) {
+                str += '[<span style="color:red">未回复</span>]'
+                if (cur.times >= yellowTimes && cur.times < redTimes) {
+                    str += '<img src="/assets/images/yellow_c.png" border="0" title="黄牌提醒" >';
+                } else if (cur.times >= redTimes) {
+                    str += '<img src="/assets/images/red_c.png" border="0" title="红牌提醒" >';
+                }
+            }
+        } else {
+            str = '<span style="color:gray">无需回复</span>'
+        }
+        return str;
+    }
+    function renderIsPublish(e) {
+        var rec = e.record, isPublish = rec.isPublish, str = "";
+        if (isPublish == '1') {
+            str = '<img src="/assets/images/status_1.png" border="0" title="已审核" >';
+        } else if (isPublish == '0' || isPublish == '2') {
+            str = '<img src="/assets/images/status_0.png" border="0" title="' + (isPublish == '0' ? '未审核' : '已屏蔽') + '" >';
+        } else {
+            str = "未知"
+        }
+        return str;
+    }
+
+    //用户搜索
+    function search() {
+        cur.params.acceptUnitId = cur.event.handelOrgan.val();
+        cur.params.order = cur.event.order.val();
+        cur.params.startTime = $("#startTime").val();
+        cur.params.endTime = $("#endTime").val();
+        cur.grid.load(cur.params);
+    }
+
+    function searchClear() {
+        $("#startTime,#endTime").val("");
+        cur.event.handelOrgan.val("");
+        cur.event.order.val("");
+        cur.params.order='';
+        cur.params.startTime = "";
+        cur.params.endTime = "";
+        cur.params.acceptUnitId = "";
+
+        cur.grid.load(cur.params);
+    }
+
+    function downLoad(data){
+        window.location.href="/bbsStatic/downUnit?order="+cur.event.order.val()+"&acceptUnitId="+cur.event.handelOrgan.val()+"&order="+cur.event.order.val()+"&startTime="+$("#startTime").val()+"&endTime="+$("#endTime").val();
+    }
+
+
+
+
+
+</script>

@@ -1,0 +1,231 @@
+<div id="doc_main" style="width: 100%; height: 100%;">
+
+    <div class="portlet light">
+        <div class="portlet-body">
+
+            <div class="table-toolbar">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量操作 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li class="publishBtn" id="recoveries"><a href="javascript:;">批量恢复</a></li>
+                                <li class="publishBtn" id="dels"><a href="javascript:;">批量彻底删除</a></li>
+                            </ul>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 属性筛选 <i
+                                class="fa fa-angle-down"></i></button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="searchByTypeCode('typeCode','videoNews')">视频新闻</a></li>
+                                <li><a href="javascript:;" onclick="searchByTypeCode('typeCode','pictureNews')">图片新闻</a></li>
+                                <li><a href="javascript:;" onclick="searchByTypeCode('typeCode','onlinePetition')">网上信访</a></li>
+                                <li><a href="javascript:;" onclick="searchByTypeCode('typeCode','articleNews')">文章新闻</a></li>
+                                <li><a href="javascript:;" onclick="searchByTypeCode('typeCode','guestBook')">留言管理</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+
+                        <form class="form-inline tr search-toolbar" role="form">
+                            <div class="form-group">
+                                <!--  <label>搜索：</label>-->
+                                <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                            </div>
+                            <button type="button" class="btn btn-default btn-search" onclick="searchContent()"> 搜 索</button>
+                            <button type="button" class="btn btn-default btn-show-all" onclick="searchClear()">显示全部</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged" collapseGroupOnLoad="false"
+                 allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/recycleBin/getRecycleContentPage" sizeList="[20,30,50]" pageSize="20"
+                 idField="id" multiSelect="true">
+                <div property="columns">
+                    <div type="checkcolumn"></div>
+                    <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                    <div field="" width="100%" headerAlign="center" renderer="goLink">标题</div>
+                    <div field="columnName" width="140" headerAlign="center" align="center">所属栏目</div>
+                    <div field="createDate" width="160" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">创建时间</div>
+                    <!--<div field="" width="60" headerAlign="center" align="center" renderer="isReply">回复状态</div>-->
+                    <!--<div field="" width="60" headerAlign="center" renderer="renderPublish" align="center" >发布状态</div>-->
+                    <div width="190" headerAlign="center" renderer="renderOpr" align="center">操作</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<script>
+
+
+    cmm = {
+        dataFlag: 1,
+    }
+
+    mini.parse();
+    var grid = mini.get("datagrid1");
+    //grid.groupBy("dateType", "asc");
+    grid.load(cmm);
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+    //操作
+    function renderOpr(e) {
+        //var str = "";
+        //var is_publish="未发布";
+        var rec = e.record;
+        //if(rec.is_publish==1) isPublish="已发布";
+        str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="details(' + rec.id + ',\'' + rec.typeCode + '\')">详 情</button> '
+            + '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="recovery(' + rec.id + ')">恢 复</button> '
+            + '<button id="adduser_btn" class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.id + ')">彻底删除</button>';
+        return str;
+    }
+
+    //详情
+    function details(id, typeCode) {
+        Ls.openWin("/recycleBin/details?id=" + id + "&typeCode=" + typeCode, {
+            width: '940px',
+            height: '600px',
+            lock: false,
+            title: '已删除内容详细信息',
+        });
+    }
+
+    //恢复
+    function recovery(id) {
+        if (confirm("确定恢复？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/recycleBin/recovery",
+                success: function (text) {
+                    Ls.tipsOk("恢复成功");
+                    grid.reload();
+                }
+            });
+        }
+    }
+    /*
+     function renderPublish(e) {
+        var str='<font color="red">未发布</font>';
+        var rec = e.record;
+        if(rec.is_publish==1) str='<font color="green">已发布<font>';
+        return str;
+      }
+
+    function isReply(e){
+        var str='<font color="red">未回复</font>';
+        var rec = e.record;
+        if(rec.is_response==1) str='<font color="green">已回复<font>';
+        return str;
+    }*/
+
+    //物理删除
+    function del(id) {
+        if (confirm("删除后不可恢复，确定删除？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/recycleBin/completelyDelete",
+                success: function (text) {
+                    Ls.tipsOk("删除成功");
+                    grid.reload();
+                }
+            });
+        }
+    }
+
+    //批量物理删除
+    $("#dels").click(function () {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            if (confirm("确定批量删除所选项？")) {
+                var ids = [];
+                for (var i = 0, l = rows.length; i < l; i++) {
+                    ids[i] = rows[i].id;
+                }
+
+                Ls.ajaxGet({
+                    data: {
+                        ids: ids
+                    },
+                    url: "/recycleBin/batchCompletelyDelete",
+                    success: function (text) {
+                        Ls.tipsOk("批量删除成功");
+                        grid.reload();
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请至少选择一项操作");
+        }
+    })
+
+    //属性筛选
+    function searchByTypeCode(param, status) {
+        if (param == "typeCode") {
+            cmm.typeCode = status;
+            grid.load(cmm);
+        }
+    }
+
+    //搜索
+    function searchContent() {
+        var title = $("#searchKey").val();
+        grid.load({title: title, dataFlag: 1});
+
+    }
+
+    //显示全部
+    function searchClear() {
+        $("#searchKey").val("");
+        cmm.typeCode = "";
+        grid.load(cmm);
+    }
+
+    //批量恢复
+    $("#recoveries").click(function () {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            if (confirm("确定批量恢复所选项？")) {
+                var ids = [];
+                for (var i = 0, l = rows.length; i < l; i++) {
+                    ids[i] = rows[i].id;
+                }
+
+                Ls.ajaxGet({
+                    data: {
+                        ids: ids
+                    },
+                    url: "/recycleBin/batchRecovery",
+                    success: function (text) {
+                        Ls.tipsOk("恢复成功");
+                        grid.reload();
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请至少选择一项操作");
+        }
+    })
+
+    function goLink(e) {
+        var rec = e.record
+        var str = "";
+        if (rec.redirectLink != null) {
+            str = '<a target="_blank" href="' + rec.redirectLink + '"><u>' + rec.title + '</u></a>';
+        } else {
+            str = '<a target="_blank" href="' + GLOBAL_HTMLFILEPATH + '' + rec.columnId + '/' + rec.id + '.htm"><u>' + rec.title + '</u></a>';
+        }
+        return str;
+    }
+
+</script>
+	

@@ -1,0 +1,38 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="240"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="organ_catalog_tree" class="ztree"></ul>
+        </div>
+    </div>
+
+    <div region="center" style="border:none; overflow: auto;">
+        <div id="public_content_body"></div>
+    </div>
+</div>
+<script>
+    var cur = {
+        id: "public_content_form",
+        organ_url: "/public/catalog/getOrgansBySiteId",//单位查询url
+        organ_catalog_tree_id: "organ_catalog_tree",//单位树id
+        tree: null,//树对象
+        type: "$!{type}",//类型，主动公开、公开指南等
+        vm: null,//模型
+        organId: null,//部门id
+        grid: null,//datagrid
+        editor: null,//编辑器
+        contentModel: null,//内容模型
+        isPublish: null,//是否发布
+        select_tree_id: null,//下拉树的id
+        class_select_tree_root_ids: null,//下拉树根节点id数组
+        contentId: null,//内容id
+        verify: "$!{verify}",//是否必填选项
+        authList: {hasEdit: false, hasPublish: false}// 权限列表
+    };
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/public_content_manage.js?v=1"></script>
+<script>
+    $(document).ready(function () {
+        public_mgr.init();
+    });
+</script>

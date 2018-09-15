@@ -1,0 +1,66 @@
+#parse("_page_layout/_header.vm")
+#parse("_page_layout/_footer.vm")
+<div class="portlet light">
+    <!--<div class="portlet-title">
+      <div class="caption font-grey-silver">
+        <span class="caption-subject bold uppercase">用户列表</span>
+      </div>
+      <div class="tools"></div>
+    </div>-->
+    <div class="portlet-body">
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+             allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChatDeal/getProcessList" sizeList="[20,30,50]" pageSize="20"
+             idField="id" multiSelect="true">
+            <div property="columns">
+                <div type="indexcolumn"></div>
+                <div field="details" width="300" headerAlign="center" align="center" allowSort="flase"  align="left">办理流程</div>
+                <div field="createDate" width="150" headerAlign="center" allowSort="flase" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">处理时间</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script stype="text/javascript">
+    mini.parse();
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID,
+        id:$!{id}
+    }
+    var grid = mini.get("datagrid1");
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+    $(document).ready(function () {
+        grid.load(cmm);
+    })
+
+   function rederTurn(e){
+      var value = e.value;
+        if(null==value || value==''){
+            return '无转办,已回复';
+        }
+       return value;
+    }
+    function rederType(e){
+        var value = e.value;
+        var rec = e.record;
+        var str='';
+        if(value=='sub'){
+            str='关注用户提交';
+        }
+        else if(value=='reply'){
+            str=rec.operateUnitName+'回复';
+        }
+        else if(value=='turn'){
+            str=rec.operateUnitName+'转办'+rec.turnUnitName;
+        }
+
+
+        return str;
+    }
+
+
+
+
+</script>

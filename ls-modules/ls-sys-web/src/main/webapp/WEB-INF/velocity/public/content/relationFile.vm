@@ -1,0 +1,318 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="tabbable-line" style="margin:12px 20px 15px;">
+    <ul class="nav nav-tabs" id="relationFile_tabs">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab">信息公开</a>
+        </li>
+        <li>
+            <a href="#tab_1_2" data-toggle="tab">内容管理</a>
+        </li>
+        <li>
+            <a href="#tab_1_3" data-toggle="tab">链接</a>
+        </li>
+    </ul>
+
+    <div class="tab-content pt10">
+        <div class="tab-pane active" id="tab_1_1">
+            <div class="table-toolbar">
+                <form class="form-inline tr search-toolbar" role="form" id="searchForm">
+                    <div class="form-group">
+                        <select name="organId" class="form-control">
+                            <option value="">请选择单位</option>
+                            #foreach($organ in $organList)
+                                <option value="$!{organ.organId}">$!{organ.name}</option>
+                            #end
+                        </select>
+                        <input type="text" name="key" class="form-control w160" placeholder='标题、索引号、文号'/>
+                    </div>
+                    <button type="button" class="btn btn-default btn-search" onclick="searchPublicContent(this.form)">搜索</button>
+                    <button type="button" class="btn btn-default btn-search" onclick="searchRelationContent(this.form)">已关联文章</button>
+                </form>
+            </div>
+
+            <div id="public_content_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true"
+                 allowCellSelect="true" onlyCheckSelection="true"
+                 sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/public/content/getPage">
+                <div property="columns">
+                    <div type="checkcolumn" width="40"></div>
+                    <div width="130" headerAlign="center" allowSort="flase" field="organName" align="left">单位名称
+                    </div>
+                    <div width="100%" headerAlign="center" allowSort="flase" field="title" align="left">文章标题
+                    </div>
+                    <div width="200" headerAlign="center" allowSort="flase" field="catName" align="left">目录名称
+                    </div>
+                    <div field="publishDate" width="130" headerAlign="center" allowSort="flase" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">发文日期
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab_1_2">
+            <div class="table-toolbar">
+                <form class="form-inline tr search-toolbar" role="form" id="searchForm">
+                    <div class="form-group">
+                        <input type="text" name="title" class="form-control w160" placeholder='标题'/>
+                    </div>
+                    <button type="button" class="btn btn-default btn-search" onclick="searchArticleNews(this.form)">搜索</button>
+                    <button type="button" class="btn btn-default btn-search" onclick="searchRelationArticle(this.form)">已关联文章</button>
+                </form>
+            </div>
+
+            <div id="article_news_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true"
+                 allowCellSelect="true" onlyCheckSelection="true"
+                 sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true" url="/content/getPage?dataFlag=1">
+                <div property="columns">
+                    <div type="checkcolumn" width="40"></div>
+                    <div width="100%" headerAlign="center" allowSort="flase" field="title" align="left">文章标题
+                    </div>
+                    <div field="publishDate" width="130" headerAlign="center" allowSort="flase" align="center"
+                         dateFormat="yyyy-MM-dd HH:mm:ss">发文日期
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab_1_3">
+            <div class="form-group">
+                <label>文件链接地址</label>
+                <input type="text" class="form-control" id="relation_link"/>
+            </div>
+            <span style="color: red">*</span>如需取消关联该链接地址，将链接置空，点击关联即可！
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        W: Ls.getWin.win,
+        api: Ls.getWin.api,
+        currentTarget: '#tab_1_1',
+        _contentId:$!{_contentId},//点文件/解读时 传入的contentId
+        _organId:$!{_organId}, //点文件/解读时 传入的organId
+        relContentId:'$!{relContentId}',
+        id: '${id}'//点文件/解读时 传入的id
+    };
+    function searchPublicContent(form) {
+        var json = $(form).serializeObject();
+        json.siteId = cur.W.GLOBAL_SITEID;
+        json.type = "DRIVING_PUBLIC";// 查询主动公开
+        json.queryDetail = true;//查询详情
+        json.isPublish = 1;//查询已发布的
+        cur.public_content_datagrid.load(json);
+    }
+    function searchArticleNews(form) {
+        var json = $(form).serializeObject();
+        json.siteId = cur.W.GLOBAL_SITEID;
+        json.typeCode = "articleNews";// 查询文字新闻
+        json.isPublish = 1;//查询已发布的
+        cur.article_news_datagrid.load(json);
+    }
+    function searchRelationContent(form) {
+        if(cur.relContentId==''){
+            Ls.tipsErr("未关联任何文章！");
+            return;
+        }
+        var json = $(form).serializeObject();
+        json.siteId = cur.W.GLOBAL_SITEID;
+        json.type = "DRIVING_PUBLIC";// 查询主动公开
+        json.queryDetail = true;//查询详情
+        json.isPublish = 1;//查询已发布的
+        json.relContentId = cur.relContentId;
+        mini.get("public_content_datagrid").load(json);
+    }
+    function searchRelationArticle(form) {
+        if(cur.relContentId==''){
+            Ls.tipsErr("未关联任何文章！");
+            return;
+        }
+        var json = $(form).serializeObject();
+        json.ids = cur.relContentId;
+        mini.get("article_news_datagrid").load(json);
+    }
+
+    $(document).ready(function () {
+        Ls.ajax({
+            url: "/public/content/getPublicContent",
+            data: {
+                contentId: cur.id,
+                organId: cur._organId
+            },
+        }).done(function (json) {
+            var data = json.data;
+            $("#relation_link").val(data.filePath);
+            cur.relContentId = data.relContentId;
+        });
+        cur.api.button({
+            id: 'cancleRelation',
+            className: 'btn-save',
+            name: '取消关联',
+            callback: function () {
+                var ids_ = "";
+                var contentIds_ = "";
+                var paths_ = "";
+                var _path = "";
+                if (cur.currentTarget == '#tab_1_1') {
+                    var rows = mini.get("public_content_datagrid").getSelecteds();
+                    if (rows.length<1) {
+                        Ls.tipsErr("请选择一篇新闻！");
+                        return false;
+                    }
+                    var idsArr=[];
+                    var contentIdsArr=[];
+                    var pathsArr=[];
+                    for(var i=0;l=rows.length,i<l;i++){
+                        if (rows[i].id == cur.W.cur.contentId) {
+                            Ls.tipsErr("不能选择自己！");
+                            return false;
+                        }
+                        console.info(rows)
+                        idsArr.push(rows[i].id);
+                        contentIdsArr.push(rows[i].contentId);
+                        pathsArr.push("/" + rows[i].organId +"/" + rows[i].contentId + ".html");
+                    }
+                    ids_ = idsArr.join(',');
+                    contentIds_ = contentIdsArr.join(',');
+                    paths_ = pathsArr.join(',');
+                    _path = "/" + cur._organId +"/" + cur._contentId + ".html";
+                } else if (cur.currentTarget == '#tab_1_2') {
+                    var rows2 = mini.get("article_news_datagrid").getSelecteds();
+                    if (rows2.length<1) {
+                        Ls.tipsErr("请选择一篇新闻！");
+                        return false;
+                    }
+                    var contentIdsArr2=[];
+                    var pathsArr2=[];
+                    for(var j=0;l=rows2.length,j<l;j++){
+                        if (rows2[j].id == cur.W.cur.contentId) {
+                            Ls.tipsErr("不能选择自己！");
+                            return false;
+                        }
+                        contentIdsArr2.push(rows2[j].id);
+                        pathsArr2.push("/" + rows2[j].column +"/" + rows2[j].id + ".html");
+                    }
+                    contentIds_ = contentIdsArr2.join(',');
+                    paths_ = pathsArr2.join(',');
+                } else if (cur.currentTarget == '#tab_1_3') {
+                        return false;
+                }
+                Ls.ajaxGet({
+                    url: "/public/content/cancleRelation",
+                    data:{
+                        id: cur.W.cur.contentId,
+                        ids_: ids_,
+                        _contentId: cur._contentId,
+                        contentIds_: contentIds_,
+                        filePaths_: paths_,
+                        _filePath: _path
+                    }
+                }).done(function (d) {
+                    if (d.status == "1") {
+                        Ls.tipsInfo('取消关联成功！', function () {
+                            cur.W.cur.grid.reload();
+                            Ls.winClose();
+                        });
+                    } else {
+                        Ls.tipsErr(d.desc);
+                    }
+                });
+                return false;
+            }
+        }, {
+            id: 'relationFile_button',
+            focus: true,
+            name: '关 联',
+            callback: function () {
+                var ids_ = "";
+                var contentIds_ = "";
+                var paths_ = "";
+                var _path = "";
+                if (cur.currentTarget == '#tab_1_1') {
+                    var rows = mini.get("public_content_datagrid").getSelecteds();
+                    if (rows.length<1) {
+                        Ls.tipsErr("请选择一篇新闻！");
+                        return false;
+                    }
+                    var idsArr=[];
+                    var contentIdsArr=[];
+                    var pathsArr=[];
+                    for(var i=0;l=rows.length,i<l;i++){
+                        if (rows[i].id == cur.W.cur.contentId) {
+                            Ls.tipsErr("不能选择自己！");
+                            return false;
+                        }
+                        idsArr.push(rows[i].id);
+                        contentIdsArr.push(rows[i].contentId);
+                        pathsArr.push("/" + rows[i].organId +"/" + rows[i].contentId + ".html");
+                    }
+                    console.info(rows)
+                    ids_ = idsArr.join(',');
+                    contentIds_ = contentIdsArr.join(',');
+                    paths_ = pathsArr.join(',');
+                    _path = "/" + cur._organId +"/" + cur._contentId + ".html";
+                } else if (cur.currentTarget == '#tab_1_2') {
+                    var rows2 = mini.get("article_news_datagrid").getSelecteds();
+                    if (rows2.length<1) {
+                        Ls.tipsErr("请选择一篇新闻！");
+                        return false;
+                    }
+                    var contentIdsArr2=[];
+                    var pathsArr2=[];
+                    for(var j=0;l=rows2.length,j<l;j++){
+                        if (rows2[j].id == cur.W.cur.contentId) {
+                            Ls.tipsErr("不能选择自己！");
+                            return false;
+                        }
+                        contentIdsArr2.push(rows2[j].id);
+                        pathsArr2.push("/" + rows2[j].column +"/" + rows2[j].id + ".html");
+                    }
+                    contentIds_ = contentIdsArr2.join(',');
+                    paths_ = pathsArr2.join(',');
+                } else if (cur.currentTarget == '#tab_1_3') {
+                    paths_ = $("#relation_link").val();
+                }
+                Ls.ajaxGet({
+                    url: "/public/content/relation",
+                    data: {
+                        id: cur.W.cur.contentId,
+                        ids_: ids_,
+                        _contentId: cur._contentId,
+                        contentIds_: contentIds_,
+                        filePaths_: paths_,
+                        _filePath: _path
+                    }
+                }).done(function (d) {
+                    if (d.status == "1") {
+                        Ls.tipsInfo('关联成功！', function () {
+                            cur.W.cur.grid.reload();
+                            Ls.winClose();
+                        });
+                    } else {
+                        Ls.tipsErr(d.desc);
+                    }
+                });
+                return false;
+            }
+        });
+
+        // 初始化布局
+        mini.parse();
+        cur.public_content_datagrid = mini.get("public_content_datagrid");
+        cur.article_news_datagrid = mini.get("article_news_datagrid");
+
+        // 设置高度
+        Ls.mini_datagrid_height(cur.public_content_datagrid, 100);
+        Ls.mini_datagrid_height(cur.article_news_datagrid, 100);
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var id = e.currentTarget.hash;
+            cur.currentTarget = id;
+
+            if (id == '#tab_1_2' && !cur.article_news_datagrid.reLayout) {
+                cur.article_news_datagrid.doLayout();
+                cur.article_news_datagrid.reLayout = true;
+            }
+        });
+
+    });
+</script>

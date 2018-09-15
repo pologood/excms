@@ -1,0 +1,13 @@
+#foreach($vo in $resultObj)
+	#if($velocityCount % 2 == 0)
+		<ul class="fr">
+	#else
+		<ul class="fl">
+	#end
+        <li>
+            <p class="p1"><span class="green">$!{velocityCount}</span></p>
+            <p class="p2">$!{vo.organName}</p>
+            <p class="p3"><span>$!{vo.counts}</span>#*<img src="/images/ph_top.png" width="8" height="10" alt=" ">*#</p>
+        </li>
+	</ul>
+#end

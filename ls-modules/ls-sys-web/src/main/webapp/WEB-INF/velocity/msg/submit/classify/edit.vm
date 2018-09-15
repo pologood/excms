@@ -1,0 +1,122 @@
+#parse("_page_layout/_header.vm")
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="msg_edit_form" role="form" ms-controller="msg_edit_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>标题名称</label>
+                            <input type="text" id="id" name="id" style="display: none" ms-duplex="id">
+                            <input type="text" id="name" maxlength="30" name="name" class="form-control" data-rule="必填项:required;name" placeholder="" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>采集到</label>
+                            <input type="text" id="columnId" name="columnId" style="display: none" ms-duplex="columnId">
+                            <input type="text" id="cSiteId" name="cSiteId" style="display: none" ms-duplex="cSiteId">
+                            <input type="text" id="columnName" name="columnName" class="form-control readonly" readonly ms-duplex="columnName">
+
+                            <div class="mt10">
+                                <ul id="ui_tree" class="ztree"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/msg/submit/column_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "msg_edit_form",
+        form: $('#msg_edit_form'),
+        type: art.dialog.data("type"),
+        win: Ls.getWin.win,
+        api:Ls.getWin.api,
+        dialog: Ls.getWin.dialog
+    };
+
+    $(document).ready(function () {
+        cur.api.button(
+            {id:'save',className:'btn-save',focus:true,name:'确定',callback:function(){saveData();return false;}},
+            {id:'back',className:'btn-back',name:'取消',callback:function(){cancel();return false;}}
+        );
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {});
+        } else {
+            cur.model = cur.dialog.data("record");
+        }
+        setData(cur.model);
+        column_tree.init();
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    /**
+     * 保存数据
+     */
+    function saveData() {
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        var column = cur.treeObj.getCheckedNodes(true);
+
+        if (cur.vm.columnId == '' || cur.vm.columnId == null) {
+            Ls.tips("请选择栏目!", {times: 2});
+            return;
+        } else if (column.length > 0) {
+            cur.vm.columnId = column[0].indicatorId;
+            cur.vm.cSiteId = column[0].siteId;
+        }
+
+        if (cur.type == 'add') {
+            url = "/msg/submit/classify/save"
+        } else {
+            url = "/msg/submit/classify/update"
+        }
+
+        Ls.ajaxGet({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                name: cur.vm.name,
+                siteId: cur.win.GLOBAL_SITEID,
+                columnId: cur.vm.columnId,
+                cSiteId: cur.vm.cSiteId
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback_add_or_edit(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<div id="list_page" class="portlet light">
+    <div class="portlet-body form">
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <button id="adduser_btn" type="button" class="btn btn-default btn-add" onclick="addTable()">
+                            添加
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <form class="form-inline tr search-toolbar" role="form">
+                        <div class="input-group">
+                            <div id="menuContent_ser"
+                                 style="display:none; position: absolute; left: 0; top:34px; z-index: 10000; width: 212px; height: 300px; border: solid 1px #c2cad8; border-top:0px; overflow: auto; background-color: InactiveBorder">
+                                <ul id="treeDemo_ser" class="ztree" style="margin-top:0;"></ul>
+                            </div>
+                            <input type="text" id="organId_ser" style="display: none" name="organId" disabled class="form-control readonly" ms-duplex="organId">
+                            <input type="text" id="organName_ser" placeholder="单位" class="form-control readonly" readonly ms-duplex="organName" onclick="showSerTree()">
+
+                            <div class="input-group-btn">
+                                <button id="icon_btn" class="btn btn-default btn-select-organ" type="button" onclick="showSerTree()">
+                                    <i class="fa fa-caret-down"></i>
+                                </button>
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                   placeholder="表格名称">
+                        </div>
+                        <button type="button" class="btn btn-default btn-search" onclick="search()">
+                            查询
+                        </button>
+                        <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                            显示全部
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="datagrid" class="mini-datagrid" allowCellSelect="true" allowResize="true"
+             url="/tableResources/getPageEOs" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="true"
+             idField="id" multiSelect="false" showColumnsMenu="true" style="width:100%;"
+        >
+            <div property="columns">
+                <div type="indexcolumn"></div>
+                <div field="name" width="100%" align="left" headerAlign="center" renderer="table_name">表格名称</div>
+                <div field="organName" width="150" align="center" align="center" headerAlign="center">单位名称</div>
+                <div width="150" align="center" headerAlign="center" allowSort="true" renderer="joinDate">加入日期</div>
+                <div width="115" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="edit_page" class="tabbable-line" style=" margin:12px 20px 15px;display: none;">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab"><strong>表格资源信息</strong></a>
+        </li>
+    </ul>
+    <div class="tab-content" style="padding: 0 0 0 0">
+        <div class="tab-pane active" id="tab_1_1">
+            <div class="portlet-body form">
+                <form id="table_edit_form" role="form" ms-controller="table_edit_form">
+                    <div class="form-body">
+                        <table class="table table-bordered article-table">
+                            <tr>
+                                <th>表格名称:</th>
+                                <td>
+                                    <input type="text" id="id" style="display: none" ms-duplex="id">
+                                    <input type="text" id="name" name="name" class="form-control" data-rule="必填项:required;name" placeholder="填写表格名称" ms-duplex="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>文件名称:</th>
+                                <td>
+                                    <div class="input-group">
+                                        <input type="text" id="uploadUrl" name="uploadUrl" style="display: none" class="form-control readonly" readonly ms-duplex="uploadUrl">
+                                        <input type="text" id="fileName" name="fileName" class="form-control readonly" readonly ms-duplex="fileName">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default btn-default-upload" type="button" onclick="fileUpload()">上传
+                                                <i class="fa fa-cloud-upload"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>办事单位:</th>
+                                <td>
+                                    <div class="input-group">
+                                        <div id="menuContent"
+                                             style="display:none; position: absolute; top: 34px; left: 0px; z-index: 10000; width: 230px; height: 300px; border: solid 1px #c2cad8; border-top:0px; overflow:auto; background-color: InactiveBorder">
+                                            <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+                                        </div>
+
+                                        <input type="text" id="organId" name="organId" style="display: none" name="organId" class="form-control readonly" readonly
+                                               ms-duplex="organId">
+                                        <input type="text" id="organName" name="organName" class="form-control readonly" readonly ms-duplex="organName" onclick="showTree()">
+
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default btn-select-organ" type="button" onclick="showTree()">
+                                                <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>加入时间:</th>
+                                <td>
+                                    <input type="text" id="joinDate" name="joinDate" class="form-control" data-rule="必填项:required;joinDate" placeholder="填写加入时间"
+                                           ms-duplex="joinDate">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" align="right">所属分类:</td>
+                                <td>
+                                    <input type="text" id="cIds" name="cIds" class="form-control" style="display: none" ms-duplex="cIds">
+                                    <textarea id="cNames" name="cNames" onclick="res_select()" class="form-control" rows="2" placeholder="点击选择相关资源" ms-duplex="cNames"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+
+                                    <button type="button" class="btn btn-default btn-save" onclick="saveData()">保 存</button>
+                                    <button type="button" class="btn btn-default btn-back" onclick="cancel()">返 回</button>
+                                </td>
+                            </tr>
+                        </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/organ_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/organ_tree_ser.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "table_edit_form",
+        form: $('#table_edit_form'),
+        grid: mini.get('datagrid'),
+        organId_ser: $('#organId_ser'),//查询单位选择组件
+        organName_ser: $('#organName_ser'),//查询单位选择组件
+        ser_key: $('#ser_key'),//查询关键字
+        list_page: $('#list_page'),
+        edit_page: $('#edit_page')
+    };
+    $(document).ready(function () {
+        cur.grid.load();
+        Ls.mini_datagrid_height(cur.grid, 30);
+        organ_select_tree.init();
+        organ_select_tree_ser.init();
+        cur.model = Ls.initFORM(cur.vm_id, {
+            id: "",
+            name: "",
+            uploadUrl: "",
+            organId: "",
+            organName: "",
+            joinDate: "",
+            cIds: "",
+            cNames: ""
+        });
+        setData(cur.model);
+    })
+
+    function addTable() {
+        cur.type = 'add';
+        form_reset();
+        edit_page_show();
+        selectNode(GLOBAL_PERSON.unitId,GLOBAL_PERSON.unitName);
+    }
+
+    function selectNode(recUnitId,recUnitName) {
+        var id = $("#organId");
+        var name = $("#organName");
+        id.val(recUnitId);
+        name.val(recUnitName);
+    }
+
+    function editTable() {
+        cur.type = 'edit';
+        var record = cur.grid.getSelected();
+        cur.model = record;
+        Ls.assignVM(cur.vm, cur.model);
+        avalon.scan();
+        edit_page_show();
+        set_classify();
+    }
+
+    function set_classify() {
+        Ls.ajaxGet({
+            url: "/resources/getCheckedClassifyEOs",
+            data: {
+                pId: cur.model.id,
+                typeCode: '$!{typeCode}'
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    var cIds = "";
+                    var cNames = "";
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 0) {
+                            cIds = data[i].indicatorId;
+                            cNames = data[i].name;
+                        } else {
+                            cIds += "," + data[i].indicatorId;
+                            cNames += "," + data[i].name;
+                        }
+                        cur.vm.cIds = cIds;
+                        cur.vm.cNames = cNames;
+                        avalon.scan();
+                    }
+                }
+            }
+        });
+    }
+
+    function saveData() {
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/tableResources/save"
+        } else {
+            url = "/tableResources/update"
+        }
+
+        var data = {
+            id: cur.vm.id,
+            name: cur.vm.name,
+            uploadUrl: cur.vm.uploadUrl,
+            fileName:cur.vm.fileName,
+            organId: cur.vm.organId,
+            joinDate: cur.vm.joinDate,
+            cIds: cur.vm.cIds
+        };
+
+        Ls.ajax({
+            url: url,
+            data: data,
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {times: 2});
+                    showAll();
+                    list_page_show();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        showAll();
+        list_page_show();
+    }
+
+    function delTable() {
+        var record = cur.grid.getSelected();
+        if (confirm('确定发布?')) {
+            Ls.ajaxGet({
+                url: "/tableResources/delete",
+                data: {
+                    id: record.id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.load();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function joinDate(obj) {
+        var record = obj.record;
+        var joinDate = record.joinDate;
+
+        if (null != joinDate && typeof joinDate == 'object') {
+            record.joinDate = joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+            return joinDate.pattern("yyyy-MM-dd HH:mm:ss");
+        } else {
+            return joinDate;
+        }
+    }
+
+    /**
+     * 资源选择
+     */
+    function res_select() {
+        art.dialog.data('cIds', cur.vm.cIds);
+        art.dialog.data('typeCode', '$!{typeCode}');
+        Ls.openWin("/resources/classifySelect", '650px', '400px', {
+            title: "选择资源"
+        });
+    }
+
+    /**
+     * 添加资源返回
+     * @param cIds
+     * @param cNames
+     */
+    function res_call_back(cIds, cNames) {
+        cur.vm.cIds = cIds;
+        cur.vm.cNames = cNames;
+        avalon.scan();
+    }
+
+    function table_name(obj) {
+        var record = obj.record;
+//        var diyDom = '<a href="javascript:;"  onclick="file_download(this)"><u>' + record.name + '</u></a>';
+        return record.name;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editTable()">修 改</button> ' +
+            '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delTable()">删 除</button>';
+        return diyDom;
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({keys: 'name', keyValue: keyValue, organId: cur.organId_ser.val()});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.organId_ser.val('');
+        cur.organName_ser.val('');
+        search();
+    }
+
+    /**
+     * 文件上传
+     */
+    function fileUpload() {
+        Ls.uploadFile(function (rst) {
+            if (rst != null && rst.length > 0) {
+                cur.vm.uploadUrl = rst[0].fileName;
+                cur.vm.fileName = rst[0].fileName;
+                avalon.scan();
+            }
+            return true;
+        }, {
+            file_types: "*.*",
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "desc": "网上办事",
+                "code": "WorkOnLine",
+                "type":"NotDefined"
+            }
+        });
+    }
+
+    /**
+     * 文件下载
+     */
+    function file_download() {
+        var record = cur.grid.getSelected();
+        $("#download_frame").attr("src", "$!{rc.contextPath}/fileCenter/download/" + record.uploadUrl);
+    }
+
+    /**
+     * 列表也显示
+     */
+    function list_page_show() {
+        cur.edit_page.hide();
+        cur.list_page.show();
+    }
+
+    /**
+     * 编辑页显示
+     */
+    function edit_page_show() {
+        cur.list_page.hide();
+        cur.edit_page.show();
+    }
+
+    /**
+     * 表单重置
+     */
+    function form_reset() {
+        cur.model = Ls.initFORM(cur.vm_id, {
+            name: "",
+            uploadUrl: "",
+            organId: "",
+            organName: "",
+            joinDate: new Date().pattern("yyyy-MM-dd HH:mm:ss"),
+            cIds: "",
+            cNames: ""
+        });
+        Ls.assignVM(cur.vm, cur.model);
+        avalon.scan();
+    }
+
+    //拉取数据
+    function setData(obj) {
+        data = obj;
+        data.vm_id = cur.vm_id;
+        cur.vm = avalon.define(data);
+    }
+
+    Date.prototype.pattern = function (fmt) {
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours() % 12 == 0 ? 12 : this.getHours() % 12, //小时
+            "H+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        var week = {
+            "0": "\u65e5",
+            "1": "\u4e00",
+            "2": "\u4e8c",
+            "3": "\u4e09",
+            "4": "\u56db",
+            "5": "\u4e94",
+            "6": "\u516d"
+        };
+        if (/(y+)/.test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        }
+        if (/(E+)/.test(fmt)) {
+            fmt = fmt.replace(RegExp.$1, ((RegExp.$1.length > 1) ? (RegExp.$1.length > 2 ? "\u661f\u671f" : "\u5468") : "") + week[this.getDay() + ""]);
+        }
+        for (var k in o) {
+            if (new RegExp("(" + k + ")").test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
+</script>

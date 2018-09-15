@@ -1,0 +1,136 @@
+<form id="attrForm" class="sui-form form-horizontal sui-validate pd10 " style="padding-top: 10px; ">
+
+    <fieldset>
+        <legend>组件设置</legend>
+
+        <sui-control-group>
+            <sui-checkbox v-model="conf.isTitle">显示标题</sui-checkbox>
+            <!--<sui-checkbox v-model="conf.isMore">显示更多</sui-checkbox>-->
+            <sui-checkbox v-model="conf.isAutoHeight">高度自适应</sui-checkbox>
+            <sui-checkbox v-model="conf.isCustomMore">自定义标题链接</sui-checkbox>
+        </sui-control-group>
+
+        <sui-control-group title="标题">
+            <sui-input size="large" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.title" rules="required"
+                       placeholder="请输入标题"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="标题链接" v-if="conf.isCustomMore">
+            <sui-input size="xlarge" :class="{'uneditable-input':!conf.isTitle}" v-model="conf.titleHref"
+                       placeholder="请输入标题链接"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="大小" v-if="!conf.isAutoHeight">
+            宽
+            <sui-input size="mini" v-model="conf.width" rules="required|digits|gt=49|lt=2001"
+                       errmsg="大于等于50且小于2000的整数"></sui-input>
+            - 高
+            <sui-input size="mini" v-model="conf.height" rules="required|digits|gt=49|lt=2001"
+                       errmsg="大于等于50且小于2000的整数"></sui-input>
+            <span class="sui-msg msg-info">(单位:像素)</span>
+        </sui-control-group>
+
+        <sui-control-group title="大小" v-if="conf.isAutoHeight">
+            宽
+            <sui-input size="mini" v-model="conf.width" rules="required|digits|gt=49|lt=2001"
+                       errmsg="大于等于50且小于2000的整数"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="内间距">
+            <sui-input v-model="conf.panelPadding" rules="required|digits|gt=-1|lt=500" errmsg="大于等于0且小于500的整数"
+                       size="mini"></sui-input>
+            <span class="sui-msg msg-info">(单位:像素)</span>
+        </sui-control-group>
+
+        <!--<sui-control-group title="标题高度" v-if="conf.isTitle">-->
+    <!--<sui-input v-model="conf.panelHeadingHeight" rules="required|digits|gt=-1|lt=500"  errmsg="大于等于0且小于500的整数" size="mini" > </sui-input>-->
+    <!--<span class="sui-msg msg-info">(单位:像素)</span>-->
+<!--</sui-control-group>-->
+
+<sui-control-group title="">
+    <sui-checkbox v-model="conf.isCustomPBH">自定义内容高度</sui-checkbox>
+</sui-control-group>
+<sui-control-group title="内容高度" v-if="conf.isCustomPBH">
+    <sui-input v-model="conf.panelBodyHeight" rules="required|digits|gt=-1|lt=5000"  errmsg="大于等于0且小于5000的整数" size="mini" > </sui-input>
+    <span class="sui-msg msg-info">(单位:像素)</span>
+</sui-control-group>
+
+<sui-control-group title="组件样式" v-if="isStyleList">
+    <sui-dropdown v-model="conf.className" @on-target-change="onStyleListChange"
+                  :items="styleList">
+    </sui-dropdown>
+</sui-control-group>
+
+        <div class="control-group">
+            <label class="control-label">关联栏目：</label>
+            <div class="controls">
+
+                <a href="javascript:void(0);" class="sui-btn btn-primary" v-on:click="associateNode()">设置关联</a>
+                <span class="sui-msg msg-warning" v-if="isRelation">
+                  <div class="msg-con">尚未关联到栏目</div>
+                  <s class="msg-icon"></s>
+                </span>
+                <span class="sui-msg msg-success" v-else>
+                  <div class="msg-con">已关联到 [ID: {{label.id}}]</div>
+                  <s class="msg-icon"></s>
+                </span>
+
+            </div>
+        </div>
+
+    </fieldset>
+    <fieldset>
+        <legend>内容设置</legend>
+
+        <sui-control-group title="调用条数">
+            <sui-input size="input-medium" v-model="label.num" maxlength="3" rules="required|digits|gt=0"
+                       errmsg="大于0的整数"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="显示字数">
+            <sui-input size="input-medium" v-model="label.length" maxlength="3" rules="required|digits|gt=0"
+                       errmsg="大于0的整数"></sui-input>
+        </sui-control-group>
+
+        <sui-control-group title="调用类型">
+            <sui-radio-group v-model="conf.linkType">
+                <sui-radio label="text">文字链接</sui-radio>
+                <sui-radio label="img">图片链接</sui-radio>
+            </sui-radio-group>
+        </sui-control-group>
+
+        <sui-control-group title="图片大小" v-if="conf.linkType=='img'">
+            宽
+            <sui-input size="mini" v-model="conf.imgWidth" rules="required|digits|gt=0|lt=2001"
+                       errmsg="大于0且小于2000的整数"></sui-input>
+            - 高
+            <sui-input size="mini" v-model="conf.imgHeight" rules="required|digits|gt=0|lt=2001"
+                       errmsg="大于0且小于2000的整数"></sui-input>
+            <span class="sui-msg msg-info">(单位:像素)</span>
+        </sui-control-group>
+
+        <!-- <div class="control-group" v-if="conf.linkType=='img'">
+             <label class="control-label">图片间距：</label>
+             <div class="controls">
+                 上：
+                 <input type="text" maxlength="2" v-model="conf.paddingTop" class="input-mini"
+                        placeholder="上" data-rules="required|digits|gt=-1">
+                 右：
+                 <input type="text" maxlength="2" v-model="conf.paddingLeft" class="input-mini"
+                        placeholder="右" data-rules="required|digits|gt=-1">
+                 下：
+                 <input type="text" maxlength="2" v-model="conf.paddingBottom" class="input-mini"
+                        placeholder="下" data-rules="required|digits|gt=-1">
+                 左：
+                 <input type="text" maxlength="2" v-model="conf.paddingRight" class="input-mini"
+                        placeholder="左" data-rules="required|digits|gt=-1">
+                 <span class="sui-msg msg-info">(单位:像素)</span>
+                 <div class="sui-msg msg-default msg-tips">
+                     <div class="msg-con">是图片与右侧图片之间的间距</div>
+                     <s class="msg-icon"></s>
+                 </div>
+             </div>
+         </div>-->
+    </fieldset>
+
+</form>

@@ -1,0 +1,26 @@
+##行政执法公示
+<div class="qzqd_list">
+    <table width="1180" border="0" align="center" cellpadding="0" cellspacing="1" bgcolor="#dcdcdc">
+		<tr>
+			#set($organList=$resultObj.get("organList"))
+			#set($organCatMap=$resultObj.get("organCatMap"))
+			#if($organList.size()>0)
+				#foreach($organ in $organList)
+                    <td width="229" height="129" align="center" valign="middle" bgcolor="#f7f7f7" class="tit">
+						<a href="/public/column/$!{organ.organId}?type=4&action=list">$!{organ.name}</a>
+					</td>
+                    <td align="center" valign="middle" bgcolor="#FFFFFF">
+						#foreach($cat in $organCatMap.get($organ.organId).entrySet())
+                            <a href="/public/column/$!{organ.organId}?type=4&action=list&catId=$!{cat.key}" target="_blank">$!{cat.value}</a><br>
+						#end
+					#if($foreach.count%3==0 && $foreach.hasNext)
+						</tr><tr>
+					#end
+				#end
+			#else
+				<td>暂无数据</td>
+			#end
+		</tr>
+    </table>
+
+</div>

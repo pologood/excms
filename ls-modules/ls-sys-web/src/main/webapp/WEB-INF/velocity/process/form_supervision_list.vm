@@ -1,0 +1,188 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+
+                                <div class="form-group">
+                                    <input type="datetime" name="startDate" id="startDate" class="form-control" placeholder="开始日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="endDate" id="endDate" class="form-control" placeholder="结束日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="curActivityName" name="curActivityName" class="form-control"
+                                           placeholder="当前步骤">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="title" name="title" class="form-control"
+                                           placeholder="标题">
+                                </div>
+
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/processForm/getSupervisionPagination?dataFlag=1&moduleCode=$!{moduleCode}" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                    <div property="columns">
+                        <<div type="indexcolumn" width="40" headerAlign="center" align="center">序号</div>
+                        <div field="title" width="400" headerAlign="center" renderer="renderTitle">标题</div>
+                        <div field="createPersonName" width="80" headerAlign="center" align="center">发起人</div>
+                        <div width="120" headerAlign="center" align="center" renderer="renderCurStep">当前步骤</div>
+                        <div field="createDate" width="80" headerAlign="center" dateFormat="yyyy-MM-dd" align="center" allowSort="true">添加日期</div>
+                        <div width="120" headerAlign="center" align="center" renderer="renderOp">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        startDate: $('#startDate'),
+        endDate: $('#endDate'),
+        title: $('#title'),//标题
+        curActivityName: $('#curActivityName'),//当前步骤
+        dialog: Ls.getWin.dialog,
+        transferTaskList : [],
+        pressTaskList : [],
+        params:{
+            moduleCode:'$!{moduleCode}'
+        }
+    };
+
+    jQuery(document).ready(function(){
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    });
+
+    function search() {
+        cur.grid.load({title: cur.title.val(),curActivityName: cur.curActivityName.val(), startDate: cur.startDate.val(), endDate: cur.endDate.val()});
+    }
+
+    function showAll() {
+        cur.startDate.val('');
+        cur.endDate.val('');
+        cur.curActivityName.val('');
+        cur.title.val('');
+        search();
+    }
+
+
+    // 重写title(流程发文)
+    function renderTitle(e){
+        var rec = e.record;
+        var str='<a onclick="read('+rec.processFormId+');"><u>'+rec.title+'</u></a>';
+        return str;
+    }
+
+    function read(processFormId) {
+        var url = "/process/processForm?processFormId="+processFormId+"&viewForm=1";
+        window.open(url,processFormId,'height='+window.screen.availHeight+',width='+window.screen.availWidth);
+    }
+
+    function renderCurStep(e){
+        var rec = e.record;
+        var str = '';
+        if(rec.curActivityName == '已办结' || rec.curActivityName == '已终止' || rec.curActivityName == '已归档'){
+            str = rec.curActivityName;
+        }else{
+            str='<a onclick="showActivityTaskList('+rec.procInstId+','+rec.curActinstId+');return false;" ><u>'+rec.curActivityName+'</u></a>';
+        }
+        return str;
+    }
+
+    //查看办理情况
+    function showActivityTaskList (procInstId,curActinstId) {
+        var url = '/process/activityTaskList'+"?procInstId="+procInstId+"&actinstId="+curActinstId;
+        Ls.openWin(url, {
+            winType: 1,
+            title: '办理情况',
+            width: '350px',
+            height: '200px'
+        });
+    }
+
+    //操作
+    function renderOp(e) {
+        var str="";
+        var rec = e.record;
+        var zbBtn = '<button type="button" class="btn btn-default btn-transfer" onclick="transfer('+rec.procInstId+',\''+rec.title+'\',\''+rec.moduleCode+'\')">移交</button>&nbsp;&nbsp;',
+                zzBtn = '<button type="button" class="btn btn-default btn-terminate" onclick="terminate('+rec.processFormId+','+rec.procInstId+',\''+rec.title+'\',\''+rec.moduleCode+'\',\''+rec.dataId+'\')">终止</button>';
+
+        if(rec.formStatus == 0) {//办理中
+            str = zbBtn  + zzBtn;
+        }
+        return str;
+    };
+
+    //公文移交
+    function transfer(procInstId,title,moduleCode){
+        //获取当前公文流程运行的任务
+        var url = '/process/getRuExecutionTaskList';
+        Ls.ajax({
+            type: "POST",
+            data: {procInstId:procInstId},
+            url: url,
+            success: function (json) {
+                var data = json.data;
+                if(data.length == 1){//如果当前只有一个任务,则直接弹出移交页面
+                    var task = data[0];
+                    if(Ls.isEmpty(task.assigneeId)){
+                        Ls.tip.info("该事项交予"+task.swimlaneName+"进行办理,当前未有具体人员办理，无法进行移交操作",3);
+                        return false;
+                    }
+                    var taskId = task.taskId;//任务ID
+                    url = '/process/taskTransfer?taskId='+taskId+"&moduleCode="+moduleCode;
+                    Ls.openWin(url, {
+                        id:procInstId,
+                        winType: 1,
+                        title: '移交',
+                        width: '500px',
+                        height: '400px'
+                    });
+                }else if(data.length > 1){//如果有多个任务,弹出选择移交任务列表
+                    cur.transferTaskList = data;
+                    url = '/process/taskTransferList?moduleCode='+moduleCode+"&title="+encodeURI(encodeURI(title));
+                    Ls.openWin(url, {
+                        id:procInstId,
+                        winType: 1,
+                        title: '移交',
+                        width: '400px',
+                        height: '320px'
+                    });
+                }
+            }
+        });
+    }
+
+    //终止
+    function terminate(processFormId,procInstId,title,moduleCode,dataId){
+        var url = '/process/processTerminate?recordId='+processFormId+"&procInstId="+procInstId+"&moduleCode="+moduleCode+"&title="+encodeURI(encodeURI(title))+"&dataId="+dataId;
+        Ls.openWin(url, {
+            winType: 1,
+            title: '终止',
+            width: '400px',
+            height: '260px'
+        });
+    }
+</script>

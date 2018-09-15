@@ -1,0 +1,137 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="formCollectIdea" role="form" ms-controller="formCollectIdea">
+                    <div id="mr" class="form-body">
+
+                        <div class="form-group">
+                            <label>您的姓名</label>
+                            <input name="name" type="text" class="form-control" placeholder="姓名不能为空" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>联系方式</label>
+                            <input name="phone" type="text" class="form-control" placeholder="联系方式不能为空" ms-duplex="phone">
+                        </div>
+                        <div class="form-group">
+                            <label>意见</label>
+		   <textarea name="content" class="form-control" rows="3" placeholder=""
+                     ms-duplex="content"></textarea>
+                        </div>
+                    </div>
+                    <div id="dz" style="display: none" class="form-body">
+                        <div class="form-group">
+                            <label>建议人姓名</label>
+                            <input name="name" type="text" class="form-control" placeholder="建议人姓名不能为空" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>联系方式</label>
+                            <input name="phone" type="text" class="form-control" placeholder="联系方式不能为空" ms-duplex="phone">
+                        </div>
+                        <div class="form-group">
+                            <label>单位、地址</label>
+                            <input name="address" type="text" class="form-control" placeholder="" ms-duplex="address">
+                        </div>
+                        <div class="form-group">
+                            <label>建议事项</label>
+                            <input name="options" type="text" class="form-control" placeholder="" ms-duplex="options">
+                        </div>
+
+                        <div class="form-group">
+                            <label>建议事项说明</label>
+		   <textarea name="content" class="form-control" rows="3" placeholder="建议事项说明不能为空，长度[2~1000]"
+                     ms-duplex="content"></textarea>
+                        </div>
+
+                    </div>
+                    <div class="form-actions noborder">
+                        <button type="submit" class="btn btn-default btn-save">保 存</button>
+                        <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        collectIdeaId: Ls.url.get("collectIdeaId"),
+        collectInfoId: Ls.url.get("collectInfoId")
+    };
+
+    $(document).ready(function () {
+        if(cur.collectInfoId == '5335972'){
+            $("#dz").show();
+            $("#mr").hide();
+        }
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/collectIdea/getCollectIdea",
+                data: {
+                    collectIdeaId: cur.collectIdeaId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formCollectIdea"
+                data.$id = cur.$id;
+                data.collectInfoId = cur.collectInfoId;
+        /*        cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0), cur.vm);*/
+                cur.init = Ls.initFORM("formCollectIdea",data);
+                //如果模型已经绑定，不再绑定
+                cur.vm = avalon.vmodels["formCollectIdea"];
+                cur.vm = avalon.define(cur.init);
+                avalon.scan($("#formCollectIdea").get(0), cur.vm);
+
+
+            }).fail(function () {
+                alert('失败!')
+            })
+        };
+
+        getData();
+
+        $('#formCollectIdea').validator({
+            fields: {
+                'name': '姓名:required;length[2~10]',
+                'phone': '联系方式:length[2~11]',
+                'content': '意见:required;length[2~1000]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            Ls.ajax({
+                url: '/collectIdea/save',
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        callback: function () {
+                            Ls.winClose();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+</script>
+</body>
+</html>

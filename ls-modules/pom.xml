@@ -1,0 +1,1134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.lonsun</groupId>
+    <artifactId>ls-modules</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <url>http://maven.apache.org</url>
+
+    <!-- 属性(版本\变量)集中管理 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <junit.version>4.11</junit.version>
+        <spring.ver>4.2.4.RELEASE</spring.ver>
+        <hibernate.ver>4.3.1.Final</hibernate.ver>
+        <sdk.ver>1.6</sdk.ver>
+        <fastjson.ver>1.2.7</fastjson.ver>
+        <mockito.core.ver>1.9.5</mockito.core.ver>
+        <dddlib.ver>4.2.1</dddlib.ver>
+        <jsonpath.version>0.9.0</jsonpath.version>
+        <submodule.version>1.0-SNAPSHOT</submodule.version>
+        <shiro.version>1.2</shiro.version>
+        <sysassets.version>1.4.4-SNAPSHOT</sysassets.version>
+    </properties>
+
+
+    <!-- 依赖组件管理 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- 项目组件 -->
+            <!-- 缓存模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-cache</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-govbbs</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 专题 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-special</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 业务模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-business</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 业务实体模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-business-entity</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 核心模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-core</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 基础模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-base</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- shiro模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-shiro</artifactId>
+                <version>${shiro.version}</version>
+            </dependency>
+
+            <!-- 流程模块 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-process</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <!-- 系统管理 -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-rbac</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-sys-assets</artifactId>
+                <version>${sysassets.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-front-assets</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-ewebeditor</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-monitor</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-nlp</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-dataimport</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-webservice</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>ls-config</artifactId>
+                <version>${submodule.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>woodstox</groupId>
+                <artifactId>wstx-asl</artifactId>
+                <version>2.0.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>hessian</groupId>
+                <artifactId>hessian</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>1.9.8</version>
+            </dependency>
+
+            <!-- Memcached客户端 -->
+            <dependency>
+                <groupId>net.spy</groupId>
+                <artifactId>spymemcached</artifactId>
+                <version>2.11.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+
+            <!-- Spring 组件 -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context-support</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-beans</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <!--Spring AOP所要用到的包 -->
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.7.4</version>
+            </dependency>
+
+            <!-- hibernate -->
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-ehcache</artifactId>
+                <version>${hibernate.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>5.1.2.Final</version>
+            </dependency>
+
+            <!-- json -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.6.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.ver}</version>
+                <type>jar</type>
+            </dependency>
+
+            <!-- springMVC @ResponseBody 输出JSON需要组件 start -->
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-core-asl</artifactId>
+                <version>1.9.13</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>1.9.13</version>
+            </dependency>
+            <!-- springMVC @ResponseBody 输出JSON需要组件 end -->
+
+            <!-- test -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.core.ver}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-mock</artifactId>
+                <version>2.0.8</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-core</artifactId>
+                <version>1.3</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dbunit</groupId>
+                <artifactId>dbunit</artifactId>
+                <version>2.4.9</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- 用于springMVC测试 -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-test</artifactId>
+                <version>${spring.ver}</version>
+                <scope>test</scope>
+                <type>jar</type>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>spring-core</artifactId>
+                        <groupId>org.springframework</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- 用于JSON类型的控制器的测试验证使用 -->
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${jsonpath.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- 数据库连接组件和驱动 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+
+            <!-- 用于项目导入数据使用 开始 -->
+            <dependency>
+                <groupId>ojdbc</groupId>
+                <artifactId>ojdbc</artifactId>
+                <version>14</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sourceforge.jtds</groupId>
+                <artifactId>jtds</artifactId>
+                <version>1.2.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.39</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>4.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mariadb.jdbc</groupId>
+                <artifactId>mariadb-java-client</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <!-- 用于项目导入数据使用 结束 -->
+
+            <!-- 日志组件 -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.17</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <!-- 其他组件 -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.neethi</groupId>
+                <artifactId>neethi</artifactId>
+                <version>3.0.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-api</artifactId>
+                <version>1.2.14</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.commons.axiom</groupId>
+                <artifactId>axiom-impl</artifactId>
+                <version>1.2.14</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.owasp.esapi</groupId>
+                <artifactId>esapi</artifactId>
+                <version>2.0GA</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ws.commons.schema</groupId>
+                <artifactId>XmlSchema</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-httpclient</groupId>
+                <artifactId>commons-httpclient</artifactId>
+                <version>3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.3.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.rampart</groupId>
+                <artifactId>rampart-core</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity</artifactId>
+                <version>1.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.velocity</groupId>
+                <artifactId>velocity-tools</artifactId>
+                <version>2.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-taglib</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-tiles</artifactId>
+                    </exclusion>
+                </exclusions>
+
+            </dependency>
+
+            <dependency>
+                <groupId>com.belerweb</groupId>
+                <artifactId>pinyin4j</artifactId>
+                <version>2.5.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jexcelapi</groupId>
+                <artifactId>jxl</artifactId>
+                <version>2.4.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sf.json-lib</groupId>
+                <artifactId>json-lib</artifactId>
+                <version>2.2.3</version>
+            </dependency>
+
+            <!-- 用于JDK1.6单元测试使用 start edit by dzl 2014-09-28 -->
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.18.1-GA</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.validation</groupId>
+                <artifactId>validation-api</artifactId>
+                <version>1.1.0.Final</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.el</groupId>
+                <artifactId>el-api</artifactId>
+                <version>2.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>2.1</version>
+            </dependency>
+            <!-- 用于JDK1.6单元测试使用 end -->
+
+            <!-- PDF转换依赖 start -->
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>aspose</artifactId>
+                <version>13.9.0.0</version>
+            </dependency>
+            <!-- PDF转换依赖 end -->
+
+            <!-- linux命令远程执行 start -->
+            <dependency>
+                <groupId>ch.ethz.ganymed</groupId>
+                <artifactId>ganymed-ssh2</artifactId>
+                <version>262</version>
+            </dependency>
+            <!-- linux命令远程执行 end -->
+
+            <dependency>
+                <groupId>com.github.briandilley.jsonrpc4j</groupId>
+                <artifactId>jsonrpc4j</artifactId>
+                <version>1.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sun.el</groupId>
+                <artifactId>el-ri</artifactId>
+                <version>1.0</version>
+            </dependency>
+
+            <!-- business -->
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analyzers-common</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queries</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-highlighter</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-grouping</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>4.6.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.paoding</groupId>
+                <artifactId>paoding-analysis</artifactId>
+                <version>2.0.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.gplatform</groupId>
+                <artifactId>Sdk4J</artifactId>
+                <version>2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-mongodb</artifactId>
+                <version>1.8.2.RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.data</groupId>
+                <artifactId>spring-data-commons-core</artifactId>
+                <version>1.4.1.RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>oro</groupId>
+                <artifactId>oro</artifactId>
+                <version>2.0.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-all</artifactId>
+                <version>5.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-jms-pool</artifactId>
+                <version>5.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-pool</artifactId>
+                <version>5.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-spring</artifactId>
+                <version>5.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>activemq-web</artifactId>
+                <version>5.9.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>${spring.ver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr</artifactId>
+                <version>4.6.0</version>
+                <type>pom</type>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.juniversalchardet</groupId>
+                <artifactId>juniversalchardet</artifactId>
+                <version>1.0.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20140107</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>5.0.73</version>
+            </dependency>
+
+            <!-- xml -->
+            <dependency>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <!-- webService -->
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-jaxws</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-spring</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-local</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-transport-http</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>wsdl4j</groupId>
+                <artifactId>wsdl4j</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.axis2</groupId>
+                <artifactId>axis2-adb</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baidu.yun</groupId>
+                <artifactId>bccs-api</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>cn.lonsun</groupId>
+                <artifactId>web-security</artifactId>
+                <version>1.0-RELEASE</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>1.10.2</version>
+            </dependency>
+
+            <!-- baidu ueditor -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baidu.ueditor</groupId>
+                <artifactId>ueditor</artifactId>
+                <version>1.1.2</version>
+            </dependency>
+            <!-- baidu ueditor end -->
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>0.4.8</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.qq.connect</groupId>
+                <artifactId>Sdk4J</artifactId>
+                <version>2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baidu.aip</groupId>
+                <artifactId>java-sdk</artifactId>
+                <version>4.4.1</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 公共依赖组件 -->
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- 测试组件 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!--<dependency> <groupId>mysql</groupId> <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.38</version> </dependency> -->
+    </dependencies>
+
+    <!-- maven远程仓储定义 -->
+    <repositories>
+
+        <repository>
+            <id>Snapshots</id>
+            <url>http://192.168.1.72:8090/nexus/content/repositories/snapshots/ex8/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>Snapshots_ex8</id>
+            <url>http://192.168.1.72:8090/nexus/content/repositories/snapshots_ex8/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>lscp</id>
+            <url>http://192.168.1.72:8090/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>lscpthird</id>
+            <url>http://192.168.1.72:8090/nexus/content/repositories/thirdparty/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>mvnrepository</id>
+            <url>http://mvnrepository.com/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>sonatype</id>
+            <url>http://repository.sonatype.org/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
+
+    <!-- 打包发布到nexus -->
+    <!-- 需要配置maven中的setting.xml 设置Releases和Snapshots的用户名和密码才能完成发布功能 -->
+    <distributionManagement>
+        <!-- 打包后的发布 -->
+        <repository>
+            <id>lscp-releases</id>
+            <url>http://192.168.1.72:8090/nexus/content/repositories/releases/ex8/</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>lscp-snapshots</id>
+            <url>http://192.168.1.72:8090/nexus/content/repositories/snapshots/ex8/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!-- 打包构建 -->
+    <build>
+        <plugins>
+            <plugin>
+                <!-- 编译插件 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- 发布插件 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+            <plugin>
+                <!-- 打包插件 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- 安装插件 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.3.1</version>
+            </plugin>
+            <plugin>
+                <!-- 单元测试插件 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7.2</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <overwrite>true</overwrite>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+
+            <!--<plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compress</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    &lt;!&ndash; 包含js文件和css文件 &ndash;&gt;
+                    <includes>
+                        <include>**/*.js</include>
+                        <include>**/*.css</include>
+                    </includes>
+                    &lt;!&ndash; 排除本来就压缩的js文件，比如jquery.min.js xxx-min.js之类的文件 &ndash;&gt;
+                    <excludes>
+                        <exclude>**/*.min.js</exclude>
+                        <exclude>**/*-min.js</exclude>
+                        <exclude>**/*.min.css</exclude>
+                        <exclude>**/*-min.css</exclude>
+                        <exclude>**/echarts/**/*.js</exclude>
+                        <exclude>**/echarts/**/*.css</exclude>
+                        <exclude>**/layer/**/*.js</exclude>
+                        <exclude>**/layer/**/*.css</exclude>
+                        <exclude>kindeditor-all.js</exclude>
+                    </excludes>
+                    <encoding>utf8</encoding>
+                    <failOnWarning>false</failOnWarning>
+                    <force>true</force>
+                    <suffix>.min</suffix>
+                    <linebreakpos>-1</linebreakpos>
+                    <sourceDirectory>${basedir}/assets</sourceDirectory>
+                    <jswarn>false</jswarn>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <warSourceExcludes>
+                        %regex[^.+(?:(?&lt;!(?:-|\.)min)\.js)],
+                        %regex[^.+(?:(?&lt;!(?:-|\.)min)\.css)]
+                    </warSourceExcludes>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                </configuration>
+            </plugin>-->
+        </plugins>
+    </build>
+
+    <!-- 通过配置来发布 -->
+    <profiles>
+        <!-- 本地环境 -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <package.env>local</package.env>
+            </properties>
+
+        </profile>
+
+        <!-- 本地环境 mysql -->
+        <profile>
+            <id>local-mysql</id>
+            <properties>
+                <package.env>local-mysql</package.env>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <!-- 开发环境 206 -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <package.env>dev</package.env>
+            </properties>
+
+        </profile>
+
+
+    </profiles>
+
+    <modules>
+        <!-- 公共模块 -->
+        <module>ls-core</module>
+        <module>ls-base</module>
+        <module>ls-webservice</module>
+        <!-- 公共应用 -->
+        <module>ls-sys-assets</module>
+        <module>ls-front-assets</module>
+        <module>ls-ewebeditor</module>
+        <module>ls-cache</module>
+        <module>ls-shiro</module>
+        <module>ls-dataimport</module>
+        <!-- 应用模块 -->
+        <module>ls-sys-web</module>
+        <module>ls-static-center</module>
+        <module>ls-rbac</module>
+        <module>ls-business</module>
+        <module>ls-business-entity</module>
+        <module>ls-config</module>
+        <module>ls-process</module>
+        <module>ls-govbbs</module>
+        <module>ls-special</module>
+        <module>ls-monitor</module>
+        <module>ls-nlp</module>
+
+    </modules>
+</project>

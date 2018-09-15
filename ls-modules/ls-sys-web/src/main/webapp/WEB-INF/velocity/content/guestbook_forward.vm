@@ -1,0 +1,107 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form" ms-controller="guestBook_forward_form" id="guestBook_forward_form">
+            <div class="form-body">
+             #if($isLocal==1)
+              <div class="form-group">
+                <span>请选择流转区域：</span>
+                <select name="localUnitId" id="localUnitId" class="form-control" data-rule="required" data-msg="请选择流转区域">
+                  <option value="" selected="selected">请选择流转区域</option>
+                    #foreach($l in $localList)
+                      <option value="$l.code">$l.key</option>
+                    #end
+                </select>
+              </div>
+              #end
+                #if($recType==0)
+                    <div class="form-group">
+                        <span>流转单位列表：</span>
+                        <select name="receiveId" id="recName" class="form-control" data-rule="required" data-msg="请选择流转单位">
+                            <option value="" selected="selected">请选择流转单位</option>
+                            #foreach($l in $list)
+                                <option value="$l.recUnitId">$l.recUnitName</option>
+                            #end
+                        </select>
+                    </div>
+                #elseif($recType==1)
+                    #if($return==1)
+                        <div class="form-group">
+                            <span>流转单位列表：</span>
+                            <select name="receiveId"  id="recName" class="form-control" data-rule="required" data-msg="请选择流转单位">
+                                <option value="" selected="selected">请选择流转单位</option>
+                                #foreach($l in $list)
+                                    <option value="$l.turnUnitId">$l.turnUnitName</option>
+                                #end
+                            </select>
+                        </div>
+
+                    #elseif($return==0)
+                        <div class="form-group">
+                            <span>流转人列表：</span>
+                            <select name="receiveUserCode" id="recName" class="form-control" data-rule="required" data-msg="请选择流转人">
+                                <option value="" selected="selected">请选择流转人</option>
+                                #foreach($l in $list)
+                                    <option value="$l.recUserId">$l.recUserName</option>
+                                #end
+                            </select>
+                        </div>
+                    #end
+
+
+
+
+                #end
+                <div class="form-group">
+                    <label>流转备注：</label>
+                    <textarea class="form-control"  name="remarks" rows="4"></textarea>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+var cur = {
+	id : "guestBook_forward_form",
+	guest_id : "$!{id}",
+	recType : "$!{recType}",
+    isLocal:"$!{isLocal}"
+};
+$(document).ready(function(){
+	// 验证
+    $('#' + cur.id).validator({
+        valid: function(form){
+			var me = this;
+        	me.holdSubmit();
+			var data = $(form).serializeObject();
+			data.id = cur.guest_id;
+			data.recType = cur.recType;
+			data.receiveName = $("#recName option:selected").text();
+            data.isLocal=cur.isLocal;
+			// 提交
+            Ls.ajaxGet({
+                url: "/guestBook/forward",
+                data: data
+            }).done(function (d) {
+                if (d.status == 0) {
+                    Ls.tipsErr("操作失败：" + d.desc, {
+						callback: function(){
+                            me.holdSubmit(false);
+                        }
+					});
+                } else {
+					Ls.tipsOk('转办成功', {
+                        callback: function(){
+                            Ls.getWin.api.close();
+                            me.holdSubmit(false);
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+</script>	

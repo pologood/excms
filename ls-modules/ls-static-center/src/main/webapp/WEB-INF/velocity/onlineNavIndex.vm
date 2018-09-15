@@ -1,0 +1,21 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($target="$!{paramObj.target}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #if($!{eo.isShow} == 1)
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+    #if($!{eo.isStartUrl} == 0)
+    <li class="$!{css} num$velocityCount">
+        <a href="/content/column/$!{eo.indicatorId}" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+    </li>
+    #else
+    <li class="$!{css} num$velocityCount">
+        <a href="$!{eo.transUrl}" target="$target" class="$!{eo.active}" title="$!{eo.name}">#cutstr($!{eo.name},$length)</a>
+    </li>
+    #end
+    #end
+#end

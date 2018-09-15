@@ -1,0 +1,6 @@
+<div class="page-sidebar-wrapper">
+    <div class="page-sidebar navbar-collapse collapse">
+        <ul id="sidebar_menu_el" class="page-sidebar-menu page-header-fixed" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="0">
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<link rel="stylesheet" href="/assets/res/css/common.css">
+<link rel="stylesheet"  href="styles/grapheditor.css?v=11">
+</head>
+<body>
+
+<script type="text/javascript">
+	var MAX_REQUEST_SIZE = 10485760;
+	var MAX_WIDTH = 6000;
+	var MAX_HEIGHT = 6000;
+	
+	var EXPORT_URL = '/flowExport';
+	var SAVE_URL = '/flowSave';
+	var OPEN_URL = '/flowOpen';
+	var RESOURCES_PATH = 'resources';
+	var RESOURCE_BASE = RESOURCES_PATH + '/grapheditor';
+	var STENCIL_PATH = 'stencils';
+	var IMAGE_PATH = 'images';
+	var STYLE_PATH = 'styles';
+	var CSS_PATH = 'styles';
+	var OPEN_FORM = 'open.html';
+	var SELECT_MODEL = null;
+
+	var tapAndHoldStartsConnection = true;
+	var showConnectorImg = true;
+	
+	var urlParams = (function(url)
+	{
+		var result = new Object();
+		var idx = url.lastIndexOf('?');
+
+		if (idx > 0)
+		{
+			var params = url.substring(idx + 1).split('&');
+			
+			for (var i = 0; i < params.length; i++)
+			{
+				idx = params[i].indexOf('=');
+				
+				if (idx > 0)
+				{
+					result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
+				}
+			}
+		}
+		
+		return result;
+	})(window.location.href);	
+	
+	mxLoadResources = false;
+	mxBasePath = '../src';
+	mxLanguages = ['zh'];
+	
+	
+	
+</script>
+<script src="/assets/core/jquery.min.js"></script>
+<script src="/assets/core/boot.js"></script>
+<script src="../src/js/mxClient.js"></script>
+<script src="js/flowDesign.js"></script>
+<script>
+Ls.debug = true;
+var COA_PROCESSID = Ls.url.get('processId') || 42778,
+	COA_MODULEID = Ls.url.get('moduleId') || 2,
+	COA_FORMID = Ls.url.get('formId') || 3;
+
+jQuery(document).ready(function(){
+	page_init();
+});
+
+function page_init(){
+	if (!mxClient.isBrowserSupported()) {
+		mxUtils.error('浏览器不支持!', 200, false);  
+	}else{
+		var container = document.body;  
+		// 去锯齿效果  
+        mxRectangleShape.prototype.crisp = true; 
+		var model = new mxGraphModel(); 
+		// 在容器中创建图形   
+        var graph = new Graph(container, model);  
+		
+		// 定义显示样式
+		graph.container.setAttribute('tabindex', '0');
+		graph.container.style.cursor = 'default';
+		graph.container.style.backgroundImage = 'url(' + IMAGE_PATH + '/grid.gif)';
+		graph.container.focus();
+		
+		graph.setConnectable(false);
+		// 允许连接
+		graph.setConnectable(false);
+		// 允许拖动
+		graph.setDropEnabled(false);
+		// 允许关联
+		graph.setPanning(false);
+		graph.isCellLocked =function(){return true;};
+		
+		// 加载xml文件
+		//var xml = mxUtils.load('mxgraph.xml');
+		// 定义获取当前工作流流程图的xml内容
+		Ls.ajax.url = "/flowChart.do";
+		Ls.ajax.get({
+			method:"getMxchart",
+			processId:COA_PROCESSID
+		},function(json){
+			// 开始更新事务 
+			graph.getModel().beginUpdate(); 
+			try{
+				var xml = mxUtils.parseXml(json.data);
+				Ls.log.add('xml >>>');
+				Ls.log.add(xml);
+				var root = xml.documentElement;
+				var dec = new mxCodec(root);  
+				dec.decode(root, graph.getModel());
+			}catch(e){
+				mxUtils.alert(mxResources.get('invalidOrMissingFile') + ': ' + e.message);	
+			}finally {
+				// 结束事务更新
+				graph.getModel().endUpdate();    
+	
+			}
+		});
+		
+	}
+
+} 
+
+
+
+</script>
+
+
+</body>
+</html>

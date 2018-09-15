@@ -1,0 +1,94 @@
+#if($!{resultObj.isAllowComment}==1)
+<form class="comment-form" id="comment-form">
+    <table width="100%" class="comment-table">
+        <tbody>
+        <tr>
+            <th height="86" align="right">昵称：</th>
+            <td class="userName">
+                <input id="userName" name="userName" class="userName">
+            </td>
+        </tr>
+        <tr>
+            <th height="86" align="right">您的牛评：</th>
+            <td class="comment_content">
+                <textarea id="content" name="content" cols="70" rows="5"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th><span>*</span>验证码：</th>
+            <td>
+                <input class="verification" name="checkCode" id="checkCode" size="6" maxlength="4" type="text">
+                <img id="imgCode" class="imgcode" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片"
+                     align="absmiddle">
+            </td>
+        </tr>
+        <tr>
+            <td align="left">&nbsp;</td>
+            <td align="left" class="btn_group">
+                <input name="Submit" id="Submit" class="btn submit" type="button" accesskey="S" value="确定(S)">
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+<script>
+    $(document).ready(function () {
+
+        using("validator", function () {
+            
+            $("#comment-form").validator({
+                fields: {
+                    userName: "昵称:required;",
+                    content: "评论:required;",
+                    checkCode: "验证码:required;"
+                },
+                valid: function () {
+                    var me = this;
+                    me.holdSubmit();
+                    saveData().always(function () {
+                        me.holdSubmit(false);
+                    });
+                },
+                msgClass: 'n-right',
+                timely: 1
+            });
+
+            function saveData() {
+                var data = {};
+                data.siteId = "$!{resultObj.siteId}";
+                data.columnId = "$!{resultObj.columnId}";
+                data.contentId = "$!{resultObj.contentId}";
+                data.contentTitle = "$!{resultObj.contentTitle}";
+                data.content = $("#content").val();
+                data.createUserName = $("#userName").val();
+                data.checkCode = $("#checkCode").val();
+                return Ls.ajax({
+                    data: data,
+                    url: "/comment/saveComment",
+                    success: function (text) {
+                        if (text.status == 1) {
+                            Ls.tipsOk("提交成功");
+                            $('#comment-form')[0].reset();
+                        } else {
+                            Ls.tipsErr(text.desc);
+                        }
+                    }
+                }).always(function () {
+                    $("#imgCode").click();
+                });
+            }
+        });
+
+        $("#imgCode").on('click', function () {
+            var _this = $(this);
+            _this.attr("src", "/member/getCode?s=" + Math.random());
+        });
+
+        $("#btn_submit").on('click', function () {
+            $("#comment-form").trigger("validate");
+        });
+
+    })
+</script>
+#end

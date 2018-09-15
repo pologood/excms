@@ -1,0 +1,344 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;overflow: auto;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>微信配置</strong></a>
+                </li>
+                <!--				<li class="">
+                                    <a href="#tab_1_2" data-toggle="tab"><strong>菜单配置</strong></a>
+                </li>-->
+            </ul>
+            <div class="tab-content" style="padding: 10px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <div class="portlet-body form">
+                        <form id="wechatConfig" role="form" ms-controller="wechatConfig">
+                            <div class="form-body">
+                                <table class="table table-bordered article-table">
+                                    <tr style="background-color: #fafafa">
+                                        <td>
+                                            <strong>帐号基本信息</strong>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table">
+                                    <tr>
+                                        <td align="left">
+                                            <table class="table table-bordered article-table">
+                                                <tr>
+                                                    <th>公众号名称:</th>
+                                                    <td>
+                                                        <input type="text" name="accountsName" value="" class="form-control" data-rule="" placeholder="公众号名称"
+                                                               ms-duplex="accountsName">
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th>微信头像:</th>
+                                                    <td>
+                                                        <div class="input-group" id="resMark">
+                                                            <input type="text" name="headImg" id="headImg" readonly class="form-control readonly" data-rule="" placeholder="微信头像路径"
+                                                                   ms-duplex="headImg"/>
+
+                                                            <div class="input-group-btn">
+                                                                <button type="button" class="btn btn-default btn-default-upload" onclick="uploadImg(1)">
+                                                                    <i class=" fa fa-upload">上传</i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th><span style="color:red;color:red;float:left" class="bold">*</span>微信账号:</th>
+                                                    <td>
+                                                        <input type="text" name="accounts" value="" class="form-control" data-rule="必填项:;account" placeholder="微信帐号"
+                                                               ms-duplex="accounts">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th><span style="color:red;color:red;float:left" class="bold">*</span>原始ID:</th>
+                                                    <td>
+                                                        <input type="text" name="primitiveId" value="" class="form-control" data-rule="必填项:;account" placeholder=""
+                                                               ms-duplex="primitiveId">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>二维码:</th>
+                                                    <td>
+                                                        <div class="input-group" id="resMark">
+                                                            <input type="text" name="qrCode" id="qrCode" readonly class="form-control readonly" data-rule="必填项:;account"
+                                                                   placeholder="公众号二维码路径" ms-duplex="qrCode"/>
+
+                                                            <div class="input-group-btn">
+                                                                <button type="button" class="btn btn-default btn-default-upload" onclick="uploadImg(2)">
+                                                                    <i class=" fa fa-upload">上传</i>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>帐号类型:</th>
+                                                    <td>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="accountsType" class="" value="1" ms-duplex-number="accountsType" checked> 订阅号
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="accountsType" class="" value="2" ms-duplex-number="accountsType"> 服务号
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>认证状态:</th>
+                                                    <td>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="isAuth" class="" value="0" ms-duplex-number="isAuth" checked> 未认证
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="isAuth" class="" value="1" ms-duplex-number="isAuth"> 已认证
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td class="w300" rowspan="7">
+                                            <div class="thumb_layout">
+                                                <div class="thumb">
+                                                    <img src="$!{sysStaticPath}/assets/images/head_image.png" style="width:195px;height:150px;" title="微信头像" alt=""
+                                                         id="headImgShow"/>
+                                                </div>
+                                                </br>
+                                                <div class="thumb">
+                                                    <img src="$!{sysStaticPath}/assets/images/qr-code.png" style="width:195px;height:150px;cursor:pointer" title="点击放大二维码"
+                                                         alt="" id="qrCodeShow" onclick="showQrCode()"/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table">
+                                    <tr style="background-color: #fafafa">
+                                        <td>
+                                            <strong>微信服务配置</strong>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table">
+                                    <tr>
+                                        <th><span style="color:red;color:red;float:left" class="bold">*</span>API接口:</th>
+                                        <td>
+                                            <input type="text" name="apiUrl" id="apiUrl" value="" class="form-control" data-rule="必填项:;validUrl"
+                                                   placeholder="域名+/weChat/api 如：http://www.ex8.cms/weChat/api" ms-duplex="apiUrl">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><span style="color:red;color:red;float:left" class="bold">*</span>TOKEN:</th>
+                                        <td>
+                                            <div class="input-group" id="resMark">
+                                                <input type="text" id="token" readonly name="token" value="" class="form-control readonly" data-rule="必填项:;appKey"
+                                                       placeholder="请点击申请TOKEN,申请成功后请复制至微信开发者配置的TOKEN项" ms-duplex="token"/>
+
+                                                <div class="input-group-btn">
+                                                    <button type="button" class="btn btn-default btn-default-upload" onclick="getToken()">
+                                                        <i class=" fa">申请TOKEN</i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table">
+                                    <tr style="background-color: #fafafa">
+                                        <td>
+                                            <strong>开发者凭据</strong>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table">
+                                    <tr>
+                                        <th><span style="color:red;color:red;float:left" class="bold">*</span>APPID:</th>
+                                        <td>
+                                            <input type="text" name="appId" value="" class="form-control" data-rule="必填项:;validUrl" placeholder="" ms-duplex="appId">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th><span style="color:red;float:left" class="bold">*</span>AppSecret:</th>
+                                        <td>
+                                            <input type="password" name="appSecret" value="" class="form-control" data-rule="必填项:;appKey" placeholder="" ms-duplex="appSecret">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td>
+                                            <button type="button" class="btn btn-default btn-save" onclick="saveData()">保 存</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        vm: {},
+        headImg: "",
+        qrCode: ""
+    };
+    var data;
+    $(document).ready(function () {
+        Ls.ajax({
+            type: "GET",
+            url: "/weChat/getConfig",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败");
+                } else {
+                    data = text.data;
+                    if (data.headImg != null) {
+                        cur.headImg = data.headImg;
+                        data.headImg = formatImgAddress(data.headImg) ;
+                        $("#headImgShow").attr("src", data.headImg);
+                    }
+                    if (data.qrCode != null) {
+                        cur.qrCode = data.qrCode;
+                        data.qrCode = formatImgAddress(data.qrCode);
+                        $("#qrCodeShow").attr("src", data.qrCode);
+                    }
+                    data.$id = "wechatConfig";
+                    cur.vm = avalon.define(data);
+                    avalon.scan($("#wechatConfig").get(0), cur.vm);
+                }
+            }
+        });
+    })
+
+    function formatImgAddress(src){
+        if(src == undefined || src == null){
+            return "";
+        }
+        if(src.indexOf("/") != -1){
+            return src;
+        }
+        if(src.indexOf(".") != -1){
+            return GLOBAL_FILESERVERNAMEPATH + src;
+        }
+        return GLOBAL_FILESERVERPATH + src;
+    }
+
+    var saveData = function () {
+        var value = cur.vm.$model;
+        var json = Ls.toJSON(value);
+        json.headImg = cur.headImg;
+        json.qrCode = cur.qrCode;
+        if (json.accounts == null || json.accounts == "") {
+            Ls.tipsInfo("帐号不能为空");
+            return;
+        }
+        if (json.primitiveId == null || json.primitiveId == "") {
+            Ls.tipsInfo("原始ID不能为空");
+            return;
+        }
+        if (json.apiUrl == null || json.apiUrl == "") {
+            Ls.tipsInfo("API接口不能为空");
+            return;
+        }
+        if (json.token == null || json.token == "") {
+            Ls.tipsInfo("TOKEN不能为空");
+            return;
+        }
+        if (json.appId == null || json.appId == "") {
+            Ls.tipsInfo("APPID不能为空");
+            return;
+        }
+        if (json.appSecret == null || json.appSecret == "") {
+            Ls.tipsInfo("AppSecret不能为空");
+            return;
+        }
+        Ls.ajax({
+            data: json,
+            url: "/weChat/saveConfig",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr("保存失败");
+                } else {
+                    Ls.tipsOk("保存成功");
+                }
+            }
+        });
+    }
+
+    function uploadImg(t) {
+        var desc = "";
+        if (t == 1) {
+            desc = "微信头像";
+        } else if (t == 2) {
+            desc = "微信二维码";
+        }
+
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+                if (t == 1) {
+//                    cur.headImg = mongoId;
+//                    $("#headImg").val(GLOBAL_FILESERVERPATH + mongoId);
+//                    $("#headImgShow").attr("src", GLOBAL_FILESERVERPATH + mongoId);
+                    cur.headImg = data[0].fileName;
+                    $("#headImg").val(GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                    $("#headImgShow").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                } else if (t == 2) {
+                    cur.qrCode = fileName;
+                    $("#qrCode").val(GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                    $("#qrCodeShow").attr("src", GLOBAL_FILESERVERNAMEPATH + data[0].fileName);
+                }
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+                "siteId": cur.vm.siteId,
+                "desc": desc,
+                "type": "NotDefined",
+                "code": "WeChatUpload",
+            }
+        })
+    }
+
+    function getToken() {
+        var apiUrl = $("#apiUrl").val();
+        Ls.ajax({
+            type: "GET",
+            data: {apiUrl: apiUrl},
+            url: "/weChat/buildToken",
+            success: function (text) {
+                if (text.status == 0) {
+                    Ls.tipsErr(text.desc);
+                } else {
+                    $("#token").val(text.data);
+                }
+            }
+        });
+    }
+
+    function showQrCode() {
+        var url = $("#qrCodeShow").attr("src");
+        Ls.openWin("/weChat/showQrCode?url=" + url, {
+            width: '450px',
+            height: '450px',
+            lock: true,
+            id: 212,
+            title: '二维码',
+        });
+    }
+</script>

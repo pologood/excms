@@ -1,0 +1,67 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+        <form role="form">
+            <div class="form-body">
+                <div class="form-group">
+                    <input type="file" name="file" id="catalog_file" accept=".xls*"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script src="$!{sysStaticPath}/assets/js/plugins/ajaxfileupload.min.js"></script>
+<script>
+    var cur = {
+        W: Ls.getWin.win,
+        api: Ls.getWin.api
+    };
+
+    function fileUpload() {
+        cur.W.cur.importComplete = false;
+        var tips = Ls.tips("上传中", {icons: 'loading', autoClose: false});
+
+        jQuery.ajaxFileUpload({
+            url: '$!{rc.contextPath}/public/catalog/upload',
+            secureuri: false,
+            type: 'post',
+            fileElementId: 'catalog_file',//input框的ID
+            dataType: 'json',//返回数据类型
+            beforeSend: function () {//上传前需要处理的工作，如显示Loading...
+            },
+            success: function (data, status) {
+                tips.hide();
+                if (data.status == 1) {
+                    cur.W.cur.importComplete = true;
+                    Ls.tipsOk("导入成功!", function () {
+                        Ls.winClose();
+                    });
+                } else {
+                    Ls.tipsErr(data.desc);
+                }
+            },
+            error: function (data, status, e) {
+                tips.hide();
+                Ls.tipsErr("系统错误!");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        cur.api.button({
+            id: 'catalog_upload_button',
+            focus: true,
+            name: '上 传',
+            callback: function () {
+                if (confirm("导入后原目录将删除，是否确认导入？")) {
+                    fileUpload();
+                }
+                return false;
+            }
+        });
+    });
+</script>

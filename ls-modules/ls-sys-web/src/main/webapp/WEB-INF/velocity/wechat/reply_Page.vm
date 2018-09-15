@@ -1,0 +1,113 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white" style=" overflow: auto;">
+<style>
+    .tr_b {
+        border: 2px solid green;
+    }
+
+    .tr_bt {
+        border-bottom: 1px solid #FFFFFF;
+    }
+
+    .wx-resource {
+        border: solid 1px #CCCCCC;
+    }
+
+    .wx-resource ul li {
+        list-style: none;
+    }
+
+    .wx-resource .big {
+        position: relative;
+    }
+
+    .wx-resource .big .img {
+        width: 290px;
+        height: 90px;
+        position: absolute;
+        z-index: 1;
+        left: 0px;
+    }
+
+    .wx-resource .big > div {
+        position: absolute;
+        z-index: 2;
+        bottom: 0px;
+        left: 0px;
+    }
+
+</style>
+<form id="pushForm">
+    <table class="table table-bordered picture-table mt20">
+        <tbody class="w100p">
+
+        <tr  id="w_content">
+            <th>内 容：</th>
+            <td>
+                <textarea class="form-control" id="repMsgContent" name="repMsgContent" style="width: 90%;height:200px; visibility: visible;"></textarea>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    var id = "$!{id}"
+    $(document).ready(function () {
+
+    })
+
+    var pushForm = $('#pushForm');
+    pushForm.validator({
+        fields: {
+            'repMsgContent': '回复信息不能为空:required;length[1~200]',
+        },
+        valid: function () {
+            saveEdit();
+        }
+    })
+
+    function saveEdit() {
+        Ls.ajax({
+            type: "POST",
+            data: {'id':id,'repMsgContent':$('#repMsgContent').val()},
+            url: "/weChatDeal/saveReply",
+            success: function (text) {
+                    Ls.tipsOk("回复成功",{
+                        callback: function () {
+                            Ls.getWin.win.grid.reload();
+                            Ls.winClose();
+                        }
+                    });
+
+            }
+        });
+    }
+
+    var dialog = art.dialog, W = dialog.parent, api = dialog.open.api;
+    if (!api) {
+        document.getElementById("content").style.display = 'none';
+        alert('不可单独打开上传页面！');
+    } else {
+
+        $(document).ready(function () {
+            api.button(
+                    {
+                        name: '保 存',
+                        callback: function () {
+                            pushForm.submit();
+                            return false;
+                        },
+                        focus: true
+                    }
+            )
+        })
+    }
+
+
+
+
+
+
+</script>

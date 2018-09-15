@@ -1,0 +1,84 @@
+<div class="list-wp">
+        	<div class="nav-current">会员中心 > 密码修改</div>
+            <div class="user-info">
+                <table>
+                   
+                    <tr>
+                        <td class="label">初始密码：</td>
+                        <td class="inpt td-password"><input type="password" id="oldPw" name="oldPw"  maxlength="30"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">新密码：</td>
+                        <td class="inpt td-password"><input type="password" id="newPw" name="newPw"  maxlength="30"/></td>
+                    </tr>
+                    <tr>
+                        <td class="label">确认密码：</td>
+                        <td class="inpt td-password"><input type="password" id="cfPw" name="cfPw"  maxlength="30"/></td>
+                    </tr>
+					<tr>
+            			<td class="label">验<span class="s01"></span>证<span class="s02"></span>码：</td>
+            			<td class="inpt td-code">
+            				<input class="verification" id="checkimg" size="6" maxlength="4" type="text">
+            		  <img id="imgCode" class="hand" src="/member/getCode" width="82" height="31" title="看不清楚，换个图片" align="absmiddle">
+                      </td>
+            		</tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <input class="sub" type="button" onclick="updatePassword()" value="保存">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+ </div>
+<script>
+var validateSite = "$!{paramObj.validateSite}";
+var siteId = "$!{resultObj.siteId}";
+$(document).ready(function(e) {
+	$("#imgCode").on('click',function(){
+		var _this = $(this);
+		_this.attr("src","/member/getCode?s="+Math.random());
+	});
+});
+function updatePassword() {
+	    var oldPw = $("#oldPw").val();
+	    var newPw = $("#newPw").val();
+		var cfPw = $("#cfPw").val();
+		var checkCode = $("#checkimg").val();
+		if(oldPw == ''){
+		   alert("初始密码不能为空！");
+           return;
+		}
+		if(newPw == ''){
+		   alert("新密码不能为空！");
+           return;
+		}
+		if(cfPw == ''){
+		   alert("密码确认不能为空！");
+           return;
+		}else{
+		   if(newPw != cfPw){
+		    alert("密码确认不正确！");
+            return;
+		   }
+		}
+		if(checkCode == ''){
+		   alert("验证码不能为空！");
+           return;
+		}
+        Ls.ajax({
+            url: "/member/updatePw",
+            data: {oldPw:oldPw,newPw:newPw,checkCode:checkCode}
+        }).done(function (d) {
+            if (d.status == 1) {
+                alert("密码修改成功");
+                location.href = "/member/center/"+siteId+"?type=uppw";
+            } else {
+                alert(d.desc);
+				$("#imgCode").click();
+            }
+        }).fail(function () {
+            alert('失败!');
+        });
+    }
+</script>

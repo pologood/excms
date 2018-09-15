@@ -1,0 +1,577 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+
+        <div style="padding:5px; overflow: hidden;">
+            <ul id="ui_tree" class="ztree"></ul>
+        </div>
+
+    </div>
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="userList portlet light " style="display: none;">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <button id="btn_add" style="display: none;" class="btn btn-default btn-add" onclick="addUser()">添 加</button>
+                            <button class="btn btn-default btn-Enable" onClick="startUser()">启 用</button>
+                            <button class=" btn btn-default btn-disabled" onclick="disableUser()">禁 用</button>
+                            <button class="btn btn-default btn-delete" onclick="delUser()">删 除</button>
+                        </div>
+                        <div class="col-md-7">
+
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="searchText" name="searchText" class="form-control" placeholder="姓名、账号或部门名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onClick="searchUser()">搜索</button>
+                                <button type="button" class="btn btn-default btn-show-all" onClick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;" allowCellSelect="false" onlyCheckSelection="true"
+                     idField="personId"
+                     sizeList="[15,30,45]" pageSize="15" allowCellSelect="true" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn" width="40"></div>
+                        <div field="uid" width="120" headerAlign="center" align="center" renderer="renderUid" allowSort="false">账号
+                        </div>
+                        <div field="name" width="100" headerAlign="center" align="center" renderer="renderName">姓名</div>
+                        <div field="fullOranName" width="100%" headerAlign="center" align="center">所属部门</div>
+                        <div field="mobile" width="120" headerAlign="center" align="center">手机号</div>
+                        <div field="loginTimes" width="68" headerAlign="center" align="center" allowSort="false">登录次数</div>
+                        <div field="lastLoginDate" width="140" headerAlign="center" align="center" dateFormat="yyyy-MM-dd HH:mm:ss">最后登录时间</div>
+                        <div width="120" headerAlign="center" align="center" renderer="renderOpt">操作</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="userAdd portlet light" style="display: none;">
+            <div id="center_tab" class="tabbable-line" style=" margin:12px 20px 15px;">
+                <ul class="nav nav-tabs" id="role_tab">
+                    <li class="active">
+                        <a href="#tab_1_1" data-toggle="tab">用户信息</a>
+                    </li>
+                    <li>
+                        <a id="menu_tab" style="display: none" href="#tab_1_2" data-toggle="tab">菜单权限</a>
+                    </li>
+                    <li>
+                        <a id="site_tab" style="display: none" href="#tab_1_3" data-toggle="tab">栏目权限</a>
+                    </li>
+                    <li>
+                        <a id="info_open_tab" style="display: none" href="#tab_1_4" data-toggle="tab">信息公开权限</a>
+                    </li>
+                </ul>
+                <div class="tab-content" style="padding-top: 10px;">
+                    <div class="tab-pane active" id="tab_1_1">
+                        <form id="user_form" class="col-md-8" role="form" ms-controller="user_form" autocomplete="off" style="padding-left: 0;">
+                            <div class="form-body">
+                                <input name="organId" class="form-control" ms-duplex="organId" type="hidden"></input>
+                                <input name="personId" class="form-control" ms-duplex="personId" type="hidden"></input>
+                                <input name="userId" class="form-control" ms-duplex="userId" type="hidden"></input>
+                                <input name="upRoleIds" class="form-control" ms-duplex="upRoleIds" type="hidden"></input>
+                                <input name="viRoleIds" class="form-control" ms-duplex="viRoleIds" type="hidden"></input>
+
+                                <div class="form-group">
+                                    <label>所属部门</label>
+                                    <input name="organName" class="form-control" placeholder="" ms-attr-disabled="true" ms-duplex="organName">
+                                </div>
+                                <div class="form-group">
+                                    <label>排序号</label>
+                                    <input name="sortNum" class="form-control" placeholder="用于排序，按从小到大排序" ms-duplex="sortNum">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>姓名</label>
+                                    <input name="name" id="name" type="text" onblur="createUid()" class="form-control" placeholder="姓名不能为空"
+                                           ms-duplex="name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>帐号</label>
+                                    <input name="uid" id="uid" type="text" class="form-control" ms-attr-disabled="disUid" placeholder="帐号不能为空" ms-duplex="uid">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>密码</label>
+                                    <input name="password" id="password" type="password" class="form-control" placeholder="密码不能为空">
+                                </div>
+                                <div class="form-group">
+                                    <label>重复密码：</label>
+                                    <input name="rePass" id="rePass" type="password" class="form-control" placeholder="重复密码不能为空">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>职务</label>
+                                    <input name="positions" type="text" class="form-control" placeholder="" ms-duplex="positions">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>手机</label>
+                                    <input name="mobile" type="text" class="form-control" placeholder="" ms-duplex="mobile">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>邮箱</label>
+                                    <input name="mail" type="text" class="form-control" placeholder="" ms-duplex="mail">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>办公电话</label>
+                                    <input name="officePhone" type="text" class="form-control" placeholder="" ms-duplex="officePhone">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>办公地址</label>
+                                    <input name="officeAddress" type="text" class="form-control" placeholder=""
+                                           ms-duplex="officeAddress">
+                                </div>
+                                <div class="form-group">
+                                    <label class="red">可分配角色（当前站点角色）</label>
+                                    <textarea name="upRoleNames" class="form-control" rows="1" readonly ms-attr-disabled="updateRole" placeholder="" ms-duplex="upRoleNames"
+                                              ms-click="getRoles()"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>其他角色（非当前站点角色）</label>
+                                    <textarea name="viRoleNames" class="form-control" rows="1" disabled placeholder="" ms-duplex="viRoleNames"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-default btn-save">保 存</button>
+                            <button type="reset" class="btn btn-default">重 置</button>
+                        </form>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="tab-pane" id="tab_1_2">
+                        <div id="menu_tree_wrap">
+                            <div id="menu_tree" class="ztree" style="margin: 5px;"></div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-default btn-save" onclick="saveMenuData()">保 存</button>
+                    </div>
+                    <div class="tab-pane" id="tab_1_3">
+                        <div id="site_opt_tree_wrap">
+                            <div id="site_opt_tree" class="ztree" style="margin: 5px;"></div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-default btn-save" onclick="saveSiteRightsData()">保 存</button>
+                    </div>
+                    <div class="tab-pane" id="tab_1_4">
+                        <div id="info_open_opt_tree_wrap">
+                            <div id="info_open_opt_tree" class="ztree" style="margin: 5px;"></div>
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-default btn-save" onclick="saveInfoOpenRightsData()">保 存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/user_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/user_menu_select.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/user_rights_manage.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/user_info_open_rights.js"></script>
+<script>
+    cur.userId = "";
+    cur.organIds = [];
+    $(document).ready(function () {
+        personManage.user();
+        if (GLOBAL_RIGHTS == 'superAdmin' || GLOBAL_RIGHTS == 'siteAdmin') {
+            $('#menu_tab').show();
+            $('#site_tab').show();
+            $('#info_open_tab').show();
+        }
+    })
+
+    function saveMenuData() {
+        //获取选中的
+        var menuNodes = cur.menuTreeObj.getCheckedNodes(true);
+        var optRights = [];
+        if (menuNodes && menuNodes.length > 0) {
+            for (var i = 0; i < menuNodes.length; i++) {
+                var rights = menuNodes[i].rights;
+                optRights.push({userId: cur.userId, menuId: menuNodes[i].id, optCode: "", siteId: GLOBAL_SITEID});
+                if (rights != null) {
+                    for (var j = 0; j < rights.length; j++) {
+                        if (rights[j].checked) {
+                            optRights.push({userId: cur.userId, menuId: menuNodes[i].id, optCode: rights[j].code, siteId: GLOBAL_SITEID});
+                        }
+                    }
+                }
+            }
+        }
+
+        var data = {};
+        data.userId = cur.userId;
+        data.optRights = JSON.stringify(optRights);
+        Ls.ajax({
+            url: "/user/menu/rights/saveMenuRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips("保存成功", {times: 2});
+            }
+        });
+    }
+
+    function saveSiteRightsData() {
+        var allNodes = cur.siteOptTreeObj.getCheckedNodes(true);
+        var rights = [];
+        for (var i = 0; i < allNodes.length; i++) {
+            var functions = allNodes[i].functions;
+            rights.push({userId: cur.userId, indicatorId: allNodes[i].indicatorId, optCode: '', type: allNodes[i].type, siteId: GLOBAL_SITEID});
+            if (functions != null) {
+                for (var j = 0; j < functions.length; j++) {
+                    if (functions[j].checked) {
+                        rights.push({userId: cur.userId, indicatorId: allNodes[i].indicatorId, optCode: functions[j].action, type: allNodes[i].type, siteId: GLOBAL_SITEID});
+                    }
+                }
+            }
+        }
+        var data = {};
+        data.rights = mini.encode(rights);
+        data.userId = cur.userId;
+        Ls.ajax({
+            url: "/user/site/rights/saveSiteRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips(resp.desc, {times: 2});
+            }
+        });
+    }
+
+    function saveInfoOpenRightsData() {
+
+        if (cur.organIds.length <= 0) {
+            Ls.tips("数据未变动!");
+            return;
+        }
+        var allNodes = cur.infoOpenOptTreeObj.getCheckedNodes(true);
+        var rights = [];
+        for (var i = 0; i < allNodes.length; i++) {
+            if (allNodes[i].type == "Organ") {
+                if (!cur.organIds.contain(allNodes[i].organId)) {
+                    continue;
+                }
+                rights.push({userId: cur.userId, organId: allNodes[i].organId, code: allNodes[i].code, siteId: GLOBAL_SITEID});
+            } else {
+                var functions = allNodes[i].functions;
+                rights.push({userId: cur.userId, organId: allNodes[i].organId, code: allNodes[i].code, siteId: GLOBAL_SITEID});
+                if (functions != null) {
+                    for (var j = 0; j < functions.length; j++) {
+                        if (functions[j].checked) {
+                            rights.push({userId: cur.userId, organId: allNodes[i].organId, code: allNodes[i].code, optCode: functions[j].action, siteId: GLOBAL_SITEID});
+                        }
+                    }
+                }
+            }
+        }
+
+        var data = {};
+        data.rights = mini.encode(rights);
+        data.userId = cur.userId;
+        data.organIds = cur.organIds.unique().join(',');
+        Ls.ajax({
+            url: "/user/info/open/saveInfoOpenRights",
+            data: data,
+            success: function (resp) {
+                Ls.tips(resp.desc, {times: 2});
+            }
+        });
+    }
+
+    cur.grid.on("beforeselect", function (e) {
+        if (!e.record.delLevel) e.cancel = true;
+    });
+
+    //标题列
+    function renderUid(e) {
+        var rec = e.record, strTitle = "", isPluralistic = "", status = "";
+        if (rec.status == "Unable") {
+            status = " <font style='color:red'>[禁]</font>";
+        }
+        if (rec.status == "Unable") {
+            strTitle = "<span class='gray-2' style='text-decoration:line-through;'>" + rec.uid + "</span>" + status;
+        } else {
+            strTitle = rec.uid + status;
+        }
+        return strTitle;
+    }
+
+    //姓名
+    function renderName(e) {
+        var rec = e.record, strTitle = "", isPluralistic = "";
+        if (rec.isPluralistic == true) {
+            isPluralistic = " <font style='color:red'>[兼]</font>";
+        }
+        strTitle = rec.name + isPluralistic;
+        return strTitle;
+    }
+
+    // 操作列
+    function renderOpt(e) {
+        var rec = e.record;
+        var editStr = '<button class="btn btn-default btn-sm btn-edit" onclick="editUserPer(' + rec.personId + ',' + rec.organId + ')">修 改</button> ';
+        var moveStr = '<button class="btn btn-default btn-sm btn-move" onclick="movePerson(' + rec.personId + ',\'' + rec.name + '\')">移 动</button> ';
+        return editStr + moveStr;
+    }
+
+    //移动
+    function movePerson(personId, name) {
+        Ls.selectUnitUser(function (arg) {
+            if (arg && arg.list.length > 0) {
+                if (arg && arg.ids && arg.names) {
+                    console.info(arg.ids);
+                    console.info(arg.names);
+                    var isRemoveRoles = true;
+                    if (confirm("确定保留该用户的原有角色吗？")) {
+                        isRemoveRoles = false;
+                    }
+                    Ls.tipsOk("用户移动中,请稍后...");
+                    Ls.ajaxGet({
+                        url: "/person/move",
+                        data: {
+                            organId: arg.ids,
+                            personId: personId,
+                            isRemoveRoles: isRemoveRoles
+                        }
+                    }).done(function (d) {
+                        if (d.status == 1) {
+                            Ls.tipsOk("操作成功!")
+                            cur.grid.load({organId: cur.organId, dataFlag: 1});
+                            try {
+                                var treeNode = cur.ztree.getNodeByParam("id", personId, null);
+                                //删除原节点
+                                var delids = [];
+                                delids.push(personId);
+                                treeNode && removeNode(delids);
+                                //插入新节点
+                                d.data.icon = "assets/images/person.gif";
+                                var treeNode = d.data;
+                                var ptreeNode = cur.ztree.getNodeByParam("id", arg.ids, null);
+                                if (ptreeNode) {
+                                    if (ptreeNode.open || !ptreeNode.isParent) {
+                                        cur.ztree.addNodes(ptreeNode, treeNode);
+                                    } else {
+                                        cur.ztree.expandNode(ptreeNode, true);
+                                    }
+                                }
+                            } catch (e) {
+                            }
+
+                        } else {
+                            Ls.tipsErr(d.desc);
+                        }
+                    })
+                }
+            }
+        }, {
+            scope: 2,
+            scopeType: 'single',
+            organIds: '',
+            data: {
+                list: {list: []}
+            }
+        });
+    }
+
+    //用户搜索
+    function searchUser() {
+        var searchText = $("#searchText").val();
+        cur.grid.load({organId: cur.organId, searchText: searchText, dataFlag: 1});
+    }
+
+    function searchClear() {
+        $("#searchText").val("");
+        cur.grid.load({organId: cur.organId, dataFlag: 1});
+    }
+
+    function editUserPer(personId, organId) {
+        cur.organId = organId;
+        cur.personId = personId;
+        $(".userList").hide();
+        $(".userAdd").show();
+        Ls.ajaxGet({
+            url: "/ldap/getPerson",
+            data: {
+                organId: organId,
+                personId: personId
+            }
+        }).done(function (d) {
+            data = d.data;
+            if (cur.personId == '') {
+                data.disUid = false;
+            } else {
+                data.disUid = true;
+            }
+            $("#password").val("");
+            $("#rePass").val("");
+            cur.vm = avalon.vmodels[cur.$id];
+            if (cur.vm) {
+                Ls.assignVM(cur.vm, data);
+            }
+            cur.userId = data.userId;
+            menu_select.menu();
+            site_opt_tree.siteOpt();
+            info_open_opt_tree.init();
+        })
+    }
+
+    //启用
+    function startUser() {
+        var userIds = getUserIds();
+        if (userIds == null || userIds.length <= 0) {
+            Ls.tipsInfo("请选择用户！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/updateStatus?status=Enabled&userIds=" + userIds,
+            success: function (text) {
+                Ls.tipsOk("启用成功！")
+                cur.grid.reload();
+                cur.grid.deselectAll(true);
+            }
+        });
+    }
+
+    function disableUser() {
+        var userIds = getUserIds();
+        if (userIds == null || userIds.length <= 0) {
+            Ls.tipsInfo("请选择用户！")
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/updateStatus?status=Unable&userIds=" + userIds,
+            success: function (text) {
+                Ls.tipsOk("禁用成功！")
+                cur.grid.reload();
+                cur.grid.deselectAll(true);
+            }
+        });
+    }
+
+    //删除
+    function delUser() {
+        var ids = getIDS();
+        if (ids == null || ids.length <= 0) {
+            Ls.tipsInfo("请选择用户！")
+            return;
+        }
+        if (confirm("确认删除吗？")) {
+            Ls.ajaxGet({
+                url: "/person/deletePersonsList?personIds=" + ids,
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    cur.grid.reload();
+                    cur.grid.deselectAll(true);
+                    try {
+                        removeNode(ids);
+                    } catch (e) {
+                    }
+                }
+            });
+        }
+
+    }
+
+    function removeNode(ids) {
+        if (Ls.isArray(ids)) {
+            var treeNode;
+            for (var i = 0; i < ids.length; i++) {
+                treeNode = cur.ztree.getNodeByParam("id", ids[i], null);
+                if (treeNode) {
+                    var ptreeNode = cur.ztree.getNodeByParam("id", treeNode.pid, null);
+                    cur.ztree.reAsyncChildNodes(ptreeNode, "refresh");
+                }
+            }
+        }
+    }
+
+
+    function getUserIds() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].userId);
+        }
+        return ids;
+    }
+
+    //循环选中的行
+    function getIDS() {
+        var rows = cur.grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].personId);
+        }
+        return ids;
+    }
+
+    function createUid() {
+        if (cur.personId != '') {
+            return;
+        }
+        var name = $("#name").val();
+        if (name == null || name.trim().length <= 0) {
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/user/createUid",
+            data: {
+                name: name
+            }
+        }).done(function (d) {
+            cur.vm.uid = d.data;
+        })
+    }
+
+    function getRoles() {
+        var url = '/person/addRoles?roleIds=' + cur.vm.upRoleIds;
+        Ls.openWin(url, '400px', '400px', {
+            id: 'user_addRoles',
+            title: '添加角色',
+            padding: 0
+        });
+    }
+
+    /*
+   * 数组去重
+   * */
+    Array.prototype.unique = function () {
+        this.sort();
+        var re = [this[0]];
+        for (var i = 1; i < this.length; i++) {
+            if (this[i] !== re[re.length - 1]) {
+                re.push(this[i]);
+            }
+        }
+        return re;
+    }
+
+    /**
+     * 数组包含
+     * @param e
+     * @returns {boolean}
+     */
+    Array.prototype.contain = function (e) {
+        for (i = 0; i < this.length; i++) {
+            if (this[i] == e)
+                return true;
+        }
+        return false;
+    }
+</script>

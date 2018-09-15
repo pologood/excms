@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+      http://www.springframework.org/schema/util
+      http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	<!-- 静态资源访问，方案1 -->
+	<mvc:resources location="classpath:/assets/" mapping="/assets/**" />
+	<mvc:resources location="/favicon.ico" mapping="/favicon.ico" />
+	<!-- SWF上传组件跨域上传的授权配置文件 -->
+
+	<bean class="cn.lonsun.core.util.SpringContextHolder" />
+
+	<import resource="classpath*:conf/**/applicationContext-*.xml" />
+
+	<!--终止生成静态消息监听-->
+	<bean class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="messageJmsFactory"/>
+		<property name="destination" ref="staticCancelQueue"/>
+		<property name="messageListener" ref="staticCancelQueueListener"/>
+		<property name="taskExecutor" ref="taskExecutor"></property>
+		<!--接收消息超时时间-->
+		<property name="receiveTimeout" value="10000" />
+		<!--多线程监听 maxMessagesPerTask值小于-1,循环接收消息-->
+		<property name="maxMessagesPerTask" value="-1"/>
+		<!--5个消费者来处理消息-->
+		<property name="maxConcurrentConsumers" value="${html.customer.num}" />
+	</bean>
+
+	<!--生成静态消息监听-->
+	<bean class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="messageJmsFactory"/>
+		<property name="destination" ref="staticGenerateQueue"/>
+
+		<property name="messageListener" ref="staticGenerateQueueListener"/>
+		<property name="taskExecutor" ref="taskExecutor"></property>
+		<!--接收消息超时时间-->
+		<property name="receiveTimeout" value="10000" />
+		<!--多线程监听 maxMessagesPerTask值小于-1,循环接收消息-->
+		<property name="maxMessagesPerTask" value="-1"/>
+		<!--5个消费者来处理消息-->
+		<property name="concurrentConsumers" value="${html.customer.num}"/>
+		<property name="maxConcurrentConsumers" value="${html.customer.num}" />
+	</bean>
+
+	<!--替换成上面的方式监听队列-->
+	<!--<bean class="cn.lonsun.staticcenter.activemq.MessageListener" />-->
+
+	<!-- shiro配置 -->
+	<bean id="shiroRealm" class="cn.lonsun.shiro.login.FrontShiroRealm" />
+	<bean id="formAuthenticationFilter" class="cn.lonsun.shiro.filter.FrontFormAuthenticationFilter" />
+	<bean id="logoutFilter" class="cn.lonsun.shiro.filter.FrontLogoutFilter">
+		<property name="redirectUrl" value="/mobile/checkLogin" />
+	</bean>
+	<!-- 只有手机端入口需要登录，注销、注册除外 -->
+	<bean id="shiroFilter" class="cn.lonsun.shiro.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/mobile/check*" />
+		<property name="successUrl" value="/index" />
+		<property name="unauthorizedUrl" value="/mobile/checkLogin" />
+		<property name="filters">
+			<util:map>
+				<entry key="anon" value-ref="anonFilter" />
+				<entry key="logout" value-ref="logoutFilter" />
+				<entry key="authc" value-ref="formAuthenticationFilter" />
+			</util:map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/lib/** = anon
+				/assets/** = anon
+				/mobile/logout = logout
+				/mobile/checkLogin = authc
+				/mobile/checkPlatform = authc
+				/mobile/updatePassword = authc
+				/mobile/saveMember = authc
+				/mobile/getGuestBookPage = authc
+				/** = anon
+			</value>
+		</property>
+	</bean>
+
+	<!--初始化数据库注入-->
+	<!--<bean class="cn.lonsun.db.aspect.DbInjectAspect" />-->
+</beans>  

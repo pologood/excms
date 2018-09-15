@@ -1,0 +1,15 @@
+#parse("_page_layout/_header.vm")
+<body style="layout:fixed;page-body-white" class="page-body-white">
+	<div style="width:500px;margin:auto;">
+<form action="/commentMgr/saveForm" method="post">
+	<input type="hidden" name="siteId" value="386"/>
+	<input type="hidden" name="columnId" value="761"/>
+	<input type="hidden" name="contentId" value="63753"/>
+	<input type="hidden" name="contentTitle" value="澳洲一城市遭10万多道闪电击中 点亮夜空(图)"/>
+	<input type="hidden" name="createUserName" value="赵得柱"/>
+    评论内容：</br><textarea name="content" rows="8" cols="80"></textarea>
+	</br><input type="submit" value="提交"/>
+</form>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")

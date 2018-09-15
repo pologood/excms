@@ -1,0 +1,12 @@
+<div class="left_top">$!{indicatorEO.name}</div>
+<div class="left_con" id="mm1" style="height: 763px;">
+    <div class="left_menu">
+		<ul>
+			#foreach($eo in $childrenList)
+                <li>
+    				<a href="$!{eo.uri}" #if("$!{eo.indicatorId}" == "$!{columnId}") class="active" #end>$!{eo.name}</a>
+    			</li>
+    		#end
+		</ul>
+	</div>
+</div>

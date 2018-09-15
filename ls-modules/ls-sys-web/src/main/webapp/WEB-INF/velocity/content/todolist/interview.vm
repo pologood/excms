@@ -1,0 +1,101 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+    #parse("_page_layout/_footer.vm")
+<script>
+    var content_mgr= {
+        indicatorId:'$!{indicatorId}',
+        node:$!{node}
+    }
+</script>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        #parse("/content/interview/interview_edit.vm")
+    </div>
+</div>
+<script>
+    mini.parse();
+    var local = {
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        siteId: Ls.getWin.dialog.data('siteId')
+    }
+
+    cur.api.button(
+            {
+                id: 'save', className: 'btn-save', name: '保存', callback: function () {
+                saveData(0,0,false);
+                return false;
+            }
+            },
+            {
+                id: 'saveAndPublish', className: 'btn-save-release', name: '保存并发布', callback: function () {
+                saveData(1,1,true);
+                return false;
+            }
+            },
+            {
+                id: 'back', className: 'btn-back', name: '返回', callback: function () {
+                back();
+                return false;
+            }
+            }
+    );
+
+    function saveData(clickBtn,issued,flag) {
+        cur.clickBtn = clickBtn;
+        cur.vm.issued = issued;
+        var data = Ls.toJSON(cur.vm.$model);
+//        data.desc = cur.editor.html()
+        data.desc = cur.eweb.getHtml();
+        try{
+            var dt = new Date(Date.parse(data.sortNum.replace(/-/g, "/")));
+            data.sortNum = dt.getTime()/1000;
+        }catch (e){
+            data.sortNum = parseInt(new Date().getTime()/1000);
+        }
+        //处理图片轮播
+        var picList = [];
+        $("#picList tr").each(function (index) {
+            var _this = $(this);
+            var imgList = {
+                "picId": _this.find(".picId").val(),
+                "picTitle": Ls.str2Json(_this.find(".picTitle").val()),
+                "description": Ls.str2Json(_this.find(".picDesc").val()),
+                "sortNum": (index + 1)
+            }
+            picList.push(imgList);
+        })
+        data.picList = JSON.stringify(picList);
+        data.pics=[];
+        if(Ls.isEmpty(data.liveLink)){
+            data.contentPath = '';
+            data.quoteStatus=1;
+        }
+        data.videoStatus=article.videoStatus;
+        Ls.ajax({
+            url: "/interviewInfo/save",
+            data: data
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips(cur.clickBtn == 1 ? "正在生成处理中" : "保存成功", {
+                    icons: "success", callback: function () {
+                        if(flag) {
+                            back();
+                        }
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc)
+            }
+        })
+    }
+
+    function saveAndPublish() {
+    }
+
+    function back() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

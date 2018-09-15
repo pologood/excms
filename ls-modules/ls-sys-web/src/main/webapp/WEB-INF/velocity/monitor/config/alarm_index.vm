@@ -1,0 +1,181 @@
+<style>
+    .survey-table > tbody > tr > th {
+        width: 176px;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">监测报警配置</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="padding-top: 40px;">
+                <div class="tab-pane active" id="tab_1_1">
+                    <form id="alarm_form" role="form" style="" ms-controller="alarm_form">
+                        <div class="form-body">
+                            <table class="table table-bordered survey-table">
+                                <tbody>
+                                <tr>
+                                    <th align="right">请勾选报警项:</th>
+                                    <td>
+##                                        <label ms-repeat-el="arr1">
+##                                            <input type="checkbox" ms-duplex-checked="el.checked"> {{el.v}}&nbsp;&nbsp;
+##                                        </label>
+                                   <label id="">
+                                        <input type="checkbox" id="isVote" name="isVote" > 出现单项否决项&nbsp;&nbsp;
+                                    </label>
+                                    <label id="">
+                                        <input type="checkbox" id="isOut"  name="isOut" > 累计扣分超过20分&nbsp;&nbsp;
+                                    </label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="right">选择接收信息人:</th>
+                                    <td>
+                                    <textarea id="sendee" class="form-control" rows="2" name="name" placeholder="点击选择"
+                                              value="" ms-duplex="name"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th align="right">请选择报警信息提醒方式:</th>
+                                    <td>
+##                                        <label ms-repeat-el="arr2" class="tip">
+##                                            <input type="checkbox" ms-duplex-checked="el.checked"> {{el.v}}&nbsp;&nbsp;
+##                                        </label>
+                                   <label id="">
+                                        <input type="checkbox" id="alarmTypeMessage"  name="alarmTypeMessage" > 消息中心&nbsp;&nbsp;
+                                    </label>
+##                                    <label id=""> ms-click="reset"
+##                                        <input type="checkbox" id=""> 邮箱&nbsp;&nbsp;
+##                                    </label>
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <th></th>
+                                    <td>
+                                        <button type="button" class="btn btn-default btn-save"> 保 存</button>
+                                        <button type="reset" class="btn btn-default btn-reset" > 重 置
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    mini.parse();
+    cur = {
+        vm_id: "alarm_form",
+        form: $('#alarm_form')
+    }
+    $(function () {
+        Ls.ajaxGet({
+            url: '/monitor/alarm/getAlarmBySite'
+        }).done(function (resp) {
+            var data=resp.data;
+            cur.init = Ls.initFORM(cur.vm_id,data);
+            //如果模型已经绑定，不再绑定
+            cur.vm = avalon.vmodels[cur.vm_id];
+            cur.vm = avalon.define(cur.init);
+            avalon.scan(cur.form.get(0), cur.vm);
+            cur.vm.receiveUserId = data.receiveUserId;
+
+            if (data.isVote == 1) {
+                $("#isVote").prop("checked", true);
+            }
+
+            if (data.isOut == 1) {
+                $("#isOut").prop("checked", true);
+            }
+            if (data.alarmTypeMessage == 1) {
+                $("#alarmTypeMessage").prop("checked", true);
+            }
+
+        });
+
+        $(".btn-save").on('click', function () {
+            var data = cur.vm.$model;
+            data = Ls.toJSON(data);
+            if ($("#isVote").is(':checked')) {
+                data.isVote = 1;
+            } else {
+                data.isVote = 0;
+            }
+            if ($("#isOut").is(':checked')) {
+                data.isOut = 1;
+            } else {
+                data.isOut = 0;
+            }
+            if ($("#alarmTypeMessage").is(':checked')) {
+                data.alarmTypeMessage = 1;
+            } else {
+                data.alarmTypeMessage = 0;
+            }
+
+            if ($("#sendee").val()!='') {
+                Ls.ajax({
+                    url: "/monitor/alarm/saveAlarmBySite",
+                    data: data,
+                    type:"POST",
+                    success: function (resp) {
+                        if (resp.status == '1') {
+                            Ls.tipsOk("保存成功",function(){
+                            });
+
+                        } else {
+                            Ls.tips(resp.desc, {icons:'error',times: 2});
+                        }
+                    }
+                });
+            } else {
+                Ls.tipsInfo("选择接受人");
+            }
+
+        })
+
+//        $(".btn-reset").on('click', function () {
+//            $("#sendee").val('');
+//        })
+
+
+    })
+
+
+    $("#sendee").click(function () {
+        Ls.selectUnitUser(function () {
+            //debugger
+            var val = this.iframe.contentWindow.returnValue;
+            console.log("返回数据"+JSON.stringify(val))
+            if (!Ls.isEmpty(val)) {
+//                cur.vm.organId = val.ids;
+//                cur.vm.organName = val.shortNames;
+//                cur.vm.organizationChart = val.parentLinkIds;
+//                cur.tmpOrgan = val.list;
+                cur.vm.name="";
+                cur.vm.receiveUserId="";
+                cur.vm.name += val.names;
+                cur.vm.receiveUserId+=val.ids;
+                return;
+            }
+        }, {
+            scope: 0,
+            scopeType:'multi',
+            isSimple: 1,
+            // 回传选择框的数据，用于已选数据的更改
+            data: {
+                list: {
+                   ids: cur.vm.receiveUserId,
+                   names: cur.vm.name
+                }
+            }
+        }, "/common/selectUnitUser2");
+    });
+</script>

@@ -1,0 +1,18 @@
+/* 表格式表单样式 */
+
+table.tbForm{background-color:#FFF;border:1px solid #a5b3c5;border-collapse:collapse;}
+table.tbForm td,th{border:1px solid #a5b3c5;border-width:0 1px 1px 0;}
+table.tbForm th{background-color:#a5b3c5;}
+.tbH{background:url(images/bg_nav01.jpg) repeat-x #DFF0F9;color:#254262;font-family:微软雅黑,arial,宋体;font-size:14px;font-weight:700;line-height:30px;padding-left:5px;text-align:center;vertical-align:middle;}
+.tbH a:link,.tbH a:visited{color:#254262;}
+.tbL,.tbL1,.tbL2{font-size:12px; padding:5px;text-align:right;}
+.tbL{background-color:#f1f5fb; color:#666}
+.tbL1{background-color:#FEF8E0; color:#666}
+.tbL2{background-color:#F6F6B5; color:#666}
+.tbC{background-color:#fff;font-size:12px;padding:5px;text-align:left;}
+.tbC2{background-color:#FCFCEA;font-size:12px;padding:5px;text-align:left;}
+.tbLine{border-bottom-width:1px!important; border-bottom-color:#a5b3c5; border-bottom-style:solid}
+.tbBT{background:url(images/wizardDownBg.gif) repeat-x top center #FCFCFC;height:40px;line-height:40px;overflow:hidden;text-align:right; border-top:0}
+.tbBC{background:url(images/wizardDownBg.gif) repeat-x center center #FCFCFC;height:40px;line-height:40px;overflow:hidden;text-align:right;border-top:0}
+.tbBD{background:url(images/wizardDownBg.gif) repeat-x bottom center #FCFCFC;height:40px;line-height:40px;overflow:hidden;text-align:right;border-top:0}
+.tbH *,.tbL *,.tbC *,.tbC2 *,.tbL1 *,.tbBT *,.tbBC *,.tbBD *,.tbL2 *{vertical-align:middle;}

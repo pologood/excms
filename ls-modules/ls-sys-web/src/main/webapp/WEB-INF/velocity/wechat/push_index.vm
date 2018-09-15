@@ -1,0 +1,211 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;overflow: auto;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="tabbable-line" style=" margin:12px 20px 15px;">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab"><strong>消息群发</strong></a>
+                </li>
+            </ul>
+            <div class="tab-content " style="padding: 10px 0 0;">
+                <div class="tab-pane active" id="tab_1_1">
+
+                #*<div class="device">
+                    <div class="phone phone-v ">
+                        <iframe width="320" height="468" scrolling="no" frameborder="0" src="http://framework7.taobao.org/apps/Framework7-Contacts7-MVC/"></iframe>
+                    </div>
+                </div>*#
+
+                    <div class="alert alert-info pd10">
+                        <div>1、对于认证订阅号，群发接口每天可成功调用<font color="red">1</font>次，此次群发可选择发送给全部用户或某个分组；</div>
+                        <div>2、对于认证服务号虽然开发者使用高级群发接口的每日调用限制为100次，但是用户每月只能接收<font color="red">4</font>条，无论在公众平台网站上，还是使用接口群发，用户每月只能接收4条群发消息，多于4条的群发将对该用户发送失败；</div>
+                        <div>3、对于消息的撤回，只能撤回<font color="red">30分钟内</font>发布的<font color="red">视频或图文</font>消息。</div>
+                    </div>
+                    <div class="table-toolbar">
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="btn-group">
+                                    <button id="deletes" class="btn btn-default btn-add" onclick="addPushMsg()"> 新 增</button>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <form class="form-inline tr search-toolbar" role="form">
+                                    <div class="form-group">
+                                        <!--  <label>搜索：</label>-->
+                                        <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="标题">
+                                    </div>
+                                    <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                    <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="articleGrid" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                         allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChat/pushMsg/getMsgPage" sizeList="[20,30,50]" pageSize="20"
+                         idField="id" multiSelect="true">
+                        <div property="columns">
+                            <div type="checkcolumn"></div>
+                            <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                            <div field="title" width="100%" headerAlign="center" align="center" allowSort="flase" align="left">标题</div>
+                            <div width="100" headerAlign="center" allowSort="flase" renderer="renderType" align="center">类型</div>
+                            <div field="createDate" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                                 align="center">创建时间
+                            </div>
+                            <div width="100" field="groupName" headerAlign="center" allowSort="flase" align="center">发送对象</div>
+                            <div width="60" headerAlign="center" renderer="renderPublish" align="center">发送</div>
+                            <div width="160" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="tab-pane" id="tab_1_2">
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var data;
+    mini.parse();
+    var grid = mini.get("articleGrid");
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid, 165);
+
+    grid.load({dataFlag: 1});
+    $(document).ready(function () {
+
+    })
+
+    function renderType(e) {
+        var str = "";
+        var rec = e.record;
+        if (rec.type == 1) {
+            str = "文本消息";
+        } else if (rec.type == 2) {
+            str = "图文消息";
+        }
+        return str;
+    }
+
+    function renderOp(e) {
+        var str = "";
+        var rec = e.record;
+        var dis = "";
+        var disk = ""
+        if (rec.isPublish == 1) {
+            dis = "disabled";
+        }
+        if (rec.isPublish != 1 || rec.type == 1) {
+            disk = "disabled";
+        }
+        str = '<button id=""  ' + dis + ' class="btn btn-default btn-sm btn-edit" onclick="edit(' + rec.id + ')">修改</button> '
+            + '<button id="" class="btn btn-default btn-sm btn-delete" onclick="deleteArt(' + rec.id + ')">删除</button>'
+            + '<button ' + disk + ' class="btn btn-default btn-sm" onclick="revokeMsg(' + rec.msgId + ',' + rec.id + ')">撤回</button>';
+        return str;
+    }
+
+    function renderPublish(e) {
+        var rec = e.record, isPublish = rec.isPublish, str = "";
+        if (isPublish == 1) {
+            str = '<a onclick="" class="disabled"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/click.gif" border="0" title="已发布" ></a>';
+        } else {
+            str = '<a onclick="sendMsg(' + rec.id + ')"><img src="' + GLOBAL_CONTEXTPATH + '/assets/images/noclick.gif" border="0" title="发布"></a>';
+        }
+        return str;
+    }
+
+    function sendMsg(id) {
+        if (confirm("确定群发消息？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/weChat/pushMsg/sendMsg",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr(text.desc);
+                    } else {
+                        Ls.tipsOk("发送成功");
+                        grid.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    function addPushMsg() {
+        Ls.openWin("/weChat/pushMsg/editMsg", {
+            width: '600px',
+            height: '450px',
+            lock: true,
+            id: 12122,
+            title: '新增消息',
+        });
+    }
+
+    function edit(id) {
+        Ls.openWin("/weChat/pushMsg/editMsg?id=" + id, {
+            width: '600px',
+            height: '450px',
+            lock: true,
+            id: 21211,
+            title: '修改消息',
+        });
+    }
+
+    function deleteArt(id) {
+        if (confirm("确定删除？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id
+                },
+                url: "/weChat/pushMsg/deleteMsg",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("删除失败");
+                    } else {
+                        Ls.tipsOk("删除成功");
+                        grid.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    function search() {
+        var name = $("#searchKey").val()
+        grid.load({title: name, dataFlag: 1});
+    }
+
+    function revokeMsg(msgId, id) {
+        if (confirm("只能撤销30分钟内发送的消息，确定撤销？")) {
+            Ls.ajaxGet({
+                data: {
+                    id: id,
+                    msgId: msgId
+                },
+                url: "/weChat/pushMsg/revokeMsg",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr(text.desc);
+                    } else {
+                        Ls.tipsOk("撤销成功");
+                        grid.reload();
+                    }
+                }
+            });
+        }
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+</script>

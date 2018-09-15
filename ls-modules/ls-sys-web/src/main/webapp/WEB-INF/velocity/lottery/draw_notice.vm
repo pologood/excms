@@ -1,0 +1,53 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0, maximum-scale=2.0" />
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="copyright" content="Copyright ? 2013 Lonsun.cn." />
+    <meta name="description" content="" />
+    <link rel="stylesheet" type="text/css" href="/css/longsun.css">
+</head>
+    #parse("/lottery/lottrty_footer.vm")
+<body class="hdbodybg" >
+
+<div class="hdnum1" id="hd01" >
+    <div class="hdtitle">请阅读活动详情</div>
+    <!--主体内容-->
+    <div class="hd_nrbg">
+        <div class="hdtit1">活动时间：</div>
+        <div class="hdinfo">2017年1月20日-2017年2月10日（法定节假日除外） </div>
+        <div class="hdtit1">活动规则：</div>
+        <div class="hdinfo">
+		<p>1 . 参与者关注“安徽省安全监管局”微信公众号；</p>
+           <p>2 . 点击“微互动”栏目“答题辅导”按钮，进行《意见》题库内容学习辅导；</p>
+           <p>3 . 点击“微互动”栏目“有奖答题”按钮（或输入关键字“答题”）进入系统，进行答题。每次答题共3道试题，为系统随机抽取产生，全部答对，即可抽奖。</p>
+           <p>4 . 每“微信ID+手机号”一天可参与一次活动。</p>
+        </div>
+        <div class="hdtit1">活动奖品：</div>
+        <div class="hdinfo fontred">话费红包将于第二天直接充值到登记的手机号码上，请确保手机号码正确。</div>
+        <div class="hdtit1">活动最终解释权归主办方所有</div>
+    </div>
+    <!--主体内容--->
+    <div class="hdbotbg">
+        <div class="zdbtn1"><a href="/lotteryDraw/drawIndex"><img src="/images/zdbtn.jpg" width="239" height="64"></a></div>
+    </div>
+</div>
+
+</body>
+
+
+<script>
+
+    $(document).ready(function () {
+
+
+    })
+
+
+
+
+</script>
+
+</html>

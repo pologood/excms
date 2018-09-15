@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <script type="text/javascript" src="dialog.js"></script>
+
+    <script type="text/javascript">
+        document.write("<link href='../language/" + lang.ActiveLanguage + ".css' type='text/css' rel='stylesheet'>");
+        document.write("<link href='../skin/" + config.Skin + "/dialog.css' type='text/css' rel='stylesheet'>");
+
+
+        var pType = GetParam("type", "image").toLowerCase();
+        var pMode = GetParam("mode", "2");
+        var pSavePath = GetParam("savepathfilename", "");
+        var pSaveFile = GetParam("savefilename", "");
+        var pOriginalFile = GetParam("originalfilename", "");
+        var pReturnFlag = GetParam("returnflag", "2");
+
+        var sSLTUrl = "";
+
+        var sTitle, sLangSource, sAllowExt, sAllowSize, bAllowUpload;
+
+        switch (pType) {
+            case "image":
+                sTitle = lang["DlgIUploadImage"];
+                sLangSource = lang["DlgImgSource"]
+                sAllowExt = config.AllowImageExt;
+                sAllowSize = config.AllowImageSize;
+                break;
+            case "flash":
+                sTitle = lang["DlgIUploadFlash"];
+                sLangSource = lang["DlgFlashSource"]
+                sAllowExt = config.AllowFlashExt;
+                sAllowSize = config.AllowFlashSize;
+                break;
+            case "media":
+                sTitle = lang["DlgIUploadMedia"];
+                sLangSource = lang["DlgMediaSource"]
+                sAllowExt = config.AllowMediaExt;
+                sAllowSize = config.AllowMediaSize;
+                break;
+            default:
+                pType = "file";
+                sTitle = lang["DlgIUploadFile"];
+                sLangSource = lang["DlgFileSource"]
+                sAllowExt = config.AllowFileExt;
+                sAllowSize = config.AllowFileSize;
+                break;
+        }
+        bAllowUpload = ((parseFloat(sAllowSize) > 0) ? true : false);
+
+
+        sTitle = lang["DlgIUpload"] + "(" + sTitle + ")";
+        var sCaption = sTitle;
+        document.write("<title>" + sCaption + "</title>");
+
+
+        function RadioClick(what) {
+            if (what == "url") {
+                $("d_fromurl").disabled = false;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = false;
+                }
+                $("d_checkfromurl").checked = true;
+                if (bAllowUpload) {
+                    $("d_checkfromfile").checked = false;
+                    $("uploadfile").disabled = true;
+                }
+            } else {
+                $("d_checkfromurl").checked = false;
+                $("uploadfile").disabled = false;
+                $("d_checkfromfile").checked = true;
+                $("d_fromurl").disabled = true;
+                if (config.AllowBrowse == "1") {
+                    $("d_browse").disabled = true;
+                }
+            }
+        }
+
+        function UploadError(s_Flag) {
+            AbleItems();
+            RadioClick('file');
+            DLGDoingMsg.Hide();
+            try {
+                BaseAlert($("uploadfile"), getUploadErrDesc(s_Flag, sAllowExt, sAllowSize));
+            }
+            catch (e) {
+            }
+        }
+
+
+        function UploadSaved(sOriginalFileName, sPathFileName, sPathFileName_s) {
+            EWIN.addUploadFile(sOriginalFileName, sPathFileName);
+            if (sPathFileName_s) {
+                EWIN.addUploadFile(sOriginalFileName, sPathFileName_s);
+            }
+
+            $("d_fromurl").value = sPathFileName;
+            sSLTUrl = sPathFileName_s;
+            ReturnValue();
+        }
+
+        function ReturnValue() {
+            var s_SavePath = $("d_fromurl").value;
+            var s_SaveFile = s_SavePath.substr(s_SavePath.lastIndexOf("/") + 1);
+            var s_OriginalFile = $("d_filename").value;
+
+            UpdateLinkField(pSavePath, s_SavePath);
+            UpdateLinkField(pSaveFile, s_SaveFile);
+            UpdateLinkField(pOriginalFile, s_OriginalFile);
+
+            if (sSLTUrl) {
+                var s_SLTFile = sSLTUrl.substr(sSLTUrl.lastIndexOf("/") + 1);
+                UpdateLinkField(pSavePath, sSLTUrl);
+                UpdateLinkField(pSaveFile, s_SLTFile);
+                UpdateLinkField(pOriginalFile, s_OriginalFile);
+            }
+
+            parent.Ok({flag: "AfterIUpload", filecount: 1, savepathfilename: pSavePath, savefilename: pSaveFile, originalfilename: pOriginalFile, type: pType});
+        }
+
+        function UpdateLinkField(s_LinkName, s_Value) {
+            if (!s_Value) {
+                return;
+            }
+            if (s_LinkName) {
+                try {
+                    var o_Link = EWIN.parent.document.getElementById(s_LinkName);
+                    if (!o_Link) {
+                        o_Link = EWIN.parent.document.getElementsByName(s_LinkName)[0];
+                    }
+                    if (o_Link) {
+                        if (pReturnFlag == "1") {
+                            o_Link.value = s_Value;
+                        } else {
+                            o_Link.value = (o_Link.value) ? (o_Link.value + "|" + s_Value) : s_Value;
+                        }
+                        o_Link.onchange();
+                    }
+                } catch (e) {
+                }
+            }
+        }
+
+        function ok() {
+            if (config.FSPath != "" && config.FSL != "ok") {
+                alert(lang["ErrFSL"]);
+                return;
+            }
+
+            if ($("d_checkfromurl").checked) {
+                GetFileName($("d_fromurl").value, "/");
+                ReturnValue();
+            } else {
+                if (!IsExt($("uploadfile").value, sAllowExt)) {
+                    UploadError("ext");
+                    return false;
+                }
+
+                CheckSizeAsync($("uploadfile"), sAllowSize,
+                    function (s_SizeFlag) {
+                        if (s_SizeFlag == "no") {
+                            UploadError("size");
+                            return false;
+                        }
+
+                        GetFileName($("uploadfile").value, "\\");
+                        DisableItems();
+                        DLGDoingMsg.Show();
+                        document.myuploadform.submit();
+                    }
+                );
+            }
+        }
+
+        function DisableItems() {
+            $("d_checkfromfile").disabled = true;
+            $("d_checkfromurl").disabled = true;
+            $("d_fromurl").disabled = true;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = true;
+            }
+            $("d_ok").disabled = true;
+        }
+
+        function AbleItems() {
+            $("d_checkfromfile").disabled = false;
+            $("d_checkfromurl").disabled = false;
+            $("d_fromurl").disabled = false;
+            if (config.AllowBrowse == "1") {
+                $("d_browse").disabled = false;
+            }
+            $("d_ok").disabled = false;
+        }
+
+
+        function GetFileName(s_Url, s_Sep) {
+            $("d_filename").value = s_Url.substr(s_Url.lastIndexOf(s_Sep) + 1);
+        }
+
+
+        function InitDocument() {
+            lang.TranslatePage(document);
+
+            if (!bAllowUpload) {
+                RadioClick("url");
+            } else {
+                RadioClick("file");
+            }
+
+            if (pMode == "0" || pMode == "1" || pMode == "2") {
+                $("tab_normal").style.display = "";
+            }
+            if (pMode == "3" || pMode == "4" || pMode == "5" || pMode == "6") {
+                $("tab_mfu").style.display = "";
+                var s_MultiFile = (pMode == "1" || pMode == "3" || pMode == "5") ? "0" : "1";
+                DLGMFU.Load(pType, $("tab_mfu"), "500px", "250px", s_MultiFile);
+            }
+
+            parent.InnerDialogLoaded(sCaption);
+
+            if (bAllowUpload && document.documentMode == 5) {
+                var b_UFDisable = true;
+                $("uploadfile").disabled = b_UFDisable;
+                $("uploadfile").disabled = !b_UFDisable;
+            }
+        }
+
+        function TabOnClick(n_Index, n_Count, s_TabID) {
+            if (s_TabID == "tab_mfu") {
+                var s_MultiFile = (pMode == "1" || pMode == "3" || pMode == "5") ? "0" : "1";
+                DLGMFU.Load(pType, $(s_TabID), "500px", "250px", s_MultiFile);
+            }
+
+            if (DLGTab.FrameSize[n_Index]) {
+                parent.ResizeDialog(DLGTab.FrameSize[n_Index].Width, DLGTab.FrameSize[n_Index].Height);
+            } else {
+                parent.ResizeDialog($("tabDialogSize").offsetWidth, $("tabDialogSize").offsetHeight);
+            }
+        }
+
+        function MFUReturn(s_Value) {
+            var aFile = s_Value.split("|");
+            var n_FileCount = 0;
+            for (var i = 0; i < aFile.length; i++) {
+                var a = aFile[i].split("::");
+                if (a.length == 3 && a[1] != "") {
+                    n_FileCount++;
+                    var s_OriginalFile = a[0].substr(a[0].lastIndexOf("\\") + 1);
+                    var s_SavePath = a[1];
+                    var s_SaveFile = s_SavePath.substr(s_SavePath.lastIndexOf("/") + 1);
+
+                    UpdateLinkField(pSavePath, s_SavePath);
+                    UpdateLinkField(pSaveFile, s_SaveFile);
+                    UpdateLinkField(pOriginalFile, s_OriginalFile);
+
+                    sSLTUrl = a[2];
+                    if (sSLTUrl) {
+                        var s_SLTFile = sSLTUrl.substr(sSLTUrl.lastIndexOf("/") + 1);
+                        UpdateLinkField(pSavePath, sSLTUrl);
+                        UpdateLinkField(pSaveFile, s_SLTFile);
+                        UpdateLinkField(pOriginalFile, s_OriginalFile);
+                    }
+                }
+            }
+
+            parent.Ok({flag: "AfterIUpload", filecount: n_FileCount, savepathfilename: pSavePath, savefilename: pSaveFile, originalfilename: pOriginalFile, type: pType});
+        }
+
+    </script>
+
+</head>
+<body onload="InitDocument()">
+<table border=0 cellpadding=0 cellspacing=5 id=tabDialogSize>
+    <tr>
+        <td>
+
+            <script type="text/javascript">
+                if (config.MFUEnable == "1") {
+                    if (pMode == "1" || pMode == "2") {
+                        DLGTab.Create([
+                            [lang["DlgComTabNormal"], "tab_normal"],
+                            [lang["DlgComTabMFU"], "tab_mfu"]
+                        ]);
+                    } else if (pMode == "5" || pMode == "6") {
+                        DLGTab.Create([
+                            [lang["DlgComTabMFU"], "tab_mfu"],
+                            [lang["DlgComTabNormal"], "tab_normal"]
+                        ]);
+                    }
+                }
+            </script>
+
+            <table id="tab_normal" border=0 cellpadding=0 cellspacing=0 align=center style="display:none">
+                <tr>
+                    <td>
+                        <fieldset>
+                            <script type="text/javascript">
+                                document.write('<legend><span>' + sLangSource + '</span></legend>');
+                            </script>
+                            <table border=0 cellpadding=5 cellspacing=0 width="100%">
+                                <tr>
+                                    <td>
+
+                                        <table border=0 cellpadding=0 cellspacing=0 width="300px">
+                                            <tr>
+                                                <td></td>
+                                            </tr>
+                                        </table>
+                                        <table border=0 cellpadding=0 cellspacing=2 width="100%">
+                                            <script type="text/javascript">
+                                                if (bAllowUpload) {
+                                                    document.write("<tr>");
+                                                    document.write("<td noWrap width=\"20%\"><input type=radio id=\"d_checkfromfile\" value=\"1\" onclick=\"RadioClick('file')\"><label for=d_checkfromfile>" + lang["DlgFromFile"] + "</label>:</td>");
+                                                    document.write("<td noWrap width=\"80%\">");
+                                                    document.write(getUploadForm(pType));
+                                                    document.write("</td>");
+                                                    document.write("</tr>");
+                                                }
+                                            </script>
+                                            <tr>
+                                                <td noWrap width="20%"><input type=radio id="d_checkfromurl" value="1" onclick="RadioClick('url')"><label for=d_checkfromurl><span
+                                                    lang=DlgFromUrl></span></label>:
+                                                </td>
+                                                <td noWrap width="80%">
+                                                    <script type="text/javascript">
+                                                        if (config.AllowBrowse == "1") {
+                                                            document.write("<table border=0 cellpadding=0 cellspacing=0 width='100%'><tr><td width='100%'><input type=text id='d_fromurl' style='width:100%' size=20 value='http://'></td><td><input class='dlgBtnBrowse' type=button id='d_browse' onclick=\"SelectBrowse('" + pType + "','fromurl')\"  value='" + lang["DlgBtnBrowse"] + "' align=absmiddle></td></tr></table>");
+                                                        } else {
+                                                            document.write("<input type=text id='d_fromurl' style='width:100%' size=40 value='http://'>");
+                                                        }
+                                                    </script>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td height=5></td>
+                </tr>
+                <tr>
+                    <td noWrap align=right><input type=submit class="dlgBtnCommon dlgBtn" value='' id=d_ok onclick="ok()" lang=DlgBtnOK>&nbsp;&nbsp;<input type=button
+                                                                                                                                                           class="dlgBtnCommon dlgBtn"
+                                                                                                                                                           value=''
+                                                                                                                                                           onclick="parent.Cancel()"
+                                                                                                                                                           lang=DlgBtnCancel></td>
+                </tr>
+            </table>
+
+
+            <div id="tab_mfu" style="display:none"></div>
+
+
+        </td>
+    </tr>
+</table>
+
+
+<script type="text/javascript">
+    DLGDoingMsg.OutHtml(lang["DlgComUploading"]);
+</script>
+<input type=hidden id=d_filename value="">
+
+</body>
+</html>

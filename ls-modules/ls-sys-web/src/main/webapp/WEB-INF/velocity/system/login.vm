@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta version="$!{version}" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <link href="$!{sysStaticPath}/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/plugins.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/components.min.css" rel="stylesheet" type="text/css"/>
+    <link href="$!{sysStaticPath}/assets/css/default.min.css" rel="stylesheet" type="text/css"/>
+    <style>
+        .login-wrap {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin: -270px 0 0 -428px
+        }
+
+        .login-dialog {
+            /*position: relative;*/
+            margin: 0 auto;
+            background: url(/assets/images/logo_dialog_bg.png) no-repeat;
+            width: 856px;
+            height: 498px;
+            border-radius: 5px !important;
+            box-shadow: 0 0 8px #3789ef;
+        }
+
+        .login-dialog .content h3 {
+            color: #47a9f3;
+            margin: 40px 0 35px 0;
+            text-align: center;
+            font-size: 32px;
+            letter-spacing: 4px;
+        }
+
+        .login-dialog .content {
+            position: absolute;
+            top: 55px;
+            right: 55px;
+            background-color: #fff;
+            width: 350px;
+            padding: 0 30px 30px 30px;
+            overflow: hidden;
+            border-radius: 5px !important;
+        }
+
+        .login-dialog .content .login-form {
+            padding: 0;
+            margin: 0
+        }
+
+        .login-dialog .content .login-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .login-dialog .content .login-form .login-btn {
+            background-color: #44a4f1 !important;
+            color: #fff;
+            font-size: 18px;
+            line-height: 18px;
+            border: 1px solid #339aec;
+        }
+
+        .login-dialog .content .login-form .login-btn:active,
+        .login-dialog .content .login-form .login-btn:focus,
+        .login-dialog .content .login-form .login-btn:hover {
+            background-color: #449ae7 !important;
+            border-color: #2a7fc2;
+            color: #fff
+        }
+
+        .login-dialog .content .login-form .form-group .form-control {
+            height: 40px
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox-inline {
+            padding: 0
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox {
+            margin-bottom: 0
+        }
+
+        .login-dialog .content .login-form .form-group .mt-checkbox > span {
+            top: 2px
+        }
+
+        .login-dialog .content .login-form .form-group .input-icon > i {
+            font-size: 20px;
+            margin-top: 13px;
+            left: 0;
+        }
+
+        .login-dialog .content .login-form .form-group .input-icon > img {
+            margin: 0 20px
+        }
+
+        .footer-bar {
+            width: 100%;
+            padding: 8px 0;
+            text-align: center;
+            background-color: rgba(0, 0, 0, .2);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            font-size: 14px;
+            color: #fff
+        }
+    </style>
+    <script>
+        //上下文
+        var GLOBAL_CONTEXTPATH = "$!{rc.contextPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERPATH = "$!{fileServerPath}";
+        //文件服务器地址
+        var GLOBAL_FILESERVERNAMEPATH = "$!{fileServerNamePath}";
+    </script>
+</head>
+<body #if("$!{indexImg}" == "")#else style="background:#fff url('$!{fileServerPath}$!{indexImg}')"#end>
+    #parse("_page_layout/_page_mask.vm")
+<div class="login-wrap">
+    <div class="login-dialog">
+        <div class="content">
+            <form id="login_form" class="login-form" action="$!{rc.contextPath}/login" method="post" autocomplete="off">
+                <h3>用户登录</h3>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa fa-user"></i>
+                        <input name="username" id="username" type="text" class="form-control" style="color:#333"
+                               value="" maxlength="50" placeholder="用户名"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fa fa-lock"></i>
+                        <input name="password" id="password" type="password" class="form-control" value=""
+                               maxlength="50" placeholder="密码"/>
+                    </div>
+                </div>
+                <div class="form-group yzmEl">
+                    <div class="input-group">
+                        <div class="input-icon">
+                            <input class="form-control" type="text" name="code" id="code" placeholder="验证码">
+                            <i class="fa fa-asterisk"></i>
+                        </div>
+                        <span class="input-group-addon pd0" title="点击换一换">
+                        <img id="codeImg" class="hand code-refresh" src="/login/getCode" width="116" height="36"
+                             style="border-top-right-radius: 4px; border-bottom-right-radius: 4px;">
+                    </span>
+                    </div>
+                </div>
+            #*<div class="form-group">
+                <div class="mt-checkbox-inline">
+                    <label class="mt-checkbox mt-radio-outline">
+                        <input type="checkbox" name="rememberUID" id="rememberUID" value="1"> 记住用户名
+                        <span></span>
+                    </label>
+                </div>
+            </div>*#
+                <div class="form-group mt30">
+                    <input type="submit" class="form-control btn login-btn" value="登  录"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+#*<style>
+    #mask {
+        height: 100vh;
+        background: rgba(0, 0, 0, .6);
+        position: relative;
+        z-index: 10;
+        /*display: none;*/
+        visibility: hidden;
+    }
+
+    #mask > #update_browser_box {
+        position: absolute;
+        width: 856px;
+        height: 501px;
+        top: 50%;
+        left: 50%;
+        margin-left: -428px;
+        margin-top: -272px;
+    }
+
+    #update_browser_box {
+        background: url($!{sysStaticPath}/assets/images/update_browser_bg.png) repeat;
+        position: absolute;
+        z-index: 9998;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        _height: expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight))
+    }
+
+    .update_browser {
+        width: 640px;
+        height: 350px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-left: -320px;
+        margin-top: -175px
+    }
+
+    .update_browser .subtitle {
+        width: 640px;
+        /*height: 36px;*/
+        line-height: 26px;
+        font-size: 14px;
+        color: #777
+    }
+
+    .update_browser .title {
+        width: 640px;
+        height: 106px;
+        line-height: 96px;
+        font-size: 48px;
+        text-align: center;
+        color: #009AD9
+    }
+
+    .update_browser .title span {
+        font-size: 60px;
+        color: #F33
+    }
+
+    .update_browser .browser {
+        background: url($!{sysStaticPath}/assets/images/browser.png) no-repeat;
+        width: 640px;
+        height: 128px;
+        overflow: hidden
+    }
+
+    .update_browser .browser a {
+        display: block;
+        width: 128px;
+        height: 128px;
+        float: left;
+        text-indent: -999em
+    }
+
+    .update_browser .bottomtitle {
+        width: 640px;
+        height: 78px;
+        line-height: 78px;
+        text-align: center;
+        font-size: 14px;
+        color: #777
+    }
+
+    .update_browser .bottomtitle a {
+        color: #777
+    }
+
+    .update_browser .bottomtitle a:hover {
+        color: #999
+    }
+</style>
+<div id="mask">
+    <div id="update_browser_box">
+        <div class="update_browser">
+            <div class="subtitle">
+                您正在使用的IE浏览器版本过低，<br>
+                我们建议您升级或者更换浏览器，以便体验顺畅、兼容、安全的互联网。<br>
+                <span style="color: #ff0000; font-size: 16px;">系统为XP的用户，建议下载 360极速浏览器<a href="http://chrome.360.cn"
+                                                                                        target="_blank"
+                                                                                        title="360 极速浏览器">[下载]</a> 或 QQ浏览器<a
+                        href="http://browser.qq.com" target="_blank" title="QQ 极速浏览器">[下载]</a></span>。
+            </div>
+            <div class="title">选择一款<span>新</span>浏览器吧</div>
+
+            <div class="browser">
+                <a href="http://rj.baidu.com/soft/detail/23356.html?ald" class="ie" target="_blank"
+                   title="ie浏览器">ie浏览器</a>
+                <a href="http://rj.baidu.com/soft/detail/14744.html?ald" class="chrome" target="_blank" title="谷歌浏览器">谷歌浏览器</a>
+                <a href="http://rj.baidu.com/soft/detail/10365.html" class="firefox" target="_blank"
+                   title="火狐浏览器">火狐浏览器</a>
+                <a href="http://rj.baidu.com/soft/detail/11508.html" class="opera" target="_blank" title="opera浏览器">opera浏览器</a>
+                <a href="http://rj.baidu.com/soft/detail/12966.html" class="safari" target="_blank" title="safari浏览器">safari浏览器</a>
+            </div>
+            <div class="bottomtitle">[&nbsp;<a href="http://www.baidu.com/search/theie6countdown.html" target="_blank">对IE6/IE7说再见</a>&nbsp;]
+            </div>
+        </div>
+    </div>
+</div>*#
+<div class="footer-bar">Copyright © 2005-<span id="currYear">2017</span>安徽龙讯信息科技有限公司</div>
+<script>
+    var security = {
+        exponent: "$!{exponent}",
+        modulus: "$!{modulus}"
+    }
+</script>
+<script src="$!{sysStaticPath}/assets/js/common.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/core.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/security.min.js"></script>
+<script src="$!{sysStaticPath}/assets/js/plugins/backstretch/backstretch.min.js"></script>
+<script>
+    var loginMgr = function () {
+
+        var loginForm = $('#login_form');
+        var key;
+        try {
+            key = RSAUtils.getKeyPair(security.exponent, '', security.modulus);
+        } catch (e) {
+        }
+
+        loginForm.validator({
+            fields: {
+                'username': '用户名:required;',
+                'password': '密码:required;',
+                'code': '验证码:required;'
+            },
+            valid: function (form) {
+                var me = this;
+                me.holdSubmit();
+                var data = $(form).serializeObject();
+                if (key) {
+                    data.password = RSAUtils.encryptedString(key, data.password);
+                    data.isEncryption = true;
+                }
+                postLogin(me, data);
+            }
+        })
+
+        var postLogin = function (me, data) {
+            Ls.ajax({
+                url: "/login",
+                data: data
+            }).done(function (text) {
+                if (text.status == 1) {// 登录成功
+                    window.location.replace(GLOBAL_CONTEXTPATH + text.data);
+                } else {
+                    $("#codeImg").click();
+                    Ls.tipsErr(text.desc, function () {
+                        me.holdSubmit(false);
+                    });
+                }
+            }).fail(function () {
+                $("#codeImg").click();
+                me.holdSubmit(false);
+            });
+        }
+
+        $(document).ready(function () {
+
+            if (Ls.browser.isIE8OrLower) {
+                window.location.replace(GLOBAL_CONTEXTPATH + "/ie_update");
+                return false;
+            }
+
+            $.backstretch([
+                "/assets/images/login-bg.jpg",
+                "/assets/images/login-bg1.jpg"
+            ], {
+                fade: 1000,
+                duration: 8000
+            });
+
+            $(".code-refresh").on('click', function () {
+                $("#code").val('');
+                $("#codeImg").attr('src', '/login/getCode?' + new Date().getTime());
+            });
+
+            setTimeout(function () {
+                $(".code-refresh").trigger('click');
+            }, 1000);
+
+            var hideMask = function () {
+                $('#loading_bd').fadeOut(1500, function () {
+                    $('#loading_mask').fadeOut(200, function () {
+                        $(this).remove();
+                        $("#username").focus();
+                    });
+                    $(this).remove();
+                });
+            }();
+
+            $("#currYear").text(new Date().getFullYear());
+        })
+    }()
+</script>
+</body>
+</html>

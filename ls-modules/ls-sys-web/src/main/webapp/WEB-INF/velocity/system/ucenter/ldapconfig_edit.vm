@@ -1,0 +1,100 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="user_form" role="form" ms-controller="user_form">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>排序号：</label>
+                    <input name="sortNum" type="number" class="form-control" placeholder="排序号不能为空" ms-duplex="sortNum">
+                </div>
+
+                <div class="form-group">
+                    <label>LDAP地址：</label>
+                    <input name="url" type="text" class="form-control" placeholder="LDAP地址不能为空" ms-duplex="url">
+                </div>
+
+                <div class="form-group">
+                    <label>服务器名称：</label>
+                    <input name="serverName" type="text" class="form-control" placeholder="服务器名称不能为空" ms-duplex="serverName">
+                </div>
+
+                <div class="form-group">
+                    <label>密码：</label>
+                    <input name="password" type="text" class="form-control" placeholder="密码不能为空" ms-duplex="password">
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        configId: '$!{configId}'
+    };
+
+    $(document).ready(function () {
+
+        //拉取数据
+        var getData = function () {
+            Ls.ajax({
+                url: "/config/getConfig",
+                data: {
+                    configId: cur.configId
+                }
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "user_form"
+                data.$id = cur.$id;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0), cur.vm);
+
+            })
+        }();
+
+        $('#user_form').validator({
+            fields: {
+                'sortNum': '排序号:required;',
+                'url': 'Ldap地址:required;',
+                'serverName': '服务器名称:required;',
+                'password': '密码:required;'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            var url = "/config/updateConfig";
+            if (cur.configId == '') url = "/config/saveConfig";
+            Ls.ajax({
+                url: url,
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tipsOk("保存成功！", function () {
+                        Ls.winClose();
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<div class="portlet light">
+    <div class="portlet-body">
+
+        <div class="table-toolbar">
+            <div class="row">
+                <div class="col-md-7">
+                    <button class="btn btn-default btn-add" onclick="addPage()">添 加</button>
+                    <!--<a class="btn btn-sm purple" onclick="del()">删除 <i class="fa fa-times"></i></a>-->
+                </div>
+                <div class="col-md-5">
+                </div>
+            </div>
+        </div>
+
+        <div id="datagrid1" class="mini-datagrid" style="width:100%;height:500px;"
+             idField="configId" sizeList="[15,30,45]" pageSize="15" allowCellSelect="false" onlyCheckSelection="true" multiSelect="true"
+             url="/config/getPagination">
+            <div property="columns">
+                <div type="checkcolumn" width="50"></div>
+                <div type="indexcolumn" width="50" headerAlign="center">序号</div>
+                <div field="url" width="100%" headerAlign="center" align="center" allowSort="false" >地址</div>
+                <div field="serverName" width="180" headerAlign="center" align="center" allowSort="false">服务器名称</div>
+                <div field="sortNum" width="80" headerAlign="center" align="center" allowSort="false">排序号</div>
+                <div field="createDate" width="160" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" align="center"
+                     allowSort="false">创建时间
+                </div>
+                <div width="115" headerAlign="center" align="center" renderer="renderopt">操作</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    mini.parse();
+    var grid = mini.get("datagrid1");
+    grid.load({dataFlag: 1});
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+    //描述
+    function renderopt(e) {
+        var str = "";
+        var rec = e.record;
+        var editStr = '<button class="btn btn-default btn-sm btn-edit" onclick="editPage(' + rec.configId + ')">修 改</button> ';
+        editStr += '<button class="btn btn-default btn-sm btn-delete" onclick="del(' + rec.configId + ')">删 除</button>';
+        return editStr;
+    }
+
+    // 删除
+    var del = function (configId) {
+        if (confirm("您确定要删除选中的记录吗?")) {
+            Ls.ajaxGet({
+                url: "/config/deleteConfig",
+                data: {
+                    configId: configId
+                },
+                success: function (text) {
+                    Ls.tipsOk("删除成功！")
+                    grid.reload();
+                }
+            });
+        }
+    }
+
+    //新增服务
+    var addPage = function (id) {
+        Ls.openWin("/config/edit", "450px", "430px", {
+            type: 2,
+            title: '新增',
+            maxmin: false,
+            close: function () {
+                grid.reload();
+            }
+        });
+    }
+
+    //修改
+    var editPage = function (id) {
+        //var ids = getIDS();
+        //if (ids == null || ids.length <= 0) {
+        // Ls.tipsErr("请选择数据！")
+        //  return;
+        // }
+        // if (ids.length > 1) {
+        // Ls.tipsErr("请选择单条数据！")
+        //  return;
+        //  }
+        Ls.openWin("/config/edit?configId=" + id, "400px", "430px", {
+            type: 2,
+            title: '编辑',
+            maxmin: false,
+            area: ['400px', '430px'],
+            close: function () {
+                grid.reload();
+            }
+        });
+    };
+
+    //循环选中的行
+    function getIDS() {
+        var rows = grid.getSelecteds();
+        var ids = [];
+        for (i = 0; i < rows.length; i++) {
+            ids.push(rows[i].configId);
+        }
+        return ids;
+    }
+
+</script>

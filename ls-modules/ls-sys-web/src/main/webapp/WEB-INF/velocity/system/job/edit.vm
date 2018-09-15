@@ -1,0 +1,123 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="job_form" role="form" ms-controller="job_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>任务名称</label>
+                            <input type="text" name="name" class="form-control" placeholder="" ms-duplex="name">
+                        </div>
+                        <div class="form-group">
+                            <label>任务类型</label>
+                            <select name="type" ms-duplex="type" class="form-control">
+								<option value="">请选择</option>
+								#if($isRoot)
+									<option value="$!{default.code}">$!{default.key}</option>
+								#else
+									#foreach($item in $jobTypeList)
+        								#if("$!{item.code}" != "$!{default.code}")
+        								<option value="$!{item.code}">$!{item.name}</option>
+        								#end
+    								#end
+								#end
+							</select>
+                        </div>
+                        <div class="form-group">
+                            <label>时间表达式</label>
+                            <input type="text" name="cronExpression" class="form-control" placeholder="" ms-duplex="cronExpression">
+                        </div>
+                        <div class="form-group">
+                            <label>类路径</label>
+                            <input type="text" name="clazz" class="form-control" placeholder="" ms-duplex="clazz">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+var cur = {
+    id: "job_form",//表单
+    vm: null,//模型
+    W: art.dialog.opener//父对象
+};
+$(document).ready(function () {
+	//获取数据
+    Ls.ajaxGet({
+        url: "/job/getScheduleJob",
+        data: {
+            id: cur.W.cur.id
+        }
+    }).done(function (data) {
+        data.$id = cur.id;
+
+		if(cur.W.cur.id == ""){//新增
+			data.siteId = cur.W.GLOBAL_SITEID
+		}
+        // 如果模型已经绑定，不再绑定
+        cur.vm = avalon.vmodels[data.$id];
+        if (!cur.vm) {
+            // 绑定模型
+            cur.vm = avalon.define(data);
+        } else {
+            Ls.assignVM(cur.vm, data);
+        }
+        avalon.scan($("#"+cur.id).get(0), cur.vm);
+    });
+
+    //验证
+    $('#' + cur.id).validator({
+    	rules: {
+            validExpression: function(el, param, field){
+				return Ls.ajaxGet({
+                    url: '/job/validExpression?cronExpression='+el.value,
+                    dataType: 'json'
+                });
+            },
+			validClazz: function(el, param, field){
+				return Ls.ajaxGet({
+                    url: '/job/validClazz?clazz='+el.value,
+                    dataType: 'json'
+                });
+            }
+        },
+        fields: {
+            'name': '任务名称:required;',
+            'type': '任务类型:required;',
+			'cronExpression': '时间表达式:required;validExpression',
+			'clazz': '类路径:required;validClazz'
+        },
+        valid: function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            // 提交
+            Ls.ajax({
+                url: "/job/saveOrUpdate",
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips('保存成功!', {
+                        icons: "success"
+                    });
+					if(cur.W.cur.id == ""){//新增
+    					cur.W.cur.grid.reload();
+					} else{
+						cur.W.cur.grid.updateRow(cur.W.cur.grid.getRow(cur.W.cur.rowIndex), d.data);
+					}
+                } else {
+                    Ls.tips(d.desc, {
+                        icons: "error"
+                    });
+                }
+                // 关闭弹框
+                art.dialog.close();
+            });
+        }
+    });
+});
+</script>

@@ -1,0 +1,71 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+	<div region="west" showHeader="false" splitSize="0" width="330" style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5;">
+        <div style="padding:5px; overflow: hidden;">
+			<ul id="organ_tree" class="ztree"></ul>
+        </div>
+	</div>
+	
+	<div region="center" style="border:none; overflow: auto;">
+		<div class="portlet light"  style="display:none;">
+			<div class="portlet-title">
+				<div class="caption font-grey-silver">
+					<span class="caption-subject bold uppercase">单位配置信息</span>
+				</div>
+			</div>
+			
+			<div class="portlet-body form">
+				<form id="organ_config_form" role="form" ms-controller="organ_config_form">
+					<div class="form-body">
+						<div class="form-group">
+							<label>单位名称</label>
+							<input type="text" readonly class="form-control" placeholder="" ms-duplex="organName">
+            			</div>
+						
+						<div class="form-group">
+							<label>单位目录</label>
+							<select id="catId" class="form-control" name="catId" ms-duplex="catId" placeholder="请选择单位目录"></select>
+            			</div>
+						
+						<div class="form-group">
+							 <label>内容模型</label>
+                             <select id="contentModelCode" class="form-control" name="contentModelCode"
+                                    ms-duplex="contentModelCode" placeholder="请选择内容模型">
+                             </select>
+            			</div>
+						
+						<div class="form-group">
+							<label>生成关联页面</label>
+							<input id="genePageIds" type="hidden" name="genePageIds" class="form-control" ms-duplex="genePageIds">
+                            <textarea class="form-control" rows="3" name="linkPageNames" id="linkPageNames"
+                                      ms-duplex-string="linkPageNames" ms-click="getGenePage()"
+                                      placeholder="点击选择栏目"></textarea>
+            			</div>
+					</div>
+        		</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var cur = {
+	$id : "organ_config_form",
+	organ_url : "/public/catalog/getOrgansBySiteId",//单位查询url
+	organ_tree_id : "organ_tree",//树id
+	tree : null//树对象
+};
+</script>
+<script src="$!{rc.contextPath}/assets/js/pages/public/catalog_manage.js"></script>
+<script>
+function getGenePage() {
+    var genePageIds = $("#genePageIds").val();
+    var url= '/siteMain/toSelectColumnTree?siteId=' + GLOBAL_SITEID + '&&genePageIds=' + genePageIds + '&&flag=1';
+    Ls.openWin(url, '400px', '500px', {
+    	id:'gene_page',
+    	title: '生成关联页面',
+    	padding: 0
+   });
+}
+$(document).ready(function(){
+    catalogManage.organConfig();
+});
+</script>

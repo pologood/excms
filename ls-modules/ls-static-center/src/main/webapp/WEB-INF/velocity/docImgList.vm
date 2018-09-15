@@ -1,0 +1,44 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($width="$!{paramObj.width}")
+#set($height="$!{paramObj.height}")
+#set($length=$Integer.parseInt($length))
+#foreach($eo in $resultObj)
+    #set($title="$!{eo.title}")
+    #set($css="even")
+    #if($velocityCount%2 == 1)
+        #set($css="odd")
+    #end
+    #set($filePath="")
+    #if($eo.imageLink.indexOf("/") == -1)
+        #if($eo.imageLink.indexOf(".") >= 0)
+            #set($filePath="$!{fileServerNamePath}")
+        #else
+            #set($filePath="$!{fileServerPath}")
+        #end
+    #else
+        #set($filePath="")
+    #end
+<li class="$!{css} num${velocityCount}">
+    <a href="#if("$!{eo.redirectLink}" != "")$!{eo.redirectLink}#else$!{eo.link}#end" target="$!{paramObj.target}" title="$!{eo.title}">
+        <img src="$!{filePath}$!{eo.imageLink}" alt="$!{eo.title}" #if("$!{width}" != "")width="$!{width}"#end #if("$!{height}" != "")height="$!{height}"#end/>
+
+        #set($style="")
+        #if("$!{eo.isBold}" == "1")
+            #set($style="font-weight:bold;")
+        #end
+        #if("$!{eo.isTilt}" == "1")
+            #set($style=$style+"font-style:italic;")
+        #end
+        #if("$!{eo.isUnderline}" == "1")
+            #set($style=$style+"text-decoration:underline;")
+        #end
+        #if("$!{eo.titleColor}" != "#000000")
+            #set($style=$style+"color:$!{eo.titleColor};")
+        #end
+
+        <span class="title" style='$style'>#cutstr($title,$length)</span>
+    </a>
+</li>
+
+#end

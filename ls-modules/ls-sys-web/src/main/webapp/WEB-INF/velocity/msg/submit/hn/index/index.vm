@@ -1,0 +1,353 @@
+<div id="menuContent"
+     style="display:none;position: absolute; z-index: 10000;width: 200px;height: 300px;border: solid 1px #c2cad8;border-top:0px;overflow: hidden;background-color: InactiveBorder">
+    <ul id="treeDemo" class="ztree"></ul>
+</div>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="add()">上报信息</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-delete" onclick="batchDelMsg()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <select id="status" name="status" class="form-control">
+                                        <option value=""> 请选择状态 </option>
+                                        <option value="0"> 未采用 </option>
+                                        <option value="1"> 已退回 </option>
+                                        <option value="2"> 已采用 </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="startDate" id="startDate" class="form-control" placeholder="开始时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endDate\')}',startDate:'%y-%M-%d 00:00:00',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="datetime" name="endDate" id="endDate" class="form-control" placeholder="结束时间"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startDate\')}',startDate:'%y-%M-%d 23:59:59',readOnly:true})" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="标题">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/msg/submit/hn/getPageList" sizeList="[5,10,20,50]" pageSize="10" allowCellWrap="false"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                >
+                    <div property="columns">
+                        <div type="checkcolumn" width="50" disabled></div>
+                        <div field="title" width="40%" align="left" headerAlign="center" renderer="name_diydom">标题</div>
+                        <div field="provider" width="200" align="center" headerAlign="center">报送人</div>
+                        <div field="submitUnitName" width="250" align="center" headerAlign="center">所属单位</div>
+                        <div field="author" width="100" align="center" headerAlign="center">作者</div>
+                        <div width="50" align="center" headerAlign="center" renderer="thumbnail">缩略图</div>
+                        <div field="publishDate" width="150" align="center" dateFormat="yyyy-MM-dd HH:mm:ss" headerAlign="center">发布日期</div>
+                        <div width="60%" align="left" headerAlign="center" renderer="status">状态</div>
+##                        <div field="useCount" width="80" align="center" headerAlign="center">采编次数</div>
+                        <div width="115" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    mini.parse();
+
+    // 鼠标移动上面出现提示框
+    var tooltip = function() {
+        var id = 'tt';
+        var top = 3;
+        var left = 3;
+        var maxw = 550;
+        var speed = 10;
+        var timer = 20;
+        var endalpha = 95;
+        var alpha = 0;
+        var tt, t, c, b, h;
+        var ie = document.all ? true : false;
+        return {
+            show : function(v, w) {
+                if (tt == null) {
+                    tt = document.createElement('div');
+                    tt.setAttribute('id', id);
+                    t = document.createElement('div');
+                    t.setAttribute('id', id + 'top');
+                    c = document.createElement('div');
+                    c.setAttribute('id', id + 'cont');
+                    b = document.createElement('div');
+                    b.setAttribute('id', id + 'bot');
+                    tt.appendChild(t);
+                    tt.appendChild(c);
+                    tt.appendChild(b);
+                    document.body.appendChild(tt);
+                    tt.style.opacity = 0;
+                    tt.style.filter = 'alpha(opacity=0)';
+                    document.onmousemove = this.pos;
+                }
+                tt.style.display = 'block';
+                c.innerHTML = v;
+                tt.style.position = "absolute";
+                tt.style.zIndex = 99999;
+                tt.style.width = w ? w + 'px' : 'auto';
+                if (!w && ie) {
+                    t.style.display = 'none';
+                    b.style.display = 'none';
+                    tt.style.width = tt.offsetWidth;
+                    t.style.display = 'block';
+                    b.style.display = 'block';
+                }
+                if (tt.offsetWidth > maxw) {
+                    tt.style.width = maxw + 'px'
+                }
+                h = parseInt(tt.offsetHeight) + top;
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function() {
+                    tooltip.fade(1)
+                }, timer);
+            },
+            pos : function(e) {
+                var u = ie ? event.clientY + document.documentElement.scrollTop : e.pageY;
+                var l = ie ? event.clientX + document.documentElement.scrollLeft : e.pageX;
+                tt.style.top = (u - h) + 'px';
+                tt.style.left = (l + left) + 'px';
+            },
+            fade : function(d) {
+                var a = alpha;
+                if ((a != endalpha && d == 1) || (a != 0 && d == -1)) {
+                    var i = speed;
+                    if (endalpha - a < speed && d == 1) {
+                        i = endalpha - a;
+                    } else if (alpha < speed && d == -1) {
+                        i = a;
+                    }
+                    alpha = a + (i * d);
+                    tt.style.opacity = alpha * .01;
+                    tt.style.filter = 'alpha(opacity=' + alpha + ')';
+                } else {
+                    clearInterval(tt.timer);
+                    if (d == -1) {
+                        tt.style.display = 'none'
+                    }
+                }
+            },
+            hide : function() {
+                clearInterval(tt.timer);
+                tt.timer = setInterval(function() {
+                    tooltip.fade(-1)
+                }, timer);
+            }
+        };
+    }();
+
+    var cur = {
+        grid: mini.get('datagrid'),
+        status:$('#status'),
+        classifyId: $('#classifyId'),
+        startDate: $('#startDate'),
+        endDate: $('#endDate'),
+        ser_key: $('#ser_key'),//查询关键字
+        dialog: Ls.getWin.dialog
+    };
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        cur.grid.on("drawcell",function(e){
+            var field=e.field;
+            var record=e.record;
+            if(record.status != 0 && record.status != 1){
+                if(e.column.type == 'checkcolumn') {
+                    e.cellHtml="<input type='checkbox' disabled='true' title='已采用信息不可删除'/>"
+                }
+            }
+        })
+
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load({siteId: GLOBAL_SITEID});
+    })
+
+    /**
+     * 添加法规
+     */
+    function add() {
+        cur.dialog.data('type', 'add');
+        Ls.openWin("/msg/submit/hn/addOrEdit", '1000px', '550px', {
+            title: "添加报送信息",
+            zIndex:99999
+        });
+    }
+
+    function edit(id) {
+        var record = cur.grid.findRow(function (row) {
+            if (row.id == id) return true;
+        });
+        cur.dialog.data('type', 'edit');
+        cur.dialog.data('record', record);
+        var title = "修改报送信息";
+        if(record.status==1) {
+            title = "修改报送信息<font color='red'>(退回)</font>";
+        }
+        Ls.openWin("/msg/submit/hn/addOrEdit", '1000px', '550px', {
+            title: title,
+            zIndex:99999
+        });
+    }
+
+    function callback_add_or_edit(msg) {
+        showAll();
+        Ls.tips(msg, {times: 2});
+    }
+
+    function batchDelMsg(msgId) {
+        var msgIds = [];
+
+        if(typeof(msgId) != "undefined"&& msgId != null && msgId != "") {
+            msgIds.push(msgId);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && msgIds.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for(var i = 0; i < records.length; i++) {
+                if(records[i].status == 0 || records[i].status == 1) {
+                    msgIds.push(records[i].id);
+                }
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/msg/submit/hn/deleteEntity",
+                data: {
+                    "msgIds[]": msgIds
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function name_diydom(obj) {
+        var record = obj.record;
+        var diyDom = '<a id=' + record.id + ' href="javascript:;"  onclick="show_detail(this)"><u>' + record.title + '</u></a>';
+        return diyDom;
+    }
+
+    function thumbnail(e) {
+        var rec = e.record;
+        var link = rec.imageLink;
+        if (!link) {
+            return;
+        }
+        var path = /\//.test(link) ? link : (GLOBAL_FILESERVERNAMEPATH + "" + link);
+        var pic = '<a href="' + path + '" target="_blank" onmouseover="tooltip.show(\'<img src=' + path + ' width=150 height=120>\')"'
+        pic += ' onmouseout="tooltip.hide();"><img src="' + path + '" height="20"></a>';
+        return pic;
+    }
+
+    function show_detail(obj) {
+        var dom = $(obj);
+        Ls.openWin("/msg/submit/hn/msgDetail?msgId=" + dom.attr('id'), '800px', '480px', {
+            title: "预览"
+        });
+    }
+
+    function status(obj) {
+        var record = obj.record;
+        if(record.status == 1) {
+            var backUnitName = null == record.backUnitName?"":record.backUnitName;
+            var backUserName = null == record.backUserName?"":record.backUserName;
+            var backReason = null == record.backReason?"":record.backReason;
+            return "<font color='red' title='退回单位:" + backUnitName + "\n退回用户:" + backUserName + "\n退回原因：" + backReason + "' style='font-weight:bold;'>【状态：退回】【原因：" + backReason +"】</font>";
+        } else {
+            var columnHnEOs = record.columnHnEOs;
+            var title = "";
+            if(columnHnEOs && null != columnHnEOs) {
+                for(var i=0;i<columnHnEOs.length;i++) {
+                    var columnHnEO = columnHnEOs[i];
+                    var j = i + 1;
+                    var status = columnHnEO.status == 0?"未采用":"已采用";
+                    if("" == title) {
+                        title = colorStatus("(" + j + "). " + columnHnEO.siteName + " >> " + columnHnEO.columnName + " 【状态：" + status + "】",columnHnEO.status);
+                    } else {
+                        title += "<br>" + colorStatus("(" + j + "). " + columnHnEO.siteName + " >> " + columnHnEO.columnName + " 【状态：" + status + "】",columnHnEO.status);
+                    }
+                }
+            }
+            return title;
+        }
+    }
+
+    function colorStatus(title,status) {
+        if(status == 1) {
+            title = "<font color='green' style='font-weight:bold;'>" + title + "</font>";
+        } else {
+            title = "<font style='font-weight:bold;'>" + title + "</font>";
+        }
+
+        return title;
+    }
+
+    function show_back_reason(backReason) {
+
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="edit(' + record.id + ')">修 改</button> ';
+
+        if (record.status == 2) {
+//            edit = '<button type="button" class="btn btn-default btn-sm btn-edit" disabled>修 改</button> ';
+        }
+
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDelMsg(' + record.id + ')">删 除</button>';
+
+        if (record.status == 2) {
+            del = '<button type="button" class="btn btn-default btn-sm btn-delete" disabled>删 除</button> ';
+        }
+
+        return edit + del;
+
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({pageIndex:cur.grid.pageIndex,pageSize:cur.grid.pageSize,status:cur.status.val(),siteId: GLOBAL_SITEID, keys: 'title', keyValue: keyValue, classifyId: cur.classifyId.val(), startDate: cur.startDate.val(), endDate: cur.endDate.val()});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.classifyId.val('');
+        cur.startDate.val('');
+        cur.endDate.val('');
+        cur.status.val('');
+        search();
+    }
+
+</script>

@@ -1,0 +1,329 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white" style="overflow:scroll;">
+<div id="ui_layout" class="tabbable-line" style=" margin:12px 20px 15px;">
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="active">
+            <a href="#tab_1_1" data-toggle="tab"><strong>表格资源信息</strong></a>
+        </li>
+    </ul>
+    <div class="tab-content" style="padding: 0 0 0 0">
+        <div class="tab-pane active" id="tab_1_1">
+            <div class="portlet-body form">
+                <form id="table_edit_form" role="form" ms-controller="table_edit_form">
+                    <div class="form-body">
+                        <table class="table table-bordered article-table">
+                            <tr>
+                                <th>表格名称:</th>
+                                <td>
+                                    <input type="text" id="id" style="display: none" ms-duplex="id">
+                                    <input type="text" id="name" name="name" class="form-control" data-rule="必填项:required;name" placeholder="填写表格名称" ms-duplex="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>文件名称:</th>
+                                <td>
+                                    <div class="input-group">
+                                        <input type="text" id="uploadUrl" name="uploadUrl" style="display: none" class="form-control readonly" readonly ms-duplex="uploadUrl">
+                                        <input type="text" id="fileName" name="fileName" class="form-control readonly" readonly ms-duplex="fileName">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default btn-default-upload" type="button" onclick="fileUpload()">上传
+                                                <i class="fa fa-cloud-upload"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>办事单位:</th>
+                                <td>
+                                    <div class="input-group">
+                                        <div id="menuContent"
+                                             style="display:none; position: absolute; top: 34px; left: 0px; z-index: 10000; width: 230px; height: 300px; border: solid 1px #c2cad8; border-top:0px; overflow:auto; background-color: InactiveBorder">
+                                            <ul id="treeDemo" class="ztree" style="margin-top:0;"></ul>
+                                        </div>
+
+                                        <input type="text" id="organId" name="organId" style="display: none" name="organId" class="form-control readonly" readonly
+                                               ms-duplex="organId">
+                                        <input type="text" id="organName" name="organName" class="form-control readonly" readonly ms-duplex="organName" onclick="showTree()">
+
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-default btn-select-organ" type="button" onclick="showTree()">
+                                                <i class="fa fa-caret-down"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>加入时间:</th>
+                                <td>
+                                    <input type="text" id="joinDate" name="joinDate" class="form-control" data-rule="必填项:required;joinDate" placeholder="填写加入时间"
+                                           ms-duplex="joinDate">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" align="right">所属分类:</td>
+                                <td>
+                                    <input type="text" id="cIds" name="cIds" class="form-control" style="display: none" ms-duplex="cIds">
+                                    <textarea id="cNames" name="cNames" onclick="res_select()" class="form-control" rows="2" placeholder="点击选择相关资源" ms-duplex="cNames"></textarea>
+                                </td>
+                            </tr>
+                        </table>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" onclick="saveData()">确 定</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">取 消</button>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+#parse("_page_layout/_footer.vm")
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/organ_tree.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/net/service/organ_tree_ser.js"></script>
+<script>
+    var cur = {
+        vm_id: "table_edit_form",
+        form: $('#table_edit_form'),
+        grid: mini.get('datagrid'),
+        organId_ser: $('#organId_ser'),//查询单位选择组件
+        organName_ser: $('#organName_ser'),//查询单位选择组件
+        ser_key: $('#ser_key'),//查询关键字
+        edit_page: $('#edit_page'),
+        dg: Ls.getWin.api,
+        pWin: Ls.getWin.win,
+        columnId:art.dialog.data('columnId'),
+        //typeCode:art.dialog.data('typeCode')
+    };
+    var content_mgr = {indicatorId:cur.columnId};
+    $(document).ready(function () {
+        organ_select_tree.init();
+        organ_select_tree_ser.init();
+        cur.model = Ls.initFORM(cur.vm_id, {
+            id: "",
+            name: "",
+            uploadUrl: "",
+            organId: "",
+            organName: "",
+            joinDate: "",
+            cIds: "",
+            cNames: ""
+        });
+        var date = new Date().format("yyyy-MM-dd hh:mm:ss");
+        cur.model.joinDate = date;
+        setData(cur.model);
+    })
+
+    function set_classify() {
+        Ls.ajaxGet({
+            url: "/resources/getCheckedClassifyEOs",
+            data: {
+                pId: cur.model.id,
+                typeCode: '$!{typeCode}'
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    var data = resp.data;
+                    var cIds = "";
+                    var cNames = "";
+
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 0) {
+                            cIds = data[i].indicatorId;
+                            cNames = data[i].name;
+                        } else {
+                            cIds += "," + data[i].indicatorId;
+                            cNames += "," + data[i].name;
+                        }
+                        cur.vm.cIds = cIds;
+                        cur.vm.cNames = cNames;
+                        avalon.scan();
+                    }
+                }
+            }
+        });
+    }
+
+    function saveData() {
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+        url = "/tableResources/save"
+        var data = {
+            id: cur.vm.id,
+            name: cur.vm.name,
+            uploadUrl: cur.vm.uploadUrl,
+            fileName:cur.vm.fileName,
+            organId: cur.vm.organId,
+            joinDate: cur.vm.joinDate,
+            cIds: cur.vm.cIds
+        };
+
+        Ls.ajax({
+            url: url,
+            data: data,
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {times: 2});
+                    cur.pWin.cur.grid.reload();
+                    cur.dg.close();
+                } else {
+                    Ls.tips(resp.desc, {times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        cur.dg.close();
+    }
+
+  /*  function delTable() {
+        var record = cur.grid.getSelected();
+        if (confirm('确定发布?')) {
+            Ls.ajaxGet({
+                url: "/tableResources/delete",
+                data: {
+                    id: record.id
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        cur.grid.load();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {times: 2});
+                    }
+                }
+            });
+        }
+    }*/
+
+ /*   function joinDate(obj) {
+        var record = obj.record;
+        var joinDate = record.joinDate;
+
+        if (null != joinDate && typeof joinDate == 'object') {
+            record.joinDate = joinDate.pattern("yyyy-MM-dd hh:mm:ss");
+            return joinDate.pattern("yyyy-MM-dd hh:mm:ss");
+        } else {
+            return joinDate;
+        }
+    }*/
+
+    /**
+     * 资源选择
+     */
+    function res_select() {
+        art.dialog.data('cIds', cur.vm.cIds);
+        art.dialog.data('typeCode', '$!{typeCode}');
+        Ls.openWin("/resources/classifySelect", '350px', '400px', {
+            id:"classifySelect",
+            title: "选择资源"
+        });
+    }
+
+    /**
+     * 添加资源返回
+     * @param cIds
+     * @param cNames
+     */
+    function res_call_back(cIds, cNames) {
+        cur.vm.cIds = cIds;
+        cur.vm.cNames = cNames;
+        avalon.scan();
+    }
+
+    function table_name(obj) {
+        var record = obj.record;
+//        var diyDom = '<a href="javascript:;"  onclick="file_download(this)"><u>' + record.name + '</u></a>';
+        return record.name;
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var diyDom = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editTable()">修 改</button> ' +
+            '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="delTable()">删 除</button>';
+        return diyDom;
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({keys: 'name', keyValue: keyValue, organId: cur.organId_ser.val()});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        cur.organId_ser.val('');
+        cur.organName_ser.val('');
+        search();
+    }
+
+    /**
+     * 文件上传
+     */
+    function fileUpload() {
+        Ls.uploadFile(function (rst) {
+            if (rst != null && rst.length > 0) {
+                cur.vm.uploadUrl = rst[0].fileName;
+                cur.vm.fileName = rst[0].fileName;
+                avalon.scan();
+            }
+            return true;
+        }, {
+            file_types: "*.*",
+            post_params: {
+                "siteId": GLOBAL_SITEID,
+                "desc": "网上办事",
+                "code": "WorkOnLine",
+                "type":"NotDefined"
+            }
+        });
+    }
+
+    /**
+     * 文件下载
+     */
+    function file_download() {
+        var record = cur.grid.getSelected();
+        $("#download_frame").attr("src", "$!{rc.contextPath}/fileCenter/download/" + record.uploadUrl);
+    }
+    //拉取数据
+    function setData(obj) {
+        data = obj;
+        data.vm_id = cur.vm_id;
+        cur.vm = avalon.define(data);
+    }
+
+
+    Date.prototype.format = function(format){
+        var o = {
+            "M+" : this.getMonth()+1, //month
+            "d+" : this.getDate(), //day
+            "h+" : this.getHours(), //hour
+            "m+" : this.getMinutes(), //minute
+            "s+" : this.getSeconds(), //second
+            "q+" : Math.floor((this.getMonth()+3)/3), //quarter
+            "S" : this.getMilliseconds() //millisecond
+        }
+
+        if(/(y+)/.test(format)) {
+            format = format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(format)) {
+                format = format.replace(RegExp.$1, RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+            }
+        }
+        return format;
+    }
+
+</script>

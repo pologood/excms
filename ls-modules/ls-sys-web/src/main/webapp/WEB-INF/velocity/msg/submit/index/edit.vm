@@ -1,0 +1,352 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .select-control {
+        /*background-color: #fff;*/
+        /*background-image: none;*/
+        border: 1px solid #c2cad8;
+        /*border-radius: 4px;*/
+        /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+        color: #4d6b8a;
+        /*display: block;*/
+        font-size: 14px;
+        height: 34px;
+        line-height: 1.42857;
+        padding: 6px 12px;
+        /*transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;*/
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div title="center" region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form role="form" id="msg_info_form" ms-controller="msg_info_form">
+                    <div class="form-body">
+
+
+                        <table class="table table-bordered article-table th80">
+                            <tbody>
+                            <tr>
+                                <th>所属分类：</th>
+                                <td>
+                                    <select type="text" id="classifyId" name="classifyId" class="form-control" data-rule="必填项:required;classifyId" placeholder="必填项"></select>
+                                </td>
+                                <td class="w300" rowspan="7">
+
+                                    <div class="thumb_layout">
+                                        <div class="thumb">
+                                            <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" alt="" id="imageLink"/>
+                                        </div>
+                                        <div class="thum-delete" id="delImg" onclick="deletePic()" title="删除"><i class="fa fa-trash"></i></div>
+                                        <div class="thum-upload" id="uploadImg" onclick="uploadPic()" title="上传"><i class="fa fa-upload"></i></div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>标题：</th>
+                                <td>
+                                    <input type="text" id="id" name="id" class="form-control" style="display: none" ms-duplex="id">
+                                    <input type="text" id="name" name="name" maxlength="40" class="form-control" data-rule="必填项:required;name" placeholder="标题名称" ms-duplex="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>供稿人：</th>
+                                <td>
+                                    <input type="text" id="provider" maxlength="20" name="provider" class="form-control" data-rule="必填项:required;provider" placeholder="供稿人" ms-duplex="provider">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>作者：</th>
+                                <td>
+                                    <input type="text" id="author" maxlength="20" ms-duplex="author" class="form-control" placeholder=""/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>发布日期：</th>
+                                <td>
+                                    <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control readonly"
+                                           onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false})" readonly/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>来源：</th>
+                                <td>
+                                    <div class="input-group" id="resMark">
+                                        <input type="text" id="fromCode" maxlength="20" name="fromCode" class="form-control" ms-duplex="fromCode" placeholder=""/>
+
+                                        <div class="input-group-btn">
+                                            <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showRes()">
+                                                <i class="fa fa-caret-down" id="select_icon"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th style="vertical-align: top;">内容：</th>
+                                <td colspan="2">
+                                    <textarea id="content" name="content" style="width: 100%;height: 350px;"></textarea>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "msg_info_form",
+        form: $('#msg_info_form'),
+        classifyId: $('#classifyId'),
+        fromCode: $('#fromCode'),
+        type: Ls.getWin.dialog.data("type"),
+        publishDate: $('#publishDate'),
+        win: Ls.getWin.win,
+        api: Ls.getWin.api,
+        dialog: Ls.getWin.dialog,
+        record: Ls.getWin.dialog.data("record") || {}
+    };
+    var eweb;
+    $(document).ready(function () {
+        initKindEditor();
+        if (cur.type == "add") {
+            cur.model = Ls.initFORM(cur.vm_id, {
+                id: "",
+                provider: cur.win.GLOBAL_PERSON.name,
+                author: "",
+                fromCode:cur.win.GLOBAL_PERSON.unitName,
+                publishDate: Ls.dateFormat(new Date(), "yyyy-MM-dd hh:mm:ss")
+            });
+        } else {
+            cur.model = cur.record;
+            if (typeof cur.model.publishDate == 'object') {
+                cur.model.publishDate = Ls.dateFormat(cur.model.publishDate, "yyyy-MM-dd hh:mm:ss")
+            }
+            /*cur.editor.html(cur.model.content);*/
+            eweb.setHtml(cur.model.content);
+        }
+        setData(cur.model);
+
+        if (cur.vm.imageLink != null) {
+            if(cur.vm.imageLink.indexOf(".") != -1){
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + cur.vm.imageLink)
+            }else{
+                $("#imageLink").attr("src", '$!{fileServerPath}' + cur.vm.imageLink)
+            }
+            $("#uploadImg").hide();
+        }
+
+        getClassifyModel();
+        //getFromModel();
+        cur.api.button(
+            {
+                id: 'save',
+                className: 'btn-save',
+                focus: true,
+                name: '确定',
+                callback: function () {
+                    saveData();
+                    return false;
+                }
+            },
+            {
+                id: 'back',
+                className: 'btn-back',
+                name: '取消',
+                callback: function () {
+                    cancel();
+                    return false;
+                }
+            }
+        );
+    })
+
+    function showRes() {
+        Ls.dropDowns('resMark', {
+            css:{
+                overflow: "auto"
+            },
+            ajax: {
+                url: "/msg/submit/msgFrom"
+            },
+            html: function (formId, d) {
+                var h = [];
+                for (var i = 0, l = d.length; i < l; i++) {
+                    h.push('<li><a href="javascript:void(0)">' + d[i].key + '</a></li>')
+                }
+                return h.join("")
+            }
+        })
+    }
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    /**
+     * 保存数据
+     */
+    function saveData() {
+        cur.vm.status = 0;
+        if (!cur.form.isValid()) {
+            return;
+        }
+
+        if (cur.type == 'add') {
+            url = "/msg/submit/save"
+        } else {
+            url = "/msg/submit/update"
+        }
+
+        Ls.ajax({
+            url: url,
+            data: {
+                id: cur.vm.id,
+                name: cur.vm.name,
+                classifyId: cur.classifyId.val(),
+                provider: cur.vm.provider,
+                author: cur.vm.author,
+                fromCode: cur.vm.fromCode,
+                imageLink: cur.vm.imageLink,
+                status: cur.vm.status,
+                backReason: cur.vm.backReason,
+                publishDate: cur.publishDate.val(),
+                /*content: cur.editor.html(),*/
+                content: eweb.getHtml(),
+                siteId: cur.win.GLOBAL_SITEID
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.callback_add_or_edit(cur.type == 'add' ? "添加成功!" : "更新成功!");
+                    Ls.winClose();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                    cur.win.search();
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+
+    function initKindEditor() {
+        eweb = Ls.editor("content", {cusdir: "/" + parent.GLOBAL_SITEID + "/" + 0});
+            #*
+        cur.editor = KindEditor.create('textarea[name="content"]', {
+            uploadJson: parent.GLOBAL_CONTEXTPATH + '/articleNews/upload',
+            fileManagerJson: '$!{rc.contextPath}/fileCenter/getPage',//文件空间
+            allowImageUpload: true,
+            allowFileManager: false,
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            filterMode: false,
+            siteId: parent.GLOBAL_SITEID,
+            columnId: 0,
+            fileServerPath: parent.GLOBAL_FILESERVERNAMEPATH
+        });
+        * *#
+    }
+
+    function getClassifyModel() {
+        Ls.ajaxGet({
+            url: "/msg/submit/classify/getEOs",
+        }).done(function (response) {
+            var str = '<option value=""> 请选择类别 </option> ';
+            if (response != null) {
+                var data = response;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value=' + data[i].id + '>' + data[i].name + '</option> '
+                    }
+                }
+            }
+            cur.classifyId.append(str);
+            cur.classifyId.val(cur.vm.classifyId);
+        });
+    }
+
+    function setSelectValue(value) {
+        cur.fromCodeAuto.val(value);
+    }
+
+    function getFromModel() {
+
+
+    }
+
+    /**
+     * 缩略图上传
+     */
+    function uploadPic() {
+        Ls.uploadFile(function (data) {
+            if (data != null && data.length > 0) {
+##                cur.vm.imageLink = data[0].mongoId;
+##                $("#imageLink").attr("src", '$!{fileServerPath}' + data[0].mongoId);
+                cur.vm.imageLink = data[0].fileName;
+                $("#imageLink").attr("src", '$!{fileServerNamePath}' + data[0].fileName);
+                $("#uploadImg").hide();
+            }
+            return true;
+        }, {
+            file_types: "*.png;*.jpg;*.jpeg;*.gif",
+            file_upload_limit: 1,
+            post_params: {
+            "type":"NotDefined"
+           }
+        })
+    }
+
+    /**
+     * 删除缩略图
+     */
+    function deletePic() {
+        if (cur.vm.imageLink == null) {
+            Ls.tipsInfo("图片不存在！");
+            return;
+        }
+        Ls.ajaxGet({
+            url: "/fileCenter/deleteByMongoId",
+            data: {
+                mongoId: cur.vm.imageLink
+            }
+        }).done(function (d) {
+            if (d.status == 1) {
+                Ls.tips("删除成功！", {
+                    icons: "success", callback: function () {
+                        cur.vm.imageLink = '';
+                        $("#uploadImg").show();
+                        $("#imageLink").attr("src", '$!{sysStaticPath}/assets/images/no.photo.jpg');
+                    }
+                })
+            } else {
+                Ls.tipsErr(d.desc);
+                cur.win.search();
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<div class="portlet light">
+    <div class="portlet-body">
+        <div class="table-toolbar">
+            <div class="row" style="margin-right: 0px;">
+                <form class="form-inline tr search-toolbar" role="form">
+                    <select class="form-control w160" name="warningType">
+                        <option value="">请选择警示类型</option>
+                        <option value="YELLOW_CARD_WARNING">黄牌警示</option>
+                        <option value="RED_CARD_WARNING">红牌警示</option>
+                    </select>
+                    <input type="datetime" id="startLastPublishDate" name="startLastPublishDate"
+                           class="form-control w160"
+                           placeholder="开始时间"
+                           onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'#F{$dp.$D(\'endLastPublishDate\')||\'%y-%M-%d %H:%m:%s\'}'})"/>
+                    <input type="datetime" id="endLastPublishDate" name="endLastPublishDate" class="form-control w160"
+                           placeholder="结束时间"
+                           onClick="WdatePicker({readOnly:true,dateFmt:'yyyy-MM-dd HH:mm:ss',minDate:'#F{$dp.$D(\'startLastPublishDate\')}',maxDate:'%y-%M-%d %H:%m:%s'})"/>
+                    <button type="button" class="btn btn-default btn-search" onclick="searchByCondition(this.form)">
+                        查询
+                    </button>
+                    <button type="button" class="btn btn-default" onclick="searchClear(this.form)">重置</button>
+                    <button type="button" class="btn btn-default btn-export" onclick="exportByCondition(this.form)">
+                        导出
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="content_update_datagrid" class="mini-datagrid" style="width:100%;" allowResize="true"
+             allowCellSelect="false"
+             onlyCheckSelection="true" sizeList="[20,30,50]" pageSize="20" idField="id" multiSelect="true"
+             url="/content/contentUpdate/getPage">
+            <div property="columns">
+                <div type="indexcolumn" width="40" headerAlign="center" allowSort="flase" align="center">序号</div>
+                <div field="columnName" width="100%" headerAlign="center" allowSort="flase" align="left">栏目名称</div>
+                <div field="warningTypeName" width="100" headerAlign="center" allowSort="flase" align="center">警示类型
+                </div>
+                <div field="lastPublishDate" width="140" headerAlign="center" allowSort="flase" align="center"
+                     dateFormat="yyyy-MM-dd HH:mm:ss">最后更新日期
+                </div>
+                <div field="message" width="280" headerAlign="center" allowSort="flase" align="center" renderer = "message" >警示消息</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var cur = {
+        siteId: GLOBAL_SITEID,
+        content_update_datagrid: null//datagrid
+    }
+
+    function searchByCondition(form) {
+        var json = $(form).serializeObject();
+        cur.content_update_datagrid.load(json);
+    }
+
+    function searchClear(form) {
+        $(form)[0].reset();
+        cur.content_update_datagrid.load();
+    }
+
+    function exportByCondition(form) {
+        var json = $(form).serializeObject();
+        var params = [];
+        for (var key in json) {
+            params.push(key + "=" + json[key]);
+        }
+        $('#download_frame').attr("src", "/content/contentUpdate/export?" + params.join("&"));
+    }
+
+    function message(e) {
+        var rec = e.record;
+        var msg = rec.message.replace("还剩-","<span style='color:red'>已超时</span>").replace("还剩","<span style='color:darkgoldenrod'>还剩</span>");
+        return msg;
+    }
+    
+    $(document).ready(function () {
+        //初始化布局
+        mini.parse();
+        // 获取datagrid
+        cur.content_update_datagrid = mini.get("content_update_datagrid");
+        cur.content_update_datagrid.reload();
+        // 重置 datagrid 高度
+        Ls.mini_datagrid_height(cur.content_update_datagrid);
+    });
+</script>

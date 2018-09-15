@@ -1,0 +1,272 @@
+#parse("_page_layout/_header.vm")
+<style>
+    th {
+        text-align: right;
+    }
+</style>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+<div region="center" style="border:none; overflow: auto;">
+<div class="tabbable-line" style=" margin:12px 20px 15px;">
+  <ul class="nav nav-tabs">
+    <li class="active">
+      <a href="#tab_1_1" data-toggle="tab">图片新闻</a>
+    </li>
+    <li>
+      <a href="#tab_1_2" data-toggle="tab">图片轮播</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="tab_1_1">
+
+      <form role="form" id="picture_form" ms-controller="picture_form">
+        <table class="table table-bordered picture-table">
+          <tbody>
+          <tr>
+            <th>标题：</th>
+            <td>
+              <table class="w100p">
+                <tbody>
+                <tr>
+                  <td><input type="text" name="title" id="title" ms-duplex="title" class="form-control"
+                             placeholder=""></td>
+                  <td class="w150 text-center">
+                    <button type="button" id="colorpicker" class="btn btn-default btn-font">
+                      <i class="fa fa-font"></i>
+                    </button>
+                    <button type="button" id="bold" class="btn btn-default btn-bold"><i class="fa fa-bold"></i>
+                    </button>
+                    <button type="button" id="tilt" class="btn btn-default btn-italic"><i class="fa fa-italic"></i>
+                    </button>
+                    <button type="button" id="underline" class="btn btn-default btn-underline"><i
+                      class="fa fa-underline"></i></button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+
+            </td>
+            <td class="w300" rowspan="7">
+              <div class="thumb_main">
+                <div id="prcture_thumb" class="thumb">
+                  <img src="$!{sysStaticPath}/assets/images/no.photo.jpg" id="imageLink"/>
+                </div>
+                <div class="thum-delete" id="delImg"><i class="fa fa-trash"></i></div>
+                <div class="thum-upload" id="uploadImg"><i class="fa fa-upload"></i></div>
+              </div>
+
+            </td>
+          </tr>
+          <tr>
+            <th>副标题：</th>
+            <td><input type="text" id="subTitle" ms-duplex="subTitle" class="form-control" placeholder=""></td>
+          </tr>
+          <tr>
+            <th>摘要：</th>
+            <td>
+              <textarea class="form-control" id="remarks" rows="2" placeholder=""></textarea>
+            </td>
+          </tr>
+          <tr>
+            <th>属性：</th>
+            <td>
+              <label class="checkbox-inline">
+                <input type="checkbox" class="publishBtn" disabled id="isTop" value="1"> 置顶
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" class="publishBtn" disabled id="isNew" value="1"> 加新
+              </label>
+              <label class="checkbox-inline">
+                <input type="checkbox" class="publishBtn" disabled id="isTitle" value="option2"> 标题新闻
+              </label>
+			  <label id="isComment" class="checkbox-inline hide">
+                <input type="checkbox" id="isAllowComments" class="publishBtn" disabled value="1"> 允许评论
+              </label>
+              <label class="checkbox-inline">
+                <button id="btn_extend_picture" type="button" class="btn btn-default btn-xs btn-picture-extend">
+                  扩展信息
+                  <i class="fa fa-angle-double-down"></i>
+                </button>
+              </label>
+            </td>
+          </tr>
+		  
+          <tr class="picture_attr_ext hide">
+            <th>来源：</th>
+            <td>
+              <div class="input-group" id="resMark">
+                <input type="text" id="resources" ms-duplex="resources" class="form-control" placeholder=""/>
+
+                <div class="input-group-btn">
+                  <button id="icon_btn" class="btn btn-default btn-default-upload" type="button" onclick="showRes()">
+                    <i class="fa fa-caret-down"></i>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr class="picture_attr_ext hide">
+            <th>作者：</th>
+            <td>
+              <input type="text" id="author" ms-duplex="author" class="form-control" placeholder="">
+            </td>
+          </tr>
+          <tr class="picture_attr_ext hide">
+            <th>发布日期：</th>
+            <td>
+              <input type="datetime" id="publishDate" ms-duplex="publishDate" class="form-control"
+                     onClick="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" readonly>
+            </td>
+          </tr>
+          <tr class="picture_attr_ext hide">
+            <th>跳转URL：</th>
+            <td>
+              <input type="text" id="redirectLink" ms-duplex="redirectLink" class="form-control" placeholder="">
+            </td>
+          </tr>
+		 <tr id="checkWords" class="picture_attr_ext hide">
+            <th>内容过滤：</th>
+			<td>
+				<button class="btn btn-default btn-reset" id="errorWords" type="button" onclick="contentCheck('EASYERR')">易错词检测</button>
+				<button class="btn btn-default btn-reset" id="senWords" type="button" onclick="contentCheck('SENSITIVE')">敏感词检测</button>
+				<button class="btn btn-default btn-reset" id="hotWords" type="button" onclick="contentCheck('HOT')">热词检测</button>
+            </td>
+		  </tr>
+          <tr>
+            <th style="vertical-align: top;">内容：</th>
+            <td colspan="2">
+              <textarea id="article_content" name="content" style="width: 100%; visibility: visible;"></textarea>
+            </td>
+          </tr>
+          <tr>
+            <th></th>
+            <td colspan="2">
+              <button class="btn btn-default btn-save" type="button" id="saveArticle"> 保 存</button>
+              <button disabled class="publishBtn btn btn-default btn-save-release" type="button" id="saveAndPublish">
+                保存并发布
+              </button>
+              <!--<button class="btn btn-default btn-back" type="button" onclick="goBack()"> 返 回</button>-->
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </form>
+
+    </div>
+
+    <div class="tab-pane" id="tab_1_2">
+
+      <div class="table-toolbar">
+        <div class="row">
+          <div class="col-md-7">
+            <div class="pdr10">
+              <button type="button" class="btn btn-default btn-upload" onclick="uploadPic()">
+                <i class="fa fa-upload"></i> 上传图片
+              </button>
+            </div>
+          </div>
+          <div class="col-md-5">
+          </div>
+        </div>
+      </div>
+
+      <table class="table table-hover picture-upload">
+        <thead>
+        <tr>
+          <th class="w50">排 序</th>
+          <th class="w180"></th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody id="picList">
+
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</body>
+<div id="res" class="" style="position: absolute;z-index: 10;display:none; overflow:auto; border:1px solid gray; background-color:#F7F7FB;height:120px;">
+  <table style="margin-left:10px;" id="ns_list">
+  </table>
+</div>
+#parse("_page_layout/_footer.vm")
+
+<script src="$!{rc.contextPath}/assets/js/pages/content/noaudit/pic_news_edit.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/selectEditBox/selectEditBox.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/picNews/editHandle.js"></script>
+<script src="$!{rc.contextPath}/assets/js/pages/content/contentCheck.js"></script>
+<script>
+   var content_mgr={
+ 		node:{
+			indicatorId:'',
+			opt:''
+			synColumnIds:''
+		}
+   }
+  content_mgr.node.indicatorId='$!{columnId}';
+  content_mgr.node.opt='$!{eo.opt}';
+  content_mgr.node.synColumnIds='$!{eo.synColumnIds}';
+  
+  config = {
+    expand: 0,
+    pageIndex: '$!{pageIndex}'
+  }
+
+  pic = {
+    id: '$!{picNewsId}',
+    columnId: '',
+    siteId: GLOBAL_SITEID,
+    title: '',
+    subTitle: '',
+    author: GLOBAL_PERSON.name,
+    resources: '',
+    redirectLink: '',
+    imageLink: '',
+    isNew: 0,
+    isTop: 0,
+    isBold: 0,
+    isUnderline: 0,
+    isTilt: 0,
+    titleColor: "",
+    remarks: '',
+    content: '',
+    isPublish: 0,
+    publishDate: '',
+    typeCode: 'pictureNews',
+    picList: ''
+  }
+
+  $(document).ready(function () {
+    mini.parse();
+    pic_news.init();
+    pic.columnId = content_mgr.indicatorId;
+	cur.columnId='$!{columnId}';
+    $("#publishDate").val('${nowDate}');
+    $("#author").val(pic.author);
+	
+	getModelConfig();
+  #*加载来源*#
+    getSource();
+  #*权限控制*#
+    for (var i = 0; i < cur.opt.length; i++) {
+      if (cur.opt[i] == "publish" || cur.opt[i] == "super") {
+        $(".publishBtn").attr("disabled", false);
+        $(".publishBtn").removeClass("disabled");
+      }
+    }
+
+
+    //初始化数据
+	initData();
+	
+  })
+
+
+
+</script>

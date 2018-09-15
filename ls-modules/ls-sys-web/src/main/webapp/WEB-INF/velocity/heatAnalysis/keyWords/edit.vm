@@ -1,0 +1,85 @@
+#parse("_page_layout/_header.vm")
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <form id="keyWords_form" role="form" ms-controller="keyWords_form">
+                    <div class="form-body">
+                        <div class="form-group">
+                            <label>关键词</label>
+                            <input type="text" name="keyWords" class="form-control" ms-duplex="keyWords">
+                        </div>
+						<div class="form-group">
+                            <label>排序</label>
+                            <input type="text" name="sortNum" class="form-control" ms-duplex="sortNum"
+                                   onKeyUp="this.value=this.value.replace(/[^\.\d]/g,'');this.value=this.value.replace('.','');" maxlength="4">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+var cur = {
+    id: "keyWords_form",//表单
+    vm: null,//模型
+    W: art.dialog.opener//父对象
+};
+$(document).ready(function () {
+	//获取数据
+    Ls.ajaxGet({
+        url: "/heatAnalysis/keyWords/getKeyWordsHeat",
+        data: {
+            id: cur.W.cur.id
+        }
+    }).done(function (data) {
+        data.$id = cur.id;
+
+		if(cur.W.cur.id == ""){//新增
+			data.siteId = cur.W.GLOBAL_SITEID
+		}
+        // 如果模型已经绑定，不再绑定
+        cur.vm = avalon.vmodels[data.$id];
+        if (!cur.vm) {
+            // 绑定模型
+            cur.vm = avalon.define(data);
+        } else {
+            Ls.assignVM(cur.vm, data);
+        }
+        avalon.scan($("#"+cur.id).get(0), cur.vm);
+    });
+
+    //验证
+    $('#' + cur.id).validator({
+        fields: {
+            'keyWords': '关键词:required;',
+			'sortNum':'排序:required;Integer'
+        },
+        valid: function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            // 提交
+            Ls.ajax({
+                url: "/heatAnalysis/keyWords/saveOrUpdate",
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips('保存成功!', {
+                        icons: "success"
+                    });
+					cur.W.cur.sort_grid.reload();
+                } else {
+                    Ls.tips(d.desc, {
+                        icons: "error"
+                    });
+                }
+                // 关闭弹框
+                art.dialog.close();
+            });
+        }
+    });
+});
+</script>

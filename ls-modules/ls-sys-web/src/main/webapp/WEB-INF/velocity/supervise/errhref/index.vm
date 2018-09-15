@@ -1,0 +1,212 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow:auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-add" onclick="addTask()">添加任务</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default btn-delete" onclick="batchDel()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-9">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <input type="text" id="ser_key" name="searchKey" class="form-control"
+                                           placeholder="名称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">
+                                    搜索
+                                </button>
+                                <button type="button" class="btn btn-default btn-show-all" onclick="showAll()">
+                                    显示全部
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/err/href/getPageTaskEOs" sizeList="[5,10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" headerAlign="center" width="50"></div>
+                        <div field="" width="100%" align="center" headerAlign="center" renderer="taskNameDiy">任务名称</div>
+                        <div field="cronDesc" width="120" align="center" headerAlign="center" >触发器</div>
+                        <div field="prevRunDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">上次运行时间</div>
+                        <div field="nextRunDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">下次运行时间</div>
+                        <div field="" width="50" align="center" headerAlign="center" renderer="runStatus">状态</div>
+                        <div width="160" align="center" headerAlign="center" allowSort="true" renderer="opt">操作</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        ser_key:$('#ser_key'),
+        dialog:Ls.getWin.dialog
+    };
+
+    /**
+     * 初始化加载
+     */
+    $(document).ready(function () {
+        Ls.mini_datagrid_height(cur.grid, 30);
+        cur.grid.load();
+    })
+
+    /*
+    * 添加采集任务
+    * */
+    function addTask() {
+        cur.dialog.data("type","add");
+        Ls.openWin("/err/href/addOrEdit", '630px', '500px', {
+            title: "添加任务"
+        });
+    }
+
+    function editTask(id) {
+        var record = cur.grid.findRow(function(row){
+            if(row.id == id) return true;
+        });
+        cur.dialog.data("type","edit");
+        cur.dialog.data("record",record);
+        Ls.openWin("/err/href/addOrEdit", '630px', '500px', {
+            title: "修改任务"
+        });
+    }
+
+    function batchDel(id) {
+        var ids = [];
+
+        if(id != null && id!= "") {
+            ids.push(id);
+        } else {
+            var records = cur.grid.getSelecteds();
+            if ((null == records || records.length <= 0) && ids.length <= 0) {
+                Ls.tips("请选择一条记录!", {times: 2});
+                return;
+            }
+            for (var i = 0; i < records.length; i++) {
+                ids.push(records[i].id);
+            }
+        }
+
+        if (confirm('确定删除?')) {
+            Ls.ajaxGet({
+                url: "/err/href/deleteTasks",
+                data: {
+                    "ids[]":ids
+                },
+                success: function (resp) {
+                    if (resp.status == 1) {
+                        showAll();
+                        Ls.tips(resp.desc, {times: 2});
+                    } else {
+                        Ls.tips(resp.desc, {icons:'error',times: 2});
+                    }
+                }
+            });
+        }
+    }
+
+    function taskNameDiy(obj) {
+        var record = obj.record;
+        var diy = '<a id=' + record.id + ' href="javascript:;"  onclick="checkResult('+record.id+',\''+record.taskName+'\')"><u>' + record.taskName + '</u></a>';;
+        return diy;
+    }
+
+    function checkResult(id,name) {
+        cur.dialog.data("taskId",id);
+        cur.dialog.data("taskName",name);
+        Ls.openWin("/err/href/checkResult", '1000px', '490px', {
+            title: "错链结果"
+        });
+    }
+
+    function runStatus(obj) {
+        var record = obj.record;
+        if(record.runStatus == 0) {
+            return "暂停";
+        } else if(record.runStatus == 1) {
+            return "正常";
+        }
+    }
+
+    function showLog(name) {
+        Ls.openWin("/data/collect/showLog", '800px', '440px', {
+            id:"log_collect",
+            title: "采集实时日志(" + name + ")"
+        });
+    }
+
+    function opt(obj) {
+        var record = obj.record;
+        var pause = '<button id="pause_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="pauseTask('+record.id+')">暂停</button> ';
+        var resume = '<button id="resume_' + record.id + '" type="button" class="btn btn-default btn-sm btn-edit" onclick="resumeTask('+record.id+')">恢复</button> ';
+        var edit = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="editTask('+record.id+')">修改</button> ';
+        var del = '<button type="button" class="btn btn-default btn-sm btn-delete" onclick="batchDel('+record.id+')">删除</button>';
+        if(record.runStatus == 0) {
+            return resume + edit + del;
+        } else {
+            return pause + edit + del;
+        }
+    }
+
+    function pauseTask(id) {
+        Ls.ajaxGet({
+            url: "/err/href/pauseTask",
+            data: {
+                taskId:id
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    Ls.tips("操作成功!");
+                    showAll();
+                } else {
+                    Ls.tips("操作失败!",{icons:'error'});
+                }
+            }
+        });
+    }
+
+    function resumeTask(id) {
+        Ls.ajaxGet({
+            url: "/err/href/resumeTask",
+            data: {
+                taskId:id
+            },
+            success: function (resp) {
+                if (resp.status == 1) {
+                    Ls.tips("操作成功!");
+                    showAll();
+                } else {
+                    Ls.tips("操作失败!",{icons:'error'});
+                }
+            }
+        });
+    }
+
+    function search() {
+        var keyValue = cur.ser_key.val();
+        cur.grid.load({siteId: GLOBAL_SITEID, keys: 'taskName', keyValue: keyValue});
+    }
+
+    function showAll() {
+        cur.ser_key.val('');
+        search();
+    }
+
+    function callback(msg) {
+        Ls.tips(msg, {times: 2});
+        search();
+    }
+</script>

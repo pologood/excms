@@ -1,0 +1,91 @@
+#parse("_page_layout/_header.vm")
+<!-- END HEAD -->
+
+<body class="page-body-white">
+
+<!-- BEGIN SAMPLE FORM PORTLET-->
+<div class="portlet light">
+    <div class="portlet-body form">
+
+        <form id="formQR" role="form" ms-controller="formQR">
+            <div class="form-body">
+
+                <div class="form-group">
+                    <label>内容</label>
+              <textarea name="content" class="form-control" rows="3" placeholder=""
+                        ms-duplex="content"></textarea>
+                </div>
+
+            </div>
+            <div class="form-actions noborder">
+                <button type="submit" class="btn btn-default btn-save">保 存</button>
+                <button type="button" class="btn btn-default btn-cancel" onclick="Ls.winClose();">取 消</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+<!-- END SAMPLE FORM PORTLET-->
+
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var W = Ls.getWin.win, api = Ls.getWin.api;
+    var cur = {
+        questionId: Ls.url.get("questionId"),
+        themeId: Ls.url.get("themeId"),
+        replyId: ''
+    }
+
+    $(document).ready(function () {
+        //拉取数据
+        var getData = function () {
+            Ls.ajaxGet({
+                url: "/survey/question/getReply",
+                data: {replyId: cur.replyId}
+            }).done(function (d) {
+
+                data = d.data;
+                cur.$id = "formQR"
+                data.$id = cur.$id;
+                data.questionId = cur.questionId;
+                data.themeId = cur.themeId;
+                cur.vm = avalon.define(data)
+                avalon.scan($("#ID").get(0),cur.vm);
+
+            })
+        };
+
+        getData();
+
+        $('#formQR').validator({
+            fields: {
+                'content': '回复内容:required;length[2~1000]'
+            },
+            valid: function () {
+                addPost()
+            }
+        })
+
+        var addPost = function () {
+            var data = Ls.toJSON(cur.vm.$model);
+            var url = "/survey/question/saveReply";
+            Ls.ajax({
+                url: url,
+                data: data
+            }).done(function (d) {
+                if (d.status == 1) {
+                    Ls.tips("保存成功！", {
+                        icons: "success", callback: function () {
+                            Ls.winClose();
+                        }
+                    })
+                } else {
+                    Ls.tipsErr(d.desc)
+                }
+            })
+        }
+    })
+</script>
+</body>
+</html>

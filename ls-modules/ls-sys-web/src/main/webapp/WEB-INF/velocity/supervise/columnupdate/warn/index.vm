@@ -1,0 +1,503 @@
+<style>
+    .mini-layout-region-west .mini-layout-region-body {
+        overflow: hidden;
+    }
+</style>
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="west" showHeader="false" splitSize="0" width="260"
+         style="border:none; background:#F6FAFD; border-right: solid 1px #e5e5e5">
+        <div style="padding:5px; overflow: hidden;">
+            <div id="ui_tree" class="ztree"></div>
+        </div>
+    </div>
+    <div region="center" style="overflow-x:hidden;border:none;">
+        <div id="center_tab" class="tabbable-line" style=" margin:12px 20px 15px;height: 90%">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1_1" data-toggle="tab">预警配置</a>
+                </li>
+            </ul>
+            <div class="tab-content" style="height: 100%; padding-top: 8px;">
+                <div class="tab-pane active" id="tab_1_1" style="width:100%;height: 100%">
+                    <div id="form_div" style="display: none">
+                        <form id="task_edit_form" role="form" ms-controller="task_edit_form" style="padding-top: 15px">
+                            <div class="form-body">
+                                <table class="table table-bordered article-table">
+                                    <tr>
+                                        <th style="width: 120px"><font color="#9f9727">说明：</font></th>
+                                        <td>
+                                            <font color="red">*代表必填项</font>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>栏目名称:</th>
+                                        <td>
+                                            <input type="text" style="display: none" name="id" class="form-control" data-tip="" placeholder="" ms-duplex="id">
+                                            <input type="text" style="display: none" name="columnId" class="form-control" data-tip="" placeholder="" ms-duplex="columnId">
+                                            <input type="text" style="width:300px;" name="columnName" class="form-control readonly" readonly data-tip="" placeholder="" ms-duplex="columnName">
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                    <tr>
+                                        <th style="width: 120px">触发周期:</th>
+                                        <td>
+                                            <div class="radio-group">
+                                                <label class="radio-inline"><input type="radio" name="timeMode" value="day" onclick="changeMode('day')" ms-duplex-string="timeMode">天</label> &nbsp;&nbsp;
+                                                <label class="radio-inline"><input type="radio" name="timeMode" value="auto" onclick="changeMode('auto')" ms-duplex-string="timeMode">自定义</label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ms-visible="timeMode=='day'" class="dn">
+                                        <th>开始时间 <font color="red">*</font>:</th>
+                                        <td>
+                                            <div class="radio-group">
+                                                <input type="datetime" style="width:300px;" id="startDate" name="startDate" ms-duplex="startDate" class="form-control readonly" placeholder="开始时间"
+                                                       onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" readonly>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ms-visible="timeMode=='day'" class="dn">
+                                        <th ms-visible="timeMode=='day'">间隔(天) <font color="red">*</font>:</th>
+                                        <td>
+                                            <input type="text" id="spaceOfDay" style="width:300px;" name="spaceOfDay" class="form-control" data-tip="" placeholder="" ms-duplex="spaceOfDay">
+                                        </td>
+                                    </tr>
+                                    <tr ms-visible="timeMode=='auto'" class="dn">
+                                        <th>选择定时 <font color="red">*</font>:</th>
+                                        <td>
+                                            <select id="cronExpress" style="width:300px;" class="form-control" name="cronExpress">
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr style="width: 30px">
+                                        <th>提醒方式:</th>
+                                        <td>
+                                            <label><input type="checkbox" class="readonly" checked disabled>系统提醒</label> &nbsp;&nbsp;
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                    <tr ms-visible="taskType=='articleNews'">
+                                        <th style="width: 120px">栏目更新数量:</th>
+                                        <td>
+                                            <input type="text" style="width:300px;" name="planUpdateNum" class="form-control" data-tip="" placeholder="栏目在周期内应该更新的数量" ms-duplex="planUpdateNum">
+                                        </td>
+                                    </tr>
+                                    <tr ms-visible="taskType=='guestBook' || taskType=='messageBoard'">
+                                        <th style="width: 120px">留言回复天数:</th>
+                                        <td>
+                                            <input type="text" style="width:300px;" name="unreplyDateNum" class="form-control" data-tip="" placeholder="回复留言的最低天数限制" ms-duplex="unreplyDateNum">
+                                        </td>
+                                    </tr>
+                                </table>
+                                <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                    <tr>
+                                        <th style="width: 120px">上次执行时间:</th>
+                                        <td>
+                                            <input type="text" style="width:300px;" name="prevRunDate" class="form-control readonly" readonly data-tip="" placeholder="" ms-duplex="prevRunDate">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 120px">下次执行时间:</th>
+                                        <td>
+                                            <input type="text" style="width:300px;" name="nextRunDate" class="form-control readonly" readonly data-tip="" placeholder="" ms-duplex="nextRunDate">
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="table table-bordered article-table" style="margin-bottom: 0px;">
+                                    <tr>
+                                        <th style="width: 120px">任务状态:</th>
+                                        <td>
+                                            <label id="run_status" style="margin-bottom: 0px"></label>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table class="table table-bordered article-table">
+                                    <tr id="content_field">
+                                        <th></th>
+                                        <td>
+                                            <button id="run" type="button" class="btn btn-default btn-save-release" onclick="runTask()">启动</button>
+                                            <button id="pause" type="button" class="btn btn-default btn-save-release" onclick="pauseTask()">暂停</button>
+                                            <button id="saverun" type="button" class="btn btn-default btn-save-release" onclick="saveData('NORMAL')">保存并启动</button>
+                                            <button id="saveonly" type="button" class="btn btn-default btn-save-release" onclick="saveData('NONE')">保存</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <label id="checkResult"></label>
+                            <div id="guest_datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                                 url="" sizeList="[10,20,50]" pageSize="10"
+                                 idField="id" multiSelect="true" showColumnsMenu="true" style="display: none;width:100%;height: 420px;margin-bottom: 20px;"
+                            >
+                                <div property="columns">
+                                    <div type="checkcolumn" ></div>
+                                    <div name="title" field="title" width="100%" align="left" headerAlign="center">留言内容</div>
+                                    <div renderer="type" width="100" align="center" headerAlign="center">留言类型</div>
+                                    <div name="personName" field="personName" width="50" align="center" headerAlign="center">留言人</div>
+                                    <div name="receiveName" field="receiveName" width="150" align="center" headerAlign="center">接收单位</div>
+                                    <div name="addDate" field="addDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">留言时间</div>
+                                    <div field="columnName" width="150" align="left" headerAlign="center">栏目名称</div>
+                                    <div renderer="rspGuest" width="60" align="center" headerAlign="center">留言回复</div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="grid_div" style="display: none;height: 100%;">
+                        <div id="datagrid_total" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                             url="" sizeList="[5,10,20,50]" pageSize="10"
+                             idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;">
+                            <div property="columns">
+                                <div type="checkcolumn" headerAlign="center" width="50"></div>
+                                <div field="columnName" width="100%" align="left" headerAlign="center">栏目名称</div>
+                                <div field="cronDesc" width="120" align="center" headerAlign="center" >触发器</div>
+                                <div field="prevRunDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">上次运行时间</div>
+                                <div field="nextRunDate" width="130" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">下次运行时间</div>
+                                <div field="" width="200" align="center" headerAlign="center" renderer="checkResult">检查结果</div>
+                                <div field="" width="50" align="center" headerAlign="center" renderer="runStatus">状态</div>
+                                <div width="55" align="center" headerAlign="center" allowSort="true" renderer="taskopt">操作</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/supervise/column_warn_tree.js"></script>
+<script>
+    mini.parse();
+    var cur = {
+        vm_id: "task_edit_form",
+        form:$('#task_edit_form'),
+        form_div:$('#form_div'),
+        grid_div:$('#grid_div'),
+        grid:mini.get('datagrid_total'),
+        guestGrid:mini.get('guest_datagrid'),
+        label_layout: mini.get('label_layout'),
+        dialog: Ls.getWin.dialog,
+        autoCron:$("#cronExpress"),
+        runStatus:$("#run_status"),
+        runtaskbtn:$("#run"),
+        pausetaskbtn:$("#pause"),
+        saveruntaskbtn:$("#saverun"),
+        savetaskbtn:$("#saveonly")
+    };
+
+    $(document).ready(function () {
+        column_tree.init();
+        Ls.mini_datagrid_height(cur.grid, 40);
+        getAutoCronModel();
+    })
+
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function changeMode(mode) {
+        if(cur.model) {
+            cur.model.timeMode = mode;
+        } else {
+            cur.model = Ls.initFORM(cur.vm_id, {
+                timeMode:'day',
+                columnName:"",
+                taskType:cur.node.columnTypeCode
+            });
+        }
+        setData(cur.model);
+    }
+
+    function getAutoCronModel() {
+        Ls.ajaxGet({
+            url: "/column/update/getAutoCron",
+        }).done(function (response) {
+            var str = '<option value=""> 选择自定义CRON </option> ';
+            if (response != null) {
+                var data = response;
+                var length = data.length;
+                if (length > 0) {
+                    for (i = 0; i < length; i++) {
+                        str += ' <option value="' + data[i].value + '">' + data[i].key + '</option> '
+                    }
+                }
+            }
+            cur.autoCron.append(str);
+        });
+    }
+
+    function runStatus(obj) {
+        var record = obj.record;
+        if(record.runStatus == "NORMAL") {
+            return "<font color='#26ad34'>启动</font>";
+        } else if(record.runStatus == "PAUSED") {
+            return "<font color='red'>暂停</font>";
+        } else if(record.runStatus == "ERROR") {
+           return "任务异常";
+        } else {
+           return "<font color='#3b20ff'>未启动</font>";
+        }
+    }
+
+    function taskopt(obj) {
+        var record = obj.record;
+        var result = "";
+        if(record.runStatus == "PAUSED"  || record.runStatus == "NONE") {
+            result = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="runTask(' + record.columnId + ',true)">启动</button> ';
+        } else if(record.runStatus == "NORMAL") {
+            result = '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="pauseTask(' + record.columnId + ',true)">暂停</button> ';
+        }
+
+        return result;
+    }
+
+    function checkResult(obj) {
+        var rst = "";
+        var record = obj.record;
+        if(record.isQualified == 1) {
+            rst = '<font color="red">' + record.checkResult + '</font>';
+        } else {
+            rst = '<font color="#006400">' + record.checkResult + '</font>';
+        }
+
+        return rst;
+    }
+
+    function formShow() {
+        formReset();
+        cur.grid_div.hide();
+        cur.form_div.show();
+        Ls.ajaxGet({
+            url: "/column/update/warn/getColumnUpdateWarnEntity",
+            data:{
+                columnId:cur.node.indicatorId
+            }
+        }).done(function (resp) {
+            if(resp.status == 1) {
+                if(resp.data) {
+                    cur.model = resp.data;
+                    if(null == cur.model.timeMode) {
+                        cur.model.timeMode = 'day';
+                        cur.model.columnName = cur.node.name;
+                    }
+                    cur.autoCron.val(cur.model.cronExpress);
+                    if(null != cur.model.checkResult) {
+                        $("#checkResult").html("<font size='5'>上次执行结果：</font><font size='4' color='red'>" + cur.model.checkResult + "</font>");
+                    }
+                } else {
+                    cur.model = Ls.initFORM(cur.vm_id, {
+                        timeMode:'day',
+                        columnId:cur.node.indicatorId,
+                        columnName:cur.node.name,
+                        taskType:cur.node.columnTypeCode
+                    });
+                }
+
+                if(cur.model.runStatus == "NORMAL") {
+                    cur.runStatus.html("<font color='#26ad34'>启动</font>");
+                    var hide = ["run","saverun","saveonly"];
+                    btnHide(hide);
+                } else if(cur.model.runStatus == "PAUSED") {
+                    cur.runStatus.html("<font color='red'>暂停</font>");
+                    var hide = ["pause"];
+                    btnHide(hide);
+                } else if(cur.model.runStatus == "ERROR") {
+                    cur.runStatus.html("任务异常");
+                    var hide = ["run","pause"];
+                    btnHide(hide);
+                } else {
+                    cur.runStatus.html("<font color='#3b20ff'>未启动</font>");
+                    var hide = ["run","pause"];
+                    btnHide(hide);
+                }
+
+                setData(cur.model);
+
+                if(cur.node.columnTypeCode == 'articleNews') {
+                    $('#guest_datagrid').hide();
+                } else {
+                    $('#guest_datagrid').show();
+                    cur.guestGrid.setUrl("/unreply/guest/getPageEOs?columnId=" + cur.node.indicatorId + "&siteId=" + cur.node.siteId);
+                    cur.guestGrid.reload();
+                }
+            }
+        });
+    }
+
+    function btnHide(obj) {
+        cur.runtaskbtn.show();
+        cur.pausetaskbtn.show();
+        cur.saveruntaskbtn.show();
+        cur.savetaskbtn.show();
+        if(obj) {
+            for(var i = 0;i < obj.length ; i++) {
+                $('#' + obj[i]).hide();
+            }
+        }
+    }
+
+    function formReset() {
+        $("#checkResult").html("");
+        cur.model = Ls.initFORM(cur.vm_id, {
+            id:'',
+            timeMode:'day',
+            columnId:cur.node.indicatorId,
+            columnName:cur.node.name,
+            taskType:cur.node.columnTypeCode,
+            startDate:'',
+            spaceOfDay:'',
+            planUpdateNum:"",
+            unreplyDateNum:'',
+            prevRunDate:'',
+            nextRunDate:'',
+            runStatus:''
+        });
+        setData(cur.model);
+    }
+
+    function gridShow() {
+        cur.form_div.hide();
+        cur.grid_div.show();
+        cur.grid.setUrl("/column/update/warn/getPageTask?columnId=" + cur.node.indicatorId);
+        cur.grid.reload();
+    }
+
+    function runTask(columnId,flag) {
+        if(null == columnId || "" == columnId) {
+            columnId = cur.node.indicatorId;
+        }
+        Ls.ajax({
+            url: "/column/update/warn/runTask",
+            data: {
+                columnId:columnId
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {icons:'success',times: 2});
+                    if(flag) {
+                        cur.grid.reload();
+                    } else {
+                        formShow();
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function pauseTask(columnId,flag) {
+        if(null == columnId || "" == columnId) {
+            columnId = cur.node.indicatorId;
+        }
+        Ls.ajax({
+            url: "/column/update/warn/pauseTask",
+            data: {
+                columnId:columnId
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {icons:'success',times: 2});
+                    if(flag) {
+                        cur.grid.reload();
+                    } else {
+                        formShow();
+                    }
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function saveData(status) {
+        if(cur.vm.timeMode == 'day') {
+            $('#startDate').attr("data-rule","开始时间:required;startDate");
+            $('#spaceOfDay').attr("data-rule","间隔:required;spaceOfDay");
+        } else {
+            $('#startDate').remove("data-rule");
+            $('#spaceOfDay').remove("data-rule");
+        }
+
+        if (!cur.form.isValid()) {
+            return;
+        }
+        Ls.ajax({
+            url: "/column/update/warn/saveOrUpdateColumnUpdateWarnEntity",
+            data: {
+                //栏目更新任务配置
+                id: cur.vm.id,
+                columnId:cur.vm.columnId,
+                columnName:cur.vm.columnName,
+                taskType:cur.vm.taskType,
+                cronDesc:getCronDesc(),
+                planUpdateNum:cur.vm.planUpdateNum,//栏目最少更新数
+                unreplyDateNum:cur.vm.unreplyDateNum,//留言回复天数
+                timeMode:cur.vm.timeMode,//定时方式
+                startDate:$("#startDate").val(),
+                cronExpress:cur.autoCron.val(),
+                spaceOfDay:cur.vm.spaceOfDay,//定时间隔（天、周）
+                runStatus:status
+            },
+            success: function (resp) {
+                if (resp.status == '1') {
+                    Ls.tips(resp.desc, {icons:'success',times: 2});
+                    formShow();
+                } else {
+                    Ls.tips(resp.desc, {icons:'error',times: 2});
+                }
+            }
+        });
+    }
+
+    function getCronDesc() {
+        if(cur.vm.timeMode == "day") {
+            return "每隔" + cur.vm.spaceOfDay + "天执行";
+        } else if(cur.vm.timeMode == "auto"){
+            return cur.autoCron.find("option:selected").text();;
+        }
+    }
+
+    function rspGuest(e) {
+        var rec = e.record;
+        return '<button type="button" class="btn btn-default btn-sm btn-edit" onclick="replyGuest(' + rec.id + ',' + rec.guestId + ',' + rec.contentId + ',' + rec.columnId + ')">回 复</button> ';
+    }
+
+
+    //后台打开回复弹窗
+    function replyGuest(id,guestId,contentId, columnId) {
+        if(cur.node.columnTypeCode == 'guestBook') {
+            Ls.openWin('/unreply/guest/guestBookReply?id=' + contentId + '&&columnId=' + columnId, '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0,
+                close: function (text) {
+                    replyBack(id);
+                }
+            });
+        } else if(cur.node.columnTypeCode == 'messageBoard')  {
+            Ls.openWin('/messageBoard/messageBoardReply?id=' + contentId + '&messageBoardId=' + guestId + '&columnId=' + columnId, '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0,
+                close: function (text) {
+                    replyBack(id);
+                }
+            });
+        }
+    }
+
+    function replyBack(id) {
+    }
+</script>

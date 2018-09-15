@@ -1,0 +1,11 @@
+#set($itype="$!{resultObj.itype}")
+#set($linkUrl="$!{resultObj.linkUrl}")
+<li #if($itype == "3")class="active" #end>
+    <a href="$linkUrl?itype=1" title="访谈预告">访谈预告$itype</a>
+</li>
+<li #if($itype == "1")class="active" #end>
+    <a href="$linkUrl?itype=2" title="最新访谈">最新访谈</a>
+</li>
+<li #if($itype == "2")class="active" #end>
+    <a href="$linkUrl?itype=3" title="往期回顾">往期回顾</a>
+</li>

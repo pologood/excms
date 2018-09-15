@@ -1,0 +1,204 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <!--<div class="portlet-title">
+              <div class="caption font-grey-silver">
+                <span class="caption-subject bold uppercase">用户列表</span>
+              </div>
+              <div class="tools"></div>
+            </div>-->
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"> 批量移动 <i
+                                    class="fa fa-angle-down"></i></button>
+                                <ul class="dropdown-menu" id="mgroup">
+                                </ul>
+                            </div>
+                            <button type="button" class="btn btn-default" onclick="userGroup()">分组管理</button>
+                            <button type="button" class="btn btn-default" onclick="synUsers()">用户同步</button>
+                        </div>
+                        <div class="col-md-5">
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <select id="groupId" class="form-control">
+                                    </select>
+                                    <!--  <label>搜索：</label>-->
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control" placeholder="昵称">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="datagrid1" class="mini-datagrid" style="width:100%;height:700px;" onPageChanged="onPageChanged"
+                     allowResize="true" allowCellSelect="false" onlyCheckSelection="true" url="/weChat/userMgr/userPage" sizeList="[20,30,50]" pageSize="20"
+                     idField="id" multiSelect="true">
+                    <div property="columns">
+                        <div type="checkcolumn"></div>
+                        <div type="indexcolumn" width="60" headerAlign="center" align="center">序号</div>
+                        <div field="" width="45" headerAlign="center" align="center" allowSort="flase" renderer="headImg" align="left">头像</div>
+                        <div field="nickname" width="220" headerAlign="center" allowSort="false" align="center">昵称</div>
+                        <div field="" width="100" headerAlign="center" allowSort="flase" renderer="Sex" align="center">性别</div>
+                        <div field="" width="100%" headerAlign="center" allowSort="flase" align="center" renderer="Location">所在地</div>
+                        <div field="groupName" width="100" headerAlign="center" allowSort="flase" align="center">所在分组</div>
+                        <div field="createDate" width="150" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss" allowSort="flase"
+                             align="center">关注时间
+                        </div>
+                        <!--  <div field="" width="105" headerAlign="center" allowSort="true" renderer="renderOp" align="center">操作</div>-->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    mini.parse();
+
+    cmm = {
+        dataFlag: 1,
+        siteId: GLOBAL_SITEID
+    }
+    var grid = mini.get("datagrid1");
+    grid.load(cmm);
+
+    //重置 datagrid 高度
+    Ls.mini_datagrid_height(grid);
+
+
+    $(document).ready(function () {
+        initGroup();
+    })
+
+    function initGroup() {
+        Ls.ajaxGet({
+            url: "/weChat/userMgr/getGroups",
+            success: function (text) {
+                if (text.status == 1) {
+                    var gp = text.data;
+                    var htm = '<option value="">选择分组</option>';
+                    var mgroup = "";
+                    for (var i = 0; i < gp.length; i++) {
+                        htm += '<option value="' + gp[i].groupid + '">' + gp[i].name + '</option>';
+                        mgroup += '<li class="" onclick="moveTo(' + gp[i].groupid + ')"><a href="javascript:;">' + gp[i].name + '</a></li>';
+                    }
+                    $("#groupId").html(htm);
+                    $("#mgroup").html(mgroup);
+                } else {
+                    Ls.tipsErr("初始化分组失败");
+                }
+            }
+        });
+    }
+
+
+    function headImg(e) {
+        var str = "";
+        var rec = e.record;
+        str = '<img src="' + rec.headimgurl + '" height="36" width="36"/>';
+        return str;
+    }
+
+    function Sex(e) {
+        var str = "";
+        var rec = e.record.sex;
+        if (rec == 1) {
+            str = "男";
+        } else if (rec == 2) {
+            str = "女";
+        } else {
+            str = "-";
+        }
+        return str;
+    }
+
+    function Location(e) {
+        var str = "";
+        var rec = e.record;
+        str = (rec.city == null ? '' : rec.city) + " - " + (rec.province == null ? '' : rec.province) + " - " + (rec.country == null ? '' : rec.country);
+        return str;
+    }
+
+    //操作加载
+    function renderOp(e) {
+        var rec = e.record;
+        str = '<button id="adduser_btn" class="btn btn-default btn-sm btn-replace" onclick="sendMsg(\'' + rec.openid + '\')"> 移动组 </button> '
+        return str;
+    }
+
+
+    function search() {
+        var name = $("#searchKey").val();
+        var groupId = $("#groupId").val();
+        grid.load({nickname: name, groupid: groupId, dataFlag: 1});
+    }
+
+    //清除条件
+    searchClear = function () {
+        $("#searchKey").val("")
+        $("#groupId").val("");
+        grid.load({dataFlag: 1});
+    }
+    function onKeyEnter(e) {
+        search();
+    }
+
+    function synUsers() {
+        if (confirm("同步用户为异步操作，可能会导致数据丢失，请谨慎操作！")) {
+            Ls.ajaxGet({
+                url: "/weChat/userMgr/synUsers",
+                success: function (text) {
+                    if (text.status == 0) {
+                        Ls.tipsErr("调用同步失败");
+                    } else {
+                        Ls.tipsOk("已启动同步，请稍候刷新");
+                    }
+                }
+            });
+        }
+    }
+
+    function moveTo(gid) {
+        var rows = grid.getSelecteds();
+        if (rows.length > 0) {
+            var ids = [];
+            for (var i = 0, l = rows.length; i < l; i++) {
+                ids[i] = rows[i].openid;
+            }
+            grid.loading("操作中，请稍后......");
+            Ls.ajaxGet({
+                data: {ids: ids, groupid: gid},
+                url: "/weChat/userMgr/moveTo",
+                success: function (text) {
+                    if (text.errcode == 0) {
+                        grid.reload();
+                        Ls.tipsOk("移动成功");
+                    } else {
+                        Ls.tipsErr(text.errmsg);
+                    }
+                }
+            });
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+    function userGroup() {
+        Ls.openWin("/weChat/userMgr/userGroup", {
+            width: '650px',
+            height: '450px',
+            lock: true,
+            title: '用户组管理',
+        });
+    }
+</script>

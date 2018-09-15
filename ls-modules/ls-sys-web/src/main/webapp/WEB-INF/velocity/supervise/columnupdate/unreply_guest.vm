@@ -1,0 +1,111 @@
+#parse("_page_layout/_header.vm")
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;" >
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div id="datagrid" class="mini-datagrid" allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="" sizeList="[10,20,50]" pageSize="10"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="width:100%;height: 420px"
+                        >
+                    <div property="columns">
+                        <div type="checkcolumn" ></div>
+                        <div name="title" field="title" width="100%" align="left" headerAlign="center">留言内容</div>
+                        <div renderer="type" width="100" align="center" headerAlign="center">留言类型</div>
+                        <div name="personName" field="personName" width="50" align="center" headerAlign="center">留言人</div>
+                        <div name="receiveName" field="receiveName" width="150" align="center" headerAlign="center">接收单位</div>
+                        <div name="addDate" field="addDate" width="150" align="center" headerAlign="center" dateFormat="yyyy-MM-dd HH:mm:ss">留言时间</div>
+                        <div field="columnName" width="150" align="left" headerAlign="center">栏目名称</div>
+                        <div renderer="rspGuest" width="60" align="center" headerAlign="center">留言回复</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid:mini.get('datagrid'),
+        api:Ls.getWin.api,
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        resultId:Ls.getWin.dialog.data("resultId"),
+        siteId:Ls.getWin.dialog.data("siteId"),
+        columnId:Ls.getWin.dialog.data("columnId"),
+        record:Ls.getWin.dialog.data("record")
+    };
+
+    $(document).ready(function () {
+        cur.grid.setUrl("/unreply/guest/getPageEOs?columnId=" + cur.columnId + "&siteId=" + cur.siteId);
+        cur.grid.reload();
+    })
+
+    function rspGuest(e) {
+        var rec = e.record;
+        return '<button id="adduser_btn" class="btn btn-default btn-sm btn-edit" onclick="reply(' + rec.id + ',' + rec.contentId + ',' + rec.columnId + ','+ rec.guestId +')">回 复</button> ';
+    }
+
+    //后台打开回复弹窗
+    function reply(id,contentId, columnId,guestId) {
+        console.info(cur.record);
+        if(cur.record.taskType == 'messageBoard') {
+            Ls.openWin('/messageBoard/messageBoardReply?id=' + contentId + '&messageBoardId=' + guestId + '&columnId=' + columnId, '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0,
+                close: function (text) {
+                }
+            });
+        } else {
+            cur.reply_guest_id = id;
+            Ls.openWin('/unreply/guest/guestBookReply?id=' + contentId + '&&columnId=' + columnId, '600px', '380px', {
+                id: 'reply',
+                title: '回复留言',
+                padding: 0,
+                close: function (text) {
+                }
+            });
+        }
+
+    }
+    
+    function reply_guest_back() {
+        Ls.tips("回复成功!", {times: 2});
+        if(cur.reply_guest_id != null && cur.reply_guest_id != "") {
+            Ls.ajax({
+                url: "",
+                data: {
+                    id: cur.reply_guest_id,
+                    resultId:cur.resultId
+                },
+                success: function (resp) {
+                    if (resp.status == '1') {
+                        Ls.tips(resp.desc, {times: 2});
+                        cur.grid.reload();
+                    } else {
+                        Ls.tips(resp.desc, {icons: 'error', times: 2});
+                    }
+                }
+            })
+        }
+    }
+
+    function type(obj) {
+        var record = obj.record;
+        var type = record.type;
+        if(type == 0) {
+            return "咨询";
+        } else if(type == 1) {
+            return "投诉";
+        } else if(type == 2) {
+            return "建议";
+        } else {
+            return "其他";
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+
+        <div class="portlet light">
+            <div class="portlet-body">
+
+                <div class="table-toolbar">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="btn-group">
+                                <button id="deletes" class="btn btn-default btn-delete" onclick="deletesF()">批量删除</button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+
+                            <form class="form-inline tr search-toolbar" role="form">
+                                <div class="form-group">
+                                    <!--     <select id="fileType" class="form-control">
+                                        <option value="">全部</option>
+##                                        #foreach($tp in ${DICT})
+                                            <option value="$!tp.value">$!tp.key</option>
+##                                        #end
+                                    <!--  <label>搜索：</label>-->
+                                    <select id="recordStatus" class="form-control w110" onchange="search()" placeholder="状态">
+                                        <option value="Normal" selected>已使用</option>
+                                        <option value="Removed">未使用</option>
+                                    </select>
+                                    <input type="datetime" id="startDate"  class="form-control w140" placeholder="开始日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate: '#F{$dp.$D(\'endDate\')}',readOnly:true})"
+                                           readonly>
+                                    <input type="datetime" id="endDate" class="form-control w140" placeholder="结束日期"
+                                           onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',minDate: '#F{$dp.$D(\'startDate\')}',readOnly:true})"
+                                           readonly>
+                                    <input type="text" id="searchKey" name="searchKey" class="form-control w120" placeholder="关键词">
+                                </div>
+                                <button type="button" class="btn btn-default btn-search" onclick="search()">搜索</button>
+                                <button type="button" class="btn btn-default" onclick="searchClear()">显示全部</button>
+                                <div style="float:right;" title="视图切换" class="hand ml8" id="showStatus">
+                                    <img height="34" width="74" src="$!{sysStaticPath}/assets/images/showList.png"/>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="doc-manage">
+                    <div id="doc_list_body">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="$!{rc.contextPath}/assets/js/pages/bbs_file.js"></script>
+<script type="text/javascript">
+    mini.parse();
+    $(document).ready(function () {
+        cur.showStatus = 1;
+        file_manage.init();
+    })
+
+    function msOver(id) {
+        $("#tr_" + id).find("#opr_" + id).removeClass("hide");
+    }
+
+    function msOut(id) {
+        $("#tr_" + id).find("#opr_" + id).addClass("hide");
+    }
+
+    function itemLink(e) {
+        var link = "";
+        var rec = e.record;
+        link = '<a href="javascript:;" onclick="dictItemList(' + rec.dictId + ');"><u>' + rec.name + '</u></a>';
+        return link;
+    }
+
+    function downloadFile(mongoId) {
+        $('#download_frame').attr("src", "/bbsFile/download/" + mongoId);
+    }
+
+    function setTypeImg() {
+        if (cur.showStatus == 2) {
+            imgHtml = "";
+            cur.pageIndex = 0;
+        }
+    }
+
+
+    function deleteFile(id) {
+        var ids = [];
+        ids.push(id);
+        if (confirm("确认删除吗？删除后将无法恢复。")) {
+            var tips = Ls.tips("正在删除...", {icons: "loading", autoClose: false});
+            Ls.ajax({
+                data: {
+                    ids: ids.join(","),
+                    isDel:1
+                },
+                url: "/bbsFile/deleteFiles",
+                success: function (text) {
+                    if (text.status == 0) {
+                        tips.hide();
+                        Ls.tipsErr(text.desc);
+                    } else {
+                        tips.hide();
+                        Ls.tipsOk("删除成功");
+                        setTypeImg();
+                        file_manage.getData(cur);
+                    }
+
+                }
+            });
+        }
+    }
+
+    function deletesF() {
+        var rows = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            rows.push(val.value);
+        });
+        if (rows.length > 0) {
+            if (confirm("确认删除吗？删除后将无法恢复。")) {
+                var tips = Ls.tips("正在删除...", {icons: "loading", autoClose: false});
+                Ls.ajax({
+                    data: {
+                        ids: rows.join(","),
+                        isDel:1
+                    },
+                    url: "/bbsFile/deleteFiles",
+                    success: function (text) {
+                        if (text.status == 0) {
+                            tips.hide();
+                            Ls.tipsErr(text.desc);
+                        } else {
+                            tips.hide();
+                            Ls.tipsOk("删除成功");
+                            setTypeImg();
+                            file_manage.getData(cur);
+                        }
+                    }
+                });
+            }
+        } else {
+            Ls.tipsInfo("请选中一条记录！");
+        }
+    }
+
+
+    function checkAll() {
+        if ($("#checkAll").is(':checked')) {
+            $("input[name='check']").prop("checked", true);
+            $(".imgBox").removeClass("unCheckImg");
+            $(".imgBox").addClass("checkImg");
+            $(".showCk").removeClass("unCheckFile");
+            $(".showCk").addClass("checkFile");
+            $(".showCk").removeClass("hide");
+            getCheckNum();
+            return;
+        } else {
+            $("input[name='check']").prop("checked", false);
+            $(".imgBox").removeClass("checkImg");
+            $(".imgBox").addClass("unCheckImg");
+            $(".showCk").removeClass("checkFile");
+            $(".showCk").addClass("unCheckFile");
+            $(".showCk").addClass("hide");
+            getCheckNum();
+            return;
+        }
+    }
+
+
+    function getMoreImg() {
+        cur.pageIndex += 1;
+        file_manage.getData();
+    }
+
+    function checkImg(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("checkImg");
+            $("#img_" + id).addClass("unCheckImg");
+            $("#" + mongoId).prop("checked", false);
+            $("#showCk_" + id).removeClass("unCheckFile");
+            $("#showCk_" + id).addClass("checkFile");
+            $("#showCk_" + id).addClass("hide");
+        } else {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#" + mongoId).prop("checked", true);
+            $("#showCk_" + id).removeClass("unCheckFile");
+            $("#showCk_" + id).addClass("checkFile");
+        }
+        getCheckNum();
+    }
+
+    function hideCheckBox(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+        } else {
+            $("#img_" + id).removeClass("checkImg");
+            $("#img_" + id).addClass("unCheckImg");
+            $("#showCk_" + id).removeClass("checkFile");
+            $("#showCk_" + id).addClass("unCheckFile");
+            $("#showCk_" + id).addClass("hide");
+        }
+    }
+
+    function showCheckBox(id, mongoId) {
+        if ($("#" + mongoId).is(':checked')) {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#showCk_" + id).removeClass("hide");
+        } else {
+            $("#img_" + id).removeClass("unCheckImg");
+            $("#img_" + id).addClass("checkImg");
+            $("#showCk_" + id).removeClass("hide");
+        }
+    }
+
+    function getCheckNum() {
+        var rows = [];
+        $("input[name='check']:checked").each(function (i, val) {
+            rows.push(val.value);
+        })
+        if (rows.length > 0) {
+            $("#checkNum").html(" 已选中" + rows.length + "个文件");
+        } else {
+            $("#checkNum").html("");
+        }
+    }
+
+    function search() {
+        cur.fileName = $("#searchKey").val();
+        cur.startDate = $("#startDate").val();
+        cur.endDate = $("#endDate").val();
+        cur.recordStatus = $("#recordStatus").val();
+        imgHtml ='';
+        file_manage.getData(cur);
+    }
+
+    function palyVideo(id) {
+        Ls.openWin("/fileCenter/playVideo?id=" + id, '550px', '400px', {
+                    id: 'palyVideo_fileCenter',
+                    title: "视频播放"
+                }
+        )
+    }
+
+    //清除条件
+    var searchClear = function () {
+        $("#searchKey").val("")
+        cur.fileName = "";
+        $("#startDate").val("");
+        cur.startDate = "";
+        $("#endDate").val("");
+        cur.endDate = "";
+        cur.pageIndex = 0;
+        setTypeImg();
+        file_manage.getData(cur);
+    }
+
+    function onKeyEnter(e) {
+        search();
+    }
+
+    $("#showStatus").click(function () {
+        if (cur.showStatus == 1) {
+            cur.showStatus = 2;
+            setTypeImg();
+            file_manage.getData(cur);
+            $("#showStatus").find("img").attr("src", "$!{sysStaticPath}/assets/images/showThumb.png");
+        } else {
+            cur.showStatus = 1;
+            setTypeImg();
+            file_manage.getData(cur);
+            $("#showStatus").find("img").attr("src", "$!{sysStaticPath}/assets/images/showList.png");
+        }
+    })
+
+</script>

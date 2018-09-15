@@ -1,0 +1,169 @@
+#parse("_page_layout/_header.vm")
+<style>
+    #style_containel {
+        /*height: 500px;*/
+        width: 590px;
+        float: right;
+        padding-bottom: 0px;
+        padding-left: 10px;
+        margin-bottom: 0px;
+        margin-left: 7px;
+        border-left: 1px solid #e0e0e0;
+    }
+
+    #check-group {
+        border: 1px solid #e0e0e0;
+        overflow-y: auto;
+        height: 260px;
+        background-color: #fff;
+    }
+
+    #check-group .check-inline {
+        padding: 2px 7px;
+        margin: 2px 0px 0px 0px;
+        min-width: 50%;
+        float: left;
+        color: #444;
+        /*overflow: hidden;*/
+        /*height: 2.3em;*/
+    }
+
+    #check-group .check-inline:hover {
+        background-color: #f0f0f0;
+        text-shadow: 1px 2px 2px #ccc;
+    }
+
+    #check-group .check-inline input {
+        margin-right: 5px;
+    }
+
+    label.radio-inline {
+        min-width: 50px;
+    }
+</style>
+</head>
+<!-- END HEAD -->
+<body class="page-body-white">
+
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <!-- BEGIN SAMPLE FORM PORTLET-->
+        <div class="portlet light" style="width: 100%;float: left;padding-bottom: 3px;">
+            <div class="portlet-body form" style="padding-top: 0;">
+                <form class="clearfix" id="pageStyle_form" role="form" ms-controller="pageStyle_form">
+                    <div class="form-body form-panel" style="float:left;width: 340px;">
+                        <div class="form-group">
+                            <label>样式名称</label>
+                            <input type="text" id="name" name="name" class="form-control" maxlength="20" data-rule="必填项:required;name" placeholder="填写样式名称" ms-duplex="name">
+                        </div>
+
+                        <div class="form-group">
+                            <label>页面宽度</label>
+                            <input type="text" id="width" name="width" class="form-control" maxlength="100" data-rule="必填项:required;width" placeholder="填写页面宽度" ms-duplex="width">
+                        </div>
+
+                        <div class="form-group">
+                            <label>是否为基础样式</label>
+
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="isBase" value="1" ms-duplex-string="isBase"> 是</label>
+                                <label class="radio-inline"><input type="radio" name="isBase" value="0" ms-duplex-string="isBase"> 否 </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>是否启用</label>
+                            <div class="radio-group">
+                                <label class="radio-inline"><input type="radio" name="useAble" value="1" ms-duplex-string="useAble">启用</label>
+                                <label class="radio-inline"><input type="radio" name="useAble" value="0" ms-duplex-string="useAble">禁用</label>
+                            </div>
+                        </div>
+                        <div class="form-group" ms-if="isBase!=1">
+                            <label>应用到模型</label>
+                            <div id="check-group">
+                                #foreach($modelItem in $models)
+                                    <label class="check-inline" title="$!modelItem.name"><input type="checkbox" name="modelCode" ms-duplex="styleModelConfig"
+                                                                                                value="$!modelItem.code">$!modelItem.name</label>
+                                #end
+                            </div>
+                        </div>
+                    </div>
+                    <div id="style_containel" class="form-panel form-group">
+                        <div class="note note-info">
+                            <h4 class="alert-heading">温馨提示：</h4>
+                            <h5 class="block">字体统一使用英文名称，详见参考 <a href="http://www.zhangxinxu.com/study/201703/font-family-chinese-english.html
+" target="_blank" style="text-decoration: underline;">"CSS 字体中英文名称对照表"</a></h5>
+                        </div>
+                        <textarea id="style" name="style" class="form-control" style="height:78%;resize: none;" data-rule="必填项:required;style" placeholder="请填写样式"
+                                  ms-duplex="style"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div region="south" height="57" splitSize="0" showHeader="false" allowResize="false" showSplit="false"
+         style="border:none; border-top: solid 1px #E9EDEF; overflow:hidden;">
+        <div class="pd10 tr">
+            <button type="button" class="btn btn-default btn-save" onclick="save()">保 存</button>
+            <button type="button" class="btn btn-default btn-reset" onclick="cancel()">取 消</button>
+        </div>
+    </div>
+</div>
+    #parse("_page_layout/_footer.vm")
+<script>
+    var cur = {
+        vm_id: 'pageStyle_form',
+        win: Ls.getWin.win,
+        dialog: Ls.getWin.dialog,
+        model: $!{itemJson}
+    }
+    //$(".form-panel").height(document.body.offsetHeight - 80);
+    $("#style_containel").width(document.body.offsetWidth - 360 - 75);
+    $("#check-group").height(document.body.offsetHeight - 80 - 300 + 15);
+    $("#style").height(600 - $(".note").outerHeight(true) - 140);
+
+    $(document).ready(function () {
+        setData(cur.model);
+    })
+
+    //拉取数据
+    function setData(obj) {
+        cur.vm = avalon.vmodels[cur.vm_id];
+        data = obj;
+        if (cur.vm) {
+            Ls.assignVM(cur.vm, data);
+        } else {
+            data.$id = cur.vm_id;
+            cur.vm = avalon.define(data);
+        }
+        avalon.scan($("#" + cur.vm_id).get(0), cur.vm);
+    }
+
+    function save() {
+
+        if (!$('#pageStyle_form').isValid()) {
+            return;
+        }
+        var data = Ls.toJSON(cur.vm.$model);
+        data.modelConfig = data.styleModelConfig;
+        data.styleModelConfig = null;
+        Ls.ajaxGet({
+            url: "/pageStyle/save",
+            data: data,
+            success: function (resp) {
+                if (resp.status == '1') {
+                    cur.win.success_save_callback(resp.desc);
+                    Ls.winClose();
+                } else {
+                    Ls.tipsErr(resp.desc, {times: 2});
+                }
+            }
+        });
+    }
+
+    function cancel() {
+        Ls.winClose();
+    }
+</script>
+</body>
+</html>

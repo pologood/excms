@@ -1,0 +1,72 @@
+#if("list" == "$!{paramObj.action}")
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gzy_table">
+    #foreach($eo in $resultObj)
+    <tr #if($velocityCount%2 == 0) class="even" #end>
+        #if("$!{paramObj.type}"=="3")
+            <td class="t1">#date_format("$!{eo.workDate}","yyyy-MM-dd")</td>
+            <td class="t2">$!{eo.leaders.organName}</td>
+            <td class="t3">$!{eo.leaders.post}</td>
+            <td class="t3">$!{eo.leaders.leadersName}</td>
+            <td class="t4">$!{eo.jobContent}</td>
+##            <td class="t5">$!{eo.remark}</td>
+        #else
+            <td class="t1">#date_format("$!{eo.workDate}","yyyy-MM-dd")</td>
+            <td class="t2">$!{eo.leaders.post}</td>
+            <td class="t3">$!{eo.leaders.leadersName}</td>
+            <td class="t4">$!{eo.jobContent}</td>
+            <td class="t5">$!{eo.remark}</td>
+        #end
+    </tr>
+	#end
+	</table>
+#else
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gzy_table">
+	<tr class="gzy_tit">
+      <th class="h1">时 间</th>
+      <th class="h2">职 务</th>
+      <th class="h3">姓 名</th>
+      <th class="h4">工作安排</th>
+      <th class="h5">备 注</th>
+    </tr>
+	#set($workData=$resultObj.data)
+	#if($workData && $workData.size() > 0)
+    #foreach($eo in $workData)
+    <tr #if($velocityCount%2 == 0) class="even" #end>
+        <td class="t1">#date_format("$!{eo.workDate}","yyyy-MM-dd")</td>
+        <td class="t2">$!{eo.leaders.post}</td>
+        <td class="t3">$!{eo.leaders.leadersName}</td>
+        <td class="t4">$!{eo.jobContent}</td>
+        <td class="t5">$!{eo.remark}</td>
+    </tr>
+	#end
+	#end
+	</table>
+	#if($!{resultObj.pageCount} > 1)
+	<div id="page_public_work_info" class="pagination">分页</div>
+    <script>
+    Ls.pagination("#page_public_work_info", function(pageIndex){
+    	Ls.ajax({
+    		dataType: "html",
+    		url: "/site/label/8888?labelName=publicWorksList",
+    		data : {
+    			siteId : "$!{context.siteId}",
+    			pageSize : "$!{paramObj.pageSize}",
+    			pageIndex : pageIndex,
+    			action : "$!{paramObj.action}",
+    			organId: "$!{paramObj.organId}",
+    			exclude: "$!{paramObj.exclude}",
+    			result : "$!{paramObj.result}",
+    			divId : "$!{paramObj.divId}"
+    		}
+        }).done(function(html) {
+    		$("#$!{paramObj.divId}").html(html);
+    	});
+    }, {
+        currPage: ($!{resultObj.pageIndex}+1),
+        pageCount:$!{resultObj.pageCount},
+        param: "pageSize=$!{paramObj.pageSize}"
+    });
+    </script>
+    <div class="clear"></div>
+	#end
+#end

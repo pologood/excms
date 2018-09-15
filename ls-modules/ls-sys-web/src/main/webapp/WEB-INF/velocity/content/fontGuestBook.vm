@@ -1,0 +1,257 @@
+#set($_title="留言 - EX8智慧云站群")
+#parse("_page_layout/_header.vm")
+	</head>
+<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td height="10"> </td></tr></table>
+</ul> 
+     </div>
+
+ <form name="regform"  method="post" action="/guestBook/save">
+        
+        <div class="message_input">
+        	<span><font>*</font> 站点：</span>  
+            <select name="siteId" id="siteId" class="message_select">
+        
+            <option value="386">中国合肥</option>
+          
+          </select>
+        </div>
+        
+        <div class="message_input">
+        	<span><font>*</font> 栏目：</span>  
+            <select name="columnId" id="columnId" class="message_select">
+        
+            <option value="13597">留言管理</option>
+          
+          </select>
+        </div>
+        
+        <div class="message_input">
+        	<span><font>*</font> 所属类型：</span>  
+            <select name="typeCode" id="typeCode" class="message_select">
+        
+            <option value="guestbook">留言</option>
+          
+          </select>
+        </div>
+        
+        
+          
+        <div class="message_input">
+        	<span><font>*</font> 收信单位：</span>            
+            <select name="receiveId" id="receiveId" class="message_select">
+				  
+                <option value="15005">发改委</option>
+				
+                <option value="13">经信委</option>
+				
+                <option value="14">商务局</option>
+				
+                <option value="15">财政局</option>
+				
+                <option value="16">审计局</option>
+				
+                <option value="17">人社局</option>
+				
+                <option value="18">住建局</option>
+				
+                <option value="19">房管局</option>
+				
+                <option value="21">国土局</option>
+				
+                <option value="22">公安局</option>
+				
+                <option value="23">交通局</option>
+				
+                <option value="24">科技局</option>
+				
+                <option value="25">教育局</option>
+				
+                <option value="26">文广新局</option>
+				
+                <option value="27">卫计委</option>
+				
+                <option value="28">县农委</option>
+				
+                <option value="30">林业局</option>
+				
+                <option value="31">水利局</option>
+				
+                <option value="32">统计局</option>
+				
+                <option value="33">环保局</option>
+				
+                <option value="34">粮食局</option>
+				
+                <option value="35">供销社</option>
+				
+                <option value="126">城管局</option>
+				
+                <option value="36">民政局</option>
+				
+                <option value="37">安监局</option>
+				
+                <option value="40">地税局</option>
+				
+                <option value="41">司法局</option>
+				
+                <option value="43">物价局</option>
+				
+                <option value="45">医保中心</option>
+				
+                <option value="49">体育局</option>
+				
+                <option value="51">度假区</option>
+				
+                <option value="52">新农合办</option>
+				
+                <option value="54">农机局</option>
+				
+                <option value="56">金融办</option>
+				
+                <option value="58">城关镇</option>
+				
+                <option value="59">桃溪镇</option>
+				
+                <option value="60">千人桥镇</option>
+				
+                <option value="61">杭埠镇</option>
+				
+                <option value="62">百神庙镇</option>
+				
+                <option value="63">南港镇</option>
+				
+                <option value="64">舒茶镇</option>
+				
+                <option value="65">春秋乡</option>
+				
+                <option value="66">干汊河镇</option>
+				
+                <option value="67">柏林乡</option>
+				
+                <option value="68">万佛湖镇</option>
+				
+                <option value="69">五显镇</option>
+				
+                <option value="70">阙店乡</option>
+				
+                <option value="71">张母桥镇</option>
+				
+                <option value="72">棠树乡</option>
+				
+                <option value="73">河棚镇</option>
+				
+                <option value="74">汤池镇</option>
+				
+                <option value="75">庐镇乡</option>
+				
+                <option value="76">晓天镇</option>
+				
+                <option value="77">山七镇</option>
+				
+                <option value="79">高峰乡</option>
+				
+                <option value="78">开发区</option>
+				
+                <option value="80">招投标局</option>
+				
+                <option value="81">公积金</option>
+				
+                <option value="82">旅游局</option>
+				
+                <option value="84">宗教局</option>
+				
+                <option value="85">县残联</option>
+				
+                <option value="87">人防办</option>
+				
+                <option value="88">消防大队</option>
+				
+                <option value="89">信访局</option>
+				
+                <option value="90">气象局</option>
+				
+                <option value="92">供电公司</option>
+				
+                <option value="94">重点局</option>
+				
+                <option value="104">地方志办公室</option>
+				
+                <option value="106">市场监管局</option>
+				
+                <option value="116">地震局</option>
+				
+                <option value="119">自来水公司</option>
+				
+                <option value="120">档案局</option>
+				
+           </select> 
+        </div>
+        
+        
+        <div class="message_input">
+        	<span><font>*</font> 信件类型：</span>  
+        <select name="type" id="type" class="message_select">
+        
+          <option value="0">我要咨询</option>
+          <option value="1">我要投诉</option>
+          <option value="2">我要建议</option>
+          <option value="3">我要举报</option>
+          <option value="4">其他</option>
+        
+          </select>
+        </div>
+        
+         
+        <div class="message_input">
+        	<span><font>*</font> 您的姓名：</span>            
+            <input name="personName" id="personName" type="text" class="txtinput" maxlength="10" />   
+         
+        </div>         
+        </div>
+        
+        
+        
+        <div class="message_input">
+        	<span><font>*</font> 联系电话：</span>
+            <input name="personPhone" id="personPhone" type="text" class="txtinput"  />
+            
+        </div> 
+        </div> 
+        
+        <div class="message_input"  style="display:none" >
+        	<span>&nbsp;&nbsp;联系地址：</span>
+            <input name="m_address" id="m_address" type="text" maxlength="25" class="txtinput"/>
+        </div>
+            
+        <div class="message_input">
+        	<span><font>*</font> 信件标题：</span>
+     <input name="title" id="title" type="text" class="txtinput" maxlength="50" />
+     
+          
+        </div>
+        <div class="message_textarea">
+        	<span><font>*</font> 主题内容：</span>
+            <textarea name="guestBookContent" cols="52" rows="15" id="guestBookContent" maxlength="200" class="txtone" ></textarea>
+            
+        </div>
+        </div>  
+        
+        <div class="message_input">
+        	<span><font>*</font> 是否愿意：</span>
+            <input name="showMark" type="radio" value="1" checked>
+            公开
+            <label>
+            <input type="radio" name="showMark" value="0">
+              不公开</label>
+        </div>
+
+      
+        </div>
+       
+        
+		<input type="submit" value="提交" />
+        </form>
+
+
+</div>
+

@@ -1,0 +1,51 @@
+#set($Integer=0)
+#set($length="$!{paramObj.length}")
+#set($isDate="$!{paramObj.isDate}")
+#set($isColumn="$!{paramObj.isColumn}")
+#set($isLine="$!{paramObj.isLine}")
+#set($isHit="$!{paramObj.isHit}")
+#set($length=$Integer.parseInt($length))
+#set($lineCount=$Integer.parseInt("$!{paramObj.lineCount}"))
+#if($resultObj.data.size()>0)
+<ul class="doc_list list-$!{context.columnId}">
+    #foreach($eo in $resultObj.data)
+        #set($css="even")
+        #if($velocityCount%2 == 1)
+            #set($css="odd")
+        #end
+        <li class="$!{css}">
+            <a href="$!{eo.redirectLink}" target="_blank" title="#filterHtml($!{eo.title})" class="left">
+                #set($new_length=$!{length})
+                #set($title=$!{eo.title})
+                <span style='$style'>#cutstr("#filterHtml($title)",$new_length)</span>
+            </a>
+            #if("$isHit"=="true")<span class="right hit">[$!{eo.hit}]</span>#end
+            #if("$isDate"=="true")<span class="right date">#date_format("$!{eo.publishDate}","$!{paramObj.dateFormat}")</span>#end
+        </li>
+        #if("${isLine}"=="true")
+            #if($velocityCount>0 && $velocityCount%$lineCount == 0)
+                #if("$!{paramObj.isPage}"=="false")
+                    <li class="lm_line add"></li>
+                #else
+                    <li class="lm_line"></li>
+                #end
+            #end
+        #end
+
+    #end
+</ul>
+    #if($!{resultObj.pageCount}>1 && "$!{paramObj.isPage}"!="false")
+    <div id="page_$!{context.columnId}" class="pagination">分页</div>
+    <script>
+        Ls.pagination("#page_$!{context.columnId}", function (pageIndex) {
+            location.href = '$!{resultObj.linkPrefix}?pageIndex=' + pageIndex;
+        }, {
+            isTotal: true,
+            total: $!{resultObj.total},
+            currPage: ($!{resultObj.pageIndex}+1),
+            pageCount:$!{resultObj.pageCount},
+            param: "pageSize=$!{paramObj.pageSize}"
+        });
+    </script>
+    #end
+#end

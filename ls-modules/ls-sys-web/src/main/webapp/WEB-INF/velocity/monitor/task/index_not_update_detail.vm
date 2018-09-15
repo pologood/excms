@@ -1,0 +1,79 @@
+#parse("_page_layout/_header.vm")
+<style>
+    .alert-success {
+        background-color: #e2f9fb;
+        border-color: #e2f9fb;
+        color: #333;
+    }
+    .red{
+        color: red;
+    }
+</style>
+</head>
+<body class="page-body-white">
+<div id="ui_layout" class="mini-layout" style="width:100%;height:100%;">
+    <div region="center" style="border:none; overflow: auto;">
+        <div class="portlet light">
+            <div class="portlet-body form">
+                <div class="alert alert-success">
+                    <p><strong>考察点：</strong>首页栏目信息更新情况。如首页仅为网站栏目导航入口，则检查所有二级页面栏目信息的更新情况。</p>
+                    <p><strong>普查扣分细则：</strong>监测时间点前2周内，首页栏目无信息更新的，即单项否决。</p>
+                    <p><strong>本站监测扣分细则：</strong>监测时间点前【<span id="monitoredNum">$!{monitoredNum}</span>】<span id="monitoredTimeType">$!{monitoredTimeType}</span>内，首页栏目更新量少于【<span id="standardCode">$!{num}</span>】篇，即单项否决。</p>
+                </div>
+                <div>小计：首页栏目<span class="red">$!{total}</span>个；监测点前2周内，首页栏目未更新的：<span class="red">$!{notUpdate}</span>个</div>
+                <div id="datagrid" class="mini-datagrid"  allowCellSelect="false" onlyCheckSelection="true" allowResize="true"
+                     url="/monitor/index/manage/getIndexNotUpdatePage?dataFlag=1" showPager="true"
+                     idField="id" multiSelect="true" showColumnsMenu="true" style="height:450px;">
+                    <div property="columns">
+                        <div field="columnType" width="200" align="center" headerAlign="center" renderer="columnType" >栏目类型</div>
+                        <div field="columnName" width="240" align="left" headerAlign="center"  renderer="columnName" >栏目名称</div>
+                        <div field="updateCount" width="150" align="center" headerAlign="center" >更新数量</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+#parse("_page_layout/_footer.vm")
+<script>
+    mini.parse();
+    var cur = {
+        grid: mini.get('datagrid'),
+        dialog:Ls.getWin.dialog,
+        params: {
+            monitorId:Ls.getWin.dialog.data("monitorId")
+        }
+    }
+
+    $(document).ready(function () {
+        cur.grid.load({monitorId:cur.params.monitorId});
+    })
+
+    function columnType(obj) {
+        var rec = obj.record;
+        var columnType = rec.columnType;
+        var columnTypeName = '';
+        switch(columnType){
+            case 'columnType_index': columnTypeName = '首页栏目';break;
+            case 'columnType_update': columnTypeName = '应更新栏目';break;
+            case 'columnType_DTYW': columnTypeName = '动态、要闻类栏目';break;
+            case 'columnType_TZZC': columnTypeName = '通知公告、政策文件类栏目';break;
+            case 'columnType_RSGH': columnTypeName = '人事、规划计划类栏目';break;
+            case 'columnType_BLANK': columnTypeName = '空白栏目';break;
+            default:columnTypeName="其他栏目";
+        }
+
+        return columnTypeName;
+
+    }
+
+    function columnName(obj) {
+        var rec = obj.record;
+        var columnName = rec.columnName;
+        var columnUrl = rec.columnUrl;
+
+        return "<a target='_blank' href='"+columnUrl+"' title='"+columnName+"' >"+columnName+"</a>";
+
+    }
+</script>
