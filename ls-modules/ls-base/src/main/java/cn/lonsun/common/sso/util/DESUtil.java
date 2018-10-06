@@ -15,11 +15,6 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * DES加密与解密
- *
- * @author xujh
- * @version 1.0
- * 2015年2月3日
- *
  */
 public class DESUtil {
 	// 算法名称

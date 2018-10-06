@@ -2,11 +2,6 @@ package cn.lonsun.common.sso.vo;
 
 /**
  * 保存登陆后的信息
- *
- * @author xujh
- * @version 1.0
- * 2015年1月26日
- *
  */
 public class UserVO {
 

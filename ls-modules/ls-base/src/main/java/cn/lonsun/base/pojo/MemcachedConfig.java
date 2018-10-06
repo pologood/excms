@@ -2,11 +2,6 @@ package cn.lonsun.base.pojo;
 
 /**
  * Memcached配置信息
- *
- * @author xujh
- * @version 1.0
- * 2015年4月6日
- *
  */
 public class MemcachedConfig {
 	

@@ -5,11 +5,6 @@ import cn.lonsun.core.util.SpringContextHolder;
 
 /**
  * 对称加密key
- *
- * @author xujh
- * @version 1.0
- * 2015年2月3日
- *
  */
 public class EncryptKey {
 

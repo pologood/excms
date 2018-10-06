@@ -28,11 +28,6 @@ import cn.lonsun.core.util.SessionUtil;
 
 /**
  * 单点登录控制器
- *
- * @author xujh
- * @version 1.0
- * 2015年1月22日
- *
  */
 @Controller
 @RequestMapping(value = "sso", produces = {"application/json;charset=UTF-8"})

@@ -13,11 +13,6 @@ import cn.lonsun.core.util.SpringContextHolder;
 
 /**
  * 用户session缓存
- *
- * @author xujh
- * @version 1.0
- * 2015年1月22日
- *
  */
 public class HttpSessionCache extends ACache<HttpSession> {
 	

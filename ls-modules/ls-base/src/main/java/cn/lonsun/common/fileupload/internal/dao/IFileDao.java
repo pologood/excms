@@ -10,10 +10,6 @@ import cn.lonsun.common.fileupload.internal.entity.FileEO;
 import cn.lonsun.core.base.dao.IBaseDao;
 
 import java.util.List;
-
-/**
- * Created by Administrator on 2014-12-3.
- */
 public interface IFileDao extends IBaseDao<FileEO> {
 
     List<FileEO> getFilesByIds(Long[] fileIds);

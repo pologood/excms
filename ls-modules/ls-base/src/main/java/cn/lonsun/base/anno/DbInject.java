@@ -1,11 +1,6 @@
 package cn.lonsun.base.anno;
 
 import java.lang.annotation.*;
-
-/**
- * @author gu.fei
- * @version 2016-07-14 11:16
- */
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

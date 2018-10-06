@@ -7,11 +7,6 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Session管理容器
- *
- * @author xujh
- * @version 1.0
- * 2015年1月26日
- *
  */
 public class SessionConcurrentMap {
 	//当前用户在Map中存储的key

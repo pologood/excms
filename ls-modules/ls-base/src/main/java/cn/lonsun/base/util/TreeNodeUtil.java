@@ -5,11 +5,6 @@ import cn.lonsun.common.vo.TreeNodeVO.Type;
 
 /**
  * 树展示组织架构工具
- *
- * @author xujh
- * @version 1.0
- * 2015年1月31日
- *
  */
 public class TreeNodeUtil {
 

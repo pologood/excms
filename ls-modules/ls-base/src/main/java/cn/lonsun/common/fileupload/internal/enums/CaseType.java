@@ -3,9 +3,6 @@ package cn.lonsun.common.fileupload.internal.enums;
 
 /**
  *文件所属实体类型
- *@date 2014-12-3 13:50  <br/>
- *@author zhusy  <br/>
- *@version v1.0  <br/>
  */
 public enum CaseType {
 

@@ -2,8 +2,6 @@ package cn.lonsun.common.enums;
 
 /**
  * 角色编码
- *
- * Created by yy on 2014-12-5.
  */
 public enum RoleCodes {
 	system_admin,//系统管理员

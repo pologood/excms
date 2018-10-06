@@ -39,9 +39,6 @@ import java.util.Map.Entry;
 
 /**
  * http连接池 ADD REASON. <br/>
- *
- * @author fangtinghua
- * @date: 2016年1月13日 上午8:57:13 <br/>
  */
 public class HttpClientUtils {
 

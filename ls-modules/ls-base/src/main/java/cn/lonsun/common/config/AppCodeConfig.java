@@ -1,9 +1,3 @@
-/**
- *TODO          <br/>
- *@date 2014-11-15 11:27  <br/> 
- *@author zhusy  <br/>
- *@version v1.0  <br/>
- */
 package cn.lonsun.common.config;
 
 import java.io.IOException;
@@ -12,14 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-/**
- * Created by zsy on 2014-11-15.
- */
 public class AppCodeConfig {
-
-
-
-
 
     public static Map<String,String> propertiesMap;
 

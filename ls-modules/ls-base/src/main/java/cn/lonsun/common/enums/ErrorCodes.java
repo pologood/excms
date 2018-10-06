@@ -2,11 +2,6 @@ package cn.lonsun.common.enums;
 
 /**
  * 系统错误编码
- *
- * @author xujh
- * @version 1.0
- * 2015年2月3日
- *
  */
 public enum ErrorCodes {
 	Unlogin("-100"),//未登录

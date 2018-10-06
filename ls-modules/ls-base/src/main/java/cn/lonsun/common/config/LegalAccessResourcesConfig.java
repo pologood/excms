@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-/**
- * Created by zsy on 2014-11-15.
- */
 public class LegalAccessResourcesConfig{
 
 

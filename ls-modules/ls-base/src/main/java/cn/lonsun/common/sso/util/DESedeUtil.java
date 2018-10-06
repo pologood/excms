@@ -9,11 +9,6 @@ import org.apache.commons.codec.binary.Base64;
 
 /**
  * DESede对称加密算法
- *
- * @author xujh
- * @version 1.0
- * 2015年2月3日
- *
  */
 public class DESedeUtil {
 	/**

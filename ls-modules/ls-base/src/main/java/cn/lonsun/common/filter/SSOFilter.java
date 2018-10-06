@@ -15,11 +15,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-/**
- * @author zhusy
- * @version V1.0
- * @date 2014年9月26日 上午11:09:18
- */
 public class SSOFilter implements Filter {
 
     private Logger logger = LoggerFactory.getLogger(getClass());

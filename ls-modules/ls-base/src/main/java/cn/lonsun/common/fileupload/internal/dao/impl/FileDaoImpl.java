@@ -18,9 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Administrator on 2014-12-3.
- */
 @Repository("fileDao")
 public class FileDaoImpl extends BaseDao<FileEO> implements IFileDao {
 
